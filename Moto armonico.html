@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulazione Moto Circolare e Armonico</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .canvas-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        canvas {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+            display: block;
+            width: 100%;
+        }
+        
+        .controls {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: inline-block;
+            width: 200px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input[type="range"] {
+            width: 200px;
+            vertical-align: middle;
+        }
+        
+        .value-display {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+            font-family: monospace;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .toggle-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .toggle-btn {
+            background: #e0e0e0;
+            color: #333;
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+        
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-box {
+            width: 30px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #333;
+        }
+        
+        .info-panel {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-top: 20px;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        
+        .info-panel p {
+            margin: 8px 0;
+            line-height: 1.6;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Simulazione Moto Circolare Uniforme e Moto Armonico</h1>
+        <p class="subtitle">Visualizzazione dei vettori posizione, velocità e accelerazione - Proiezione sull'asse x</p>
+        
+        <div class="canvas-container">
+            <div>
+                <h3 style="text-align: center; color: #667eea;">Moto Circolare e Proiezione Armonica</h3>
+                <canvas id="circleCanvas" width="600" height="600"></canvas>
+            </div>
+            <div>
+                <h3 style="text-align: center; color: #667eea;">Grafici Temporali (Moto Armonico)</h3>
+                <canvas id="graphCanvas" width="600" height="600"></canvas>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <h3 style="margin-top: 0; color: #667eea;">⚙️ Controlli della Simulazione</h3>
+            
+            <div class="control-group">
+                <label>Raggio (r):</label>
+                <input type="range" id="radiusSlider" min="50" max="200" value="150" step="10">
+                <span class="value-display" id="radiusValue">150 px</span>
+            </div>
+            
+            <div class="control-group">
+                <label>Velocità Angolare (ω):</label>
+                <input type="range" id="speedSlider" min="0.5" max="5" value="2" step="0.1">
+                <span class="value-display" id="speedValue">2.0 rad/s</span>
+            </div>
+            
+            <div class="control-group">
+                <label>Scala Vettori:</label>
+                <input type="range" id="scaleSlider" min="0.5" max="3" value="1" step="0.1">
+                <span class="value-display" id="scaleValue">1.0×</span>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button id="playPauseBtn">⏸️ Pausa</button>
+                <button id="resetBtn">🔄 Reset</button>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="margin-bottom: 10px; color: #667eea;">📐 Posiziona il punto agli angoli caratteristici:</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="angle0Btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">θ = 0° (x max)</button>
+                    <button id="angle90Btn" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">θ = 90° (π/2)</button>
+                    <button id="angle180Btn" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">θ = 180° (π)</button>
+                    <button id="angle270Btn" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">θ = 270° (3π/2)</button>
+                </div>
+            </div>
+            
+            <div class="toggle-buttons">
+                <h4 style="width: 100%; margin: 10px 0;">Seleziona grandezze da visualizzare nei grafici:</h4>
+                <button class="toggle-btn active" data-graph="position">📍 Posizione (x)</button>
+                <button class="toggle-btn active" data-graph="velocity">⚡ Velocità (vx)</button>
+                <button class="toggle-btn active" data-graph="acceleration">🎯 Accelerazione (ax)</button>
+                <button class="toggle-btn active" data-graph="angularVelocity">🔄 Velocità Angolare (ω)</button>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background: #ff8800;"></div>
+                <span><strong>Raggio vettore (r) e Velocità Angolare (ω)</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: #ff4444;"></div>
+                <span><strong>Posizione armonica (x)</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: #44ff44;"></div>
+                <span><strong>Velocità (v)</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: #4444ff;"></div>
+                <span><strong>Accelerazione (a)</strong></span>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h3>📚 Relazioni Fisiche</h3>
+            <p><strong>Moto Circolare Uniforme:</strong> Un punto si muove su una circonferenza di raggio r con velocità angolare costante ω. La velocità tangenziale ha modulo v = ωr e l'accelerazione centripeta ha modulo a = ω²r, diretta sempre verso il centro.</p>
+            <p><strong>Moto Armonico:</strong> La proiezione del moto circolare sull'asse x genera un moto armonico semplice. La posizione è x(t) = r·cos(ωt + φ), la velocità è vx(t) = -ωr·sin(ωt + φ), e l'accelerazione è ax(t) = -ω²r·cos(ωt + φ) = -ω²x. Tutte le grandezze oscillano sinusoidalmente con la stessa frequenza angolare ω ma con sfasamenti di π/2 radianti (90°).</p>
+            <p><strong>Relazione tra i vettori:</strong> Nel moto circolare, velocità e posizione sono sempre perpendicolari, mentre l'accelerazione è sempre opposta alla posizione. Nel moto armonico (proiezione), queste relazioni si manifestano attraverso le funzioni seno e coseno che descrivono l'andamento temporale. Notare che: quando θ=0 (punto a destra) la posizione è massima, la velocità è nulla e l'accelerazione è massima verso sinistra; quando θ=π/2 (punto in alto) la posizione è nulla, la velocità è massima verso sinistra e l'accelerazione è nulla; quando θ=π (punto a sinistra) la posizione è minima (massima verso sinistra), la velocità è nulla e l'accelerazione è massima verso destra; quando θ=3π/2 (punto in basso) la posizione è nulla, la velocità è massima verso destra e l'accelerazione è nulla.</p>
+        </div>
+    </div>
+
+    <script>
+        // Canvas e contesti
+        const circleCanvas = document.getElementById('circleCanvas');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const ctxCircle = circleCanvas.getContext('2d');
+        const ctxGraph = graphCanvas.getContext('2d');
+        
+        // Parametri della simulazione
+        let radius = 150;
+        let angularVelocity = 2;
+        let angle = 0; // Inizia da 0° (a destra)
+        let time = 0;
+        let isPlaying = true;
+        let vectorScale = 1;
+        
+        // Storico dei dati per i grafici
+        let maxDataPoints = 200;
+        let timeHistory = [];
+        let positionHistory = [];
+        let velocityHistory = [];
+        let accelerationHistory = [];
+        let angularVelocityHistory = [];
+        
+        // Grafici da mostrare
+        let showGraphs = {
+            position: true,
+            velocity: true,
+            acceleration: true,
+            angularVelocity: true
+        };
+        
+        // Controlli
+        const radiusSlider = document.getElementById('radiusSlider');
+        const speedSlider = document.getElementById('speedSlider');
+        const scaleSlider = document.getElementById('scaleSlider');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // Event listeners per i controlli
+        radiusSlider.addEventListener('input', (e) => {
+            radius = parseFloat(e.target.value);
+            document.getElementById('radiusValue').textContent = radius + ' px';
+        });
+        
+        speedSlider.addEventListener('input', (e) => {
+            angularVelocity = parseFloat(e.target.value);
+            document.getElementById('speedValue').textContent = angularVelocity.toFixed(1) + ' rad/s';
+        });
+        
+        scaleSlider.addEventListener('input', (e) => {
+            vectorScale = parseFloat(e.target.value);
+            document.getElementById('scaleValue').textContent = vectorScale.toFixed(1) + '×';
+        });
+        
+        playPauseBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playPauseBtn.textContent = isPlaying ? '⏸️ Pausa' : '▶️ Play';
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            angle = 0;
+            time = 0;
+            timeHistory = [];
+            positionHistory = [];
+            velocityHistory = [];
+            accelerationHistory = [];
+            angularVelocityHistory = [];
+        });
+        
+        // Funzione helper per resettare e posizionare
+        function setAngleAndUpdateGraphs(newAngle) {
+            angle = newAngle;
+            time = 0;
+            
+            // Resetta gli storici
+            timeHistory = [];
+            positionHistory = [];
+            velocityHistory = [];
+            accelerationHistory = [];
+            angularVelocityHistory = [];
+            
+            // Calcola e aggiungi il punto iniziale
+            const x = radius * Math.cos(angle);
+            const vx = -angularVelocity * radius * Math.sin(angle);
+            const ax = -angularVelocity * angularVelocity * radius * Math.cos(angle);
+            
+            timeHistory.push(0);
+            positionHistory.push(x);
+            velocityHistory.push(vx);
+            accelerationHistory.push(ax);
+            angularVelocityHistory.push(angularVelocity);
+            
+            // Metti in pausa
+            isPlaying = false;
+            playPauseBtn.textContent = '▶️ Play';
+        }
+        
+        // Event listeners per i pulsanti degli angoli caratteristici
+        document.getElementById('angle0Btn').addEventListener('click', () => {
+            setAngleAndUpdateGraphs(0);
+        });
+        
+        document.getElementById('angle90Btn').addEventListener('click', () => {
+            setAngleAndUpdateGraphs(Math.PI / 2);
+        });
+        
+        document.getElementById('angle180Btn').addEventListener('click', () => {
+            setAngleAndUpdateGraphs(Math.PI);
+        });
+        
+        document.getElementById('angle270Btn').addEventListener('click', () => {
+            setAngleAndUpdateGraphs(3 * Math.PI / 2);
+        });
+        
+        // Toggle per i grafici
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const graphType = btn.dataset.graph;
+                showGraphs[graphType] = !showGraphs[graphType];
+                btn.classList.toggle('active');
+            });
+        });
+        
+        // Funzione per disegnare una freccia
+        function drawArrow(ctx, fromX, fromY, toX, toY, color, label) {
+            const headLength = 10;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            
+            if (length < 0.1) return;
+            
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 3;
+            
+            // Linea della freccia
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // Punta della freccia
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+            
+            // Etichetta
+            if (label) {
+                ctx.fillStyle = color;
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText(label, toX + 10, toY - 10);
+            }
+        }
+        
+        // Funzione principale di animazione
+        function animate() {
+            // Aggiorna l'angolo se in play
+            if (isPlaying) {
+                angle += angularVelocity * 0.016; // ~60 FPS
+                time += 0.016;
+                
+                // Calcola le grandezze per il moto armonico (proiezione sull'asse x)
+                const x = radius * Math.cos(angle);
+                const vx = -angularVelocity * radius * Math.sin(angle);
+                const ax = -angularVelocity * angularVelocity * radius * Math.cos(angle);
+                
+                // Aggiungi ai dati storici
+                timeHistory.push(time);
+                positionHistory.push(x);
+                velocityHistory.push(vx);
+                accelerationHistory.push(ax);
+                angularVelocityHistory.push(angularVelocity);
+                
+                // Mantieni solo gli ultimi maxDataPoints
+                if (timeHistory.length > maxDataPoints) {
+                    timeHistory.shift();
+                    positionHistory.shift();
+                    velocityHistory.shift();
+                    accelerationHistory.shift();
+                    angularVelocityHistory.shift();
+                }
+            }
+            
+            // Pulisci i canvas
+            ctxCircle.clearRect(0, 0, circleCanvas.width, circleCanvas.height);
+            ctxGraph.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            
+            // Disegna il canvas del moto circolare
+            drawCircularMotion();
+            
+            // Disegna i grafici temporali
+            drawGraphs();
+            
+            requestAnimationFrame(animate);
+        }
+        
+        function drawCircularMotion() {
+            const centerX = 300;
+            const centerY = 250;
+            
+            // Calcola la posizione del punto sul cerchio
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY - radius * Math.sin(angle); // -sin perché y cresce verso il basso
+            
+            // Disegna gli assi
+            ctxCircle.strokeStyle = '#ccc';
+            ctxCircle.lineWidth = 1;
+            ctxCircle.beginPath();
+            ctxCircle.moveTo(0, centerY);
+            ctxCircle.lineTo(circleCanvas.width, centerY);
+            ctxCircle.moveTo(centerX, 0);
+            ctxCircle.lineTo(centerX, circleCanvas.height);
+            ctxCircle.stroke();
+            
+            // Disegna la circonferenza
+            ctxCircle.strokeStyle = '#999';
+            ctxCircle.lineWidth = 2;
+            ctxCircle.setLineDash([5, 5]);
+            ctxCircle.beginPath();
+            ctxCircle.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctxCircle.stroke();
+            ctxCircle.setLineDash([]);
+            
+            // Disegna la linea di proiezione verticale (verso l'asse x centrale e verso il basso)
+            ctxCircle.strokeStyle = '#ddd';
+            ctxCircle.lineWidth = 2;
+            ctxCircle.setLineDash([3, 3]);
+            ctxCircle.beginPath();
+            ctxCircle.moveTo(x, y);
+            ctxCircle.lineTo(x, centerY);  // Proiezione verso l'asse x centrale
+            ctxCircle.stroke();
+            ctxCircle.beginPath();
+            ctxCircle.moveTo(x, y);
+            ctxCircle.lineTo(x, 500);  // Proiezione verso il basso
+            ctxCircle.stroke();
+            ctxCircle.setLineDash([]);
+            
+            // Disegna l'asse x per il moto armonico (linea orizzontale in basso)
+            const harmonicY = 500;
+            ctxCircle.strokeStyle = '#666';
+            ctxCircle.lineWidth = 3;
+            ctxCircle.beginPath();
+            ctxCircle.moveTo(centerX - radius - 20, harmonicY);
+            ctxCircle.lineTo(centerX + radius + 20, harmonicY);
+            ctxCircle.stroke();
+            
+            // Frecce alle estremità dell'asse x
+            ctxCircle.fillStyle = '#666';
+            ctxCircle.beginPath();
+            ctxCircle.moveTo(centerX + radius + 20, harmonicY);
+            ctxCircle.lineTo(centerX + radius + 15, harmonicY - 5);
+            ctxCircle.lineTo(centerX + radius + 15, harmonicY + 5);
+            ctxCircle.closePath();
+            ctxCircle.fill();
+            
+            // Etichette degli assi
+            ctxCircle.fillStyle = '#333';
+            ctxCircle.font = 'bold 16px Arial';
+            ctxCircle.fillText('x', circleCanvas.width - 30, centerY - 10);
+            ctxCircle.fillText('y', centerX + 10, 20);
+            ctxCircle.fillText('x', centerX + radius + 30, harmonicY + 5);
+            
+            // VETTORI PER IL MOTO CIRCOLARE
+            
+            // Vettore posizione (dal centro al punto) - ARANCIONE CON TRASPARENZA
+            // Salva il contesto per applicare la trasparenza
+            ctxCircle.save();
+            ctxCircle.globalAlpha = 0.7;
+            drawArrow(ctxCircle, centerX, centerY, x, y, '#ff8800', 'r');
+            ctxCircle.restore();
+            
+            // Vettore velocità (tangente alla circonferenza)
+            const vx_circ = -radius * angularVelocity * Math.sin(angle);
+            const vy_circ = -radius * angularVelocity * Math.cos(angle);
+            const vScale = vectorScale * 0.35;
+            drawArrow(ctxCircle, x, y, x + vx_circ * vScale, y + vy_circ * vScale, '#44ff44', 'v');
+            
+            // Vettore accelerazione centripeta (verso il centro)
+            const ax_circ = -radius * angularVelocity * angularVelocity * Math.cos(angle);
+            const ay_circ = radius * angularVelocity * angularVelocity * Math.sin(angle);
+            const aScale = vectorScale * 0.125;
+            drawArrow(ctxCircle, x, y, x + ax_circ * aScale, y + ay_circ * aScale, '#4444ff', 'a');
+            
+            // Disegna il punto sul cerchio (grigio)
+            ctxCircle.fillStyle = '#888';
+            ctxCircle.beginPath();
+            ctxCircle.arc(x, y, 8, 0, 2 * Math.PI);
+            ctxCircle.fill();
+            
+            // VETTORI PER IL MOTO ARMONICO SULL'ASSE X CENTRALE
+            
+            const harmonicXCenter = x; // La coordinata x è la stessa del punto sul cerchio
+            
+            // Calcola le componenti x dei vettori per il moto armonico
+            const posX = radius * Math.cos(angle);
+            const velX = -angularVelocity * radius * Math.sin(angle);
+            const accX = -angularVelocity * angularVelocity * radius * Math.cos(angle);
+            
+            // Vettore posizione (dalla posizione di equilibrio al punto proiettato sull'asse x centrale)
+            drawArrow(ctxCircle, centerX, centerY, harmonicXCenter, centerY, '#ff4444', '');
+            
+            // Disegna il punto proiettato sull'asse x centrale
+            ctxCircle.fillStyle = '#333';
+            ctxCircle.beginPath();
+            ctxCircle.arc(harmonicXCenter, centerY, 8, 0, 2 * Math.PI);
+            ctxCircle.fill();
+            
+            // Etichetta "Proiezione sull'asse x"
+            ctxCircle.fillStyle = '#666';
+            ctxCircle.font = 'bold 11px Arial';
+            ctxCircle.fillText('Proiezione', centerX + radius/2, centerY - 85);
+            ctxCircle.fillText('sull\'asse x', centerX + radius/2, centerY - 72);
+            
+            // VETTORI PER IL MOTO ARMONICO (sulla linea orizzontale in basso)
+            
+            const harmonicXBottom = x; // La coordinata x è la stessa del punto sul cerchio
+            
+            // Vettore posizione (dalla posizione di equilibrio al punto)
+            // Parte dal centro e arriva al punto proiettato
+            drawArrow(ctxCircle, centerX, harmonicY, harmonicXBottom, harmonicY, '#ff4444', '');
+            
+            // Vettore velocità (orizzontale, parte dal punto proiettato)
+            const velScaleHarm = vectorScale * 0.35;
+            if (Math.abs(velX) > 0.1) {
+                drawArrow(ctxCircle, harmonicXBottom, harmonicY - 30, 
+                         harmonicXBottom + velX * velScaleHarm, harmonicY - 30, '#44ff44', '');
+            }
+            
+            // Vettore accelerazione (orizzontale, parte dal punto proiettato)
+            const accScaleHarm = vectorScale * 0.125;
+            if (Math.abs(accX) > 0.1) {
+                drawArrow(ctxCircle, harmonicXBottom, harmonicY - 60, 
+                         harmonicXBottom + accX * accScaleHarm, harmonicY - 60, '#4444ff', '');
+            }
+            
+            // Disegna il punto sul moto armonico
+            ctxCircle.fillStyle = '#333';
+            ctxCircle.beginPath();
+            ctxCircle.arc(harmonicXBottom, harmonicY, 8, 0, 2 * Math.PI);
+            ctxCircle.fill();
+            
+            // Etichetta "Proiezione"
+            ctxCircle.fillStyle = '#666';
+            ctxCircle.font = 'bold 14px Arial';
+            ctxCircle.fillText('Proiezione armonica', centerX - 60, harmonicY + 30);
+            
+            // Indicatori di posizione angolare
+            ctxCircle.fillStyle = '#999';
+            ctxCircle.font = '12px Arial';
+            const normalizedAngle = ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            ctxCircle.fillText('θ = ' + (normalizedAngle * 180 / Math.PI).toFixed(1) + '°', centerX - 40, centerY - radius - 20);
+        }
+        
+        function drawGraphs() {
+            const padding = 50;
+            const graphWidth = graphCanvas.width - 2 * padding;
+            const graphHeight = (graphCanvas.height - 5 * padding) / 4;
+            
+            if (timeHistory.length < 1) return;
+            
+            // Trova i valori min e max per la scala
+            const maxPos = Math.max(...positionHistory.map(Math.abs), radius);
+            const maxVel = Math.max(...velocityHistory.map(Math.abs), angularVelocity * radius);
+            const maxAcc = Math.max(...accelerationHistory.map(Math.abs), angularVelocity * angularVelocity * radius);
+            const maxOmega = angularVelocity * 1.2; // Un po' di margine per il grafico
+            
+            const graphs = [
+                { data: positionHistory, max: maxPos, color: '#ff4444', label: 'Posizione x(t) [px]', show: showGraphs.position, type: 'position' },
+                { data: velocityHistory, max: maxVel, color: '#44ff44', label: 'Velocità vx(t) [px/s]', show: showGraphs.velocity, type: 'velocity' },
+                { data: accelerationHistory, max: maxAcc, color: '#4444ff', label: 'Accelerazione ax(t) [px/s²]', show: showGraphs.acceleration, type: 'acceleration' },
+                { data: angularVelocityHistory, max: maxOmega, color: '#ff8800', label: 'Velocità Angolare ω(t) [rad/s]', show: showGraphs.angularVelocity, type: 'angularVelocity' }
+            ];
+            
+            let graphIndex = 0;
+            graphs.forEach((graph, idx) => {
+                if (!graph.show) return;
+                
+                const yOffset = padding + graphIndex * (graphHeight + padding);
+                
+                // Disegna gli assi
+                ctxGraph.strokeStyle = '#ccc';
+                ctxGraph.lineWidth = 2;
+                ctxGraph.beginPath();
+                ctxGraph.moveTo(padding, yOffset);
+                ctxGraph.lineTo(padding, yOffset + graphHeight);
+                ctxGraph.lineTo(padding + graphWidth, yOffset + graphHeight);
+                ctxGraph.stroke();
+                
+                // Linea dello zero
+                ctxGraph.strokeStyle = '#999';
+                ctxGraph.lineWidth = 1;
+                ctxGraph.setLineDash([5, 5]);
+                ctxGraph.beginPath();
+                const zeroY = yOffset + graphHeight / 2;
+                ctxGraph.moveTo(padding, zeroY);
+                ctxGraph.lineTo(padding + graphWidth, zeroY);
+                ctxGraph.stroke();
+                ctxGraph.setLineDash([]);
+                
+                // Disegna linee verticali tratteggiate per gli angoli caratteristici
+                if (timeHistory.length > 1) {
+                    ctxGraph.strokeStyle = '#bbb';
+                    ctxGraph.lineWidth = 1;
+                    ctxGraph.setLineDash([2, 4]);
+                    
+                    for (let i = 0; i < timeHistory.length; i++) {
+                        const currentAngle = (angularVelocity * timeHistory[i]) % (2 * Math.PI);
+                        const tolerance = 0.1;
+                        
+                        const isSpecialAngle = 
+                            Math.abs(currentAngle) < tolerance || 
+                            Math.abs(currentAngle - Math.PI / 2) < tolerance ||
+                            Math.abs(currentAngle - Math.PI) < tolerance ||
+                            Math.abs(currentAngle - 3 * Math.PI / 2) < tolerance ||
+                            Math.abs(currentAngle - 2 * Math.PI) < tolerance;
+                        
+                        if (isSpecialAngle && i > 0) {
+                            const prevAngle = (angularVelocity * timeHistory[i-1]) % (2 * Math.PI);
+                            const justCrossed = !( 
+                                Math.abs(prevAngle) < tolerance || 
+                                Math.abs(prevAngle - Math.PI / 2) < tolerance ||
+                                Math.abs(prevAngle - Math.PI) < tolerance ||
+                                Math.abs(prevAngle - 3 * Math.PI / 2) < tolerance ||
+                                Math.abs(prevAngle - 2 * Math.PI) < tolerance
+                            );
+                            
+                            if (justCrossed) {
+                                const x = padding + (i / maxDataPoints) * graphWidth;
+                                ctxGraph.beginPath();
+                                ctxGraph.moveTo(x, yOffset);
+                                ctxGraph.lineTo(x, yOffset + graphHeight);
+                                ctxGraph.stroke();
+                                
+                                ctxGraph.fillStyle = '#666';
+                                ctxGraph.font = '10px Arial';
+                                let angleLabel = '';
+                                if (Math.abs(currentAngle) < tolerance || Math.abs(currentAngle - 2 * Math.PI) < tolerance) {
+                                    angleLabel = '0';
+                                } else if (Math.abs(currentAngle - Math.PI / 2) < tolerance) {
+                                    angleLabel = 'π/2';
+                                } else if (Math.abs(currentAngle - Math.PI) < tolerance) {
+                                    angleLabel = 'π';
+                                } else if (Math.abs(currentAngle - 3 * Math.PI / 2) < tolerance) {
+                                    angleLabel = '3π/2';
+                                }
+                                if (graphIndex === 0) {
+                                    ctxGraph.fillText(angleLabel, x - 8, yOffset - 5);
+                                }
+                            }
+                        }
+                    }
+                    ctxGraph.setLineDash([]);
+                }
+                
+                // Etichette
+                ctxGraph.fillStyle = '#333';
+                ctxGraph.font = 'bold 14px Arial';
+                ctxGraph.fillText(graph.label, padding, yOffset - 10);
+                
+                // Etichette simboliche in base al tipo di grafico con pedici
+                if (graph.type === 'position') {
+                    // Disegna x in normale e max come pedice
+                    ctxGraph.font = '12px Arial';
+                    ctxGraph.fillText('x', padding - 45, yOffset + 5);
+                    ctxGraph.font = '9px Arial';
+                    ctxGraph.fillText('max', padding - 37, yOffset + 9);
+                    
+                    ctxGraph.font = '12px Arial';
+                    ctxGraph.fillText('x', padding - 45, yOffset + graphHeight);
+                    ctxGraph.font = '9px Arial';
+                    ctxGraph.fillText('min', padding - 38, yOffset + graphHeight + 4);
+                } else if (graph.type === 'velocity') {
+                    ctxGraph.font = '12px Arial';
+                    ctxGraph.fillText('v', padding - 45, yOffset + 5);
+                    ctxGraph.font = '9px Arial';
+                    ctxGraph.fillText('x,max', padding - 39, yOffset + 9);
+                    
+                    ctxGraph.font = '12px Arial';
+                    ctxGraph.fillText('v', padding - 45, yOffset + graphHeight);
+                    ctxGraph.font = '9px Arial';
+                    ctxGraph.fillText('x,min', padding - 39, yOffset + graphHeight + 4);
+                } else if (graph.type === 'acceleration') {
+                    ctxGraph.font = '12px Arial';
+                    ctxGraph.fillText('a', padding - 45, yOffset + 5);
+                    ctxGraph.font = '9px Arial';
+                    ctxGraph.fillText('x,max', padding - 38, yOffset + 9);
+                    
+                    ctxGraph.font = '12px Arial';
+                    ctxGraph.fillText('a', padding - 45, yOffset + graphHeight);
+                    ctxGraph.font = '9px Arial';
+                    ctxGraph.fillText('x,min', padding - 38, yOffset + graphHeight + 4);
+                } else if (graph.type === 'angularVelocity') {
+                    // Per la velocità angolare mostriamo solo ω costante
+                    ctxGraph.font = '12px Arial';
+                    ctxGraph.fillText('ω', padding - 25, zeroY + graphHeight/2 - 5);
+                }
+                
+                ctxGraph.font = '12px Arial';
+                if (graph.type !== 'angularVelocity') {
+                    ctxGraph.fillText('0', padding - 20, zeroY + 5);
+                }
+                ctxGraph.fillText('t', padding + graphWidth + 5, yOffset + graphHeight + 5);
+                
+                // Disegna il grafico (solo se ci sono almeno 2 punti)
+                if (graph.data.length >= 2) {
+                    ctxGraph.strokeStyle = graph.color;
+                    ctxGraph.lineWidth = 3;
+                    ctxGraph.beginPath();
+                    
+                    if (graph.type === 'angularVelocity') {
+                        // Per la velocità angolare, disegna una linea orizzontale costante
+                        const constantY = zeroY + graphHeight/2 - (angularVelocity / graph.max) * (graphHeight - 20);
+                        ctxGraph.moveTo(padding, constantY);
+                        ctxGraph.lineTo(padding + graphWidth, constantY);
+                    } else {
+                        // Per gli altri grafici, comportamento normale
+                        for (let i = 0; i < graph.data.length; i++) {
+                            const x = padding + (i / maxDataPoints) * graphWidth;
+                            const normalizedValue = graph.data[i] / graph.max;
+                            const y = zeroY - normalizedValue * (graphHeight / 2 - 10);
+                            
+                            if (i === 0) {
+                                ctxGraph.moveTo(x, y);
+                            } else {
+                                ctxGraph.lineTo(x, y);
+                            }
+                        }
+                    }
+                    ctxGraph.stroke();
+                }
+                
+                // Punto attuale (anche se è l'unico punto)
+                if (graph.data.length >= 1) {
+                    let currentX, currentY;
+                    
+                    if (graph.type === 'angularVelocity') {
+                        // Per la velocità angolare, il punto si muove orizzontalmente
+                        currentX = padding + ((graph.data.length - 1) / maxDataPoints) * graphWidth;
+                        currentY = zeroY + graphHeight/2 - (angularVelocity / graph.max) * (graphHeight - 20);
+                    } else {
+                        // Per gli altri grafici, comportamento normale
+                        currentX = padding + ((graph.data.length - 1) / maxDataPoints) * graphWidth;
+                        const currentValue = graph.data[graph.data.length - 1];
+                        const normalizedCurrent = currentValue / graph.max;
+                        currentY = zeroY - normalizedCurrent * (graphHeight / 2 - 10);
+                    }
+                    
+                    ctxGraph.fillStyle = graph.color;
+                    ctxGraph.beginPath();
+                    ctxGraph.arc(currentX, currentY, 6, 0, 2 * Math.PI);
+                    ctxGraph.fill();
+                }
+                
+                graphIndex++;
+            });
+        }
+        
+        // Avvia l'animazione
+        animate();
+    </script>
+</body>
+</html>

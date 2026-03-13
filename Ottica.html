@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Ottica Geometrica - Lenti e Specchi</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .nav-tab {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .simulator-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .footer {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // ============================================
+        // LENS SIMULATOR COMPONENT
+        // ============================================
+        const LensSimulator = () => {
+            const canvasRef = useRef(null);
+            const [do_, setDo] = useState(10.0);
+            const [fMag, setFMag] = useState(5.0);
+            const [ho, setHo] = useState(3.0);
+            const [lensType, setLensType] = useState('convergente');
+            const [showInfo, setShowInfo] = useState(true);
+
+            const XMIN = -20.0, XMAX = 20.0;
+            const YMIN = -10.0, YMAX = 10.0;
+            const CANVAS_WIDTH = 1000;
+            const CANVAS_HEIGHT = 600;
+
+            const COL_R1_INC = "#2ca02c";
+            const COL_R1_OUT = "#8fd19e";
+            const COL_R1_EXT = "#8fd19e";
+            const COL_R2_LINE = "#d62728";
+            const COL_R2_EXT = "#ff7f0e";
+
+            const safeDi = (f, do_) => {
+                const denom = do_ - f;
+                if (Math.abs(denom) < 1e-6) {
+                    return Math.sign(f) * 1e9;
+                }
+                return (f * do_) / denom;
+            };
+
+            const lineFromPoints = (p1, p2) => {
+                const [x1, y1] = p1;
+                const [x2, y2] = p2;
+                const a = y1 - y2;
+                const b = x2 - x1;
+                const c = x1 * y2 - x2 * y1;
+                return [a, b, c];
+            };
+
+            const intersectLines = (L1, L2) => {
+                const [a1, b1, c1] = L1;
+                const [a2, b2, c2] = L2;
+                const det = a1 * b2 - a2 * b1;
+                if (Math.abs(det) < 1e-10) return null;
+                const x = (b1 * c2 - b2 * c1) / det;
+                const y = (c1 * a2 - c2 * a1) / det;
+                return [x, y];
+            };
+
+            const yOnLineAtX = (L, x) => {
+                const [a, b, c] = L;
+                if (Math.abs(b) < 1e-10) return null;
+                return -(a * x + c) / b;
+            };
+
+            const lensShapeXY = (lensType, yExtent = 8.0, n = 240, a = 0.85) => {
+                const ys = [];
+                const xLeft = [];
+                const xRight = [];
+                
+                for (let i = 0; i <= n; i++) {
+                    const y = -yExtent + (2 * yExtent * i) / n;
+                    const t = y / yExtent;
+                    let xProfile;
+                    
+                    if (lensType === 'convergente') {
+                        xProfile = a * (1.0 - t * t);
+                    } else {
+                        xProfile = a * (t * t);
+                    }
+                    
+                    ys.push(y);
+                    xLeft.push(-xProfile);
+                    xRight.push(xProfile);
+                }
+                
+                return { xLeft, ys, xRight };
+            };
+
+            const worldToCanvas = (x, y) => {
+                const px = ((x - XMIN) / (XMAX - XMIN)) * CANVAS_WIDTH;
+                const py = ((YMAX - y) / (YMAX - YMIN)) * CANVAS_HEIGHT;
+                return [px, py];
+            };
+
+            const drawLine = (ctx, p1, p2, color, lineWidth = 2, lineDash = []) => {
+                const [x1, y1] = worldToCanvas(p1[0], p1[1]);
+                const [x2, y2] = worldToCanvas(p2[0], p2[1]);
+                
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth;
+                ctx.setLineDash(lineDash);
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            };
+
+            const drawVerticalArrow = (ctx, x, h, label, color) => {
+                const [px, py0] = worldToCanvas(x, 0);
+                const [_, pyH] = worldToCanvas(x, h);
+                
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(px, py0);
+                ctx.lineTo(px, pyH);
+                ctx.stroke();
+                
+                const headSize = 8;
+                ctx.beginPath();
+                if (h >= 0) {
+                    ctx.moveTo(px - headSize, pyH + headSize);
+                    ctx.lineTo(px, pyH);
+                    ctx.lineTo(px + headSize, pyH + headSize);
+                } else {
+                    ctx.moveTo(px - headSize, pyH - headSize);
+                    ctx.lineTo(px, pyH);
+                    ctx.lineTo(px + headSize, pyH - headSize);
+                }
+                ctx.stroke();
+                
+                ctx.fillStyle = color;
+                ctx.font = "14px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = h >= 0 ? "bottom" : "top";
+                const [__, pyLabel] = worldToCanvas(x, h + (h >= 0 ? 0.4 : -0.4));
+                ctx.fillText(label, px, pyLabel);
+            };
+
+            const drawDirectionArrow = (ctx, p1, p2, color, lineDash = []) => {
+                const [x1, y1] = worldToCanvas(p1[0], p1[1]);
+                const [x2, y2] = worldToCanvas(p2[0], p2[1]);
+                
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 10) return;
+                
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+                
+                const arrowSize = 8;
+                const angle = Math.atan2(dy, dx);
+                
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash(lineDash);
+                
+                ctx.beginPath();
+                ctx.moveTo(midX, midY);
+                ctx.lineTo(
+                    midX - arrowSize * Math.cos(angle - Math.PI / 6),
+                    midY - arrowSize * Math.sin(angle - Math.PI / 6)
+                );
+                ctx.moveTo(midX, midY);
+                ctx.lineTo(
+                    midX - arrowSize * Math.cos(angle + Math.PI / 6),
+                    midY - arrowSize * Math.sin(angle + Math.PI / 6)
+                );
+                ctx.stroke();
+                ctx.setLineDash([]);
+            };
+
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+                ctx.lineWidth = 0.5;
+                for (let x = XMIN; x <= XMAX; x += 2) {
+                    const [px, _] = worldToCanvas(x, 0);
+                    ctx.beginPath();
+                    ctx.moveTo(px, 0);
+                    ctx.lineTo(px, CANVAS_HEIGHT);
+                    ctx.stroke();
+                }
+                for (let y = YMIN; y <= YMAX; y += 2) {
+                    const [_, py] = worldToCanvas(0, y);
+                    ctx.beginPath();
+                    ctx.moveTo(0, py);
+                    ctx.lineTo(CANVAS_WIDTH, py);
+                    ctx.stroke();
+                }
+                
+                const [_, pyAxis] = worldToCanvas(0, 0);
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(0, pyAxis);
+                ctx.lineTo(CANVAS_WIDTH, pyAxis);
+                ctx.stroke();
+                
+                const f = lensType === 'convergente' ? fMag : -fMag;
+                const di_th = safeDi(f, do_);
+                const m_th = -di_th / do_;
+                const hi_th = m_th * ho;
+                const isVirtual = di_th < 0;
+                
+                const xF = f;
+                const xObj = -do_;
+                
+                const { xLeft, ys, xRight } = lensShapeXY(lensType);
+                
+                // Disegna la lente con linee visibili
+                ctx.strokeStyle = "rgba(70, 130, 180, 0.8)";  // azzurro (steel blue)
+                ctx.lineWidth = 5;
+                ctx.lineCap = "round";
+                
+                // Disegna il profilo sinistro
+                ctx.beginPath();
+                const [pxL0, pyL0] = worldToCanvas(xLeft[0], ys[0]);
+                ctx.moveTo(pxL0, pyL0);
+                for (let i = 1; i < xLeft.length; i++) {
+                    const [pxL, pyL] = worldToCanvas(xLeft[i], ys[i]);
+                    ctx.lineTo(pxL, pyL);
+                }
+                ctx.stroke();
+                
+                // Disegna il profilo destro
+                ctx.beginPath();
+                const [pxR0, pyR0] = worldToCanvas(xRight[0], ys[0]);
+                ctx.moveTo(pxR0, pyR0);
+                for (let i = 1; i < xRight.length; i++) {
+                    const [pxR, pyR] = worldToCanvas(xRight[i], ys[i]);
+                    ctx.lineTo(pxR, pyR);
+                }
+                ctx.stroke();
+                
+                const [pxLensText, pyLensText] = worldToCanvas(0, 9.2);
+                ctx.fillStyle = "black";
+                ctx.font = "13px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("Lente (piano x=0)", pxLensText, pyLensText);
+                
+                const [pxFL, pyF] = worldToCanvas(-Math.abs(f), 0);
+                const [pxFR, _2] = worldToCanvas(Math.abs(f), 0);
+                
+                ctx.fillStyle = "#1f77b4";
+                ctx.beginPath();
+                ctx.arc(pxFL, pyF, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(pxFR, pyF, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = "black";
+                ctx.font = "12px Arial";
+                ctx.textAlign = "center";
+                const [__, pyFLabel] = worldToCanvas(-Math.abs(f), 0.5);
+                ctx.fillText("F_L", pxFL, pyFLabel);
+                ctx.fillText("F_R", pxFR, pyFLabel);
+                
+                drawVerticalArrow(ctx, xObj, ho, "Oggetto", "black");
+                
+                const PTop = [xObj, ho];
+                const PLens1 = [0, ho];
+                
+                drawLine(ctx, PTop, PLens1, COL_R1_INC, 2.2);
+                drawDirectionArrow(ctx, PTop, PLens1, COL_R1_INC);
+                
+                let LOut1;
+                if (f > 0) {
+                    LOut1 = lineFromPoints(PLens1, [xF, 0]);
+                    const yRight = yOnLineAtX(LOut1, XMAX);
+                    drawLine(ctx, PLens1, [XMAX, yRight], COL_R1_OUT, 2.2);
+                    drawDirectionArrow(ctx, PLens1, [XMAX, yRight], COL_R1_OUT);
+                    
+                    if (isVirtual) {
+                        const yLeft = yOnLineAtX(LOut1, XMIN);
+                        drawLine(ctx, PLens1, [XMIN, yLeft], COL_R1_EXT, 1.5, [5, 5]);
+                        drawDirectionArrow(ctx, [XMIN, yLeft], PLens1, COL_R1_EXT, [5, 5]);
+                    }
+                } else {
+                    LOut1 = lineFromPoints(PLens1, [-Math.abs(f), 0]);
+                    const yRight = yOnLineAtX(LOut1, XMAX);
+                    drawLine(ctx, PLens1, [XMAX, yRight], COL_R1_OUT, 2.2);
+                    drawDirectionArrow(ctx, PLens1, [XMAX, yRight], COL_R1_OUT);
+                    
+                    drawLine(ctx, PLens1, [-Math.abs(f), 0], COL_R1_EXT, 1.5, [5, 5]);
+                    drawDirectionArrow(ctx, [-Math.abs(f), 0], PLens1, COL_R1_EXT, [5, 5]);
+                }
+                
+                const LCenter = lineFromPoints(PTop, [0, 0]);
+                const yRight2 = yOnLineAtX(LCenter, XMAX);
+                drawLine(ctx, PTop, [XMAX, yRight2], COL_R2_LINE, 2.2);
+                drawDirectionArrow(ctx, PTop, [XMAX, yRight2], COL_R2_LINE);
+                
+                if (isVirtual) {
+                    const yLeft2 = yOnLineAtX(LCenter, XMIN);
+                    drawLine(ctx, [0, 0], [XMIN, yLeft2], COL_R2_EXT, 1.5, [5, 5]);
+                    drawDirectionArrow(ctx, [XMIN, yLeft2], [0, 0], COL_R2_EXT, [5, 5]);
+                }
+                
+                const PInt = intersectLines(LOut1, LCenter);
+                let xImg = -di_th;
+                let hImg = hi_th;
+                
+                if (PInt) {
+                    const [xi, yi] = PInt;
+                    if ((!isVirtual && xi > 0) || (isVirtual && xi < 0)) {
+                        xImg = xi;
+                        hImg = yi;
+                    }
+                }
+                
+                const imgColor = xImg > 0 ? "#1f77b4" : "#ff7f0e";
+                drawVerticalArrow(ctx, xImg, hImg, "Immagine", imgColor);
+                
+                // Disegna i valori di f, p, q, G
+                const p = do_;  // distanza oggetto
+                const q = di_th;  // distanza immagine (PER LENTI: positiva se reale, negativa se virtuale)
+                const G = m_th;  // ingrandimento
+                
+                ctx.fillStyle = "#000";
+                ctx.font = "bold 16px Arial";
+                ctx.textAlign = "left";
+                
+                const [pxLabel, pyLabel] = worldToCanvas(8, 9);
+                const lineHeight = 22;
+                
+                ctx.fillText(`f = ${f.toFixed(2)} cm ${f > 0 ? '(convergente)' : '(divergente)'}`, pxLabel, pyLabel);
+                ctx.fillText(`p = ${p.toFixed(2)} cm`, pxLabel, pyLabel + lineHeight);
+                
+                // Check if object is at focus (q = infinity)
+                if (Math.abs(di_th) > 1e8) {
+                    ctx.fillText(`q = ∞ (infinito)`, pxLabel, pyLabel + 2 * lineHeight);
+                } else {
+                    ctx.fillText(`q = ${q.toFixed(2)} cm ${q > 0 ? '(reale)' : '(virtuale)'}`, pxLabel, pyLabel + 2 * lineHeight);
+                }
+                
+                ctx.fillText(`G = ${G.toFixed(2)}`, pxLabel, pyLabel + 3 * lineHeight);
+            }, [do_, fMag, ho, lensType]);
+
+            const f = lensType === 'convergente' ? fMag : -fMag;
+            const di_th = safeDi(f, do_);
+            const m_th = -di_th / do_;
+            const hi_th = m_th * ho;
+
+            return (
+                <div style={{ padding: '10px' }}>
+                    <h2 style={{ textAlign: 'center', color: '#333', marginBottom: '20px' }}>
+                        Lenti Sottili
+                    </h2>
+                    
+                    <div style={{ backgroundColor: 'white', padding: '10px', borderRadius: '8px', marginBottom: '15px' }}>
+                        <canvas 
+                            ref={canvasRef} 
+                            width={CANVAS_WIDTH} 
+                            height={CANVAS_HEIGHT}
+                            style={{ width: '100%', height: 'auto', border: '2px solid #ddd', borderRadius: '5px' }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                                Distanza oggetto (d_o): {do_.toFixed(2)} cm
+                            </label>
+                            <input type="range" min="2" max="18" step="0.1" value={do_} onChange={(e) => setDo(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                        </div>
+
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                                Distanza focale (|f|): {fMag.toFixed(2)} cm
+                            </label>
+                            <input type="range" min="2" max="8" step="0.1" value={fMag} onChange={(e) => setFMag(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                        </div>
+
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                                Altezza oggetto (h_o): {ho.toFixed(2)} cm
+                            </label>
+                            <input type="range" min="1" max="5" step="0.1" value={ho} onChange={(e) => setHo(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                        </div>
+
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#555' }}>
+                                Tipo di lente:
+                            </label>
+                            <div>
+                                <label style={{ marginRight: '15px', cursor: 'pointer' }}>
+                                    <input type="radio" value="convergente" checked={lensType === 'convergente'} onChange={(e) => setLensType(e.target.value)} style={{ marginRight: '5px' }} />
+                                    Convergente
+                                </label>
+                                <label style={{ cursor: 'pointer' }}>
+                                    <input type="radio" value="divergente" checked={lensType === 'divergente'} onChange={(e) => setLensType(e.target.value)} style={{ marginRight: '5px' }} />
+                                    Divergente
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
+                        <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                            <input type="checkbox" checked={showInfo} onChange={(e) => setShowInfo(e.target.checked)} style={{ marginRight: '8px' }} />
+                            <span style={{ fontWeight: 'bold' }}>Mostra informazioni dettagliate</span>
+                        </label>
+                    </div>
+
+                    {showInfo && (
+                        <div style={{ backgroundColor: '#e8f4f8', padding: '15px', borderRadius: '8px', border: '2px solid #b3d9e6', fontSize: '14px' }}>
+                            <p><strong>d_i:</strong> {di_th.toFixed(2)} cm | <strong>m:</strong> {m_th.toFixed(2)} | <strong>h_i:</strong> {hi_th.toFixed(2)} cm</p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ============================================
+        // MIRROR SIMULATOR COMPONENT
+        // ============================================
+        const MirrorSimulator = () => {
+            const canvasRef = useRef(null);
+            const [do_, setDo] = useState(10.0);
+            const [fMag, setFMag] = useState(5.0);
+            const [ho, setHo] = useState(3.0);
+            const [mirrorType, setMirrorType] = useState('concavo');
+            const [showInfo, setShowInfo] = useState(true);
+
+            const XMIN = -20.0, XMAX = 20.0;
+            const YMIN = -10.0, YMAX = 10.0;
+            const CANVAS_WIDTH = 1000;
+            const CANVAS_HEIGHT = 600;
+
+            const COL_R1_INC = "#2ca02c";
+            const COL_R1_REF = "#8fd19e";
+            const COL_R2_INC = "#d62728";
+            const COL_R2_REF = "#ff7f0e";
+
+            const safeDi = (f, do_) => {
+                const denom = do_ - f;
+                if (Math.abs(denom) < 1e-6) return Math.sign(f) * 1e9;
+                return (f * do_) / denom;
+            };
+
+            const lineFromPoints = (p1, p2) => {
+                const [x1, y1] = p1;
+                const [x2, y2] = p2;
+                return [y1 - y2, x2 - x1, x1 * y2 - x2 * y1];
+            };
+
+            const intersectLines = (L1, L2) => {
+                const [a1, b1, c1] = L1;
+                const [a2, b2, c2] = L2;
+                const det = a1 * b2 - a2 * b1;
+                if (Math.abs(det) < 1e-10) return null;
+                return [(b1 * c2 - b2 * c1) / det, (c1 * a2 - c2 * a1) / det];
+            };
+
+            const yOnLineAtX = (L, x) => {
+                const [a, b, c] = L;
+                if (Math.abs(b) < 1e-10) return null;
+                return -(a * x + c) / b;
+            };
+
+            const intersectLineCircle = (p0, p1, xC, R, preferSign) => {
+                const [x0, y0] = p0;
+                const [x1, y1] = p1;
+                const vx = x1 - x0, vy = y1 - y0;
+                const A = vx * vx + vy * vy;
+                if (Math.abs(A) < 1e-10) return null;
+                const B = 2.0 * ((x0 - xC) * vx + y0 * vy);
+                const C = (x0 - xC) ** 2 + y0 * y0 - R * R;
+                const disc = B * B - 4 * A * C;
+                if (disc < 0) return null;
+                const sd = Math.sqrt(disc);
+                const t1 = (-B - sd) / (2 * A), t2 = (-B + sd) / (2 * A);
+                const candidates = [];
+                for (const t of [t1, t2]) {
+                    const x = x0 + t * vx, y = y0 + t * vy;
+                    if (preferSign < 0 && x > 1e-6) continue;
+                    if (preferSign > 0 && x < -1e-6) continue;
+                    if (x >= XMIN && x <= XMAX && y >= YMIN && y <= YMAX) candidates.push([x, y]);
+                }
+                if (candidates.length > 0) {
+                    candidates.sort((a, b) => Math.abs(a[0]) - Math.abs(b[0]));
+                    return candidates[0];
+                }
+                let best = null, bestAbsX = null;
+                for (const t of [t1, t2]) {
+                    const x = x0 + t * vx, y = y0 + t * vy;
+                    if (x >= XMIN && x <= XMAX && y >= YMIN && y <= YMAX) {
+                        const ax = Math.abs(x);
+                        if (best === null || ax < bestAbsX) { best = [x, y]; bestAbsX = ax; }
+                    }
+                }
+                return best;
+            };
+
+            const mirrorArcXY = (f) => {
+                const R = Math.abs(2.0 * f);
+                if (R < 1e-9) return [[], []];
+                const xC = -2.0 * f;
+                const yMax = Math.min(YMAX, 0.98 * R);
+                const xs = [], ys = [];
+                for (let i = 0; i <= 260; i++) {
+                    const y = -yMax + (2 * yMax * i) / 260;
+                    const rad = R * R - y * y;
+                    if (rad < 0) continue;
+                    const x = xC + (-xC / R) * Math.sqrt(rad);
+                    xs.push(x); ys.push(y);
+                }
+                return [xs, ys];
+            };
+
+            const worldToCanvas = (x, y) => [
+                ((x - XMIN) / (XMAX - XMIN)) * CANVAS_WIDTH,
+                ((YMAX - y) / (YMAX - YMIN)) * CANVAS_HEIGHT
+            ];
+
+            const drawLine = (ctx, p1, p2, color, lineWidth = 2, lineDash = []) => {
+                const [x1, y1] = worldToCanvas(p1[0], p1[1]);
+                const [x2, y2] = worldToCanvas(p2[0], p2[1]);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth;
+                ctx.setLineDash(lineDash);
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            };
+
+            const drawCurve = (ctx, xs, ys, color, lineWidth = 4) => {
+                if (xs.length < 2) return;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                const [px0, py0] = worldToCanvas(xs[0], ys[0]);
+                ctx.moveTo(px0, py0);
+                for (let i = 1; i < xs.length; i++) {
+                    const [px, py] = worldToCanvas(xs[i], ys[i]);
+                    ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+            };
+
+            const drawVerticalArrow = (ctx, x, h, label, color) => {
+                const [px, py0] = worldToCanvas(x, 0);
+                const [_, pyH] = worldToCanvas(x, h);
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(px, py0);
+                ctx.lineTo(px, pyH);
+                ctx.stroke();
+                const headSize = 8;
+                ctx.beginPath();
+                if (h >= 0) {
+                    ctx.moveTo(px - headSize, pyH + headSize);
+                    ctx.lineTo(px, pyH);
+                    ctx.lineTo(px + headSize, pyH + headSize);
+                } else {
+                    ctx.moveTo(px - headSize, pyH - headSize);
+                    ctx.lineTo(px, pyH);
+                    ctx.lineTo(px + headSize, pyH - headSize);
+                }
+                ctx.stroke();
+                ctx.fillStyle = color;
+                ctx.font = "14px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = h >= 0 ? "bottom" : "top";
+                const [__, pyLabel] = worldToCanvas(x, h + (h >= 0 ? 0.4 : -0.4));
+                ctx.fillText(label, px, pyLabel);
+            };
+
+            const drawDirectionArrow = (ctx, p1, p2, color, lineDash = []) => {
+                const [x1, y1] = worldToCanvas(p1[0], p1[1]);
+                const [x2, y2] = worldToCanvas(p2[0], p2[1]);
+                const dx = x2 - x1, dy = y2 - y1;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 10) return;
+                const midX = (x1 + x2) / 2, midY = (y1 + y2) / 2;
+                const arrowSize = 8, angle = Math.atan2(dy, dx);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash(lineDash);
+                ctx.beginPath();
+                ctx.moveTo(midX, midY);
+                ctx.lineTo(midX - arrowSize * Math.cos(angle - Math.PI / 6), midY - arrowSize * Math.sin(angle - Math.PI / 6));
+                ctx.moveTo(midX, midY);
+                ctx.lineTo(midX - arrowSize * Math.cos(angle + Math.PI / 6), midY - arrowSize * Math.sin(angle + Math.PI / 6));
+                ctx.stroke();
+                ctx.setLineDash([]);
+            };
+
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+                ctx.lineWidth = 0.5;
+                for (let x = XMIN; x <= XMAX; x += 2) {
+                    const [px] = worldToCanvas(x, 0);
+                    ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, CANVAS_HEIGHT); ctx.stroke();
+                }
+                for (let y = YMIN; y <= YMAX; y += 2) {
+                    const [_, py] = worldToCanvas(0, y);
+                    ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(CANVAS_WIDTH, py); ctx.stroke();
+                }
+                
+                const [__, pyAxis] = worldToCanvas(0, 0);
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(0, pyAxis);
+                ctx.lineTo(CANVAS_WIDTH, pyAxis);
+                ctx.stroke();
+                
+                const f = mirrorType === 'concavo' ? fMag : -fMag;
+                const di_th = safeDi(f, do_);
+                const m_th = -di_th / do_;
+                const hi_th = m_th * ho;
+                const isVirtual = di_th < 0;
+                const xF = -f, xC = -2.0 * f, xObj = -do_;
+                const R = Math.abs(2.0 * f), xCenter = -2.0 * f;
+                const preferSign = f > 0 ? -1 : +1;
+                
+                const [xs_m, ys_m] = mirrorArcXY(f);
+                drawCurve(ctx, xs_m, ys_m, "rgba(70, 130, 180, 0.8)", 4);  // azzurro
+                
+                const [pxV, pyV] = worldToCanvas(0, 0);
+                ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+                ctx.beginPath(); ctx.arc(pxV, pyV, 4, 0, 2 * Math.PI); ctx.fill();
+                ctx.fillStyle = "black";
+                ctx.font = "12px Arial";
+                ctx.textAlign = "center";
+                const [___, pyVLabel] = worldToCanvas(0, 0.6);
+                ctx.fillText("V", pxV, pyVLabel);
+                
+                const [pxF, pyF] = worldToCanvas(xF, 0);
+                ctx.fillStyle = "#1f77b4";
+                ctx.beginPath(); ctx.arc(pxF, pyF, 5, 0, 2 * Math.PI); ctx.fill();
+                ctx.fillStyle = "black";
+                const [____, pyFLabel] = worldToCanvas(xF, 0.5);
+                ctx.fillText("F", pxF, pyFLabel);
+                
+                const [pxC, pyC] = worldToCanvas(xC, 0);
+                ctx.fillStyle = "#1f77b4";
+                ctx.beginPath(); ctx.arc(pxC, pyC, 5, 0, 2 * Math.PI); ctx.fill();
+                ctx.fillStyle = "black";
+                const [_____, pyCLabel] = worldToCanvas(xC, 0.5);
+                ctx.fillText("C", pxC, pyCLabel);
+                
+                drawVerticalArrow(ctx, xObj, ho, "Oggetto", "black");
+                
+                const PTop = [xObj, ho];
+                const PHit1 = intersectLineCircle(PTop, [PTop[0] + 1.0, ho], xCenter, R, preferSign) || [0, ho];
+                drawLine(ctx, PTop, PHit1, COL_R1_INC, 2.2);
+                drawDirectionArrow(ctx, PTop, PHit1, COL_R1_INC);
+                
+                const LRef1 = lineFromPoints(PHit1, [xF, 0]);
+                if (f > 0) {
+                    const yLeft = yOnLineAtX(LRef1, XMIN);
+                    if (yLeft !== null) {
+                        drawLine(ctx, PHit1, [XMIN, yLeft], COL_R1_REF, 2.2);
+                        drawDirectionArrow(ctx, PHit1, [XMIN, yLeft], COL_R1_REF);
+                    }
+                    if (isVirtual) {
+                        const yRight = yOnLineAtX(LRef1, XMAX);
+                        if (yRight !== null) {
+                            drawLine(ctx, PHit1, [XMAX, yRight], COL_R1_REF, 1.5, [5, 5]);
+                            drawDirectionArrow(ctx, [XMAX, yRight], PHit1, COL_R1_REF, [5, 5]);
+                        }
+                    }
+                } else {
+                    const vx = PHit1[0] - xF, vy = PHit1[1];
+                    const t = (XMIN - PHit1[0]) / (vx + 1e-12);
+                    const PFar = [XMIN, PHit1[1] + t * vy];
+                    drawLine(ctx, PHit1, PFar, COL_R1_REF, 2.2);
+                    drawDirectionArrow(ctx, PHit1, PFar, COL_R1_REF);
+                    drawLine(ctx, PHit1, [xF, 0], COL_R1_REF, 1.5, [5, 5]);
+                    drawDirectionArrow(ctx, [xF, 0], PHit1, COL_R1_REF, [5, 5]);
+                }
+                
+                const PHit2 = intersectLineCircle(PTop, [xC, 0], xCenter, R, preferSign) || [0, ho];
+                const LInc2 = lineFromPoints(PTop, [xC, 0]);
+                drawLine(ctx, PTop, PHit2, COL_R2_INC, 2.2);
+                drawDirectionArrow(ctx, PTop, PHit2, COL_R2_INC);
+                
+                const yLeft2 = yOnLineAtX(LInc2, XMIN);
+                if (yLeft2 !== null) {
+                    drawLine(ctx, PHit2, [XMIN, yLeft2], COL_R2_REF, 1.8);
+                    drawDirectionArrow(ctx, PHit2, [XMIN, yLeft2], COL_R2_REF);
+                }
+                
+                if (isVirtual) {
+                    const yRight2 = yOnLineAtX(LInc2, XMAX);
+                    if (yRight2 !== null) {
+                        drawLine(ctx, PHit2, [XMAX, yRight2], COL_R2_REF, 1.5, [5, 5]);
+                        drawDirectionArrow(ctx, [XMAX, yRight2], PHit2, COL_R2_REF, [5, 5]);
+                    }
+                }
+                
+                const PInt = intersectLines(LRef1, LInc2);
+                let xImg = -di_th, hImg = hi_th;
+                if (PInt) {
+                    const [xi, yi] = PInt;
+                    if ((!isVirtual && xi < 0) || (isVirtual && xi > 0)) {
+                        xImg = xi; hImg = yi;
+                    }
+                }
+                
+                const imgColor = xImg < 0 ? "#1f77b4" : "#ff7f0e";
+                drawVerticalArrow(ctx, xImg, hImg, "Immagine", imgColor);
+                
+                // Disegna i valori di f, p, q, G
+                const p = do_;  // distanza oggetto
+                const q = di_th;  // distanza immagine (PER SPECCHI: negativa se reale, positiva se virtuale)
+                const G = m_th;  // ingrandimento
+                
+                ctx.fillStyle = "#000";
+                ctx.font = "bold 16px Arial";
+                ctx.textAlign = "left";
+                
+                const [pxLabel, pyLabel] = worldToCanvas(8, 9);
+                const lineHeight = 22;
+                
+                ctx.fillText(`f = ${f.toFixed(2)} cm ${f > 0 ? '(concavo)' : '(convesso)'}`, pxLabel, pyLabel);
+                ctx.fillText(`p = ${p.toFixed(2)} cm`, pxLabel, pyLabel + lineHeight);
+                
+                // Check if object is at focus (q = infinity)
+                if (Math.abs(di_th) > 1e8) {
+                    ctx.fillText(`q = ∞ (infinito)`, pxLabel, pyLabel + 2 * lineHeight);
+                } else {
+                    ctx.fillText(`q = ${q.toFixed(2)} cm ${q > 0 ? '(reale)' : '(virtuale)'}`, pxLabel, pyLabel + 2 * lineHeight);
+                }
+                
+                ctx.fillText(`G = ${G.toFixed(2)}`, pxLabel, pyLabel + 3 * lineHeight);
+            }, [do_, fMag, ho, mirrorType]);
+
+            const f = mirrorType === 'concavo' ? fMag : -fMag;
+            const di_th = safeDi(f, do_);
+            const m_th = -di_th / do_;
+            const hi_th = m_th * ho;
+
+            return (
+                <div style={{ padding: '10px' }}>
+                    <h2 style={{ textAlign: 'center', color: '#333', marginBottom: '20px' }}>
+                        Specchi Sferici
+                    </h2>
+                    
+                    <div style={{ backgroundColor: 'white', padding: '10px', borderRadius: '8px', marginBottom: '15px' }}>
+                        <canvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} style={{ width: '100%', height: 'auto', border: '2px solid #ddd', borderRadius: '5px' }} />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                                Distanza oggetto (d_o): {do_.toFixed(2)} cm
+                            </label>
+                            <input type="range" min="2" max="18" step="0.1" value={do_} onChange={(e) => setDo(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                        </div>
+
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                                Distanza focale (|f|): {fMag.toFixed(2)} cm
+                            </label>
+                            <input type="range" min="2" max="8" step="0.1" value={fMag} onChange={(e) => setFMag(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                        </div>
+
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                                Altezza oggetto (h_o): {ho.toFixed(2)} cm
+                            </label>
+                            <input type="range" min="1" max="5" step="0.1" value={ho} onChange={(e) => setHo(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                        </div>
+
+                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#555' }}>
+                                Tipo di specchio:
+                            </label>
+                            <div>
+                                <label style={{ marginRight: '15px', cursor: 'pointer' }}>
+                                    <input type="radio" value="concavo" checked={mirrorType === 'concavo'} onChange={(e) => setMirrorType(e.target.value)} style={{ marginRight: '5px' }} />
+                                    Concavo
+                                </label>
+                                <label style={{ cursor: 'pointer' }}>
+                                    <input type="radio" value="convesso" checked={mirrorType === 'convesso'} onChange={(e) => setMirrorType(e.target.value)} style={{ marginRight: '5px' }} />
+                                    Convesso
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
+                        <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                            <input type="checkbox" checked={showInfo} onChange={(e) => setShowInfo(e.target.checked)} style={{ marginRight: '8px' }} />
+                            <span style={{ fontWeight: 'bold' }}>Mostra informazioni dettagliate</span>
+                        </label>
+                    </div>
+
+                    {showInfo && (
+                        <div style={{ backgroundColor: '#e8f4f8', padding: '15px', borderRadius: '8px', border: '2px solid #b3d9e6', fontSize: '14px' }}>
+                            <p><strong>d_i:</strong> {di_th.toFixed(2)} cm | <strong>m:</strong> {m_th.toFixed(2)} | <strong>h_i:</strong> {hi_th.toFixed(2)} cm</p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ============================================
+        // MAIN APP COMPONENT
+        // ============================================
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('lenti');
+
+            return (
+                <div className="main-container">
+                    <div className="header">
+                        <h1>Simulatore di Ottica Geometrica</h1>
+                        <p>Esplora il comportamento di lenti e specchi</p>
+                    </div>
+
+                    <div className="nav-tabs">
+                        <button 
+                            className={`nav-tab ${activeTab === 'lenti' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('lenti')}
+                        >
+                            🔍 Lenti Sottili
+                        </button>
+                        <button 
+                            className={`nav-tab ${activeTab === 'specchi' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('specchi')}
+                        >
+                            🪞 Specchi Sferici
+                        </button>
+                    </div>
+
+                    <div className="simulator-container">
+                        {activeTab === 'lenti' && <LensSimulator />}
+                        {activeTab === 'specchi' && <MirrorSimulator />}
+                    </div>
+
+                    <div className="footer">
+                        <p>Simulatore di Ottica Geometrica - Strumento didattico per l'insegnamento della fisica</p>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

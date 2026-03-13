@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Simulazioni di Fisica</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+    text-align:center;
+    margin:0;
+    padding:40px;
+}
+
+h1{
+    margin-bottom:40px;
+}
+
+.container{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+}
+
+button{
+    padding:15px 25px;
+    font-size:16px;
+    border:none;
+    border-radius:8px;
+    background:#2c7be5;
+    color:white;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    background:#1a5ec8;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Simulazioni di Fisica</h1>
+
+<div class="container" id="buttons"></div>
+
+<script>
+
+const user = "robertocurciorubertini-ctrl";
+const repo = "Simulazioni";
+
+const api = `https://api.github.com/repos/${user}/${repo}/contents/`;
+
+fetch(api)
+.then(response => response.json())
+.then(files => {
+
+    const container = document.getElementById("buttons");
+
+    files.forEach(file => {
+
+        if(file.name.endsWith(".html") && file.name !== "index.html"){
+
+            const button = document.createElement("button");
+
+            const nome = file.name
+                .replace(".html","")
+                .replaceAll("-"," ")
+                .replaceAll("_"," ");
+
+            button.textContent = nome;
+
+            button.onclick = () => {
+                window.location.href = file.name;
+            };
+
+            container.appendChild(button);
+        }
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

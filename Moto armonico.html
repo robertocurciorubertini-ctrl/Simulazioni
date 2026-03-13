@@ -578,34 +578,87 @@
             
             const harmonicXBottom = x; // La coordinata x è la stessa del punto sul cerchio
             
-            // Vettore posizione (dalla posizione di equilibrio al punto)
-            // Parte dal centro e arriva al punto proiettato
+            // DISEGNA IL SISTEMA MASSA-MOLLA ORIZZONTALE
+            const springStartX = centerX - radius - 40; // Punto di ancoraggio della molla
+            const massSize = 30;
+            const massY = harmonicY;
+            
+            // Disegna il punto di ancoraggio (muro)
+            ctxCircle.fillStyle = '#666';
+            ctxCircle.fillRect(springStartX - 10, massY - 40, 10, 80);
+            // Linee del muro
+            ctxCircle.strokeStyle = '#666';
+            ctxCircle.lineWidth = 2;
+            for (let i = 0; i < 5; i++) {
+                ctxCircle.beginPath();
+                ctxCircle.moveTo(springStartX - 10, massY - 40 + i * 20);
+                ctxCircle.lineTo(springStartX - 20, massY - 30 + i * 20);
+                ctxCircle.stroke();
+            }
+            
+            // Disegna la molla orizzontale
+            const springCoils = 10;
+            const springHeight = 15;
+            const springLength = harmonicXBottom - springStartX - massSize / 2;
+            const coilWidth = springLength / springCoils;
+            
+            ctxCircle.strokeStyle = '#666';
+            ctxCircle.lineWidth = 3;
+            ctxCircle.beginPath();
+            ctxCircle.moveTo(springStartX, massY);
+            
+            for (let i = 0; i < springCoils; i++) {
+                const x1 = springStartX + i * coilWidth + coilWidth / 4;
+                const x2 = springStartX + i * coilWidth + coilWidth / 2;
+                const x3 = springStartX + i * coilWidth + 3 * coilWidth / 4;
+                const x4 = springStartX + (i + 1) * coilWidth;
+                
+                ctxCircle.lineTo(x1, massY - springHeight);
+                ctxCircle.lineTo(x2, massY - springHeight);
+                ctxCircle.lineTo(x2, massY + springHeight);
+                ctxCircle.lineTo(x3, massY + springHeight);
+                ctxCircle.lineTo(x4, massY);
+            }
+            ctxCircle.lineTo(harmonicXBottom - massSize / 2, massY);
+            ctxCircle.stroke();
+            
+            // Disegna la massa
+            ctxCircle.fillStyle = '#555';
+            ctxCircle.fillRect(harmonicXBottom - massSize / 2, massY - massSize / 2, massSize, massSize);
+            ctxCircle.strokeStyle = '#333';
+            ctxCircle.lineWidth = 2;
+            ctxCircle.strokeRect(harmonicXBottom - massSize / 2, massY - massSize / 2, massSize, massSize);
+            
+            // Scrivi "m" sulla massa
+            ctxCircle.fillStyle = 'white';
+            ctxCircle.font = 'bold 16px Arial';
+            ctxCircle.textAlign = 'center';
+            ctxCircle.textBaseline = 'middle';
+            ctxCircle.fillText('m', harmonicXBottom, massY);
+            ctxCircle.textAlign = 'left';
+            ctxCircle.textBaseline = 'alphabetic';
+            
+            // Vettore posizione (dalla posizione di equilibrio alla massa)
             drawArrow(ctxCircle, centerX, harmonicY, harmonicXBottom, harmonicY, '#ff4444', '');
             
-            // Vettore velocità (orizzontale, parte dal punto proiettato)
+            // Vettore velocità (orizzontale, parte dalla massa)
             const velScaleHarm = vectorScale * 0.35;
             if (Math.abs(velX) > 0.1) {
-                drawArrow(ctxCircle, harmonicXBottom, harmonicY - 30, 
-                         harmonicXBottom + velX * velScaleHarm, harmonicY - 30, '#44ff44', '');
+                drawArrow(ctxCircle, harmonicXBottom, harmonicY - 50, 
+                         harmonicXBottom + velX * velScaleHarm, harmonicY - 50, '#44ff44', 'v');
             }
             
-            // Vettore accelerazione (orizzontale, parte dal punto proiettato)
+            // Vettore accelerazione (orizzontale, parte dalla massa)
             const accScaleHarm = vectorScale * 0.125;
             if (Math.abs(accX) > 0.1) {
-                drawArrow(ctxCircle, harmonicXBottom, harmonicY - 60, 
-                         harmonicXBottom + accX * accScaleHarm, harmonicY - 60, '#4444ff', '');
+                drawArrow(ctxCircle, harmonicXBottom, harmonicY - 80, 
+                         harmonicXBottom + accX * accScaleHarm, harmonicY - 80, '#4444ff', 'a');
             }
             
-            // Disegna il punto sul moto armonico
-            ctxCircle.fillStyle = '#333';
-            ctxCircle.beginPath();
-            ctxCircle.arc(harmonicXBottom, harmonicY, 8, 0, 2 * Math.PI);
-            ctxCircle.fill();
-            
-            // Etichetta "Proiezione"
+            // Etichetta "Sistema massa-molla"
             ctxCircle.fillStyle = '#666';
             ctxCircle.font = 'bold 14px Arial';
-            ctxCircle.fillText('Proiezione armonica', centerX - 60, harmonicY + 30);
+            ctxCircle.fillText('Sistema massa-molla', centerX - 60, harmonicY + 35);
             
             // Indicatori di posizione angolare
             ctxCircle.fillStyle = '#999';

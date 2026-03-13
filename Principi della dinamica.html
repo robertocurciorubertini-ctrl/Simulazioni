@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le tre leggi di Newton — Simulatore interattivo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #fff;
+    color: #555;
+    transition: all 0.15s;
+  }
+
+  .tab:hover { background: #f5f5f5; }
+
+  .tab.active {
+    background: #f0f0f0;
+    color: #1a1a1a;
+    border-color: #999;
+    font-weight: 500;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .law-label { font-size: 12px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .law-title { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .law-formula { font-family: 'Courier New', Courier, monospace; font-size: 15px; color: #185FA5; margin-bottom: 1rem; }
+
+  canvas {
+    display: block;
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+
+  .controls {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .control-row label {
+    font-size: 13px;
+    color: #555;
+    min-width: 160px;
+  }
+
+  .control-row input[type=range] {
+    flex: 1;
+    accent-color: #185FA5;
+    height: 4px;
+    cursor: pointer;
+  }
+
+  .control-row .val {
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 70px;
+    color: #1a1a1a;
+    text-align: right;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  button.action {
+    padding: 8px 18px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #fff;
+    color: #1a1a1a;
+    transition: background 0.12s;
+  }
+
+  button.action:hover { background: #f0f0f0; }
+  button.action:active { transform: scale(0.98); }
+
+  .info-box {
+    margin-top: 1rem;
+    padding: 12px 16px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    border: 1px solid #e8e8e8;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+  }
+
+  .info-box strong { color: #1a1a1a; font-weight: 500; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #e8e8e8;
+    margin: 1.5rem 0;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Le tre leggi di Newton</h1>
+  <p class="subtitle">Simulatore interattivo — seleziona una legge e modifica i parametri</p>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab(0)">1° legge — inerzia</button>
+    <button class="tab" onclick="showTab(1)">2° legge — F = ma</button>
+    <button class="tab" onclick="showTab(2)">3° legge — azione e reazione</button>
+  </div>
+
+  <!-- PANEL 1: Inertia -->
+  <div class="panel active" id="panel0">
+    <div class="law-label">Prima legge di Newton</div>
+    <div class="law-title">Principio di inerzia</div>
+    <div class="law-formula">Se &Sigma;F = 0 &rarr; v = costante</div>
+    <canvas id="c1" height="200"></canvas>
+    <div class="controls">
+      <div class="control-row">
+        <label>Attrito (frizione)</label>
+        <input type="range" min="0" max="1" step="0.01" value="0" id="friction" oninput="updateFriction()">
+        <span class="val" id="frictionVal">0.00</span>
+      </div>
+      <div class="btn-row">
+        <button class="action" onclick="launchBall()">Lancia</button>
+        <button class="action" onclick="resetLaw1()">Reset</button>
+      </div>
+    </div>
+    <div class="info-box">
+      <strong>Prova con attrito = 0:</strong> la palla scorre indefinitamente — nessuna forza, nessun cambiamento di velocità. Aumenta l'attrito per vedere come una forza esterna (la frizione) decelera gradualmente il moto. Questo è il principio di inerzia: un corpo in moto rettilineo uniforme rimane tale finché non interviene una forza.
+    </div>
+  </div>
+
+  <!-- PANEL 2: F=ma -->
+  <div class="panel" id="panel1">
+    <div class="law-label">Seconda legge di Newton</div>
+    <div class="law-title">Legge fondamentale della dinamica</div>
+    <div class="law-formula">F = m &middot; a &nbsp;&rarr;&nbsp; a = F / m</div>
+    <canvas id="c2" height="220"></canvas>
+    <div class="controls">
+      <div class="control-row">
+        <label>Forza applicata (N)</label>
+        <input type="range" min="10" max="200" step="1" value="80" id="force" oninput="updateForce()">
+        <span class="val" id="forceVal">80 N</span>
+      </div>
+      <div class="control-row">
+        <label>Massa (kg)</label>
+        <input type="range" min="1" max="30" step="1" value="8" id="mass" oninput="updateMass()">
+        <span class="val" id="massVal">8 kg</span>
+      </div>
+      <div class="btn-row">
+        <button class="action" onclick="startLaw2()">Avvia</button>
+        <button class="action" onclick="resetLaw2()">Reset</button>
+      </div>
+    </div>
+    <div class="info-box">
+      Accelerazione calcolata: <strong id="accDisplay">10.0 m/s²</strong>. Aumenta la massa mantenendo la stessa forza: l'accelerazione cala. Raddoppia la forza a parità di massa: l'accelerazione raddoppia. La relazione è lineare in entrambe le direzioni.
+    </div>
+  </div>
+
+  <!-- PANEL 3: Action-Reaction -->
+  <div class="panel" id="panel2">
+    <div class="law-label">Terza legge di Newton</div>
+    <div class="law-title">Azione e reazione</div>
+    <div class="law-formula">F&#8321;&#8322; = &minus;F&#8322;&#8321;</div>
+    <canvas id="c3" height="220"></canvas>
+    <div class="controls">
+      <div class="control-row">
+        <label>Massa oggetto A (kg)</label>
+        <input type="range" min="1" max="20" step="1" value="5" id="massA" oninput="updateMasses()">
+        <span class="val" id="massAVal">5 kg</span>
+      </div>
+      <div class="control-row">
+        <label>Massa oggetto B (kg)</label>
+        <input type="range" min="1" max="20" step="1" value="10" id="massB" oninput="updateMasses()">
+        <span class="val" id="massBVal">10 kg</span>
+      </div>
+      <div class="btn-row">
+        <button class="action" onclick="explode()">Esplosione / spinta</button>
+        <button class="action" onclick="resetLaw3()">Reset</button>
+      </div>
+    </div>
+    <div class="info-box">
+      Le due forze sono <strong>uguali e opposte</strong> per definizione. Ma le accelerazioni sono diverse perché le masse lo sono: <strong id="accsDisplay">aA = 20.0 m/s², aB = 10.0 m/s²</strong>. L'oggetto più leggero riceve la stessa spinta ma si allontana molto più in fretta — come un proiettile rispetto al fucile che rincula.
+    </div>
+  </div>
+</div>
+
+<script>
+const FORCE_IMPULSE = 100;
+
+function getCtx(id) {
+  const c = document.getElementById(id);
+  c.width = c.offsetWidth || 680;
+  return c.getContext('2d');
+}
+
+// ============ LAW 1 ============
+let l1 = { x: 60, vx: 0, running: false, raf: null };
+let frictionVal = 0;
+
+function updateFriction() {
+  frictionVal = parseFloat(document.getElementById('friction').value);
+  document.getElementById('frictionVal').textContent = frictionVal.toFixed(2);
+}
+
+function launchBall() {
+  l1.vx = 4; l1.running = true;
+  if (l1.raf) cancelAnimationFrame(l1.raf);
+  animateLaw1();
+}
+
+function resetLaw1() {
+  l1.x = 60; l1.vx = 0; l1.running = false;
+  if (l1.raf) cancelAnimationFrame(l1.raf);
+  drawLaw1();
+}
+
+function drawLaw1() {
+  const ctx = getCtx('c1');
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const R = 20;
+
+  ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H - 30); ctx.lineTo(W, H - 30); ctx.stroke();
+
+  if (Math.abs(l1.vx) > 0.05) {
+    const arrowLen = Math.min(Math.abs(l1.vx) * 12, 100);
+    ctx.strokeStyle = '#185FA5'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(l1.x + R + 4, H - 30 - R);
+    ctx.lineTo(l1.x + R + 4 + arrowLen, H - 30 - R);
+    ctx.stroke();
+    ctx.fillStyle = '#185FA5';
+    ctx.beginPath();
+    ctx.moveTo(l1.x + R + 4 + arrowLen, H - 30 - R - 5);
+    ctx.lineTo(l1.x + R + 4 + arrowLen + 8, H - 30 - R);
+    ctx.lineTo(l1.x + R + 4 + arrowLen, H - 30 - R + 5);
+    ctx.fill();
+    ctx.font = '12px sans-serif'; ctx.fillStyle = '#185FA5';
+    ctx.fillText('v = ' + l1.vx.toFixed(1) + ' m/s', l1.x + R + 4, H - 30 - R - 10);
+  }
+
+  ctx.beginPath();
+  ctx.arc(l1.x + R, H - 30 - R, R, 0, Math.PI * 2);
+  ctx.fillStyle = frictionVal === 0 ? '#1D9E75' : '#D85A30';
+  ctx.fill();
+
+  ctx.font = '12px sans-serif'; ctx.fillStyle = '#888';
+  ctx.fillText(frictionVal === 0 ? 'nessun attrito' : 'attrito = ' + frictionVal.toFixed(2), 12, 18);
+}
+
+function animateLaw1() {
+  if (!l1.running) return;
+  const canvas = document.getElementById('c1');
+  const W = canvas.width; const R = 20;
+  l1.vx *= (1 - frictionVal * 0.04);
+  l1.x += l1.vx;
+  if (l1.x + R * 2 > W - 8) { l1.x = W - R * 2 - 8; l1.vx = 0; }
+  if (Math.abs(l1.vx) < 0.01) { l1.vx = 0; l1.running = false; }
+  drawLaw1();
+  if (l1.running) l1.raf = requestAnimationFrame(animateLaw1);
+}
+
+// ============ LAW 2 ============
+let l2 = { x: 50, vx: 0, running: false, raf: null };
+let forceN = 80, massKg = 8;
+
+function updateForce() {
+  forceN = parseFloat(document.getElementById('force').value);
+  document.getElementById('forceVal').textContent = forceN + ' N';
+  updateAccDisplay();
+}
+function updateMass() {
+  massKg = parseFloat(document.getElementById('mass').value);
+  document.getElementById('massVal').textContent = massKg + ' kg';
+  updateAccDisplay();
+}
+function updateAccDisplay() {
+  document.getElementById('accDisplay').textContent = (forceN / massKg).toFixed(1) + ' m/s²';
+}
+
+function startLaw2() {
+  l2.x = 50; l2.vx = 0; l2.running = true;
+  if (l2.raf) cancelAnimationFrame(l2.raf);
+  animateLaw2();
+}
+function resetLaw2() {
+  l2.x = 50; l2.vx = 0; l2.running = false;
+  if (l2.raf) cancelAnimationFrame(l2.raf);
+  drawLaw2();
+}
+
+function drawLaw2() {
+  const ctx = getCtx('c2');
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const R = Math.max(10, Math.min(30, massKg * 1.5));
+  const a = forceN / massKg;
+
+  ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H - 30); ctx.lineTo(W, H - 30); ctx.stroke();
+
+  const fLen = Math.min(forceN * 0.5, 120);
+  const bx = l2.x + R;
+  ctx.strokeStyle = '#D85A30'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(bx + R + 2, H - 30 - R); ctx.lineTo(bx + R + 2 + fLen, H - 30 - R); ctx.stroke();
+  ctx.fillStyle = '#D85A30';
+  ctx.beginPath();
+  ctx.moveTo(bx + R + 2 + fLen, H - 30 - R - 5);
+  ctx.lineTo(bx + R + 2 + fLen + 8, H - 30 - R);
+  ctx.lineTo(bx + R + 2 + fLen, H - 30 - R + 5);
+  ctx.fill();
+  ctx.font = '12px sans-serif'; ctx.fillStyle = '#D85A30';
+  ctx.fillText('F = ' + forceN + ' N', bx + R + 4, H - 30 - R - 10);
+
+  ctx.beginPath();
+  ctx.arc(l2.x + R, H - 30 - R, R, 0, Math.PI * 2);
+  ctx.fillStyle = '#7F77DD'; ctx.fill();
+  ctx.font = 'bold ' + Math.min(R, 13) + 'px sans-serif';
+  ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  ctx.fillText(massKg + 'kg', l2.x + R, H - 30 - R + 4);
+  ctx.textAlign = 'left';
+
+  ctx.font = '12px sans-serif'; ctx.fillStyle = '#888';
+  ctx.fillText('a = ' + a.toFixed(1) + ' m/s²  |  v = ' + l2.vx.toFixed(1) + ' m/s', 12, 18);
+}
+
+function animateLaw2() {
+  if (!l2.running) return;
+  const canvas = document.getElementById('c2');
+  const W = canvas.width;
+  const a = forceN / massKg;
+  l2.vx += a * 0.016 * 1.5;
+  l2.x += l2.vx;
+  const R = Math.max(10, Math.min(30, massKg * 1.5));
+  if (l2.x + R * 2 > W - 8) { l2.x = W - R * 2 - 8; l2.running = false; }
+  drawLaw2();
+  if (l2.running) l2.raf = requestAnimationFrame(animateLaw2);
+}
+
+// ============ LAW 3 ============
+let l3 = { xA: 0, xB: 0, vA: 0, vB: 0, running: false, raf: null, exploded: false };
+let mA = 5, mB = 10;
+
+function updateMasses() {
+  mA = parseFloat(document.getElementById('massA').value);
+  mB = parseFloat(document.getElementById('massB').value);
+  document.getElementById('massAVal').textContent = mA + ' kg';
+  document.getElementById('massBVal').textContent = mB + ' kg';
+  document.getElementById('accsDisplay').textContent =
+    'aA = ' + (FORCE_IMPULSE / mA).toFixed(1) + ' m/s², aB = ' + (FORCE_IMPULSE / mB).toFixed(1) + ' m/s²';
+  if (!l3.exploded) drawLaw3(false);
+}
+
+function explode() {
+  l3.exploded = true;
+  l3.vA = -(FORCE_IMPULSE / mA) * 0.6;
+  l3.vB = (FORCE_IMPULSE / mB) * 0.6;
+  l3.running = true;
+  if (l3.raf) cancelAnimationFrame(l3.raf);
+  animateLaw3();
+}
+
+function resetLaw3() {
+  l3.xA = 0; l3.xB = 0; l3.vA = 0; l3.vB = 0;
+  l3.running = false; l3.exploded = false;
+  if (l3.raf) cancelAnimationFrame(l3.raf);
+  drawLaw3(false);
+}
+
+function drawLaw3(moving) {
+  const ctx = getCtx('c3');
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const CX = W / 2;
+  const RA = Math.max(12, Math.min(28, mA * 1.8));
+  const RB = Math.max(12, Math.min(28, mB * 1.8));
+
+  ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H - 30); ctx.lineTo(W, H - 30); ctx.stroke();
+
+  ctx.strokeStyle = '#e8e8e8'; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(CX, 10); ctx.lineTo(CX, H - 30); ctx.stroke();
+  ctx.setLineDash([]);
+
+  const posA = CX - RA * 1.5 + l3.xA;
+  const posB = CX + RB * 0.5 + l3.xB;
+  const Y = H - 30 - Math.max(RA, RB);
+
+  if (moving && Math.abs(l3.vA) > 0.05) {
+    const len = Math.min(Math.abs(l3.vA) * 30, 80);
+    ctx.strokeStyle = '#1D9E75'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(posA - RA, Y); ctx.lineTo(posA - RA - len, Y); ctx.stroke();
+    ctx.fillStyle = '#1D9E75';
+    ctx.beginPath(); ctx.moveTo(posA - RA - len, Y - 5); ctx.lineTo(posA - RA - len - 8, Y); ctx.lineTo(posA - RA - len, Y + 5); ctx.fill();
+  }
+  if (moving && Math.abs(l3.vB) > 0.05) {
+    const len = Math.min(Math.abs(l3.vB) * 30, 80);
+    ctx.strokeStyle = '#D85A30'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(posB + RB, Y); ctx.lineTo(posB + RB + len, Y); ctx.stroke();
+    ctx.fillStyle = '#D85A30';
+    ctx.beginPath(); ctx.moveTo(posB + RB + len, Y - 5); ctx.lineTo(posB + RB + len + 8, Y); ctx.lineTo(posB + RB + len, Y + 5); ctx.fill();
+  }
+
+  ctx.beginPath(); ctx.arc(posA, Y, RA, 0, Math.PI * 2);
+  ctx.fillStyle = '#1D9E75'; ctx.fill();
+  ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  ctx.fillText('A ' + mA + 'kg', posA, Y + 4);
+
+  ctx.beginPath(); ctx.arc(posB, Y, RB, 0, Math.PI * 2);
+  ctx.fillStyle = '#D85A30'; ctx.fill();
+  ctx.fillText('B ' + mB + 'kg', posB, Y + 4);
+  ctx.textAlign = 'left';
+
+  ctx.font = '11px sans-serif';
+  if (moving) {
+    ctx.fillStyle = '#1D9E75'; ctx.fillText('vA = ' + l3.vA.toFixed(1) + ' m/s', 10, 18);
+    ctx.fillStyle = '#D85A30'; ctx.fillText('vB = ' + l3.vB.toFixed(1) + ' m/s', 10, 34);
+  } else {
+    ctx.fillStyle = '#aaa'; ctx.fillText('premi "Esplosione / spinta" per avviare', 10, 18);
+  }
+}
+
+function animateLaw3() {
+  if (!l3.running) return;
+  l3.xA += l3.vA; l3.xB += l3.vB;
+  const canvas = document.getElementById('c3');
+  const W = canvas.width;
+  if (l3.xA < -(W / 2) || l3.xB > W) l3.running = false;
+  drawLaw3(true);
+  if (l3.running) l3.raf = requestAnimationFrame(animateLaw3);
+}
+
+// ---- Tab switching ----
+function showTab(idx) {
+  document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  setTimeout(() => {
+    if (idx === 0) drawLaw1();
+    if (idx === 1) { updateAccDisplay(); drawLaw2(); }
+    if (idx === 2) { updateMasses(); }
+  }, 30);
+}
+
+window.addEventListener('load', () => {
+  drawLaw1();
+  updateAccDisplay();
+  drawLaw2();
+  drawLaw3(false);
+});
+
+window.addEventListener('resize', () => {
+  const active = document.querySelector('.panel.active');
+  if (active.id === 'panel0') drawLaw1();
+  else if (active.id === 'panel1') drawLaw2();
+  else drawLaw3(l3.exploded);
+});
+</script>
+</body>
+</html>

@@ -1,90 +1,389 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Simulazioni di Fisica</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulazioni di Fisica</title>
+  <style>
+    :root {
+      --bg-1: #07111f;
+      --bg-2: #0d1b2a;
+      --bg-3: #10263d;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.14);
+      --text: #eaf2ff;
+      --muted: #b8c7e6;
+      --accent: #61dafb;
+      --accent-2: #7ef0c7;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
 
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f8;
-    text-align:center;
-    margin:0;
-    padding:40px;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-h1{
-    margin-bottom:40px;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(97, 218, 251, 0.15), transparent 30%),
+        radial-gradient(circle at top right, rgba(126, 240, 199, 0.12), transparent 25%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+      overflow-x: hidden;
+    }
 
-.container{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:20px;
-}
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+        radial-gradient(2px 2px at 140px 80px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 300px 120px, #ffffff, transparent),
+        radial-gradient(2px 2px at 500px 40px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 700px 150px, #ffffff, transparent),
+        radial-gradient(2px 2px at 900px 70px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 1100px 180px, #ffffff, transparent);
+      background-size: 1200px 300px;
+      animation: drift 20s linear infinite;
+    }
 
-button{
-    padding:15px 25px;
-    font-size:16px;
-    border:none;
-    border-radius:8px;
-    background:#2c7be5;
-    color:white;
-    cursor:pointer;
-    transition:0.2s;
-}
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(30px); }
+    }
 
-button:hover{
-    background:#1a5ec8;
-}
-</style>
+    .container {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 64px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 32px 16px 20px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid rgba(97, 218, 251, 0.35);
+      border-radius: 999px;
+      background: rgba(97, 218, 251, 0.08);
+      color: var(--accent);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 18px auto 0;
+      font-size: 1.08rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .panel {
+      margin-top: 34px;
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .panel-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+
+    .counter {
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      padding: 22px 20px;
+      border: 1px solid var(--card-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      box-shadow: var(--shadow);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(97, 218, 251, 0.10), rgba(126, 240, 199, 0.06));
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(97, 218, 251, 0.35);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 16px;
+      font-size: 1.35rem;
+      background: linear-gradient(135deg, rgba(97,218,251,0.18), rgba(126,240,199,0.18));
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .sim-title {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .sim-desc {
+      margin: 0 0 18px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--muted);
+      min-height: 3.2em;
+    }
+
+    .sim-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #00141f;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .sim-link:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .empty-state,
+    .loading-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 20px;
+      font-size: 1rem;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        width: min(100% - 20px, 1100px);
+        padding-top: 26px;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .hero {
+        padding-top: 14px;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="stars"></div>
 
-<h1>Simulazioni di Fisica</h1>
+  <div class="container">
+    <section class="hero">
+      <div class="hero-badge">Laboratorio digitale di fisica</div>
+      <h1>Simulazioni di Fisica</h1>
+      <p class="subtitle">
+        Raccolta di simulazioni interattive dedicate ai principali argomenti di fisica.
+        Seleziona una simulazione per aprirla direttamente nel browser.
+      </p>
+    </section>
 
-<div class="container" id="buttons"></div>
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Simulazioni disponibili</div>
+        <div class="counter" id="counter">Caricamento...</div>
+      </div>
 
-<script>
+      <div class="grid" id="simGrid">
+        <div class="loading-state">Sto recuperando l'elenco delle simulazioni...</div>
+      </div>
+    </section>
 
-const user = "robertocurciorubertini-ctrl";
-const repo = "Simulazioni";
+    <div class="footer">
+      Repository GitHub Pages per la condivisione delle simulazioni con la classe
+    </div>
+  </div>
 
-const api = `https://api.github.com/repos/${user}/${repo}/contents/`;
+  <script>
+    const user = "robertocurciorubertini-ctrl";
+    const repo = "Simulazioni";
+    const api = `https://api.github.com/repos/${user}/${repo}/contents/`;
 
-fetch(api)
-.then(response => response.json())
-.then(files => {
+    const grid = document.getElementById("simGrid");
+    const counter = document.getElementById("counter");
 
-    const container = document.getElementById("buttons");
+    function prettyName(filename) {
+      return filename
+        .replace(/\.html$/i, "")
+        .replace(/[-_]+/g, " ")
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
 
-    files.forEach(file => {
+    function detectIcon(name) {
+      const n = name.toLowerCase();
 
-        if(file.name.endsWith(".html") && file.name !== "index.html"){
+      if (n.includes("armonico") || n.includes("oscill")) return "∿";
+      if (n.includes("parabol")) return "⤴";
+      if (n.includes("circolar") || n.includes("rotaz")) return "◯";
+      if (n.includes("onda") || n.includes("interferenz") || n.includes("diffraz")) return "≈";
+      if (n.includes("ottic") || n.includes("lente") || n.includes("specchi")) return "◇";
+      if (n.includes("campo") || n.includes("elettric") || n.includes("magnet")) return "⚡";
+      return "Φ";
+    }
 
-            const button = document.createElement("button");
+    function detectDescription(name) {
+      const n = name.toLowerCase();
 
-            const nome = file.name
-                .replace(".html","")
-                .replaceAll("-"," ")
-                .replaceAll("_"," ");
+      if (n.includes("armonico")) return "Visualizzazione del moto armonico semplice e delle sue grandezze cinematiche principali.";
+      if (n.includes("parabol")) return "Studio del moto parabolico con traiettoria bidimensionale e parametri iniziali.";
+      if (n.includes("circolar")) return "Analisi del moto circolare uniforme con velocità angolare e grandezze associate.";
+      if (n.includes("onda")) return "Simulazione di fenomeni ondulatori con rappresentazione dinamica dell’evoluzione temporale.";
+      if (n.includes("interferenz")) return "Esplorazione delle condizioni di interferenza costruttiva e distruttiva.";
+      if (n.includes("diffraz")) return "Rappresentazione qualitativa della diffrazione e dei suoi effetti osservabili.";
+      if (n.includes("lente")) return "Simulazione ottica con formazione delle immagini e dipendenza dalle distanze.";
+      if (n.includes("specchi")) return "Studio della formazione delle immagini mediante specchi sferici o piani.";
+      return "Simulazione interattiva di fisica accessibile direttamente dal browser.";
+    }
 
-            button.textContent = nome;
+    fetch(api)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Impossibile recuperare i file dal repository.");
+        }
+        return response.json();
+      })
+      .then(files => {
+        const htmlFiles = files.filter(file =>
+          file.name.endsWith(".html") && file.name.toLowerCase() !== "index.html"
+        );
 
-            button.onclick = () => {
-                window.location.href = file.name;
-            };
+        counter.textContent = `${htmlFiles.length} simulazione${htmlFiles.length === 1 ? "" : "i"}`;
 
-            container.appendChild(button);
+        if (htmlFiles.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              Non ci sono ancora simulazioni HTML nella cartella del repository.
+            </div>
+          `;
+          return;
         }
 
-    });
+        htmlFiles.sort((a, b) => a.name.localeCompare(b.name, "it"));
 
-});
+        grid.innerHTML = "";
 
-</script>
+        htmlFiles.forEach(file => {
+          const title = prettyName(file.name);
+          const icon = detectIcon(file.name);
+          const desc = detectDescription(file.name);
 
+          const card = document.createElement("article");
+          card.className = "card";
+
+          card.innerHTML = `
+            <div class="card-content">
+              <div class="icon">${icon}</div>
+              <h2 class="sim-title">${title}</h2>
+              <p class="sim-desc">${desc}</p>
+              <a class="sim-link" href="${file.name}">
+                Apri simulazione
+                <span>→</span>
+              </a>
+            </div>
+          `;
+
+          grid.appendChild(card);
+        });
+      })
+      .catch(error => {
+        counter.textContent = "Errore";
+        grid.innerHTML = `
+          <div class="empty-state">
+            Non è stato possibile caricare l'elenco delle simulazioni.<br>
+            Verifica che il repository sia pubblico e che i file siano presenti nella cartella principale.
+          </div>
+        `;
+        console.error(error);
+      });
+  </script>
 </body>
 </html>

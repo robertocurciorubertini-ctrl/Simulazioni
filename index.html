@@ -309,21 +309,19 @@
       if (n.includes("campo") || n.includes("elettric") || n.includes("magnet")) return "⚡";
       return "Φ";
     }
-
     function detectDescription(name) {
-      const n = name.toLowerCase();
+  const descriptions = {
+    "elettrostatica.html": "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
+    "moto-armonico.html": "Simulazione del moto armonico semplice con analisi di posizione, velocità, accelerazione, periodo e ampiezza.",
+    "moto-circolare.html": "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
+    "moto-parabolico.html": "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
+    "principi-della-dinamica.html": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
+    "rifrazione.html": "Simulazione della rifrazione della luce tra mezzi diversi con visualizzazione degli angoli e del cambio di direzione.",
+    "specchi-e-lenti.html": "Studio della formazione delle immagini con specchi e lenti attraverso la costruzione geometrica dei raggi principali."
+  };
 
-      if (n.includes("armonico")) return "Visualizzazione del moto armonico semplice e delle sue grandezze cinematiche principali.";
-      if (n.includes("parabol")) return "Studio del moto parabolico con traiettoria bidimensionale e parametri iniziali.";
-      if (n.includes("circolar")) return "Analisi del moto circolare uniforme con velocità angolare e grandezze associate.";
-      if (n.includes("onda")) return "Simulazione di fenomeni ondulatori con rappresentazione dinamica dell’evoluzione temporale.";
-      if (n.includes("interferenz")) return "Esplorazione delle condizioni di interferenza costruttiva e distruttiva.";
-      if (n.includes("diffraz")) return "Rappresentazione qualitativa della diffrazione e dei suoi effetti osservabili.";
-      if (n.includes("lente")) return "Simulazione ottica con formazione delle immagini e dipendenza dalle distanze.";
-      if (n.includes("specchi")) return "Studio della formazione delle immagini mediante specchi sferici o piani.";
-      return "Simulazione interattiva di fisica accessibile direttamente dal browser.";
-    }
-
+  return descriptions[name.toLowerCase()] || "Simulazione interattiva di fisica accessibile direttamente dal browser.";
+}
     fetch(api)
       .then(response => {
         if (!response.ok) {

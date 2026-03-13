@@ -9,19 +9,19 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0d0f0e;
-    --surface: #161a18;
-    --surface2: #1e2421;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.12);
-    --text: #e8ede9;
-    --text2: #8a9e8e;
-    --text3: #5a6b5d;
-    --accent-traj: #4a9eff;
-    --accent-L: #e8724a;
-    --accent-h: #3ecf8e;
-    --accent-vec: #b8c4b9;
-    --accent-pt: #a78bfa;
+    --bg: #f5f5f2;
+    --surface: #ffffff;
+    --surface2: #f0f0ec;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.14);
+    --text: #1a1a18;
+    --text2: #4a5c4d;
+    --text3: #8a9a8d;
+    --accent-traj: #1a6fd4;
+    --accent-L: #c04f20;
+    --accent-h: #0e8a5a;
+    --accent-vec: #222222;
+    --accent-pt: #6d4fc0;
     --mono: 'DM Mono', monospace;
     --sans: 'DM Sans', sans-serif;
   }
@@ -419,11 +419,11 @@ function draw() {
   ctx.clearRect(0,0,W,H);
 
   // background
-  ctx.fillStyle = '#0d0f0e';
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0,0,W,H);
 
   // grid
-  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
   ctx.lineWidth = 0.5;
   for (let i=0;i<=6;i++) {
     const x = minX+(maxX-minX)*i/6;
@@ -435,7 +435,7 @@ function draw() {
   }
 
   // axes
-  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
   ctx.lineWidth = 0.8;
   ctx.beginPath();
   ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+plotH);
@@ -443,7 +443,7 @@ function draw() {
   ctx.stroke();
 
   // tick labels
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
   ctx.font = '10px "DM Mono", monospace';
   ctx.textAlign = 'right';
   for (let i=0;i<=5;i++) {
@@ -455,7 +455,7 @@ function draw() {
     const x = minX+(maxX-minX)*i/6;
     ctx.fillText(x.toFixed(0), tx(x), pad.t+plotH+16);
   }
-  ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '11px "DM Mono", monospace';
+  ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.font = '11px "DM Mono", monospace';
   ctx.fillText('x (m)', pad.l+plotW/2, H-6);
   ctx.save(); ctx.translate(13, pad.t+plotH/2); ctx.rotate(-Math.PI/2);
   ctx.fillText('y (m)', 0,0); ctx.restore();
@@ -463,27 +463,27 @@ function draw() {
   // h_max lines
   if (comp.hmax > 0.5) {
     const xA = inp.x0 + inp.v0*Math.cos(inp.theta)*(inp.v0*Math.sin(inp.theta)/g);
-    ctx.strokeStyle = 'rgba(62,207,142,0.5)'; ctx.lineWidth=1;
+    ctx.strokeStyle = 'rgba(14,138,90,0.55)'; ctx.lineWidth=1;
     ctx.setLineDash([4,4]);
     ctx.beginPath(); ctx.moveTo(tx(xA),ty(comp.hmax)); ctx.lineTo(tx(xA),ty(0)); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(pad.l+2,ty(comp.hmax)); ctx.lineTo(tx(xA),ty(comp.hmax)); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(62,207,142,0.8)'; ctx.font='italic 11px "DM Mono", monospace'; ctx.textAlign='left';
+    ctx.fillStyle='rgba(14,138,90,1)'; ctx.font='italic 11px "DM Mono", monospace'; ctx.textAlign='left';
     ctx.fillText('h_max = '+comp.hmax.toFixed(1)+' m', pad.l+5, ty(comp.hmax)-6);
   }
 
   // gittata arrow
   const yg = ty(0)+9;
-  ctx.strokeStyle='rgba(232,114,74,0.7)'; ctx.lineWidth=1.5;
+  ctx.strokeStyle='rgba(192,79,32,0.8)'; ctx.lineWidth=1.5;
   ctx.setLineDash([5,4]);
   ctx.beginPath(); ctx.moveTo(tx(inp.x0),yg); ctx.lineTo(tx(comp.xLand),yg); ctx.stroke();
   ctx.setLineDash([]);
   [[tx(inp.x0),1],[tx(comp.xLand),-1]].forEach(([cx,dir])=>{
     ctx.beginPath(); ctx.moveTo(cx,yg);
     ctx.lineTo(cx+dir*6,yg-4); ctx.lineTo(cx+dir*6,yg+4);
-    ctx.fillStyle='rgba(232,114,74,0.9)'; ctx.fill();
+    ctx.fillStyle='rgba(192,79,32,1)'; ctx.fill();
   });
-  ctx.fillStyle='rgba(232,114,74,0.9)'; ctx.font='italic 11px "DM Mono", monospace'; ctx.textAlign='center';
+  ctx.fillStyle='rgba(192,79,32,1)'; ctx.font='italic 11px "DM Mono", monospace'; ctx.textAlign='center';
   ctx.fillText('L = '+comp.gittata.toFixed(1)+' m', (tx(inp.x0)+tx(comp.xLand))/2, yg+20);
 
   // tangent velocity vectors along trajectory
@@ -524,15 +524,15 @@ function draw() {
 
     const angle = Math.atan2(ey3 - cy, ex3 - cx);
     const isFirst = k === 0;
-    const alpha = isFirst ? 0.9 : 0.45 + k * 0.06;
+    const alpha = 1.0;
 
-    ctx.strokeStyle = `rgba(184,196,185,${alpha})`;
-    ctx.lineWidth = isFirst ? 1.8 : 1.2;
+    ctx.strokeStyle = isFirst ? '#1a1a18' : '#444440';
+    ctx.lineWidth = isFirst ? 2.2 : 1.6;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex3, ey3); ctx.stroke();
 
     // punta freccia
-    const arrSize = isFirst ? 8 : 6;
-    ctx.fillStyle = `rgba(184,196,185,${alpha})`;
+    const arrSize = isFirst ? 9 : 7;
+    ctx.fillStyle = isFirst ? '#1a1a18' : '#444440';
     ctx.beginPath();
     ctx.moveTo(ex3, ey3);
     ctx.lineTo(ex3 - arrSize * Math.cos(angle - 0.38), ey3 - arrSize * Math.sin(angle - 0.38));
@@ -541,23 +541,23 @@ function draw() {
 
     // etichetta solo sul primo vettore (v₀)
     if (isFirst) {
-      ctx.fillStyle = 'rgba(184,196,185,0.6)';
-      ctx.font = '10px "DM Mono", monospace';
+      ctx.fillStyle = '#1a1a18';
+      ctx.font = 'bold 10px "DM Mono", monospace';
       ctx.textAlign = 'left';
-      ctx.fillText('v₀='+inp.v0+' m/s', ex3+5, ey3-3);
+      ctx.fillText('v₀='+inp.v0+' m/s', ex3+6, ey3-4);
     }
   }
 
   // angle arc sul punto di partenza
-  ctx.strokeStyle='rgba(184,196,185,0.3)'; ctx.lineWidth=0.8;
+  ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=0.8;
   ctx.beginPath(); ctx.arc(tx(inp.x0),ty(inp.y0),22,-inp.theta,0); ctx.stroke();
-  ctx.fillStyle='rgba(184,196,185,0.4)'; ctx.font='10px "DM Mono", monospace'; ctx.textAlign='left';
+  ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.font='10px "DM Mono", monospace'; ctx.textAlign='left';
   ctx.fillText('θ='+Math.round(inp.theta*180/Math.PI)+'°', tx(inp.x0)+26, ty(inp.y0)-2);
 
   // trajectory glow
-  ctx.shadowColor='rgba(74,158,255,0.3)';
-  ctx.shadowBlur=8;
-  ctx.strokeStyle='rgba(74,158,255,0.9)'; ctx.lineWidth=2;
+  ctx.shadowColor='rgba(26,111,212,0.15)';
+  ctx.shadowBlur=4;
+  ctx.strokeStyle='rgba(26,111,212,1)'; ctx.lineWidth=2.2;
   ctx.beginPath();
   traj.forEach((p,i)=>{ i===0?ctx.moveTo(tx(p.x),ty(p.y)):ctx.lineTo(tx(p.x),ty(p.y)); });
   ctx.stroke();
@@ -567,15 +567,15 @@ function draw() {
   const drawDot = (x,y,color,r=4.5) => {
     ctx.fillStyle=color;
     ctx.beginPath(); ctx.arc(tx(x),ty(y),r,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle='#0d0f0e'; ctx.lineWidth=1.5;
+    ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.arc(tx(x),ty(y),r,0,Math.PI*2); ctx.stroke();
   };
   const xA = inp.x0+inp.v0*Math.cos(inp.theta)*(inp.v0*Math.sin(inp.theta)/g);
-  drawDot(inp.x0, inp.y0, '#a78bfa');
-  drawDot(xA, comp.hmax, '#3ecf8e');
-  drawDot(comp.xLand, 0, '#e8724a');
+  drawDot(inp.x0, inp.y0, '#6d4fc0');
+  drawDot(xA, comp.hmax, '#0e8a5a');
+  drawDot(comp.xLand, 0, '#c04f20');
 
-  ctx.fillStyle='rgba(167,139,250,0.7)'; ctx.font='10px "DM Mono", monospace'; ctx.textAlign='left';
+  ctx.fillStyle='#6d4fc0'; ctx.font='10px "DM Mono", monospace'; ctx.textAlign='left';
   ctx.fillText('(x₀,y₀)', tx(inp.x0)+7, ty(inp.y0)-6);
 }
 

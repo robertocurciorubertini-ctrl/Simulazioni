@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulazione Rifrazione — Legge di Snell</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+    options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #2c2c2a; padding: 20px; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888780; margin-bottom: 16px; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .ctrl-group { background: #f7f6f2; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 160px; }
+  .ctrl-label { font-size: 11px; color: #888780; margin-bottom: 3px; }
+  .ctrl-val { font-size: 20px; font-weight: 500; }
+  .ctrl-unit { font-size: 12px; color: #888780; }
+  input[type=range] { width: 100%; margin-top: 5px; accent-color: #378add; }
+
+  .mat3-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .toggle-btn { font-size: 12px; padding: 6px 12px; border: 0.5px solid #d3d1c7; border-radius: 6px; background: white; cursor: pointer; color: #444441; }
+  .toggle-btn.active { background: #b5d4f4; border-color: #378add; color: #042c53; }
+  .mat3-inline { display: none; align-items: center; gap: 8px; font-size: 13px; color: #444441; }
+  .mat3-inline.show { display: flex; }
+  .n-input { width: 72px; border: 0.5px solid #d3d1c7; border-radius: 6px; padding: 5px 8px; font-size: 13px; background: white; color: #2c2c2a; }
+
+  .canvas-wrap { border: 0.5px solid #d3d1c7; border-radius: 10px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: auto; }
+
+  .status-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .stat { background: #f7f6f2; border: 0.5px solid #d3d1c7; border-radius: 6px; padding: 5px 11px; font-size: 13px; }
+  .stat .val { color: #185fa5; font-weight: 500; }
+  .tir-badge { background: #fcebeb; border: 0.5px solid #f09595; border-radius: 6px; padding: 5px 12px; font-size: 13px; color: #a32d2d; font-weight: 500; display: none; }
+
+  .formulas { margin-top: 22px; border-top: 0.5px solid #d3d1c7; padding-top: 18px; }
+  .formulas h2 { font-size: 14px; font-weight: 500; margin-bottom: 14px; }
+  .formula-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .formula-card { flex: 1; min-width: 200px; background: #f7f6f2; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 12px 16px; }
+  .formula-title { font-size: 10px; color: #888780; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+  .formula-body { font-size: 15px; line-height: 2.2; color: #2c2c2a; }
+  .formula-note { font-size: 11px; color: #888780; margin-top: 6px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>Simulazione Rifrazione — Legge di Snell</h1>
+<p class="subtitle">Il raggio di luce arriva dall'alto. Modifica i parametri per osservare la variazione dell'angolo di rifrazione e il fenomeno della riflessione interna totale.</p>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <div class="ctrl-label">Angolo di incidenza θ₁</div>
+    <div><span class="ctrl-val" id="val-theta">45</span><span class="ctrl-unit">°</span></div>
+    <input type="range" id="sl-theta" min="0" max="89" value="45" step="1">
+  </div>
+  <div class="ctrl-group">
+    <div class="ctrl-label">Indice di rifrazione n₁ (mezzo superiore)</div>
+    <div><span class="ctrl-val" id="val-n1">1.00</span></div>
+    <input type="range" id="sl-n1" min="100" max="300" value="100" step="1">
+  </div>
+  <div class="ctrl-group">
+    <div class="ctrl-label">Indice di rifrazione n₂ (mezzo inferiore)</div>
+    <div><span class="ctrl-val" id="val-n2">1.50</span></div>
+    <input type="range" id="sl-n2" min="100" max="300" value="150" step="1">
+  </div>
+</div>
+
+<div class="mat3-row">
+  <button class="toggle-btn" id="btn-add3" onclick="toggleMat3()">+ Aggiungi terzo materiale</button>
+  <div class="mat3-inline" id="mat3-controls">
+    <span style="color:#888780;font-size:12px">n₃ =</span>
+    <input class="n-input" type="number" id="inp-n3" min="1.00" max="3.00" step="0.05" value="2.00" oninput="draw()">
+    <span style="font-size:11px;color:#888780">(terzo strato)</span>
+  </div>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="c" width="680" height="400"></canvas>
+</div>
+
+<div class="status-bar">
+  <div class="stat">θ₁ = <span class="val" id="s-t1">45.0°</span></div>
+  <div class="stat">θ₂ = <span class="val" id="s-t2">28.1°</span></div>
+  <div class="stat" id="s-crit-wrap" style="display:none">θ_critico = <span class="val" id="s-crit">—</span></div>
+  <div class="stat">n₁ = <span class="val" id="s-n1">1.00</span></div>
+  <div class="stat">n₂ = <span class="val" id="s-n2">1.50</span></div>
+  <div class="tir-badge" id="tir-badge">⚠ Riflessione interna totale</div>
+</div>
+
+<div class="formulas">
+  <h2>Relazioni fisiche fondamentali</h2>
+  <div class="formula-row">
+
+    <div class="formula-card">
+      <div class="formula-title">Legge di Snell-Descartes</div>
+      <div class="formula-body">$$n_1 \sin\theta_1 = n_2 \sin\theta_2$$</div>
+      <div class="formula-note">$\theta_1$ = angolo di incidenza, $\theta_2$ = angolo di rifrazione. Entrambi misurati rispetto alla normale alla superficie di separazione tra i due mezzi.</div>
+    </div>
+
+    <div class="formula-card">
+      <div class="formula-title">Indice di rifrazione</div>
+      <div class="formula-body">$$n = \frac{c}{v_m}$$</div>
+      <div class="formula-note">$c \approx 2{,}998 \times 10^8\ \text{m/s}$ è la velocità della luce nel vuoto; $v_m$ è la velocità nel mezzo. Per definizione $n \geq 1$.</div>
+    </div>
+
+    <div class="formula-card">
+      <div class="formula-title">Angolo critico (riflessione interna totale)</div>
+      <div class="formula-body">$$\sin\theta_c = \frac{n_2}{n_1} \quad (n_1 > n_2)$$</div>
+      <div class="formula-note">Esiste solo se $n_1 > n_2$. Per $\theta_1 \geq \theta_c$ il raggio non si rifrange: si ha riflessione interna totale (RIT) e il raggio rimane nel mezzo più denso.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 680, H = 400;
+const IY = 200, OX = 310;
+const LAYER2_H = 90;
+let mat3Active = false;
+
+function getParams() {
+  return {
+    theta1: parseFloat(document.getElementById('sl-theta').value),
+    n1: parseFloat(document.getElementById('sl-n1').value) / 100,
+    n2: parseFloat(document.getElementById('sl-n2').value) / 100
+  };
+}
+
+function snell(na, nb, taDeg) {
+  const s = (na / nb) * Math.sin(taDeg * Math.PI / 180);
+  if (Math.abs(s) > 1) return null;
+  return Math.asin(s) * 180 / Math.PI;
+}
+
+function critAngle(n1, n2) {
+  if (n1 <= n2) return null;
+  return Math.asin(n2 / n1) * 180 / Math.PI;
+}
+
+function seg(x1, y1, x2, y2, color, lw, dash) {
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = lw || 2.5;
+  ctx.setLineDash(dash || []);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.restore();
+}
+
+function arrowHead(x1, y1, x2, y2, color, frac) {
+  frac = frac || 0.55;
+  const mx = x1+(x2-x1)*frac, my = y1+(y2-y1)*frac;
+  const a = Math.atan2(y2-y1, x2-x1), al=11, aw=Math.PI/6;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(mx, my);
+  ctx.lineTo(mx - al*Math.cos(a-aw), my - al*Math.sin(a-aw));
+  ctx.lineTo(mx - al*Math.cos(a+aw), my - al*Math.sin(a+aw));
+  ctx.closePath(); ctx.fill();
+}
+
+function ray(x1, y1, x2, y2, color) {
+  seg(x1,y1,x2,y2,color,2.8);
+  arrowHead(x1,y1,x2,y2,color,0.55);
+}
+
+/*
+  drawArc: disegna l'arco MINORE tra i due vettori (vAx,vAy) e (vBx,vBy)
+  partenti dal punto (cx,cy), con raggio r.
+
+  Algoritmo:
+  1. Calcola aA = atan2(vAy,vAx) e aB = atan2(vBy,vBx)
+  2. Calcola diff = aB - aA, normalizzata in (-π, π]
+     → diff rappresenta la rotazione MINIMA da vA a vB
+  3. Se diff > 0: in canvas (y↓) "positivo" = senso orario → ccw = false
+     Se diff < 0: → ccw = true
+  4. Disegna ctx.arc(cx,cy,r, aA, aB, ccw)
+     L'arco percorso avrà ampiezza |diff| = angolo tra i due vettori.
+  5. Label posizionata al centro angolare: aA + diff/2
+*/
+function drawArc(cx, cy, r, vAx, vAy, vBx, vBy, color, label) {
+  const aA = Math.atan2(vAy, vAx);
+  const aB = Math.atan2(vBy, vBx);
+  let diff = aB - aA;
+  while (diff >  Math.PI) diff -= 2*Math.PI;
+  while (diff < -Math.PI) diff += 2*Math.PI;
+  const ccw = diff < 0;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = 1.3; ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, aA, aB, ccw);
+  ctx.stroke();
+  ctx.restore();
+  if (label && Math.abs(diff) > 0.02) {
+    const midA = aA + diff/2;
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.font = '500 12px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, cx+(r+18)*Math.cos(midA), cy+(r+18)*Math.sin(midA));
+    ctx.restore();
+  }
+}
+
+function draw() {
+  const { theta1, n1, n2 } = getParams();
+  ctx.clearRect(0, 0, W, H);
+
+  const iY2 = mat3Active ? IY + LAYER2_H : null;
+
+  // Sfondi
+  ctx.fillStyle = '#eaf3de'; ctx.fillRect(0, 0, W, IY);
+  if (mat3Active) {
+    ctx.fillStyle = '#e6f1fb'; ctx.fillRect(0, IY, W, LAYER2_H);
+    ctx.fillStyle = '#faeeda'; ctx.fillRect(0, iY2, W, H - iY2);
+  } else {
+    ctx.fillStyle = '#e6f1fb'; ctx.fillRect(0, IY, W, H - IY);
+  }
+
+  // Etichette mezzi
+  ctx.textBaseline = 'alphabetic'; ctx.font = '500 13px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#3b6d11'; ctx.fillText('Mezzo 1  ·  n₁ = '+n1.toFixed(2), 14, 26);
+  ctx.fillStyle = '#185fa5'; ctx.fillText('Mezzo 2  ·  n₂ = '+n2.toFixed(2), 14, IY+22);
+  if (mat3Active) {
+    const n3v = parseFloat(document.getElementById('inp-n3').value);
+    ctx.fillStyle = '#854f0b';
+    ctx.fillText('Mezzo 3  ·  n₃ = '+n3v.toFixed(2), 14, iY2+22);
+  }
+
+  // Interfacce
+  seg(0, IY, W, IY, '#73726c', 1.5);
+  if (mat3Active) seg(0, iY2, W, iY2, '#73726c', 1.5);
+
+  // Normale
+  const normTop = IY-120, normBot = mat3Active ? iY2+75 : IY+140;
+  seg(OX, normTop, OX, normBot, '#aaa', 1, [7,5]);
+  ctx.fillStyle='#999'; ctx.font='12px sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Normale', OX+6, normTop+14);
+
+  // Calcoli
+  const t1r = theta1 * Math.PI / 180;
+  const theta2 = snell(n1, n2, theta1);
+  const tir = theta2 === null;
+  const thetaCrit = critAngle(n1, n2);
+
+  // UI
+  document.getElementById('s-t1').textContent = theta1.toFixed(1)+'°';
+  document.getElementById('s-n1').textContent = n1.toFixed(2);
+  document.getElementById('s-n2').textContent = n2.toFixed(2);
+  document.getElementById('s-t2').textContent = tir ? '—' : theta2.toFixed(1)+'°';
+  if (thetaCrit !== null) {
+    document.getElementById('s-crit').textContent = thetaCrit.toFixed(1)+'°';
+    document.getElementById('s-crit-wrap').style.display = '';
+  } else {
+    document.getElementById('s-crit-wrap').style.display = 'none';
+  }
+  document.getElementById('tir-badge').style.display = tir ? '' : 'none';
+
+  const RAY = 130, ARC = 48;
+
+  /*
+    RAGGIO INCIDENTE: arriva dall'alto, direzione di propagazione = (sin θ₁, cos θ₁).
+    Parte da: (OX - sin θ₁·RAY,  IY - cos θ₁·RAY)  → scende verso O=(OX,IY)
+  */
+  const incX0 = OX - Math.sin(t1r)*RAY;
+  const incY0 = IY - Math.cos(t1r)*RAY;
+  ray(incX0, incY0, OX, IY, '#d85a30');
+
+  /*
+    ARCO θ₁ — angolo tra la normale (verso l'alto) e il raggio incidente.
+    
+    Entrambi i vettori partono da O e puntano "verso fuori" (lontano dall'interfaccia):
+      • Normale UP:         (0, -1)
+      • Raggio verso sorgente: (-sin θ₁, -cos θ₁)   [opposto alla direzione di propagazione]
+    
+    Con drawArc questi due vettori definiscono esattamente l'angolo θ₁:
+      θ₁=0°  → entrambi i vettori = (0,-1)  → diff=0 → nessun arco  ✓
+      θ₁=45° → angolo tra (0,-1) e (-0.707,-0.707) = 45°            ✓
+      θ₁=90° → angolo tra (0,-1) e (-1,0) = 90°                     ✓
+  */
+  if (theta1 >= 1) {
+    drawArc(OX, IY, ARC,
+      0, -1,                           // normale UP
+      -Math.sin(t1r), -Math.cos(t1r),  // verso sorgente
+      '#d85a30', 'θ₁='+theta1.toFixed(0)+'°');
+  }
+
+  if (tir) {
+    // Raggio riflesso: direzione (sin θ₁, -cos θ₁) — verso l'alto a destra
+    const rflX = OX + Math.sin(t1r)*RAY;
+    const rflY = IY - Math.cos(t1r)*RAY;
+    ray(OX, IY, rflX, rflY, '#e24b4a');
+
+    // Arco θ_r: normale UP vs direzione del riflesso uscente (sin θ₁, -cos θ₁)
+    if (theta1 >= 1) {
+      drawArc(OX, IY, ARC,
+        0, -1,
+        Math.sin(t1r), -Math.cos(t1r),
+        '#e24b4a', 'θ_r='+theta1.toFixed(0)+'°');
+    }
+
+    seg(OX, IY, OX+100, IY+50, '#e24b4a', 1.5, [5,4]);
+    ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif';
+    ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+    ctx.fillText('Onda evanescente', OX+105, IY+54);
+    ctx.font='500 12px sans-serif';
+    ctx.fillText('Raggio riflesso (RIT)', rflX+6, rflY-6);
+
+  } else {
+    const t2r = theta2 * Math.PI / 180;
+    let endX2, endY2;
+    if (mat3Active) {
+      const dist = LAYER2_H / Math.cos(t2r);
+      endX2 = OX + Math.sin(t2r)*dist; endY2 = iY2;
+    } else {
+      endX2 = OX + Math.sin(t2r)*RAY; endY2 = IY + Math.cos(t2r)*RAY;
+    }
+    ray(OX, IY, endX2, endY2, '#185fa5');
+
+    /*
+      ARCO θ₂ — angolo tra normale (verso il basso) e raggio rifratto.
+      
+      Vettori partendo da O:
+        • Normale DOWN:        (0, +1)
+        • Direzione rifratto:  (sin θ₂, cos θ₂)
+      
+      θ₂=0°  → rifratto = (0,1) = normale DOWN → diff=0   ✓
+      θ₂=30° → angolo = 30°                                ✓
+    */
+    if (theta2 >= 1) {
+      drawArc(OX, IY, ARC,
+        0, 1,
+        Math.sin(t2r), Math.cos(t2r),
+        '#185fa5', 'θ₂='+theta2.toFixed(1)+'°');
+    }
+
+    // Riflesso parziale (grigio)
+    const rpX = OX + Math.sin(t1r)*80, rpY = IY - Math.cos(t1r)*80;
+    seg(OX, IY, rpX, rpY, '#ccc', 1.5, [4,4]);
+    arrowHead(OX, IY, rpX, rpY, '#ccc', 0.55);
+    ctx.fillStyle='#b4b2a9'; ctx.font='11px sans-serif';
+    ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+    ctx.fillText('Riflesso parziale', rpX+5, rpY-4);
+
+    // Terzo mezzo
+    if (mat3Active) {
+      const n3v = parseFloat(document.getElementById('inp-n3').value);
+      const theta3 = snell(n2, n3v, theta2);
+      const tirM3 = theta3 === null;
+      seg(endX2, iY2-65, endX2, iY2+75, '#bbb', 1, [6,4]);
+      if (tirM3) {
+        const r3x = endX2 - Math.sin(t2r)*80, r3y = iY2 - Math.cos(t2r)*80;
+        ray(endX2, iY2, r3x, r3y, '#e24b4a');
+        ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif';
+        ctx.textBaseline='alphabetic';
+        ctx.fillText('RIT (2ª interfaccia)', r3x-130, r3y-4);
+      } else {
+        const t3r = theta3 * Math.PI / 180;
+        const e3x = endX2 + Math.sin(t3r)*85, e3y = iY2 + Math.cos(t3r)*85;
+        ray(endX2, iY2, e3x, e3y, '#854f0b');
+        if (theta3 >= 1) {
+          drawArc(endX2, iY2, 36, 0, 1, Math.sin(t3r), Math.cos(t3r),
+            '#854f0b', 'θ₃='+theta3.toFixed(1)+'°');
+        }
+      }
+    }
+  }
+
+  // Punto di incidenza
+  ctx.beginPath();
+  ctx.arc(OX, IY, 5, 0, Math.PI*2);
+  ctx.fillStyle='#2c2c2a'; ctx.fill();
+}
+
+function toggleMat3() {
+  mat3Active = !mat3Active;
+  document.getElementById('btn-add3').classList.toggle('active', mat3Active);
+  document.getElementById('btn-add3').textContent = mat3Active ? '− Rimuovi terzo materiale' : '+ Aggiungi terzo materiale';
+  document.getElementById('mat3-controls').classList.toggle('show', mat3Active);
+  draw();
+}
+
+['sl-theta','sl-n1','sl-n2'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    if (id==='sl-theta') document.getElementById('val-theta').textContent = this.value;
+    if (id==='sl-n1')    document.getElementById('val-n1').textContent = (this.value/100).toFixed(2);
+    if (id==='sl-n2')    document.getElementById('val-n2').textContent = (this.value/100).toFixed(2);
+    draw();
+  });
+});
+
+draw();
+</script>
+</body>
+</html>

@@ -27,25 +27,7 @@
       --radius-lg: 12px;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #1e1e1c;
-        --bg2: #2a2a27;
-        --bg3: #333330;
-        --text: #e8e6de;
-        --text2: #9c9a92;
-        --text3: #6e6d67;
-        --border: rgba(255,255,255,0.1);
-        --border2: rgba(255,255,255,0.2);
-        --blue: #5aa3e8;
-        --blue-dark: #85B7EB;
-        --blue-label: #B5D4F4;
-        --red: #e86e6d;
-        --red-dark: #F09595;
-        --green: #97C459;
-        --purple: #AFA9EC;
-      }
-    }
+
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
@@ -221,17 +203,15 @@
       border: 0.5px solid var(--border);
       border-radius: var(--radius-md);
       padding: 0.6rem 0.9rem;
-    }
-    .formula-name {
-      font-size: 11px;
-      color: var(--text3);
-      margin-bottom: 2px;
+      min-height: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .formula-eq {
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 15px;
       color: var(--text);
-      font-family: 'Georgia', serif;
+      margin-top: 4px;
     }
 
     footer {
@@ -295,27 +275,27 @@
     <div class="formula-grid">
       <div class="formula-item">
         <div class="formula-name">Velocità tangenziale</div>
-        <div class="formula-eq">v = ω · r</div>
+        <div class="formula-eq">\( v = \omega \cdot r \)</div>
       </div>
       <div class="formula-item">
         <div class="formula-name">Accelerazione centripeta</div>
-        <div class="formula-eq">a<sub>c</sub> = ω² · r = v²/r</div>
+        <div class="formula-eq">\( a_c = \omega^2 \cdot r = \dfrac{v^2}{r} \)</div>
       </div>
       <div class="formula-item">
         <div class="formula-name">Periodo</div>
-        <div class="formula-eq">T = 2π / ω</div>
+        <div class="formula-eq">\( T = \dfrac{2\pi}{\omega} \)</div>
       </div>
       <div class="formula-item">
         <div class="formula-name">Frequenza</div>
-        <div class="formula-eq">f = 1/T = ω / (2π)</div>
+        <div class="formula-eq">\( f = \dfrac{1}{T} = \dfrac{\omega}{2\pi} \)</div>
       </div>
       <div class="formula-item">
         <div class="formula-name">Posizione angolare</div>
-        <div class="formula-eq">θ(t) = θ₀ + ω · t</div>
+        <div class="formula-eq">\( \theta(t) = \theta_0 + \omega \cdot t \)</div>
       </div>
       <div class="formula-item">
-        <div class="formula-name">Direzione velocità</div>
-        <div class="formula-eq">v̂ = (−sin θ, cos θ)</div>
+        <div class="formula-name">Direzione velocità tangenziale</div>
+        <div class="formula-eq">\( \hat{v} = (-\sin\theta,\; \cos\theta) \)</div>
       </div>
     </div>
   </div>
@@ -370,18 +350,17 @@
       lastTime = ts;
       angle += omega * dt;
 
-      const dark = isDark();
-      const gridCol  = dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-      const axisCol  = dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
-      const textCol  = dark ? '#9c9a92' : '#73726c';
-      const radCol   = dark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.15)';
-      const dotFill  = dark ? '#AFA9EC' : '#534AB7';
-      const dotStroke= dark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.18)';
-      const blueV    = dark ? '#5aa3e8' : '#378ADD';
-      const blueTxt  = dark ? '#B5D4F4' : '#0C447C';
-      const redA     = dark ? '#e86e6d' : '#E24B4A';
-      const redTxt   = dark ? '#F09595' : '#A32D2D';
-      const greenT   = dark ? '#97C459' : '#639922';
+      const gridCol   = 'rgba(0,0,0,0.05)';
+      const axisCol   = 'rgba(0,0,0,0.15)';
+      const textCol   = '#73726c';
+      const radCol    = 'rgba(0,0,0,0.15)';
+      const dotFill   = '#534AB7';
+      const dotStroke = 'rgba(0,0,0,0.18)';
+      const blueV     = '#378ADD';
+      const blueTxt   = '#0C447C';
+      const redA      = '#E24B4A';
+      const redTxt    = '#A32D2D';
+      const greenT    = '#639922';
 
       ctx.clearRect(0, 0, W, H);
 
@@ -516,5 +495,13 @@
     update();
     requestAnimationFrame(draw);
   </script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: true }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </body>
 </html>

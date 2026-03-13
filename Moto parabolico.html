@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulatore Moto Parabolico</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, startup: { typeset: false } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -251,13 +255,12 @@
   }
 
   .eq-formula {
-    font-family: var(--mono);
-    font-size: 0.78rem;
+    font-size: 0.92rem;
     color: var(--text2);
-    line-height: 1.6;
+    line-height: 2;
   }
 
-  .eq-formula span { color: var(--text); }
+  .eq-formula .MJX-TEX { color: var(--text); }
 
   @media (max-width: 680px) {
     .container { grid-template-columns: 1fr; }
@@ -313,10 +316,20 @@
         <div class="metric-val" id="mT">—</div>
         <div class="metric-unit">secondi</div>
       </div>
-      <div class="metric m-v">
-        <div class="metric-label">vx · vy</div>
-        <div class="metric-val" id="mVxy">—</div>
-        <div class="metric-unit">m/s</div>
+      <div class="metric m-v" style="grid-column: span 2;">
+        <div style="display:flex; gap:12px; justify-content:space-around;">
+          <div style="text-align:center;">
+            <div class="metric-label">v<sub>(0,x)</sub></div>
+            <div class="metric-val" id="mVx" style="font-size:1rem;">—</div>
+            <div class="metric-unit">m/s</div>
+          </div>
+          <div style="border-left:0.5px solid var(--border2);"></div>
+          <div style="text-align:center;">
+            <div class="metric-label">v<sub>(0,y)</sub></div>
+            <div class="metric-val" id="mVy" style="font-size:1rem;">—</div>
+            <div class="metric-unit">m/s</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -336,25 +349,28 @@
   <div class="eq-card">
     <div class="eq-label">Equazioni del moto</div>
     <div class="eq-formula">
-      x(t) = <span>x₀ + v₀cosθ · t</span><br>
-      y(t) = <span>y₀ + v₀sinθ · t − ½gt²</span>
+      $x(t) = x_0 + v_0 \cos\theta \cdot t$<br><br>
+      $y(t) = y_0 + v_0 \sin\theta \cdot t - \dfrac{1}{2}g t^2$
     </div>
   </div>
   <div class="eq-card">
     <div class="eq-label">Altezza massima</div>
     <div class="eq-formula">
-      t_apice = <span>v₀sinθ / g</span><br>
-      h_max = <span>y₀ + (v₀sinθ)² / 2g</span>
+      $t_{\text{apice}} = \dfrac{v_0 \sin\theta}{g}$<br><br>
+      $h_{\max} = y_0 + \dfrac{(v_0 \sin\theta)^2}{2g}$
     </div>
   </div>
   <div class="eq-card">
     <div class="eq-label">Gittata (y₀ = 0)</div>
     <div class="eq-formula">
-      L = <span>v₀² · sin2θ / g</span><br>
-      L_max @ <span>θ = 45°</span>
+      $L = \dfrac{v_0^2 \sin 2\theta}{g}$<br><br>
+      $L_{\max} \text{ per } \theta = 45°$
     </div>
   </div>
 </div>
+<script>
+if (window.MathJax) MathJax.typesetPromise();
+</script>
 
 <script>
 const g = 9.81;
@@ -470,8 +486,8 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(tx(xA),ty(comp.hmax)); ctx.lineTo(tx(xA),ty(0)); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(pad.l+2,ty(comp.hmax)); ctx.lineTo(tx(xA),ty(comp.hmax)); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(14,138,90,1)'; ctx.font='italic 11px "DM Mono", monospace'; ctx.textAlign='left';
-    ctx.fillText('h_max = '+comp.hmax.toFixed(1)+' m', pad.l+5, ty(comp.hmax)-6);
+    ctx.fillStyle='rgba(14,138,90,1)'; ctx.font='italic 12px "DM Mono", monospace'; ctx.textAlign='left';
+    ctx.fillText('h_max', pad.l+5, ty(comp.hmax)-6);
   }
 
   // gittata arrow
@@ -485,8 +501,8 @@ function draw() {
     ctx.lineTo(cx+dir*6,yg-4); ctx.lineTo(cx+dir*6,yg+4);
     ctx.fillStyle='rgba(192,79,32,1)'; ctx.fill();
   });
-  ctx.fillStyle='rgba(192,79,32,1)'; ctx.font='italic 11px "DM Mono", monospace'; ctx.textAlign='center';
-  ctx.fillText('L = '+comp.gittata.toFixed(1)+' m', (tx(inp.x0)+tx(comp.xLand))/2, yg+20);
+  ctx.fillStyle='rgba(192,79,32,1)'; ctx.font='italic 12px "DM Mono", monospace'; ctx.textAlign='center';
+  ctx.fillText('L', (tx(inp.x0)+tx(comp.xLand))/2, yg+20);
 
   // tangent velocity vectors along trajectory
   // v(t) = (vx, vy0 - g*t) — tangente esatta alla parabola
@@ -577,7 +593,6 @@ function draw() {
   drawDot(comp.xLand, 0, '#c04f20');
 
   ctx.fillStyle='#6d4fc0'; ctx.font='10px "DM Mono", monospace'; ctx.textAlign='left';
-  ctx.fillText('(x₀,y₀)', tx(inp.x0)+7, ty(inp.y0)-6);
 }
 
 function updateMetrics() {
@@ -586,7 +601,8 @@ function updateMetrics() {
   document.getElementById('mL').textContent = comp.gittata.toFixed(1);
   document.getElementById('mH').textContent = comp.hmax.toFixed(1);
   document.getElementById('mT').textContent = comp.tFlight.toFixed(2);
-  document.getElementById('mVxy').textContent = comp.vx.toFixed(1)+' · '+comp.vy.toFixed(1);
+  document.getElementById('mVx').textContent = comp.vx.toFixed(1);
+  document.getElementById('mVy').textContent = comp.vy.toFixed(1);
   document.getElementById('vx0').textContent = inp.x0;
   document.getElementById('vy0').textContent = inp.y0;
   document.getElementById('vv0').textContent = inp.v0;

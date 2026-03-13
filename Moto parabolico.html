@@ -291,7 +291,7 @@
     </div>
     <div class="ctrl-group">
       <div class="ctrl-label">θ — angolo di lancio <span class="ctrl-val"><span id="vtheta">45</span>°</span></div>
-      <input type="range" id="theta" min="1" max="89" value="45" step="1">
+      <input type="range" id="theta" min="0" max="89" value="45" step="1">
     </div>
 
     <hr class="divider">
@@ -373,7 +373,8 @@ function getInputs() {
 function compute({x0, y0, v0, theta}) {
   const vx = v0 * Math.cos(theta);
   const vy = v0 * Math.sin(theta);
-  const tFlight = (vy + Math.sqrt(vy*vy + 2*g*y0)) / g;
+  const disc = Math.max(0, vy*vy + 2*g*y0);
+  const tFlight = (vy + Math.sqrt(disc)) / g;
   const tApex = vy / g;
   const hmax = y0 + vy*vy / (2*g);
   const xLand = x0 + vx * tFlight;
@@ -383,7 +384,8 @@ function compute({x0, y0, v0, theta}) {
 function getTrajectory(x0, y0, v0, theta, steps=400) {
   const vx = v0 * Math.cos(theta);
   const vy = v0 * Math.sin(theta);
-  const tFlight = (vy + Math.sqrt(vy*vy + 2*g*y0)) / g;
+  const disc = Math.max(0, vy*vy + 2*g*y0);
+  const tFlight = (vy + Math.sqrt(disc)) / g;
   const pts = [];
   for (let i = 0; i <= steps; i++) {
     const t = (i / steps) * tFlight;
@@ -491,10 +493,14 @@ function draw() {
   const vx0c = inp.v0 * Math.cos(inp.theta);
   const vy0c = inp.v0 * Math.sin(inp.theta);
   const tFlight = comp.tFlight;
-  // scala: il vettore v0 occupa ~14% della larghezza del plot
-  const vsc = (plotW / (maxX - minX)) * 0.14 / inp.v0;
 
-  const nVecs = 5; // vettori distribuiti sulla traiettoria (incluso t=0)
+  // Lunghezza fissa in pixel per il vettore v0: sempre 70px
+  // Tutti gli altri vettori scalano proporzionalmente a |v(t)| / v0
+  const VEC_BASE_PX = 70;
+  const scaleX = plotW / (maxX - minX);
+  const scaleY = plotH / (maxY - minY);
+
+  const nVecs = 5;
   for (let k = 0; k < nVecs; k++) {
     const t = (k / (nVecs - 1)) * tFlight;
     const px = inp.x0 + vx0c * t;
@@ -503,34 +509,30 @@ function draw() {
     const vyt = vy0c - g * t;
     const speed = Math.sqrt(vxt*vxt + vyt*vyt);
 
-    // coordinate canvas
+    // direzione unitaria del vettore nello spazio canvas
+    // (teniamo conto delle scale diverse su x e y)
+    const dxCanvas = vxt * scaleX;
+    const dyCanvas = -vyt * scaleY;
+    const lenCanvas = Math.sqrt(dxCanvas*dxCanvas + dyCanvas*dyCanvas);
+    if (lenCanvas < 0.001) continue;
+
+    // lunghezza in pixel proporzionale alla velocità istantanea
+    const lenPx = VEC_BASE_PX * (speed / inp.v0);
+    const nx = dxCanvas / lenCanvas;
+    const ny = dyCanvas / lenCanvas;
+
     const cx = tx(px);
     const cy = ty(py);
-    // direzione del vettore nello spazio canvas (y invertita)
-    const dvx = vxt * vsc;
-    const dvy = -vyt * vsc; // y canvas cresce verso il basso
-    const ex2 = cx + dvx * plotW;
-    const ey2 = cy + dvy * plotH / (maxY - minY) * (maxY - minY);
-
-    // ricalcolo corretto con scale separate
-    const scaleX = plotW / (maxX - minX);
-    const scaleY = plotH / (maxY - minY);
-    const vecFrac = 0.14; // frazione della larghezza come lunghezza massima
-    const maxLen = plotW * vecFrac;
-    const lenPx = speed * vsc * Math.sqrt(scaleX * scaleX + scaleY * scaleY) / Math.sqrt(2);
-
-    const ex3 = cx + vxt * scaleX * vsc;
-    const ey3 = cy - vyt * scaleY * vsc;
+    const ex3 = cx + nx * lenPx;
+    const ey3 = cy + ny * lenPx;
 
     const angle = Math.atan2(ey3 - cy, ex3 - cx);
     const isFirst = k === 0;
-    const alpha = 1.0;
 
     ctx.strokeStyle = isFirst ? '#1a1a18' : '#444440';
     ctx.lineWidth = isFirst ? 2.2 : 1.6;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex3, ey3); ctx.stroke();
 
-    // punta freccia
     const arrSize = isFirst ? 9 : 7;
     ctx.fillStyle = isFirst ? '#1a1a18' : '#444440';
     ctx.beginPath();
@@ -539,7 +541,6 @@ function draw() {
     ctx.lineTo(ex3 - arrSize * Math.cos(angle + 0.38), ey3 - arrSize * Math.sin(angle + 0.38));
     ctx.closePath(); ctx.fill();
 
-    // etichetta solo sul primo vettore (v₀)
     if (isFirst) {
       ctx.fillStyle = '#1a1a18';
       ctx.font = 'bold 10px "DM Mono", monospace';

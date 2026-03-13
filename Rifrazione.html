@@ -85,11 +85,6 @@
 </div>
 
 <div class="status-bar">
-  <div class="stat">θ₁ = <span class="val" id="s-t1">45.0°</span></div>
-  <div class="stat">θ₂ = <span class="val" id="s-t2">28.1°</span></div>
-  <div class="stat" id="s-crit-wrap" style="display:none">θ_critico = <span class="val" id="s-crit">—</span></div>
-  <div class="stat">n₁ = <span class="val" id="s-n1">1.00</span></div>
-  <div class="stat">n₂ = <span class="val" id="s-n2">1.50</span></div>
   <div class="tir-badge" id="tir-badge">⚠ Riflessione interna totale</div>
 </div>
 
@@ -251,16 +246,6 @@ function draw() {
   const thetaCrit = critAngle(n1, n2);
 
   // UI
-  document.getElementById('s-t1').textContent = theta1.toFixed(1)+'°';
-  document.getElementById('s-n1').textContent = n1.toFixed(2);
-  document.getElementById('s-n2').textContent = n2.toFixed(2);
-  document.getElementById('s-t2').textContent = tir ? '—' : theta2.toFixed(1)+'°';
-  if (thetaCrit !== null) {
-    document.getElementById('s-crit').textContent = thetaCrit.toFixed(1)+'°';
-    document.getElementById('s-crit-wrap').style.display = '';
-  } else {
-    document.getElementById('s-crit-wrap').style.display = 'none';
-  }
   document.getElementById('tir-badge').style.display = tir ? '' : 'none';
 
   const RAY = 130, ARC = 48;
@@ -377,6 +362,40 @@ function draw() {
   ctx.beginPath();
   ctx.arc(OX, IY, 5, 0, Math.PI*2);
   ctx.fillStyle='#2c2c2a'; ctx.fill();
+
+  // Angolo critico — mostrato in alto a destra nel canvas
+  const cx2 = 540, cy2 = 40;
+  if (thetaCrit !== null) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.roundRect(cx2 - 8, cy2 - 22, 168, 52, 7);
+    ctx.fill();
+    ctx.strokeStyle = '#d05538';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+    ctx.fillStyle = '#888780';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Angolo critico (n₁ > n₂)', cx2, cy2 - 6);
+    ctx.fillStyle = '#d05538';
+    ctx.font = '500 18px sans-serif';
+    ctx.fillText('θ_c = ' + thetaCrit.toFixed(1) + '°', cx2, cy2 + 18);
+    ctx.restore();
+  } else {
+    // Se n1 <= n2 non esiste angolo critico: mostra nota
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.beginPath();
+    ctx.roundRect(cx2 - 8, cy2 - 22, 168, 42, 7);
+    ctx.fill();
+    ctx.fillStyle = '#aaa';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Angolo critico:', cx2, cy2 - 6);
+    ctx.fillText('non esiste (n₁ ≤ n₂)', cx2, cy2 + 10);
+    ctx.restore();
+  }
 }
 
 function toggleMat3() {

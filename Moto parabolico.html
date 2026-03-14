@@ -426,10 +426,15 @@ function draw() {
   const plotH = H - pad.t - pad.b;
 
   const allX = traj.map(p=>p.x);
-  const minX = Math.min(0, inp.x0-2, ...allX);
-  const maxX = Math.max(...allX)*1.1+2;
+  const minX = 0;
+  // maxX basato sulla gittata massima teorica (θ=45°): L_max = v₀²/g
+  // così la scala x non cambia al variare dell'angolo
+  const gittataMax = (inp.v0 * inp.v0) / g;
+  const maxX = inp.x0 + gittataMax * 1.15 + 2;
   const minY = 0;
-  const maxY = Math.max(comp.hmax, inp.y0)*1.22+2;
+  // maxY basato sull'altezza massima teorica (θ=90°): h_max = y₀ + v₀²/(2g)
+  const hmaxTeor = inp.y0 + (inp.v0 * inp.v0) / (2 * g);
+  const maxY = hmaxTeor * 1.25 + 2;
 
   const tx = x => pad.l + (x-minX)/(maxX-minX)*plotW;
   const ty = y => pad.t + plotH - (y-minY)/(maxY-minY)*plotH;

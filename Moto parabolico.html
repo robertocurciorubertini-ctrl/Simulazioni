@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulatore Moto Parabolico</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script>
 MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, startup: { typeset: false } };
 </script>
@@ -13,21 +13,23 @@ MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, star
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #f5f5f2;
+    --bg: #f4f3ef;
     --surface: #ffffff;
-    --surface2: #f0f0ec;
-    --border: rgba(0,0,0,0.08);
-    --border2: rgba(0,0,0,0.14);
-    --text: #1a1a18;
-    --text2: #4a5c4d;
-    --text3: #8a9a8d;
+    --surface2: #f0efe9;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.13);
+    --text: #1c1c1a;
+    --text2: #4a5040;
+    --text3: #8a8f80;
     --accent-traj: #1a6fd4;
     --accent-L: #c04f20;
     --accent-h: #0e8a5a;
     --accent-vec: #222222;
     --accent-pt: #6d4fc0;
+    --accent-line: #2a2a26;
     --mono: 'DM Mono', monospace;
     --sans: 'DM Sans', sans-serif;
+    --serif: 'EB Garamond', Georgia, serif;
   }
 
   body {
@@ -38,32 +40,56 @@ MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, star
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem 1rem 3rem;
+    padding: 2.5rem 1rem 3.5rem;
   }
 
   header {
     width: 100%;
     max-width: 900px;
     margin-bottom: 2rem;
-    display: flex;
-    align-items: baseline;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--accent-line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
     gap: 1rem;
-    border-bottom: 0.5px solid var(--border2);
-    padding-bottom: 1rem;
   }
+
+  .header-left {}
 
   header h1 {
-    font-family: var(--mono);
-    font-size: 1.05rem;
+    font-family: var(--serif);
+    font-size: 1.75rem;
     font-weight: 400;
+    font-style: italic;
     color: var(--text);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    margin-bottom: 4px;
   }
 
-  header p {
-    font-size: 0.8rem;
-    color: var(--text3);
+  header .subtitle {
     font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .header-badge {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text3);
+    border: 0.5px solid var(--border2);
+    border-radius: 4px;
+    padding: 5px 10px;
+    white-space: nowrap;
+    background: var(--surface);
+  }
+
+  .header-badge span {
+    color: var(--text2);
+    font-style: italic;
   }
 
   .container {
@@ -77,17 +103,20 @@ MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, star
   .panel {
     background: var(--surface);
     border: 0.5px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
   .panel-title {
     font-family: var(--mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text3);
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
   }
 
   .ctrl-group {
@@ -190,10 +219,11 @@ MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, star
   .canvas-panel {
     background: var(--surface);
     border: 0.5px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 16px;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
   canvas {
@@ -229,29 +259,33 @@ MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, star
   .eq-section {
     width: 100%;
     max-width: 900px;
-    margin-top: 16px;
+    margin-top: 14px;
     background: var(--surface);
     border: 0.5px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
+    border-radius: 8px;
+    padding: 16px 20px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
   .eq-card {
     background: var(--surface2);
-    border-radius: 7px;
-    padding: 12px 14px;
+    border-radius: 6px;
+    padding: 14px 16px;
+    border: 0.5px solid var(--border);
   }
 
   .eq-label {
     font-family: var(--mono);
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     color: var(--text3);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 6px;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 0.5px solid var(--border2);
   }
 
   .eq-formula {
@@ -272,8 +306,11 @@ MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, star
 <body>
 
 <header>
-  <h1>// simulatore_moto_parabolico</h1>
-  <p>g = 9.81 m/s² — sistema di riferimento cartesiano</p>
+  <div class="header-left">
+    <h1>Moto Parabolico</h1>
+    <div class="subtitle">Simulatore interattivo &nbsp;·&nbsp; cinematica del proiettile</div>
+  </div>
+  <div class="header-badge"><span>g</span> = 9.81 m/s²&nbsp;&nbsp;·&nbsp;&nbsp;sistema cartesiano</div>
 </header>
 
 <div class="container">

@@ -419,47 +419,95 @@ function buildSrcs(wX,cY){
       const by=cY+(s===0?-sep/2:sep/2);
       for(let i=0;i<h;i++) srcs.push({x:wX,y:by-sw/2+sw/(h-1||1)*i});
     }
-  } else {
-    const tot=DSH*0.8,obs=sw,arm=(tot-obs)/2;
-    const tn=Math.round(hn/2),bn=hn-tn;
-    const ts=cY-tot/2;
-    for(let i=0;i<tn;i++) srcs.push({x:wX,y:ts+arm/(tn-1||1)*i});
-    const bs=cY+obs/2;
-    for(let i=0;i<bn;i++) srcs.push({x:wX,y:bs+arm/(bn-1||1)*i});
   }
+  // ostacolo: gestito separatamente con Babinet, non usa srcs
   return srcs;
+}
+
+// Calcola il campo complesso da un set di sorgenti in un punto (px,py)
+function fieldAt(px,py,srcs,k,om,t){
+  let re=0,im=0;
+  for(const s of srcs){
+    const r=Math.sqrt((px-s.x)**2+(py-s.y)**2);
+    if(r<0.5)continue;
+    const att=1/(1+r*0.008);
+    re+=att*Math.cos(k*r-om*t);
+    im+=att*Math.sin(k*r-om*t);
+  }
+  return{re,im};
 }
 
 function drawDiff(){
   const{sw,lw,hn}=DP;
   const wX=Math.round(DSW*0.35),cY=DSH/2;
   const k=Math.PI*2/(lw/DSC),om=Math.PI*2;
-  const srcs=buildSrcs(wX,cY);
   const img=dSX.createImageData(DSW,DSH);
   const d=img.data;
-  for(let py=0;py<DSH;py++){
-    for(let px=0;px<DSW;px++){
-      const ii=(py*DSW+px)*4;
-      if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=248;d[ii+3]=255;continue;}
-      let re=0,im=0;
-      for(const s of srcs){
-        const r=Math.sqrt((px-s.x)**2+(py-s.y)**2);
-        if(r<0.5)continue;
-        const att=1/(1+r*0.009);
-        re+=att*Math.cos(k*r-om*dT);
-        im+=att*Math.sin(k*r-om*dT);
+
+  if(dMode==='obstacle'){
+    // ── PRINCIPIO DI BABINET ──────────────────────────────────────────
+    // Campo totale = onda piana incidente − campo della fenditura equivalente
+    // U_ostacolo(P) = U_piano(P) − U_fenditura(P)
+    //
+    // U_piano: onda piana che si propaga in direzione +x
+    //   U_piano(px,py,t) = cos(k·px − om·t)   [parte reale]
+    //
+    // U_fenditura: sorgenti Huygens all'interno dell'ostacolo (zona bloccata)
+    //   Le usiamo con densità alta (ogni pixel nella striscia)
+
+    // Costruisce sorgenti dense nell'area dell'ostacolo (la "fenditura complementare")
+    const obstSrcs=[];
+    const nObs=Math.max(hn*2, 30); // densità alta per buona approssimazione
+    for(let i=0;i<nObs;i++){
+      const y=cY-sw/2 + sw/(nObs-1)*i;
+      obstSrcs.push({x:wX,y});
+    }
+
+    for(let py=0;py<DSH;py++){
+      for(let px=0;px<DSW;px++){
+        const ii=(py*DSW+px)*4;
+        if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=248;d[ii+3]=255;continue;}
+
+        // Campo onda piana: U_piano = e^{i(k·px − om·t)}
+        const planeRe = Math.cos(k*px - om*dT);
+        const planeIm = Math.sin(k*px - om*dT);
+
+        // Campo fenditura complementare (zona ostacolo)
+        const f=fieldAt(px,py,obstSrcs,k,om,dT);
+        const slitRe=f.re/nObs, slitIm=f.im/nObs;
+
+        // Babinet: U_obs = U_piano − U_slit
+        const totRe = planeRe - slitRe;
+        const totIm = planeIm - slitIm;
+        const amp = Math.min(1, Math.sqrt(totRe*totRe+totIm*totIm)*0.7);
+
+        d[ii]=Math.round(255*(1-amp*0.85));
+        d[ii+1]=Math.round(255*(1-amp*0.6));
+        d[ii+2]=255;
+        d[ii+3]=255;
       }
-      const amp=Math.min(1,Math.sqrt(re*re+im*im)/srcs.length*2.8);
-      // blu su bianco: alta intensità=blu scuro, bassa=bianco
-      d[ii]=Math.round(255*(1-amp*0.85));
-      d[ii+1]=Math.round(255*(1-amp*0.6));
-      d[ii+2]=255;
-      d[ii+3]=255;
+    }
+  } else {
+    // ── FENDITURA SINGOLA / DOPPIA: Huygens classico ─────────────────
+    const srcs=buildSrcs(wX,cY);
+    for(let py=0;py<DSH;py++){
+      for(let px=0;px<DSW;px++){
+        const ii=(py*DSW+px)*4;
+        if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=248;d[ii+3]=255;continue;}
+        const f=fieldAt(px,py,srcs,k,om,dT);
+        const amp=Math.min(1,Math.sqrt(f.re*f.re+f.im*f.im)/srcs.length*2.8);
+        d[ii]=Math.round(255*(1-amp*0.85));
+        d[ii+1]=Math.round(255*(1-amp*0.6));
+        d[ii+2]=255;
+        d[ii+3]=255;
+      }
     }
   }
+
   dSX.putImageData(img,0,0);
   DX.drawImage(dSC,0,0,DW,DH);
-  // plane waves left
+
+  // onde piane a sinistra
   const wXf=wX*DSC,spacing=lw,off=(dT*spacing)%spacing;
   DX.strokeStyle='rgba(0,100,200,0.35)';DX.lineWidth=1.5;
   for(let i=0;i*spacing<wXf+spacing;i++){
@@ -467,7 +515,8 @@ function drawDiff(){
     if(x<0||x>wXf)continue;
     DX.beginPath();DX.moveTo(x,0);DX.lineTo(x,DH);DX.stroke();
   }
-  // wall
+
+  // muro / ostacolo
   const cYf=DH/2,swf=sw,sepf=Math.max(sw*1.6,60);
   DX.fillStyle='#334155';
   if(dMode==='single'){
@@ -478,20 +527,44 @@ function drawDiff(){
     DX.fillRect(wXf-5,cYf-sepf/2+swf/2,10,sepf-swf);
     DX.fillRect(wXf-5,cYf+sepf/2+swf/2,10,DH);
   } else {
-    DX.fillStyle='#64748b';
-    DX.fillRect(wXf-5,cYf-swf/2,10,swf);
+    DX.fillStyle='#334155';
+    DX.fillRect(wXf-6,cYf-swf/2,12,swf);
+    DX.strokeStyle='#0f172a';DX.lineWidth=1.5;
+    DX.strokeRect(wXf-6,cYf-swf/2,12,swf);
   }
-  // Huygens dots
-  DX.fillStyle='rgba(46,139,0,0.9)';
-  for(const s of srcs){DX.beginPath();DX.arc(s.x*DSC,s.y*DSC,3,0,Math.PI*2);DX.fill();}
-  // labels
+
+  // punti Huygens (solo per fenditure)
+  if(dMode!=='obstacle'){
+    const srcs=buildSrcs(wX,cY);
+    DX.fillStyle='rgba(46,139,0,0.9)';
+    for(const s of srcs){DX.beginPath();DX.arc(s.x*DSC,s.y*DSC,3,0,Math.PI*2);DX.fill();}
+  } else {
+    // per ostacolo mostra solo i due bordi come sorgenti privilegiate di diffrazione
+    DX.fillStyle='rgba(224,20,42,0.9)';
+    DX.beginPath();DX.arc(wXf,cYf-swf/2,4,0,Math.PI*2);DX.fill();
+    DX.beginPath();DX.arc(wXf,cYf+swf/2,4,0,Math.PI*2);DX.fill();
+    // etichetta punto di Poisson
+    DX.fillStyle='rgba(0,119,204,0.7)';DX.font='9px Space Mono,monospace';
+    DX.fillText('← punto di Poisson-Arago (sull\'asse)',wXf+14,cYf+4);
+  }
+
+  // label alto
   DX.fillStyle='rgba(71,85,105,0.8)';DX.font='10px Space Mono,monospace';
   DX.fillText('← onda piana',10,18);
   DX.fillText('onda diffratta →',wXf+10,18);
-  const ratio=(sw/lw).toFixed(2);
-  const rl=sw/lw>4?'a≫λ: poca diffrazione':sw/lw>1.5?'a≈λ: forte diffrazione':'a<λ: onda quasi circolare';
-  DX.fillStyle='#2e8b00';DX.font='bold 11px Syne,sans-serif';
-  DX.fillText('a/λ='+ratio+'  →  '+rl,wXf+10,DH-12);
+
+  // label basso
+  if(dMode==='obstacle'){
+    const r=(sw/lw).toFixed(2);
+    const rl=sw/lw>4?'ombra netta + diff. ai bordi':sw/lw>1?'diffrazione ai bordi evidente':'ostacolo≈λ: quasi trasparente';
+    DX.fillStyle='#0077cc';DX.font='bold 11px Syne,sans-serif';
+    DX.fillText('d/λ='+r+'  →  '+rl,wXf+10,DH-12);
+  } else {
+    const ratio=(sw/lw).toFixed(2);
+    const rl=sw/lw>4?'a≫λ: poca diffrazione':sw/lw>1.5?'a≈λ: forte diffrazione':'a<λ: onda quasi circolare';
+    DX.fillStyle='#2e8b00';DX.font='bold 11px Syne,sans-serif';
+    DX.fillText('a/λ='+ratio+'  →  '+rl,wXf+10,DH-12);
+  }
 }
 
 // ══════════════════════════════════════════════

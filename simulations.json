@@ -7,13 +7,13 @@
     "category": "Elettromagnetismo"
   },
   {
-    "file": "momento di un forza.html",
+    "file": "momento-di-una-forza.html",
     "title": "Momento di una forza",
     "icon": "⚖",
     "description": "Esplorazione del momento di una forza e dell’equilibrio delle leve variando intensità della forza, posizione del fulcro e lunghezza del braccio.",
     "category": "Meccanica"
   },
-   {
+  {
     "file": "gravita.html",
     "title": "Gravità",
     "icon": "🪐",
@@ -21,21 +21,21 @@
     "category": "Gravitazione"
   },
   {
-    "file": "moto armonico.html",
+    "file": "moto-armonico.html",
     "title": "Moto Armonico",
     "icon": "∿",
     "description": "Simulazione del moto armonico semplice con analisi di posizione, velocità, accelerazione, periodo e ampiezza.",
     "category": "Meccanica"
   },
   {
-    "file": "moto circolare.html",
+    "file": "moto-circolare.html",
     "title": "Moto Circolare",
     "icon": "◯",
     "description": "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
     "category": "Meccanica"
   },
   {
-    "file": "moto parabolico.html",
+    "file": "moto-parabolico.html",
     "title": "Moto Parabolico",
     "icon": "➶",
     "description": "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
@@ -56,14 +56,14 @@
     "category": "Ottica"
   },
   {
-    "file": "specchi e lenti.html",
+    "file": "specchi-e-lenti.html",
     "title": "Specchi e Lenti",
     "icon": "🔍",
     "description": "Studio della formazione delle immagini con specchi e lenti attraverso la costruzione geometrica dei raggi principali.",
     "category": "Ottica"
   },
   {
-    "file": "interferenza onde.html",
+    "file": "interferenza-onde.html",
     "title": "Interferenza tra Onde",
     "icon": "≈",
     "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",

@@ -252,6 +252,40 @@
         font-size: 1rem;
       }
     }
+    .category-block {
+  margin-top: 28px;
+}
+
+.category-block:first-child {
+  margin-top: 0;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.category-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.category-count {
+  color: var(--muted);
+  font-size: 0.92rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
   </style>
 </head>
 <body>
@@ -268,16 +302,16 @@
     </section>
 
     <section class="panel">
-      <div class="panel-header">
-        <div class="panel-title">Simulazioni disponibili</div>
-        <div class="counter" id="counter">Caricamento...</div>
-      </div>
+  <div class="panel-header">
+    <div class="panel-title">Simulazioni disponibili</div>
+    <div class="counter" id="counter">Caricamento...</div>
+  </div>
 
-      <div class="grid" id="simGrid">
-        <div class="loading-state">Sto recuperando l'elenco delle simulazioni...</div>
-      </div>
-    </section>
-
+  <div id="simSections">
+    <div class="loading-state">Sto recuperando l'elenco delle simulazioni...</div>
+  </div>
+</section>
+    
     <div class="footer">
       Repository GitHub Pages per la condivisione delle simulazioni con la classe
     </div>
@@ -287,8 +321,54 @@
     <script>
   const dataFile = "simulations.json";
 
-  const grid = document.getElementById("simGrid");
+  const sectionsContainer = document.getElementById("simSections");
   const counter = document.getElementById("counter");
+
+  <script>
+  const dataFile = "simulations.json";
+
+  const sectionsContainer = document.getElementById("simSections");
+  const counter = document.getElementById("counter");
+
+  function createCard(sim) {
+    const title = sim.title;
+    const icon = sim.icon || "Φ";
+    const desc = sim.description || "Simulazione interattiva di fisica accessibile direttamente dal browser.";
+    const file = sim.file;
+
+    const card = document.createElement("article");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="card-content">
+        <div class="icon">${icon}</div>
+        <h2 class="sim-title">${title}</h2>
+        <p class="sim-desc">${desc}</p>
+        <a class="sim-link" href="${file}">
+          Apri simulazione
+          <span>→</span>
+        </a>
+      </div>
+    `;
+
+    return card;
+  }
+
+  function groupByCategory(simulations) {
+    const groups = {};
+
+    simulations.forEach(sim => {
+      const category = sim.category || "Altre simulazioni";
+
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+
+      groups[category].push(sim);
+    });
+
+    return groups;
+  }
 
   fetch(dataFile)
     .then(response => {
@@ -301,7 +381,7 @@
       counter.textContent = `${simulations.length} simulazione${simulations.length === 1 ? "" : "i"}`;
 
       if (simulations.length === 0) {
-        grid.innerHTML = `
+        sectionsContainer.innerHTML = `
           <div class="empty-state">
             Non ci sono ancora simulazioni nel file simulations.json.
           </div>
@@ -311,35 +391,39 @@
 
       simulations.sort((a, b) => a.title.localeCompare(b.title, "it"));
 
-      grid.innerHTML = "";
+      const grouped = groupByCategory(simulations);
+      const orderedCategories = Object.keys(grouped).sort((a, b) => a.localeCompare(b, "it"));
 
-      simulations.forEach(sim => {
-        const title = sim.title;
-        const icon = sim.icon || "Φ";
-        const desc = sim.description || "Simulazione interattiva di fisica accessibile direttamente dal browser.";
-        const file = sim.file;
+      sectionsContainer.innerHTML = "";
 
-        const card = document.createElement("article");
-        card.className = "card";
+      orderedCategories.forEach(category => {
+        const sims = grouped[category];
 
-        card.innerHTML = `
-          <div class="card-content">
-            <div class="icon">${icon}</div>
-            <h2 class="sim-title">${title}</h2>
-            <p class="sim-desc">${desc}</p>
-            <a class="sim-link" href="${file}">
-              Apri simulazione
-              <span>→</span>
-            </a>
-          </div>
+        const section = document.createElement("section");
+        section.className = "category-block";
+
+        const header = document.createElement("div");
+        header.className = "category-header";
+        header.innerHTML = `
+          <h2 class="category-title">${category}</h2>
+          <div class="category-count">${sims.length} simulazione${sims.length === 1 ? "" : "i"}</div>
         `;
 
-        grid.appendChild(card);
+        const grid = document.createElement("div");
+        grid.className = "grid";
+
+        sims.forEach(sim => {
+          grid.appendChild(createCard(sim));
+        });
+
+        section.appendChild(header);
+        section.appendChild(grid);
+        sectionsContainer.appendChild(section);
       });
     })
     .catch(error => {
       counter.textContent = "Errore";
-      grid.innerHTML = `
+      sectionsContainer.innerHTML = `
         <div class="empty-state">
           Non è stato possibile caricare l'elenco delle simulazioni.<br>
           Verifica che il file <strong>simulations.json</strong> sia presente nella cartella principale e sia scritto correttamente.

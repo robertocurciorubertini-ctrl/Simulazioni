@@ -284,119 +284,69 @@
   </div>
 
   <script>
-    const user = "robertocurciorubertini-ctrl";
-    const repo = "Simulazioni";
-    const api = `https://api.github.com/repos/${user}/${repo}/contents/`;
+    <script>
+  const dataFile = "simulations.json";
 
-    const grid = document.getElementById("simGrid");
-    const counter = document.getElementById("counter");
+  const grid = document.getElementById("simGrid");
+  const counter = document.getElementById("counter");
 
-    function prettyName(filename) {
-      return filename
-        .replace(/\.html$/i, "")
-        .replace(/[-_]+/g, " ")
-        .replace(/\b\w/g, c => c.toUpperCase());
-    }
+  fetch(dataFile)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Impossibile recuperare simulations.json.");
+      }
+      return response.json();
+    })
+    .then(simulations => {
+      counter.textContent = `${simulations.length} simulazione${simulations.length === 1 ? "" : "i"}`;
 
-    function detectIcon(name) {
-  const n = name.toLowerCase();
-
-  if (n.includes("elettrostatic") || n.includes("elettric") || n.includes("campo")) return "⚡";
-  if (n.includes("rifraz")) return "↘";
-  if (n.includes("dinami") || n.includes("newton")) return "→";
-  if (n.includes("armonico") || n.includes("oscill")) return "∿";
-  if (n.includes("parabol")) return "➶";
-  if (n.includes("gravit")) return "🪐";
-  if (n.includes("circolar") || n.includes("rotaz")) return "◯";
-  if (n.includes("onda") || n.includes("interferenz") || n.includes("diffraz")) return "≈";
-  if (n.includes("ottic") || n.includes("lente") || n.includes("specchi")) return "🔍";
-
-  return "Φ";
-}
-    function detectDescription(name) {
-
-  const descriptions = {
-
-    "elettrostatica.html": "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
-
-    "moto armonico.html": "Simulazione del moto armonico semplice con analisi di posizione, velocità, accelerazione, periodo e ampiezza.",
-
-    "moto circolare.html": "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
-
-    "moto parabolico.html": "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
-
-    "dinamica.html": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
-
-    "rifrazione.html": "Simulazione della rifrazione della luce tra mezzi diversi con visualizzazione degli angoli e del cambio di direzione.",
-
-    "specchi e lenti.html": "Studio della formazione delle immagini con specchi e lenti attraverso la costruzione geometrica dei raggi principali.",
-
-    "interferenza onde.html": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con rappresentazione dei fenomeni di diffrazione."
-  };
-
-  return descriptions[name.toLowerCase()] || "Simulazione interattiva di fisica accessibile direttamente dal browser.";
-}
- 
-    fetch(api)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Impossibile recuperare i file dal repository.");
-        }
-        return response.json();
-      })
-      .then(files => {
-        const htmlFiles = files.filter(file =>
-          file.name.endsWith(".html") && file.name.toLowerCase() !== "index.html"
-        );
-
-        counter.textContent = `${htmlFiles.length} simulazione${htmlFiles.length === 1 ? "" : "i"}`;
-
-        if (htmlFiles.length === 0) {
-          grid.innerHTML = `
-            <div class="empty-state">
-              Non ci sono ancora simulazioni HTML nella cartella del repository.
-            </div>
-          `;
-          return;
-        }
-
-        htmlFiles.sort((a, b) => a.name.localeCompare(b.name, "it"));
-
-        grid.innerHTML = "";
-
-        htmlFiles.forEach(file => {
-          const title = prettyName(file.name);
-          const icon = detectIcon(file.name);
-          const desc = detectDescription(file.name);
-
-          const card = document.createElement("article");
-          card.className = "card";
-
-          card.innerHTML = `
-            <div class="card-content">
-              <div class="icon">${icon}</div>
-              <h2 class="sim-title">${title}</h2>
-              <p class="sim-desc">${desc}</p>
-              <a class="sim-link" href="${file.name}">
-                Apri simulazione
-                <span>→</span>
-              </a>
-            </div>
-          `;
-
-          grid.appendChild(card);
-        });
-      })
-      .catch(error => {
-        counter.textContent = "Errore";
+      if (simulations.length === 0) {
         grid.innerHTML = `
           <div class="empty-state">
-            Non è stato possibile caricare l'elenco delle simulazioni.<br>
-            Verifica che il repository sia pubblico e che i file siano presenti nella cartella principale.
+            Non ci sono ancora simulazioni nel file simulations.json.
           </div>
         `;
-        console.error(error);
+        return;
+      }
+
+      simulations.sort((a, b) => a.title.localeCompare(b.title, "it"));
+
+      grid.innerHTML = "";
+
+      simulations.forEach(sim => {
+        const title = sim.title;
+        const icon = sim.icon || "Φ";
+        const desc = sim.description || "Simulazione interattiva di fisica accessibile direttamente dal browser.";
+        const file = sim.file;
+
+        const card = document.createElement("article");
+        card.className = "card";
+
+        card.innerHTML = `
+          <div class="card-content">
+            <div class="icon">${icon}</div>
+            <h2 class="sim-title">${title}</h2>
+            <p class="sim-desc">${desc}</p>
+            <a class="sim-link" href="${file}">
+              Apri simulazione
+              <span>→</span>
+            </a>
+          </div>
+        `;
+
+        grid.appendChild(card);
       });
-  </script>
+    })
+    .catch(error => {
+      counter.textContent = "Errore";
+      grid.innerHTML = `
+        <div class="empty-state">
+          Non è stato possibile caricare l'elenco delle simulazioni.<br>
+          Verifica che il file <strong>simulations.json</strong> sia presente nella cartella principale e sia scritto correttamente.
+        </div>
+      `;
+      console.error(error);
+    });
+</script>
 </body>
 </html>

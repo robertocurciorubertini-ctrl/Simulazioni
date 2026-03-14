@@ -201,7 +201,7 @@ button.dng:hover{background:#fff5f5;}
         </div>
         <div style="display:flex;gap:6px;align-items:center;">
           <div class="vp"><label>Vx</label><input type="number" id="vx1" value="0" step="0.5"></div>
-          <div class="vp"><label>Vy</label><input type="number" id="vy1" value="-8" step="0.5"></div>
+          <div class="vp"><label>Vy</label><input type="number" id="vy1" value="-1.5" step="0.5"></div>
           <span style="font-size:.5rem;color:var(--dim);">AU/yr</span>
         </div>
       </div>
@@ -218,7 +218,7 @@ button.dng:hover{background:#fff5f5;}
         </div>
         <div style="display:flex;gap:6px;align-items:center;">
           <div class="vp"><label>Vx</label><input type="number" id="vx2" value="0" step="0.5"></div>
-          <div class="vp"><label>Vy</label><input type="number" id="vy2" value="40" step="0.5"></div>
+          <div class="vp"><label>Vy</label><input type="number" id="vy2" value="7.5" step="0.5"></div>
           <span style="font-size:.5rem;color:var(--dim);">AU/yr</span>
         </div>
       </div>
@@ -246,6 +246,7 @@ button.dng:hover{background:#fff5f5;}
         <div class="tr">Settori (2ª L.)<label class="tgl"><input type="checkbox" id="tog-area" checked><span class="tsl"></span></label></div>
         <div class="tr">Centro massa<label class="tgl"><input type="checkbox" id="tog-cm" checked><span class="tsl"></span></label></div>
         <div class="tr">CoM fisso<label class="tgl"><input type="checkbox" id="tog-comframe" checked><span class="tsl"></span></label></div>
+        <div class="tr">Auto-zoom<label class="tgl"><input type="checkbox" id="tog-autozoom" checked><span class="tsl"></span></label></div>
       </div>
     </div>
   </div>
@@ -537,6 +538,59 @@ function draw(){
   ctx.restore();
 }
 
+// ── Auto-zoom: mantiene entrambi i corpi nel campo visivo ──
+// La camera interpola morbidamente verso il centro dei due corpi
+// e aggiusta la scala se uno dei due rischia di uscire dal canvas.
+let autoZoomEnabled = true;
+const AZ_MARGIN   = 0.18;  // frazione del canvas tenuta come margine
+const AZ_LERP_POS = 0.04;  // velocità di inseguimento del centro (0–1 per frame)
+const AZ_LERP_SCL = 0.03;  // velocità di cambio scala
+
+function autoZoom(){
+  if(!autoZoomEnabled || !running) return;
+
+  const {b1,b2} = state;
+  const off = comOff();
+
+  // Posizioni in coordinate mondo *relative alla camera attuale*
+  // (senza offset CoM perché ts() lo applica già; qui calcoliamo
+  //  direttamente le coordinate schermo per capire dove sono)
+  const p1 = ts(b1.x, b1.y);
+  const p2 = ts(b2.x, b2.y);
+  const W  = canvas.width, H = canvas.height;
+  const mx = AZ_MARGIN * Math.min(W, H);
+
+  // Controlla se uno dei due corpi è fuori dal margine
+  const outOfBounds =
+    p1.x < mx || p1.x > W-mx || p1.y < mx || p1.y > H-mx ||
+    p2.x < mx || p2.x > W-mx || p2.y < mx || p2.y > H-mx;
+
+  if(!outOfBounds) return;   // tutto ok, non fare nulla
+
+  // Centro geometrico dei due corpi in coordinate mondo
+  const wcx = (b1.x + b2.x) / 2 - off.x;
+  const wcy = (b1.y + b2.y) / 2 - off.y;
+
+  // Distanza massima dal centro verso uno dei due corpi
+  const dx1 = b1.x - b2.x, dy1 = b1.y - b2.y;
+  const spread = Math.sqrt(dx1*dx1 + dy1*dy1) * 0.5; // raggio del sistema
+
+  // Scala ideale: vogliamo che spread occupi al massimo (0.5 - margin) del canvas
+  const halfViewW = (W / 2) * (1 - AZ_MARGIN * 2);
+  const halfViewH = (H / 2) * (1 - AZ_MARGIN * 2);
+  const targetScale = Math.min(
+    halfViewW / Math.max(spread, 0.1),
+    halfViewH / Math.max(spread, 0.1),
+    400   // non zoomare troppo
+  );
+  const clampedTarget = Math.max(targetScale, 15);
+
+  // Interpola scala e posizione camera
+  cam.scale += (clampedTarget - cam.scale) * AZ_LERP_SCL;
+  cam.x     += (wcx - cam.x) * AZ_LERP_POS;
+  cam.y     += (wcy - cam.y) * AZ_LERP_POS;
+}
+
 function updateStats(){
   const {b1,b2}=state,gv=grav(b1,b2);
   g('stat-force').textContent=gv.F.toExponential(2);
@@ -570,7 +624,7 @@ function loop(t){
     state.sectorTimer+=sdt;
     if(state.sectorTimer>=state.sectorInterval){state.sectorTimer=0;sampleSector();}
   }
-  updateStats();draw();
+  autoZoom();updateStats();draw();
 }
 
 function applyVel(){
@@ -591,9 +645,9 @@ function applyPreset(name){
   Object.assign(state,{trail1:[],trail2:[],sectors:[],sectorTimer:0,time:0,sma:null,ecc:null,T:null});
   sci=0;
   const P={
-    circular:{b1:{x:-1.0,y:0,vx:0,vy:-8, m:50},b2:{x:2.0,y:0,vx:0,vy:40,m:10}},
-    elliptic:{b1:{x:-0.5,y:0,vx:0,vy:-3, m:50},b2:{x:3.2,y:0,vx:0,vy:18,m:10}},
-    binary:  {b1:{x:-1.2,y:0,vx:0,vy:-20,m:30},b2:{x:1.2,y:0,vx:0,vy:20,m:30}},
+    circular:{b1:{x:-1.0,y:0,vx:0,vy:-1.5,m:50},b2:{x:2.0,y:0,vx:0,vy:7.5,m:10}},
+    elliptic:{b1:{x:-0.5,y:0,vx:0,vy:-0.6,m:50},b2:{x:3.2,y:0,vx:0,vy:3.5,m:10}},
+    binary:  {b1:{x:-1.2,y:0,vx:0,vy:-4.0,m:30},b2:{x:1.2,y:0,vx:0,vy:4.0,m:30}},
   }[name];
   Object.assign(state.b1,P.b1);Object.assign(state.b2,P.b2);
   const map={m1:state.b1.m,m2:state.b2.m,vx1:state.b1.vx,vy1:state.b1.vy,vx2:state.b2.vx,vy2:state.b2.vy};
@@ -601,6 +655,7 @@ function applyPreset(name){
   g('m1').dispatchEvent(new Event('input'));
   g('m2').dispatchEvent(new Event('input'));
   cam={x:0,y:0,scale:130};
+  autoZoomEnabled=true;g('tog-autozoom').checked=true;
   draw();g('mode-hint').textContent='Premi ▶ Avvia per iniziare';
 }
 
@@ -610,7 +665,7 @@ function setupSliders(){
   g('speed').addEventListener('input',e=>g('speed-val').textContent=e.target.value+'×');
   g('trail').addEventListener('input',e=>g('trail-val').textContent=e.target.value);
   g('gscale').addEventListener('input',e=>g('g-val').textContent=(parseFloat(e.target.value)/10).toFixed(1));
-  ['vx1','vy1','vx2','vy2'].forEach(id=>g(id).addEventListener('change',applyVel));
+  g('tog-autozoom').addEventListener('change',e=>{autoZoomEnabled=e.target.checked;});
   g('m1').dispatchEvent(new Event('input'));g('m2').dispatchEvent(new Event('input'));
 }
 
@@ -650,6 +705,9 @@ canvas.addEventListener('mouseup',()=>{dragging=null;panning=false;canvas.style.
 canvas.addEventListener('mouseleave',()=>{dragging=null;panning=false;});
 canvas.addEventListener('wheel',e=>{
   e.preventDefault();
+  // Disabilita temporaneamente l'auto-zoom quando l'utente zooma manualmente
+  autoZoomEnabled = false;
+  g('tog-autozoom').checked = false;
   cam.scale=Math.min(Math.max(cam.scale*(e.deltaY>0?.88:1.13),15),800);
   if(!running)draw();
 },{passive:false});

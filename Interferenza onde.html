@@ -163,7 +163,7 @@
       <div class="ms">
         <button class="btn on" id="bSingle" onclick="setDm('single')">Singola</button>
         <button class="btn" id="bDouble" onclick="setDm('double')">Doppia</button>
-        <button class="btn" id="bObst" onclick="setDm('obstacle')">Ostacolo</button>
+        <button class="btn" id="bObst" disabled style="opacity:0.35;cursor:not-allowed;border-color:#94a3b8;color:#94a3b8">Ostacolo</button>
       </div>
     </div>
   </div>
@@ -445,22 +445,22 @@ function drawDiff(){
   const d=img.data;
 
   if(dMode==='obstacle'){
-    // ── PRINCIPIO DI BABINET ──────────────────────────────────────────
-    // Campo totale = onda piana incidente − campo della fenditura equivalente
-    // U_ostacolo(P) = U_piano(P) − U_fenditura(P)
-    //
-    // U_piano: onda piana che si propaga in direzione +x
-    //   U_piano(px,py,t) = cos(k·px − om·t)   [parte reale]
-    //
-    // U_fenditura: sorgenti Huygens all'interno dell'ostacolo (zona bloccata)
-    //   Le usiamo con densità alta (ogni pixel nella striscia)
+    // ── OSTACOLO: onda piana + diffrazione ai bordi ───────────────────
+    // L'onda piana passa ovunque tranne nella zona d'ombra geometrica.
+    // Ai bordi dell'ostacolo la discontinuità genera sorgenti di Huygens.
+    // Campo totale = onda piana (fuori dall'ombra) + contributo bordi
 
-    // Costruisce sorgenti dense nell'area dell'ostacolo (la "fenditura complementare")
-    const obstSrcs=[];
-    const nObs=Math.max(hn*2, 30); // densità alta per buona approssimazione
-    for(let i=0;i<nObs;i++){
-      const y=cY-sw/2 + sw/(nObs-1)*i;
-      obstSrcs.push({x:wX,y});
+    const edgeY1 = cY - sw/2;  // bordo superiore ostacolo
+    const edgeY2 = cY + sw/2;  // bordo inferiore ostacolo
+
+    // Sorgenti di Huygens concentrate sui due bordi (fascia stretta ~ λ)
+    const edgeSrcs=[];
+    const nEdge = Math.max(hn, 12);
+    const edgeSpread = Math.max(4, (lw/DSC)*0.8); // spread ~ λ
+    for(let i=0;i<nEdge;i++){
+      const dy = -edgeSpread/2 + edgeSpread/(nEdge-1)*i;
+      edgeSrcs.push({x:wX, y:edgeY1+dy});
+      edgeSrcs.push({x:wX, y:edgeY2+dy});
     }
 
     for(let py=0;py<DSH;py++){
@@ -468,19 +468,20 @@ function drawDiff(){
         const ii=(py*DSW+px)*4;
         if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=248;d[ii+3]=255;continue;}
 
-        // Campo onda piana: U_piano = e^{i(k·px − om·t)}
-        const planeRe = Math.cos(k*px - om*dT);
-        const planeIm = Math.sin(k*px - om*dT);
+        // Ombra geometrica: y tra i due bordi
+        const inShadow = (py >= edgeY1 && py <= edgeY2);
 
-        // Campo fenditura complementare (zona ostacolo)
-        const f=fieldAt(px,py,obstSrcs,k,om,dT);
-        const slitRe=f.re/nObs, slitIm=f.im/nObs;
+        // Onda piana: presente solo fuori dall'ombra geometrica
+        let totRe = inShadow ? 0 : Math.cos(k*px - om*dT);
+        let totIm = inShadow ? 0 : Math.sin(k*px - om*dT);
 
-        // Babinet: U_obs = U_piano − U_slit
-        const totRe = planeRe - slitRe;
-        const totIm = planeIm - slitIm;
-        const amp = Math.min(1, Math.sqrt(totRe*totRe+totIm*totIm)*0.7);
+        // Contributo di diffrazione dai bordi (presente ovunque)
+        const f = fieldAt(px,py,edgeSrcs,k,om,dT);
+        const norm = edgeSrcs.length * 0.5;
+        totRe += f.re / norm;
+        totIm += f.im / norm;
 
+        const amp = Math.min(1, Math.sqrt(totRe*totRe+totIm*totIm)*0.65);
         d[ii]=Math.round(255*(1-amp*0.85));
         d[ii+1]=Math.round(255*(1-amp*0.6));
         d[ii+2]=255;
@@ -533,19 +534,17 @@ function drawDiff(){
     DX.strokeRect(wXf-6,cYf-swf/2,12,swf);
   }
 
-  // punti Huygens (solo per fenditure)
   if(dMode!=='obstacle'){
     const srcs=buildSrcs(wX,cY);
     DX.fillStyle='rgba(46,139,0,0.9)';
     for(const s of srcs){DX.beginPath();DX.arc(s.x*DSC,s.y*DSC,3,0,Math.PI*2);DX.fill();}
   } else {
-    // per ostacolo mostra solo i due bordi come sorgenti privilegiate di diffrazione
+    // mostra solo i due bordi come sorgenti di diffrazione
     DX.fillStyle='rgba(224,20,42,0.9)';
-    DX.beginPath();DX.arc(wXf,cYf-swf/2,4,0,Math.PI*2);DX.fill();
-    DX.beginPath();DX.arc(wXf,cYf+swf/2,4,0,Math.PI*2);DX.fill();
-    // etichetta punto di Poisson
-    DX.fillStyle='rgba(0,119,204,0.7)';DX.font='9px Space Mono,monospace';
-    DX.fillText('← punto di Poisson-Arago (sull\'asse)',wXf+14,cYf+4);
+    DX.beginPath();DX.arc(wXf, cYf-swf/2, 5, 0, Math.PI*2);DX.fill();
+    DX.beginPath();DX.arc(wXf, cYf+swf/2, 5, 0, Math.PI*2);DX.fill();
+    DX.fillStyle='rgba(0,100,180,0.65)';DX.font='9px Space Mono,monospace';
+    DX.fillText('← bordi: sorgenti di diffrazione',wXf+10,cYf);
   }
 
   // label alto

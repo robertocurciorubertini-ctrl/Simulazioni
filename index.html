@@ -265,12 +265,14 @@ function createCard(sim){
 const card=document.createElement("article");
 card.className="card";
 
+const file = encodeURI(sim.file);   // ← aggiungi questa riga
+
 card.innerHTML=`
 <div class="card-content">
 <div class="icon">${sim.icon || "Φ"}</div>
 <h2 class="sim-title">${sim.title}</h2>
 <p class="sim-desc">${sim.description}</p>
-<a class="sim-link" href="${sim.file}">
+<a class="sim-link" href="${file}">
 Apri simulazione
 <span>→</span>
 </a>
@@ -279,7 +281,6 @@ Apri simulazione
 
 return card;
 }
-
 function groupByCategory(sims){
 
 const groups={};

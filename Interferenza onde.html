@@ -7,16 +7,16 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
   :root {
-    --bg:#05080f; --surface:#0c1220; --surface2:#111827;
-    --c1:#00e5ff; --c2:#ff4d6d; --c3:#a8ff3e;
-    --text:#e2e8f0; --dim:#64748b; --border:#1e2d45;
+    --bg:#ffffff; --surface:#f8f9fb; --surface2:#f0f2f5;
+    --c1:#0077cc; --c2:#e0142a; --c3:#2e8b00;
+    --text:#0f172a; --dim:#64748b; --border:#cbd5e1;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden}
 
   header{padding:2.5rem 3rem 1.8rem;border-bottom:1px solid var(--border)}
   .hlabel{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--c1);letter-spacing:.25em;text-transform:uppercase;margin-bottom:.5rem}
-  h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,var(--text),var(--c1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;color:var(--text)}
   .hsub{margin-top:.5rem;color:var(--dim);font-size:.8rem;font-family:'Space Mono',monospace;max-width:580px;line-height:1.6}
 
   nav{display:flex;padding:0 3rem;border-bottom:1px solid var(--border);background:var(--surface)}
@@ -38,8 +38,8 @@
   input[type=range]{-webkit-appearance:none;width:150px;height:3px;background:var(--border);border-radius:2px;outline:none}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--c1);cursor:pointer}
 
-  .btn{padding:.45rem 1rem;background:transparent;border:1px solid var(--c1);color:var(--c1);font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.06em;cursor:pointer;border-radius:2px;transition:background .15s;text-transform:uppercase}
-  .btn:hover{background:rgba(0,229,255,.1)}.btn.on{background:rgba(0,229,255,.15)}
+  .btn{padding:.45rem 1rem;background:transparent;border:1px solid var(--c1);color:var(--c1);font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.06em;cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase}
+  .btn:hover{background:rgba(0,119,204,.08)}.btn.on{background:rgba(0,119,204,.12);font-weight:700}
 
   .legend{display:flex;gap:1.4rem;margin-top:.9rem}
   .li{display:flex;align-items:center;gap:.35rem;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--dim)}
@@ -132,7 +132,7 @@
   </div>
   <div class="legend">
     <div class="li"><div class="ld" style="background:var(--c1)"></div>Massimo costruttivo</div>
-    <div class="li"><div class="ld" style="background:#05080f;border:1px solid #333"></div>Minimo distruttivo</div>
+    <div class="li"><div class="ld" style="background:#e8edf2;border:1px solid #94a3b8"></div>Minimo distruttivo</div>
     <div class="li"><div class="ld" style="background:var(--c2)"></div>Sorgente</div>
   </div>
   <div class="fbox">
@@ -201,29 +201,29 @@ const NP   = RW;
 const GC = document.createElement('canvas');
 GC.width = RW; GC.height = RH;
 const GX = GC.getContext('2d');
-GX.fillStyle = '#05080f';
+GX.fillStyle = '#f8f9fb';
 GX.fillRect(0,0,RW,RH);
-GX.strokeStyle = 'rgba(30,45,69,0.5)';
+GX.strokeStyle = 'rgba(203,213,225,0.8)';
 GX.lineWidth = 1;
 GX.beginPath();
 for (let y=0;y<RH;y+=40){GX.moveTo(0,y);GX.lineTo(RW,y);}
 for (let x=0;x<RW;x+=60){GX.moveTo(x,0);GX.lineTo(x,RH);}
 GX.stroke();
-GX.strokeStyle = 'rgba(255,255,255,0.06)';
+GX.strokeStyle = 'rgba(100,116,139,0.2)';
 GX.beginPath();
 GX.moveTo(0,LANE);   GX.lineTo(RW,LANE);
 GX.moveTo(0,LANE*2); GX.lineTo(RW,LANE*2);
 GX.stroke();
-GX.strokeStyle = 'rgba(100,116,139,0.2)';
+GX.strokeStyle = 'rgba(100,116,139,0.15)';
 GX.beginPath();
 GX.moveTo(0,LANE*0.5);  GX.lineTo(RW,LANE*0.5);
 GX.moveTo(0,LANE*1.5);  GX.lineTo(RW,LANE*1.5);
 GX.moveTo(0,LANE*2.5);  GX.lineTo(RW,LANE*2.5);
 GX.stroke();
 GX.font = '11px Space Mono,monospace';
-GX.fillStyle='rgba(0,229,255,0.4)';  GX.fillText('ONDA 1',8,16);
-GX.fillStyle='rgba(255,77,109,0.4)'; GX.fillText('ONDA 2',8,LANE+16);
-GX.fillStyle='rgba(168,255,62,0.4)'; GX.fillText('RISULTANTE  (y₁ + y₂)',8,LANE*2+16);
+GX.fillStyle='rgba(0,119,204,0.55)';  GX.fillText('ONDA 1',8,16);
+GX.fillStyle='rgba(224,20,42,0.55)';  GX.fillText('ONDA 2',8,LANE+16);
+GX.fillStyle='rgba(46,139,0,0.55)';   GX.fillText('RISULTANTE  (y₁ + y₂)',8,LANE*2+16);
 
 const XS = new Float32Array(NP);
 for (let i=0;i<NP;i++) XS[i] = i/NP * Math.PI*8;
@@ -252,18 +252,18 @@ function drawRope(){
   for(let i=0;i<NP;i++){Y1[i]=a1*Math.sin(XS[i]-o1);Y2[i]=a2*Math.sin(XS[i]-o2+phR);}
   RX.drawImage(GC,0,0);
   // onda 1
-  RX.strokeStyle='#00e5ff';RX.lineWidth=2.5;
+  RX.strokeStyle='#0077cc';RX.lineWidth=2.5;
   RX.beginPath();RX.moveTo(0,LANE*0.5-Y1[0]*AMP);
   for(let i=1;i<NP;i++)RX.lineTo(i,LANE*0.5-Y1[i]*AMP);
   RX.stroke();
   // onda 2
-  RX.strokeStyle='#ff4d6d';RX.lineWidth=2.5;
+  RX.strokeStyle='#e0142a';RX.lineWidth=2.5;
   RX.beginPath();RX.moveTo(0,LANE*1.5-Y2[0]*AMP);
   for(let i=1;i<NP;i++)RX.lineTo(i,LANE*1.5-Y2[i]*AMP);
   RX.stroke();
   // guide tratteggiate ampiezza massima nella corsia risultante
   const maxAmp = (RP.a1 + RP.a2) * AMP;
-  RX.strokeStyle = 'rgba(168,255,62,0.25)';
+  RX.strokeStyle = 'rgba(46,139,0,0.3)';
   RX.lineWidth = 1;
   RX.setLineDash([6,4]);
   RX.beginPath();
@@ -271,24 +271,23 @@ function drawRope(){
   RX.moveTo(0, LANE*2.5 + maxAmp); RX.lineTo(RW, LANE*2.5 + maxAmp);
   RX.stroke();
   RX.setLineDash([]);
-
   // risultante — stessa scala AMP delle onde componenti: costruttiva → visivamente doppia
-  RX.strokeStyle='#a8ff3e';RX.lineWidth=3;
+  RX.strokeStyle='#2e8b00';RX.lineWidth=3;
   RX.beginPath();RX.moveTo(0,LANE*2.5-(Y1[0]+Y2[0])*AMP);
   for(let i=1;i<NP;i++)RX.lineTo(i,LANE*2.5-(Y1[i]+Y2[i])*AMP);
   RX.stroke();
   // badge
   const pn=((ph%360)+360)%360;
   let lbl,col;
-  if(Math.abs(f1-f2)>0.12){lbl='BATTIMENTI  f_bat='+Math.abs(f1-f2).toFixed(1)+' Hz';col='#a8ff3e';}
-  else if(pn<30||pn>330){lbl='INTERFERENZA COSTRUTTIVA — A = A₁+A₂';col='#00e5ff';}
-  else if(pn>150&&pn<210){lbl='INTERFERENZA DISTRUTTIVA — A = |A₁−A₂|';col='#ff4d6d';}
-  else{lbl='INTERFERENZA PARZIALE  φ='+pn.toFixed(0)+'°';col='#ffb347';}
+  if(Math.abs(f1-f2)>0.12){lbl='BATTIMENTI  f_bat='+Math.abs(f1-f2).toFixed(1)+' Hz';col='#b45800';}
+  else if(pn<30||pn>330){lbl='INTERFERENZA COSTRUTTIVA — A = A₁+A₂';col='#0077cc';}
+  else if(pn>150&&pn<210){lbl='INTERFERENZA DISTRUTTIVA — A = |A₁−A₂|';col='#e0142a';}
+  else{lbl='INTERFERENZA PARZIALE  φ='+pn.toFixed(0)+'°';col='#7c4dff';}
   RX.font='11px Space Mono,monospace';
   const bw=RX.measureText(lbl).width+22;
-  RX.fillStyle='rgba(5,8,15,0.82)';
+  RX.fillStyle='rgba(248,249,251,0.92)';
   RX.fillRect(RW/2-bw/2,5,bw,20);
-  RX.strokeStyle=col;RX.lineWidth=1;
+  RX.strokeStyle=col;RX.lineWidth=1.5;
   RX.strokeRect(RW/2-bw/2,5,bw,20);
   RX.fillStyle=col;
   RX.fillText(lbl,RW/2-bw/2+11,19);
@@ -340,12 +339,23 @@ function drawW2D(){
       const v=(a1*Math.sin(k*r1-om*w2T)+a2*Math.sin(k*r2-om*w2T+phR))*0.5;
       const ii=(py*SW+px)*4;
       if(w2Mode==='heat'){
+        // bianco=zero, blu=cresta, rosso=avvallamento
         const n=Math.max(-1,Math.min(1,v));
-        if(n>0){d[ii]=0;d[ii+1]=Math.round(n*229);d[ii+2]=Math.round(n*255);}
-        else{const m=-n;d[ii]=Math.round(m*255);d[ii+1]=Math.round(m*77);d[ii+2]=Math.round(m*109);}
+        if(n>0){
+          d[ii]=Math.round(255*(1-n));
+          d[ii+1]=Math.round(255*(1-n*0.6));
+          d[ii+2]=255;
+        } else {
+          const m=-n;
+          d[ii]=255;
+          d[ii+1]=Math.round(255*(1-m*0.85));
+          d[ii+2]=Math.round(255*(1-m));
+        }
       } else {
+        // frangie: nero su bianco
         const b=Math.min(255,Math.round(Math.abs(v)*510));
-        d[ii]=d[ii+1]=d[ii+2]=b;
+        const inv=255-b;
+        d[ii]=inv;d[ii+1]=inv;d[ii+2]=inv;
       }
       d[ii+3]=255;
     }
@@ -356,14 +366,14 @@ function drawW2D(){
   const fs1x=s1x*SC,fs2x=s2x*SC,fsy=W2H/2;
   [fs1x,fs2x].forEach(sx=>{
     W2X.beginPath();W2X.arc(sx,fsy,6,0,Math.PI*2);
-    W2X.fillStyle='#ff4d6d';W2X.fill();
+    W2X.fillStyle='#e0142a';W2X.fill();
     W2X.strokeStyle='#fff';W2X.lineWidth=1.5;W2X.stroke();
   });
-  W2X.strokeStyle='rgba(255,77,109,0.3)';W2X.lineWidth=1;
+  W2X.strokeStyle='rgba(224,20,42,0.4)';W2X.lineWidth=1;
   W2X.setLineDash([4,4]);
   W2X.beginPath();W2X.moveTo(fs1x,fsy);W2X.lineTo(fs2x,fsy);W2X.stroke();
   W2X.setLineDash([]);
-  W2X.fillStyle='rgba(255,77,109,0.8)';W2X.font='10px Space Mono,monospace';
+  W2X.fillStyle='rgba(224,20,42,0.9)';W2X.font='10px Space Mono,monospace';
   W2X.fillText('d='+W2P.dist.toFixed(0)+'px',W2W/2-20,fsy-12);
 }
 
@@ -430,7 +440,7 @@ function drawDiff(){
   for(let py=0;py<DSH;py++){
     for(let px=0;px<DSW;px++){
       const ii=(py*DSW+px)*4;
-      if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=0;d[ii+3]=255;continue;}
+      if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=248;d[ii+3]=255;continue;}
       let re=0,im=0;
       for(const s of srcs){
         const r=Math.sqrt((px-s.x)**2+(py-s.y)**2);
@@ -440,14 +450,18 @@ function drawDiff(){
         im+=att*Math.sin(k*r-om*dT);
       }
       const amp=Math.min(1,Math.sqrt(re*re+im*im)/srcs.length*2.8);
-      d[ii]=0;d[ii+1]=Math.round(amp*200);d[ii+2]=Math.round(amp*255);d[ii+3]=255;
+      // blu su bianco: alta intensità=blu scuro, bassa=bianco
+      d[ii]=Math.round(255*(1-amp*0.85));
+      d[ii+1]=Math.round(255*(1-amp*0.6));
+      d[ii+2]=255;
+      d[ii+3]=255;
     }
   }
   dSX.putImageData(img,0,0);
   DX.drawImage(dSC,0,0,DW,DH);
   // plane waves left
   const wXf=wX*DSC,spacing=lw,off=(dT*spacing)%spacing;
-  DX.strokeStyle='rgba(0,229,255,0.28)';DX.lineWidth=1.5;
+  DX.strokeStyle='rgba(0,100,200,0.35)';DX.lineWidth=1.5;
   for(let i=0;i*spacing<wXf+spacing;i++){
     const x=wXf-i*spacing+off;
     if(x<0||x>wXf)continue;
@@ -455,7 +469,7 @@ function drawDiff(){
   }
   // wall
   const cYf=DH/2,swf=sw,sepf=Math.max(sw*1.6,60);
-  DX.fillStyle='#1a2535';
+  DX.fillStyle='#334155';
   if(dMode==='single'){
     DX.fillRect(wXf-5,0,10,cYf-swf/2);
     DX.fillRect(wXf-5,cYf+swf/2,10,DH);
@@ -464,19 +478,19 @@ function drawDiff(){
     DX.fillRect(wXf-5,cYf-sepf/2+swf/2,10,sepf-swf);
     DX.fillRect(wXf-5,cYf+sepf/2+swf/2,10,DH);
   } else {
-    DX.fillStyle='#2a3a55';
+    DX.fillStyle='#64748b';
     DX.fillRect(wXf-5,cYf-swf/2,10,swf);
   }
   // Huygens dots
-  DX.fillStyle='rgba(168,255,62,0.8)';
+  DX.fillStyle='rgba(46,139,0,0.9)';
   for(const s of srcs){DX.beginPath();DX.arc(s.x*DSC,s.y*DSC,3,0,Math.PI*2);DX.fill();}
   // labels
-  DX.fillStyle='rgba(100,116,139,0.65)';DX.font='10px Space Mono,monospace';
+  DX.fillStyle='rgba(71,85,105,0.8)';DX.font='10px Space Mono,monospace';
   DX.fillText('← onda piana',10,18);
   DX.fillText('onda diffratta →',wXf+10,18);
   const ratio=(sw/lw).toFixed(2);
   const rl=sw/lw>4?'a≫λ: poca diffrazione':sw/lw>1.5?'a≈λ: forte diffrazione':'a<λ: onda quasi circolare';
-  DX.fillStyle='#a8ff3e';DX.font='bold 11px Syne,sans-serif';
+  DX.fillStyle='#2e8b00';DX.font='bold 11px Syne,sans-serif';
   DX.fillText('a/λ='+ratio+'  →  '+rl,wXf+10,DH-12);
 }
 

@@ -1,0 +1,58 @@
+[
+  {
+    "file": "elettrostatica.html",
+    "title": "Elettrostatica",
+    "icon": "⚡",
+    "description": "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
+    "category": "Elettromagnetismo"
+  },
+  {
+    "file": "moto armonico.html",
+    "title": "Moto Armonico",
+    "icon": "∿",
+    "description": "Simulazione del moto armonico semplice con analisi di posizione, velocità, accelerazione, periodo e ampiezza.",
+    "category": "Meccanica"
+  },
+  {
+    "file": "moto circolare.html",
+    "title": "Moto Circolare",
+    "icon": "◯",
+    "description": "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
+    "category": "Meccanica"
+  },
+  {
+    "file": "moto parabolico.html",
+    "title": "Moto Parabolico",
+    "icon": "➶",
+    "description": "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
+    "category": "Meccanica"
+  },
+  {
+    "file": "dinamica.html",
+    "title": "Principi della Dinamica",
+    "icon": "→",
+    "description": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
+    "category": "Meccanica"
+  },
+  {
+    "file": "rifrazione.html",
+    "title": "Rifrazione",
+    "icon": "↘",
+    "description": "Simulazione della rifrazione della luce tra mezzi diversi con visualizzazione degli angoli e del cambio di direzione.",
+    "category": "Ottica"
+  },
+  {
+    "file": "specchi e lenti.html",
+    "title": "Specchi e Lenti",
+    "icon": "🔍",
+    "description": "Studio della formazione delle immagini con specchi e lenti attraverso la costruzione geometrica dei raggi principali.",
+    "category": "Ottica"
+  },
+  {
+    "file": "interferenza onde.html",
+    "title": "Interferenza tra Onde",
+    "icon": "≈",
+    "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
+    "category": "Onde"
+  }
+]

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Moto rettilineo uniforme</title>
+
+<script>
+window.SIM_METADATA = {
+  title: "Moto rettilineo uniforme",
+  description: "Visualizza come la posizione varia linearmente nel tempo quando la velocità è costante, attraverso animazioni e grafici sincronizzati.",
+  category: "Meccanica",
+  icon: "➡️",
+  order: 1,
+  tags: ["moto rettilineo", "velocità costante", "legge oraria", "grafico posizione-tempo", "cinematica"],
+  level: "base"
+};
+</script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f7fa;
+  color: #111;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+canvas {
+  background: white;
+  border: 1px solid #ccc;
+}
+
+.controls {
+  margin-top: 10px;
+}
+
+input[type=range] {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.box {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.theory {
+  margin-top: 25px;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <h1>Moto rettilineo uniforme</h1>
+  <p style="color:#555;">
+    Visualizza come la posizione varia linearmente nel tempo quando la velocità è costante.
+  </p>
+</header>
+
+<div class="row">
+  <div class="box">
+    <canvas id="motionCanvas" width="500" height="120"></canvas>
+  </div>
+
+  <div class="box">
+    <canvas id="graphX" width="500" height="200"></canvas>
+    <canvas id="graphV" width="500" height="200"></canvas>
+  </div>
+</div>
+
+<div class="box controls">
+  <label>Posizione iniziale x₀: <span id="x0Val">0</span></label>
+  <input type="range" id="x0" min="-10" max="10" step="0.5" value="0">
+
+  <label>Velocità v: <span id="vVal">2</span></label>
+  <input type="range" id="v" min="-10" max="10" step="0.5" value="2">
+
+  <label>
+    <input type="checkbox" id="secondBody">
+    Attiva secondo corpo
+  </label>
+
+  <button onclick="start()">Avvia</button>
+  <button onclick="pause()">Pausa</button>
+  <button onclick="reset()">Reset</button>
+</div>
+
+<div class="theory">
+  <h3>Richiamo teorico</h3>
+  <p>
+    Il moto rettilineo uniforme è un moto lungo una retta con velocità costante.
+  </p>
+  <p>
+    Legge oraria:
+    <br><br>
+    <strong>x(t) = x₀ + v t</strong>
+  </p>
+  <p>
+    dove:
+    <br>
+    x(t) = posizione nel tempo<br>
+    x₀ = posizione iniziale<br>
+    v = velocità costante<br>
+    t = tempo
+  </p>
+  <p>
+    Il grafico posizione-tempo è una retta la cui pendenza rappresenta la velocità.
+  </p>
+</div>
+
+</div>
+
+<script>
+let t = 0;
+let running = false;
+let dt = 0.05;
+
+const canvas = document.getElementById("motionCanvas");
+const ctx = canvas.getContext("2d");
+
+const graphX = document.getElementById("graphX").getContext("2d");
+const graphV = document.getElementById("graphV").getContext("2d");
+
+let dataX = [];
+let dataV = [];
+
+function drawMotion(x) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.beginPath();
+  ctx.moveTo(0, 60);
+  ctx.lineTo(canvas.width, 60);
+  ctx.stroke();
+
+  let px = canvas.width/2 + x*20;
+
+  ctx.beginPath();
+  ctx.arc(px, 60, 8, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawGraph(ctx, data, color) {
+  ctx.clearRect(0,0,500,200);
+
+  ctx.beginPath();
+  for (let i=0; i<data.length; i++) {
+    let x = i;
+    let y = 100 - data[i]*10;
+    if (i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle = color;
+  ctx.stroke();
+}
+
+function update() {
+  if (!running) return;
+
+  let x0 = parseFloat(document.getElementById("x0").value);
+  let v = parseFloat(document.getElementById("v").value);
+
+  let x = x0 + v*t;
+
+  drawMotion(x);
+
+  dataX.push(x);
+  dataV.push(v);
+
+  drawGraph(graphX, dataX, "blue");
+  drawGraph(graphV, dataV, "red");
+
+  t += dt;
+
+  requestAnimationFrame(update);
+}
+
+function start() {
+  running = true;
+  update();
+}
+
+function pause() {
+  running = false;
+}
+
+function reset() {
+  t = 0;
+  dataX = [];
+  dataV = [];
+  running = false;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  graphX.clearRect(0,0,500,200);
+  graphV.clearRect(0,0,500,200);
+}
+
+document.getElementById("x0").oninput = e => {
+  document.getElementById("x0Val").innerText = e.target.value;
+};
+
+document.getElementById("v").oninput = e => {
+  document.getElementById("vVal").innerText = e.target.value;
+};
+</script>
+
+</body>
+</html>

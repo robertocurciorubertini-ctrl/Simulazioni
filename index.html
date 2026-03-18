@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulazioni di Fisica</title>
+  <style>
+    :root {
+      --bg-1: #07111f;
+      --bg-2: #0d1b2a;
+      --bg-3: #10263d;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.14);
+      --panel: rgba(255, 255, 255, 0.05);
+      --text: #eaf2ff;
+      --muted: #b8c7e6;
+      --accent: #61dafb;
+      --accent-2: #7ef0c7;
+      --danger: #ff9d9d;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(97, 218, 251, 0.15), transparent 30%),
+        radial-gradient(circle at top right, rgba(126, 240, 199, 0.12), transparent 25%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+      overflow-x: hidden;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+        radial-gradient(2px 2px at 140px 80px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 300px 120px, #ffffff, transparent),
+        radial-gradient(2px 2px at 500px 40px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 700px 150px, #ffffff, transparent),
+        radial-gradient(2px 2px at 900px 70px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 1100px 180px, #ffffff, transparent);
+      background-size: 1200px 300px;
+      animation: drift 20s linear infinite;
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(30px); }
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 64px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 32px 16px 20px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid rgba(97, 218, 251, 0.35);
+      border-radius: 999px;
+      background: rgba(97, 218, 251, 0.08);
+      color: var(--accent);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .subtitle {
+      max-width: 820px;
+      margin: 18px auto 0;
+      font-size: 1.08rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .panel {
+      margin-top: 34px;
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header,
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filters {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .panel-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+
+    .counter {
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .filters-left, .filters-right {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search,
+    .select {
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(7, 17, 31, 0.55);
+      color: var(--text);
+      padding: 0 14px;
+      outline: none;
+    }
+
+    .search {
+      min-width: min(340px, 70vw);
+    }
+
+    .select { min-width: 180px; }
+
+    .results {
+      margin-top: 24px;
+      display: grid;
+      gap: 28px;
+    }
+
+    .category-block {
+      display: grid;
+      gap: 14px;
+    }
+
+    .category-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .category-title {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .category-desc {
+      margin: 6px 0 0;
+      max-width: 780px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 0.97rem;
+    }
+
+    .category-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(97, 218, 251, 0.08);
+      border: 1px solid rgba(97, 218, 251, 0.18);
+      color: var(--accent);
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      padding: 22px 20px;
+      border: 1px solid var(--card-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      box-shadow: var(--shadow);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(97, 218, 251, 0.10), rgba(126, 240, 199, 0.06));
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(97, 218, 251, 0.35);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .sim-card-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card-content { position: relative; z-index: 1; }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 16px;
+      font-size: 1.35rem;
+      background: linear-gradient(135deg, rgba(97,218,251,0.18), rgba(126,240,199,0.18));
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .sim-title {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .sim-desc {
+      margin: 0 0 16px;
+      font-size: 0.94rem;
+      line-height: 1.6;
+      color: var(--muted);
+      min-height: 4.6em;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .chip.level {
+      font-weight: 600;
+    }
+
+    .chip.level.base {
+      color: #dffcf4;
+      border-color: rgba(126,240,199,0.3);
+      background: rgba(126,240,199,0.12);
+    }
+
+    .chip.level.intermedio {
+      color: #fff4dc;
+      border-color: rgba(255,200,120,0.35);
+      background: rgba(255,200,120,0.15);
+    }
+
+    .chip.level.avanzato {
+      color: #ffe0e0;
+      border-color: rgba(255,120,120,0.35);
+      background: rgba(255,120,120,0.15);
+    }
+
+    .sim-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #00141f;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .sim-link:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .empty-state,
+    .loading-state,
+    .error-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 20px;
+      font-size: 1rem;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .error-state { color: var(--danger); }
+
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 760px) {
+      .container {
+        width: min(100% - 20px, 1200px);
+        padding-top: 26px;
+      }
+
+      .panel { padding: 18px; }
+      .hero { padding-top: 14px; }
+      .subtitle { font-size: 1rem; }
+      .search { min-width: 100%; }
+      .filters-left, .filters-right { width: 100%; }
+      .select { flex: 1 1 180px; min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <div class="container">
+    <section class="hero">
+      <div class="hero-badge">Laboratorio digitale di fisica</div>
+      <h1>Simulazioni di Fisica</h1>
+      <p class="subtitle">
+        Raccolta di simulazioni interattive dedicate ai principali argomenti di fisica.
+        La home legge direttamente <code>simulations.json</code>, quindi supporta anche file
+        organizzati in sottocartelle e una struttura più vicina a un piccolo libro interattivo.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Simulazioni disponibili</div>
+        <div class="counter" id="counter">Caricamento...</div>
+      </div>
+
+      <div class="filters">
+        <div class="filters-left">
+          <input id="searchInput" class="search" type="search" placeholder="Cerca per titolo, categoria o tag..." />
+        </div>
+        <div class="filters-right">
+          <select id="categoryFilter" class="select">
+            <option value="">Tutte le categorie</option>
+          </select>
+          <select id="levelFilter" class="select">
+            <option value="">Tutti i livelli</option>
+            <option value="base">Base</option>
+            <option value="intermedio">Intermedio</option>
+            <option value="avanzato">Avanzato</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="results" id="results">
+        <div class="loading-state">Sto caricando il catalogo delle simulazioni...</div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Repository GitHub Pages per la condivisione delle simulazioni con la classe
+    </div>
+  </div>
+
+  <script>
+    const CATALOG_PATH = "simulations.json";
+
+    const counter = document.getElementById("counter");
+    const results = document.getElementById("results");
+    const searchInput = document.getElementById("searchInput");
+    const categoryFilter = document.getElementById("categoryFilter");
+    const levelFilter = document.getElementById("levelFilter");
+
+    let catalog = { categories: [], simulations: [] };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function normalize(value) {
+      return String(value ?? "").trim().toLowerCase();
+    }
+
+    function titleCaseFromSlug(value) {
+      return String(value ?? "")
+        .replace(/[-_]+/g, " ")
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function levelLabel(value) {
+      const v = normalize(value);
+      if (v === "base") return "Base";
+      if (v === "intermedio") return "Intermedio";
+      if (v === "avanzato") return "Avanzato";
+      return value || "";
+    }
+
+    function getCategoryMap(categories) {
+      const map = new Map();
+      categories.forEach(cat => {
+        if (!cat || !cat.name) return;
+        map.set(normalize(cat.name), cat);
+      });
+      return map;
+    }
+
+    function inferCategoryFromPath(filePath) {
+      const parts = String(filePath ?? "").split("/").filter(Boolean);
+      if (parts.length <= 1) return "Senza categoria";
+      return titleCaseFromSlug(parts[0]);
+    }
+
+    function normalizeSimulation(sim) {
+      const file = String(sim.file ?? "").trim();
+      const inferredCategory = inferCategoryFromPath(file);
+      const category = String(sim.category ?? inferredCategory).trim() || inferredCategory;
+      const tags = Array.isArray(sim.tags) ? sim.tags.map(tag => String(tag).trim()).filter(Boolean) : [];
+      const level = String(sim.level ?? "").trim();
+
+      return {
+        ...sim,
+        file,
+        title: String(sim.title ?? "Simulazione senza titolo").trim(),
+        description: String(sim.description ?? "Simulazione interattiva di fisica accessibile direttamente dal browser.").trim(),
+        icon: String(sim.icon ?? "Φ").trim() || "Φ",
+        category,
+        order: Number.isFinite(Number(sim.order)) ? Number(sim.order) : 9999,
+        tags,
+        level
+      };
+    }
+
+    function buildCategoryOptions(simulations, categories) {
+      const names = new Set();
+
+      categories.forEach(cat => {
+        if (cat?.name) names.add(cat.name);
+      });
+      simulations.forEach(sim => {
+        if (sim?.category) names.add(sim.category);
+      });
+
+      const categoryMap = getCategoryMap(categories);
+      const sorted = Array.from(names)
+        .map(name => {
+          const cat = categoryMap.get(normalize(name)) || {};
+          return {
+            name,
+            order: Number.isFinite(Number(cat.order)) ? Number(cat.order) : 9999
+          };
+        })
+        .sort((a, b) => {
+          if (a.order !== b.order) return a.order - b.order;
+          return a.name.localeCompare(b.name, "it");
+        });
+
+      categoryFilter.innerHTML = '<option value="">Tutte le categorie</option>' +
+        sorted.map(item => `<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}</option>`).join("");
+    }
+
+    function sortCategories(categories, simulations) {
+      const map = getCategoryMap(categories);
+      const names = new Set();
+
+      categories.forEach(cat => {
+        if (cat?.name) names.add(cat.name);
+      });
+      simulations.forEach(sim => {
+        if (sim?.category) names.add(sim.category);
+      });
+
+      return Array.from(names)
+        .map(name => {
+          const categoryData = map.get(normalize(name)) || {};
+          return {
+            name,
+            description: categoryData.description || "",
+            order: Number.isFinite(Number(categoryData.order)) ? Number(categoryData.order) : 9999
+          };
+        })
+        .sort((a, b) => {
+          if (a.order !== b.order) return a.order - b.order;
+          return a.name.localeCompare(b.name, "it");
+        });
+    }
+
+    function matchesFilters(sim) {
+      const query = normalize(searchInput.value);
+      const selectedCategory = normalize(categoryFilter.value);
+      const selectedLevel = normalize(levelFilter.value);
+
+      if (selectedCategory && normalize(sim.category) !== selectedCategory) {
+        return false;
+      }
+
+      if (selectedLevel && normalize(sim.level) !== selectedLevel) {
+        return false;
+      }
+
+      if (!query) return true;
+
+      const haystack = [
+        sim.title,
+        sim.description,
+        sim.category,
+        sim.level,
+        ...(sim.tags || [])
+      ].map(normalize).join(" ");
+
+      return haystack.includes(query);
+    }
+
+    function renderCard(sim) {
+      const tagsMarkup = "";
+
+      const levelMarkup = sim.level
+        ? `<span class="chip level ${normalize(sim.level)}">${escapeHtml(levelLabel(sim.level))}</span>`
+        : "";
+
+      return `
+        <a class="card sim-card-link" href="${encodeURI(sim.file)}" aria-label="Apri simulazione ${escapeHtml(sim.title)}">
+          <div class="card-content">
+            <div class="icon">${escapeHtml(sim.icon)}</div>
+            <h2 class="sim-title">${escapeHtml(sim.title)}</h2>
+            <p class="sim-desc">${escapeHtml(sim.description)}</p>
+            <div class="meta-row">
+              ${levelMarkup}
+              
+            </div>
+            <span class="sim-link">
+              Apri simulazione
+              <span>→</span>
+            </span>
+          </div>
+        </a>
+      `;
+    }
+
+    function render() {
+      const simulations = (catalog.simulations || []).map(normalizeSimulation).filter(matchesFilters);
+      const orderedCategories = sortCategories(catalog.categories || [], simulations);
+
+      counter.textContent = `${simulations.length} simulazione${simulations.length === 1 ? "" : "i"}`;
+
+      if (simulations.length === 0) {
+        results.innerHTML = `
+          <div class="empty-state">
+            Nessuna simulazione corrisponde ai filtri selezionati.
+          </div>
+        `;
+        return;
+      }
+
+      const html = orderedCategories
+        .map(category => {
+          const sims = simulations
+            .filter(sim => normalize(sim.category) === normalize(category.name))
+            .sort((a, b) => {
+              if (a.order !== b.order) return a.order - b.order;
+              return a.title.localeCompare(b.title, "it");
+            });
+
+          if (sims.length === 0) return "";
+
+          return `
+            <section class="category-block">
+              <div class="category-head">
+                <div>
+                  <h2 class="category-title">${escapeHtml(category.name)}</h2>
+                  ${category.description ? `<p class="category-desc">${escapeHtml(category.description)}</p>` : ""}
+                </div>
+                <div class="category-pill">${sims.length} simulazion${sims.length === 1 ? "e" : "i"}</div>
+              </div>
+              <div class="grid">
+                ${sims.map(renderCard).join("")}
+              </div>
+            </section>
+          `;
+        })
+        .filter(Boolean)
+        .join("");
+
+      results.innerHTML = html;
+    }
+
+    async function loadCatalog() {
+      try {
+        const response = await fetch(CATALOG_PATH, { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error("Impossibile recuperare simulations.json");
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          catalog = { categories: [], simulations: data };
+        } else {
+          catalog = {
+            categories: Array.isArray(data.categories) ? data.categories : [],
+            simulations: Array.isArray(data.simulations) ? data.simulations : []
+          };
+        }
+
+        const normalizedSimulations = (catalog.simulations || []).map(normalizeSimulation);
+        buildCategoryOptions(normalizedSimulations, catalog.categories || []);
+        render();
+      } catch (error) {
+        counter.textContent = "Errore";
+        results.innerHTML = `
+          <div class="error-state">
+            Non è stato possibile caricare il catalogo delle simulazioni.<br>
+            Verifica che <code>simulations.json</code> sia presente nella stessa cartella di questo file
+            e che la sua sintassi sia valida.
+          </div>
+        `;
+        console.error(error);
+      }
+    }
+
+    searchInput.addEventListener("input", render);
+    categoryFilter.addEventListener("change", render);
+    levelFilter.addEventListener("change", render);
+
+    loadCatalog();
+  </script>
+</body>
+</html>

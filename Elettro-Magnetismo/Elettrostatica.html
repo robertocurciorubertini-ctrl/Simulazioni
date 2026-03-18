@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+
+<script>
+window.SIM_METADATA = {
+  title: "Elettrostatica",
+  description: "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
+  category: "Elettromagnetismo",
+  icon: "⚡",
+  order: 1,
+  tags: ["cariche elettriche", "campo elettrico", "forza elettrica", "legge di Coulomb"],
+  level: "intermedio"
+};
+</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore di Campo Elettrico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111827;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .controls {
+            background-color: #1f2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            max-width: 1200px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-positive {
+            background-color: #374151;
+            color: #d1d5db;
+        }
+
+        .btn-positive.active {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .btn-negative {
+            background-color: #374151;
+            color: #d1d5db;
+        }
+
+        .btn-negative.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-simulation {
+            background-color: #16a34a;
+            color: white;
+            padding: 0.5rem 1.5rem;
+        }
+
+        .btn-simulation:hover:not(:disabled) {
+            background-color: #15803d;
+        }
+
+        .btn-simulation.running {
+            background-color: #ca8a04;
+        }
+
+        .btn-simulation.running:hover {
+            background-color: #a16207;
+        }
+
+        .btn-clear {
+            background-color: #374151;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #4b5563;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slider-container label {
+            color: #d1d5db;
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        input[type="range"] {
+            width: 8rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .checkbox-container label {
+            color: #d1d5db;
+            font-size: 0.875rem;
+        }
+
+        .divider {
+            width: 2px;
+            height: 3rem;
+            background-color: #4b5563;
+            margin: 0 0.5rem;
+        }
+
+        canvas {
+            border: 2px solid #374151;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        canvas.running {
+            cursor: not-allowed;
+        }
+
+        canvas:not(.running) {
+            cursor: crosshair;
+        }
+
+        .legend {
+            background-color: #1f2937;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            max-width: 800px;
+        }
+
+        .legend-title {
+            color: #d1d5db;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-gradient {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-gradient span {
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+
+        .gradient-bar {
+            display: flex;
+            height: 1.5rem;
+            width: 16rem;
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+
+        .gradient-segment {
+            flex: 1;
+        }
+
+        .info-box {
+            background-color: #1f2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-width: 48rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-content {
+            display: flex;
+            gap: 0.5rem;
+            color: #d1d5db;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .info-icon {
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .info-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        .info-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .stats {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulatore di Campo Elettrico</h1>
+    <p class="subtitle">Clicca sul canvas per aggiungere cariche e visualizzare il campo elettrico generato</p>
+
+    <div class="controls">
+        <div class="button-group">
+            <button class="btn-positive active" id="btnPositive">
+                <span>+</span> Positiva
+            </button>
+            <button class="btn-negative" id="btnNegative">
+                <span>−</span> Negativa
+            </button>
+        </div>
+
+        <div class="slider-container">
+            <label>Intensità carica: <span id="chargeValue">1</span></label>
+            <input type="range" id="chargeMagnitude" min="0.5" max="3" step="0.5" value="1">
+        </div>
+
+        <div class="divider"></div>
+
+        <button class="btn-simulation" id="btnSimulation" disabled>
+            ▶ Avvia Simulazione
+        </button>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="showForceVectors" checked>
+            <label for="showForceVectors">Vettori forza (verde)</label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="showFieldLines" checked>
+            <label for="showFieldLines">Linee di campo</label>
+        </div>
+
+        <div class="slider-container" id="fieldLinesDensityContainer">
+            <label>Densità linee: <span id="fieldLinesDensityValue">8</span></label>
+            <input type="range" id="fieldLinesDensity" min="4" max="16" step="2" value="8">
+        </div>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="showVectors" checked>
+            <label for="showVectors">Vettori campo</label>
+        </div>
+
+        <div class="slider-container" id="vectorDensityContainer">
+            <label>Spaziatura vettori: <span id="vectorDensityValue">20</span></label>
+            <input type="range" id="vectorDensity" min="15" max="40" step="5" value="20">
+        </div>
+
+        <button class="btn-clear" id="btnClear">
+            🗑 Cancella tutto
+        </button>
+    </div>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <div class="legend" id="legend" style="display: none;">
+        <div class="legend-title">Intensità del campo elettrico:</div>
+        <div class="legend-gradient">
+            <span>Debole</span>
+            <div class="gradient-bar">
+                <div class="gradient-segment" style="background: linear-gradient(to right, rgb(0,0,200), rgb(0,150,200))"></div>
+                <div class="gradient-segment" style="background: linear-gradient(to right, rgb(0,150,200), rgb(0,255,0))"></div>
+                <div class="gradient-segment" style="background: linear-gradient(to right, rgb(0,255,0), rgb(255,255,0))"></div>
+                <div class="gradient-segment" style="background: linear-gradient(to right, rgb(255,255,0), rgb(255,0,0))"></div>
+            </div>
+            <span>Intenso</span>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-content">
+            <div class="info-icon">ℹ️</div>
+            <div>
+                <p><strong>Come funziona:</strong> Il campo elettrico è calcolato utilizzando la legge di Coulomb e il principio di sovrapposizione. In ogni punto dello spazio, il campo elettrico totale è la somma vettoriale dei campi generati da ciascuna carica secondo la formula E = k·q/r², dove k è la costante di Coulomb, q è la carica e r è la distanza dal punto considerato.</p>
+                <p><strong>Simulazione dinamica:</strong> Le frecce verdi mostrano la forza elettrostatica totale che agisce su ogni carica (F = q·E). Quando avvii la simulazione, le cariche si muovono seguendo la seconda legge di Newton (F = m·a). Le cariche dello stesso segno si respingono, mentre cariche di segno opposto si attraggono. Il sistema include un fattore di smorzamento per stabilizzare il movimento e le cariche rimbalzano sui bordi del canvas. <strong>Failsafe:</strong> Se due cariche di segno opposto si avvicinano troppo (meno di 30 pixel), la simulazione si interrompe automaticamente per evitare instabilità numeriche dovute a forze che tendono all'infinito.</p>
+                <p><strong>Visualizzazione:</strong> Le linee di campo (blu) partono dalle cariche positive e terminano su quelle negative. I vettori colorati mostrano direzione e intensità del campo in vari punti, con colori che variano dal blu (campo debole) al rosso (campo intenso).</p>
+            </div>
+        </div>
+    </div>
+
+    <p class="stats" id="stats">Cariche totali: 0 | Cariche positive: 0 | Cariche negative: 0</p>
+
+    <script>
+        // Costanti
+        const WIDTH = 800;
+        const HEIGHT = 600;
+        const K = 8000;
+        const DAMPING_FACTOR = 0.98;
+        const MIN_DISTANCE = 30;
+
+        // Stato dell'applicazione
+        let charges = [];
+        let chargeType = 1;
+        let chargeMagnitude = 1;
+        let showFieldLines = true;
+        let showVectors = true;
+        let showForceVectors = true;
+        let fieldLinesDensity = 8;
+        let vectorDensity = 20;
+        let isSimulationRunning = false;
+        let animationId = null;
+
+        // Elementi DOM
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const btnPositive = document.getElementById('btnPositive');
+        const btnNegative = document.getElementById('btnNegative');
+        const btnSimulation = document.getElementById('btnSimulation');
+        const btnClear = document.getElementById('btnClear');
+        const chargeMagnitudeSlider = document.getElementById('chargeMagnitude');
+        const chargeValueSpan = document.getElementById('chargeValue');
+        const showFieldLinesCheckbox = document.getElementById('showFieldLines');
+        const showVectorsCheckbox = document.getElementById('showVectors');
+        const showForceVectorsCheckbox = document.getElementById('showForceVectors');
+        const fieldLinesDensitySlider = document.getElementById('fieldLinesDensity');
+        const fieldLinesDensityValueSpan = document.getElementById('fieldLinesDensityValue');
+        const vectorDensitySlider = document.getElementById('vectorDensity');
+        const vectorDensityValueSpan = document.getElementById('vectorDensityValue');
+        const statsElement = document.getElementById('stats');
+        const legendElement = document.getElementById('legend');
+
+        // Event listeners
+        btnPositive.addEventListener('click', () => {
+            if (!isSimulationRunning) {
+                chargeType = 1;
+                btnPositive.classList.add('active');
+                btnNegative.classList.remove('active');
+            }
+        });
+
+        btnNegative.addEventListener('click', () => {
+            if (!isSimulationRunning) {
+                chargeType = -1;
+                btnNegative.classList.add('active');
+                btnPositive.classList.remove('active');
+            }
+        });
+
+        btnSimulation.addEventListener('click', toggleSimulation);
+        btnClear.addEventListener('click', clearCharges);
+
+        chargeMagnitudeSlider.addEventListener('input', (e) => {
+            chargeMagnitude = parseFloat(e.target.value);
+            chargeValueSpan.textContent = chargeMagnitude;
+        });
+
+        showFieldLinesCheckbox.addEventListener('change', (e) => {
+            showFieldLines = e.target.checked;
+            render();
+        });
+
+        showVectorsCheckbox.addEventListener('change', (e) => {
+            showVectors = e.target.checked;
+            updateLegendVisibility();
+            render();
+        });
+
+        showForceVectorsCheckbox.addEventListener('change', (e) => {
+            showForceVectors = e.target.checked;
+            render();
+        });
+
+        fieldLinesDensitySlider.addEventListener('input', (e) => {
+            fieldLinesDensity = parseInt(e.target.value);
+            fieldLinesDensityValueSpan.textContent = fieldLinesDensity;
+            render();
+        });
+
+        vectorDensitySlider.addEventListener('input', (e) => {
+            vectorDensity = parseInt(e.target.value);
+            vectorDensityValueSpan.textContent = vectorDensity;
+            render();
+        });
+
+        canvas.addEventListener('click', handleCanvasClick);
+
+        // Funzioni
+        function handleCanvasClick(e) {
+            if (isSimulationRunning) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            charges.push({
+                x: x,
+                y: y,
+                q: chargeType * chargeMagnitude,
+                id: Date.now(),
+                vx: 0,
+                vy: 0
+            });
+
+            updateStats();
+            updateSimulationButton();
+            render();
+        }
+
+        function clearCharges() {
+            isSimulationRunning = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            charges = [];
+            updateStats();
+            updateSimulationButton();
+            updateUIState();
+            render();
+        }
+
+        function toggleSimulation() {
+            isSimulationRunning = !isSimulationRunning;
+            
+            if (isSimulationRunning) {
+                btnSimulation.textContent = '⏸ Ferma Simulazione';
+                btnSimulation.classList.add('running');
+                canvas.classList.add('running');
+                animate();
+            } else {
+                btnSimulation.textContent = '▶ Avvia Simulazione';
+                btnSimulation.classList.remove('running');
+                canvas.classList.remove('running');
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
+            
+            updateUIState();
+        }
+
+        function updateUIState() {
+            btnPositive.disabled = isSimulationRunning;
+            btnNegative.disabled = isSimulationRunning;
+            chargeMagnitudeSlider.disabled = isSimulationRunning;
+        }
+
+        function updateSimulationButton() {
+            btnSimulation.disabled = charges.length < 2;
+        }
+
+        function updateStats() {
+            const total = charges.length;
+            const positive = charges.filter(c => c.q > 0).length;
+            const negative = charges.filter(c => c.q < 0).length;
+            statsElement.textContent = `Cariche totali: ${total} | Cariche positive: ${positive} | Cariche negative: ${negative}`;
+        }
+
+        function updateLegendVisibility() {
+            legendElement.style.display = showVectors && charges.length > 0 ? 'block' : 'none';
+        }
+
+        function calculateElectricField(x, y) {
+            let Ex = 0;
+            let Ey = 0;
+
+            charges.forEach(charge => {
+                const dx = x - charge.x;
+                const dy = y - charge.y;
+                const r2 = dx * dx + dy * dy;
+                const r = Math.sqrt(r2);
+
+                if (r < 5) return;
+
+                const E = K * charge.q / r2;
+                Ex += E * dx / r;
+                Ey += E * dy / r;
+            });
+
+            return { Ex, Ey, magnitude: Math.sqrt(Ex * Ex + Ey * Ey) };
+        }
+
+        function calculateForceOnCharge(targetCharge) {
+            let Fx = 0;
+            let Fy = 0;
+
+            charges.forEach(charge => {
+                if (charge.id === targetCharge.id) return;
+
+                const dx = targetCharge.x - charge.x;
+                const dy = targetCharge.y - charge.y;
+                const r2 = dx * dx + dy * dy;
+                const r = Math.sqrt(r2);
+
+                const minR = 15;
+                if (r < minR) return;
+
+                const F = K * targetCharge.q * charge.q / r2;
+                const maxF = 100;
+                const limitedF = Math.max(Math.min(F, maxF), -maxF);
+
+                Fx += limitedF * dx / r;
+                Fy += limitedF * dy / r;
+            });
+
+            return { Fx, Fy, magnitude: Math.sqrt(Fx * Fx + Fy * Fy) };
+        }
+
+        function traceFieldLine(startX, startY, direction) {
+            let x = startX;
+            let y = startY;
+            const step = 2;
+            const maxSteps = 1000;
+            let steps = 0;
+            const points = [];
+
+            points.push({ x, y });
+
+            while (steps < maxSteps && x >= 0 && x <= WIDTH && y >= 0 && y <= HEIGHT) {
+                const field = calculateElectricField(x, y);
+
+                if (field.magnitude < 0.1) break;
+
+                const dx = direction * field.Ex / field.magnitude * step;
+                const dy = direction * field.Ey / field.magnitude * step;
+
+                x += dx;
+                y += dy;
+
+                points.push({ x, y });
+                steps++;
+            }
+
+            if (points.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+
+                const arrowInterval = Math.floor(points.length / 4);
+                for (let i = arrowInterval; i < points.length - 1; i += arrowInterval) {
+                    const p1 = points[i];
+                    const p2 = points[i + 1];
+                    const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+                    const arrowSize = 8;
+
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(
+                        p1.x - arrowSize * Math.cos(angle - Math.PI / 6),
+                        p1.y - arrowSize * Math.sin(angle - Math.PI / 6)
+                    );
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(
+                        p1.x - arrowSize * Math.cos(angle + Math.PI / 6),
+                        p1.y - arrowSize * Math.sin(angle + Math.PI / 6)
+                    );
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawFieldLines() {
+            ctx.strokeStyle = 'rgba(100, 180, 255, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = 'rgba(100, 180, 255, 0.5)';
+            ctx.shadowBlur = 3;
+
+            charges.forEach(charge => {
+                const numLines = Math.abs(charge.q) * fieldLinesDensity;
+                const direction = charge.q > 0 ? 1 : -1;
+
+                for (let i = 0; i < numLines; i++) {
+                    const angle = (2 * Math.PI * i) / numLines;
+                    const startX = charge.x + Math.cos(angle) * 15;
+                    const startY = charge.y + Math.sin(angle) * 15;
+
+                    traceFieldLine(startX, startY, direction);
+                }
+            });
+
+            ctx.shadowBlur = 0;
+        }
+
+        function drawFieldVectors() {
+            const spacing = vectorDensity;
+
+            for (let x = spacing; x < WIDTH; x += spacing) {
+                for (let y = spacing; y < HEIGHT; y += spacing) {
+                    const field = calculateElectricField(x, y);
+
+                    if (field.magnitude < 0.1) continue;
+
+                    const maxMagnitude = 8;
+                    const normalizedMag = Math.min(field.magnitude / maxMagnitude, 1);
+                    const vectorLength = 12;
+
+                    const angle = Math.atan2(field.Ey, field.Ex);
+
+                    const startX = x - Math.cos(angle) * vectorLength / 2;
+                    const startY = y - Math.sin(angle) * vectorLength / 2;
+                    const endX = x + Math.cos(angle) * vectorLength / 2;
+                    const endY = y + Math.sin(angle) * vectorLength / 2;
+
+                    let r, g, b;
+                    if (normalizedMag < 0.25) {
+                        r = 0;
+                        g = Math.floor(normalizedMag * 4 * 150);
+                        b = 200;
+                    } else if (normalizedMag < 0.5) {
+                        r = 0;
+                        g = 150 + Math.floor((normalizedMag - 0.25) * 4 * 105);
+                        b = 200 - Math.floor((normalizedMag - 0.25) * 4 * 200);
+                    } else if (normalizedMag < 0.75) {
+                        r = Math.floor((normalizedMag - 0.5) * 4 * 255);
+                        g = 255;
+                        b = 0;
+                    } else {
+                        r = 255;
+                        g = 255 - Math.floor((normalizedMag - 0.75) * 4 * 255);
+                        b = 0;
+                    }
+
+                    ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.fillStyle = ctx.strokeStyle;
+                    ctx.lineWidth = 2;
+
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+
+                    const arrowHeadLength = 5;
+                    ctx.beginPath();
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(
+                        endX - arrowHeadLength * Math.cos(angle - Math.PI / 6),
+                        endY - arrowHeadLength * Math.sin(angle - Math.PI / 6)
+                    );
+                    ctx.lineTo(
+                        endX - arrowHeadLength * Math.cos(angle + Math.PI / 6),
+                        endY - arrowHeadLength * Math.sin(angle + Math.PI / 6)
+                    );
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+        }
+
+        function drawCharges() {
+            charges.forEach(charge => {
+                const radius = 10 + Math.abs(charge.q) * 5;
+
+                const gradient = ctx.createRadialGradient(charge.x, charge.y, 0, charge.x, charge.y, radius * 2);
+                if (charge.q > 0) {
+                    gradient.addColorStop(0, 'rgba(255, 100, 100, 0.3)');
+                    gradient.addColorStop(1, 'rgba(255, 100, 100, 0)');
+                } else {
+                    gradient.addColorStop(0, 'rgba(100, 100, 255, 0.3)');
+                    gradient.addColorStop(1, 'rgba(100, 100, 255, 0)');
+                }
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(charge.x, charge.y, radius * 2, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.fillStyle = charge.q > 0 ? '#ff4444' : '#4444ff';
+                ctx.beginPath();
+                ctx.arc(charge.x, charge.y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(charge.q > 0 ? '+' : '−', charge.x, charge.y);
+            });
+        }
+
+        function drawForceVectors() {
+            if (!showForceVectors || charges.length < 2) return;
+
+            charges.forEach(charge => {
+                const force = calculateForceOnCharge(charge);
+
+                if (force.magnitude < 0.1) return;
+
+                const radius = 10 + Math.abs(charge.q) * 5;
+                const scaleFactor = 15;
+                const arrowLength = Math.min(force.magnitude * scaleFactor, 250);
+
+                const angle = Math.atan2(force.Fy, force.Fx);
+                const startX = charge.x + Math.cos(angle) * (radius + 8);
+                const startY = charge.y + Math.sin(angle) * (radius + 8);
+                const endX = startX + Math.cos(angle) * arrowLength;
+                const endY = startY + Math.sin(angle) * arrowLength;
+
+                ctx.shadowColor = '#00ff00';
+                ctx.shadowBlur = 20;
+
+                ctx.strokeStyle = '#00ff00';
+                ctx.fillStyle = '#00ff00';
+                ctx.lineWidth = 5;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                const arrowHeadLength = 16;
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(
+                    endX - arrowHeadLength * Math.cos(angle - Math.PI / 6),
+                    endY - arrowHeadLength * Math.sin(angle - Math.PI / 6)
+                );
+                ctx.lineTo(
+                    endX - arrowHeadLength * Math.cos(angle + Math.PI / 6),
+                    endY - arrowHeadLength * Math.sin(angle + Math.PI / 6)
+                );
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function render() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < WIDTH; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, HEIGHT);
+                ctx.stroke();
+            }
+            for (let y = 0; y < HEIGHT; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(WIDTH, y);
+                ctx.stroke();
+            }
+
+            if (charges.length > 0) {
+                if (showFieldLines) {
+                    drawFieldLines();
+                }
+
+                if (showVectors) {
+                    drawFieldVectors();
+                }
+
+                drawCharges();
+                drawForceVectors();
+            }
+
+            updateLegendVisibility();
+        }
+
+        function updateSimulation() {
+            // Failsafe
+            for (let i = 0; i < charges.length; i++) {
+                for (let j = i + 1; j < charges.length; j++) {
+                    const charge1 = charges[i];
+                    const charge2 = charges[j];
+
+                    if (charge1.q * charge2.q < 0) {
+                        const dx = charge1.x - charge2.x;
+                        const dy = charge1.y - charge2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < MIN_DISTANCE) {
+                            isSimulationRunning = false;
+                            btnSimulation.textContent = '▶ Avvia Simulazione';
+                            btnSimulation.classList.remove('running');
+                            canvas.classList.remove('running');
+                            if (animationId) {
+                                cancelAnimationFrame(animationId);
+                                animationId = null;
+                            }
+                            updateUIState();
+                            alert(`⚠️ Simulazione interrotta!\n\nDue cariche di segno opposto si sono avvicinate troppo (distanza: ${Math.round(distance)}px).\n\nQuesto causerebbe forze infinite e instabilità numerica.\n\nNella fisica reale, le cariche si neutralizzerebbero o si formerebbe un dipolo elettrico.`);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            charges.forEach(charge => {
+                const force = calculateForceOnCharge(charge);
+
+                const mass = Math.abs(charge.q) * 10;
+
+                const ax = force.Fx / mass;
+                const ay = force.Fy / mass;
+
+                charge.vx = (charge.vx + ax * 0.3) * DAMPING_FACTOR;
+                charge.vy = (charge.vy + ay * 0.3) * DAMPING_FACTOR;
+
+                const maxSpeed = 8;
+                const speed = Math.sqrt(charge.vx * charge.vx + charge.vy * charge.vy);
+                if (speed > maxSpeed) {
+                    charge.vx = (charge.vx / speed) * maxSpeed;
+                    charge.vy = (charge.vy / speed) * maxSpeed;
+                }
+
+                let newX = charge.x + charge.vx;
+                let newY = charge.y + charge.vy;
+
+                const radius = 10 + Math.abs(charge.q) * 5;
+                if (newX < radius) {
+                    newX = radius;
+                    charge.vx = -charge.vx * 0.8;
+                }
+                if (newX > WIDTH - radius) {
+                    newX = WIDTH - radius;
+                    charge.vx = -charge.vx * 0.8;
+                }
+                if (newY < radius) {
+                    newY = radius;
+                    charge.vy = -charge.vy * 0.8;
+                }
+                if (newY > HEIGHT - radius) {
+                    newY = HEIGHT - radius;
+                    charge.vy = -charge.vy * 0.8;
+                }
+
+                charge.x = newX;
+                charge.y = newY;
+            });
+        }
+
+        function animate() {
+            if (!isSimulationRunning) return;
+
+            updateSimulation();
+            render();
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Inizializzazione
+        render();
+    </script>
+</body>
+</html>

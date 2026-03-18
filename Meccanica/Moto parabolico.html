@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Moto Parabolico",
+  description: "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
+  category: "Meccanica",
+  icon: "➶",
+  order: 1,
+  tags: ["moto parabolico", "lancio di proiettili", "gittata", "tempo di volo", "composizione dei moti"],
+  level: "base"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulatore Moto Parabolico</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script>
+MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' }, startup: { typeset: false } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f3ef;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.13);
+    --text: #1c1c1a;
+    --text2: #4a5040;
+    --text3: #8a8f80;
+    --accent-traj: #1a6fd4;
+    --accent-L: #c04f20;
+    --accent-h: #0e8a5a;
+    --accent-vec: #222222;
+    --accent-pt: #6d4fc0;
+    --accent-line: #2a2a26;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --serif: 'EB Garamond', Georgia, serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1rem 3.5rem;
+  }
+
+  header {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--accent-line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 1rem;
+  }
+
+  .header-left {}
+
+  header h1 {
+    font-family: var(--serif);
+    font-size: 1.75rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text);
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  header .subtitle {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .header-badge {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text3);
+    border: 0.5px solid var(--border2);
+    border-radius: 4px;
+    padding: 5px 10px;
+    white-space: nowrap;
+    background: var(--surface);
+  }
+
+  .header-badge span {
+    color: var(--text2);
+    font-style: italic;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 16px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .panel-title {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .ctrl-group {
+    margin-bottom: 18px;
+  }
+
+  .ctrl-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    color: var(--text2);
+    margin-bottom: 8px;
+    font-family: var(--mono);
+  }
+
+  .ctrl-val {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+  }
+
+  input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+  }
+
+  .divider {
+    border: none;
+    border-top: 0.5px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .metric {
+    background: var(--surface2);
+    border-radius: 7px;
+    padding: 10px 12px;
+  }
+
+  .metric-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .metric-val {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .metric-unit {
+    font-size: 0.65rem;
+    color: var(--text3);
+    font-family: var(--mono);
+    margin-top: 1px;
+  }
+
+  .m-L .metric-val { color: var(--accent-L); }
+  .m-h .metric-val { color: var(--accent-h); }
+  .m-T .metric-val { color: var(--accent-traj); }
+  .m-v .metric-val { color: var(--accent-vec); font-size: 0.82rem; }
+
+  .canvas-panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  canvas {
+    width: 100%;
+    border-radius: 6px;
+    display: block;
+  }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .leg-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text3);
+  }
+
+  .leg-line {
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+  }
+
+  .eq-section {
+    width: 100%;
+    max-width: 900px;
+    margin-top: 14px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .eq-card {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 14px 16px;
+    border: 0.5px solid var(--border);
+  }
+
+  .eq-label {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 0.5px solid var(--border2);
+  }
+
+  .eq-formula {
+    font-size: 0.92rem;
+    color: var(--text2);
+    line-height: 2;
+  }
+
+  .eq-formula .MJX-TEX { color: var(--text); }
+
+  @media (max-width: 680px) {
+    .container { grid-template-columns: 1fr; }
+    .eq-section { grid-template-columns: 1fr; }
+    header { flex-direction: column; gap: 0.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Moto Parabolico</h1>
+    <div class="subtitle">Simulatore interattivo &nbsp;·&nbsp; cinematica del proiettile</div>
+  </div>
+  <div class="header-badge"><span>g</span> = 9.81 m/s²&nbsp;&nbsp;·&nbsp;&nbsp;sistema cartesiano</div>
+</header>
+
+<div class="container">
+  <div class="panel">
+    <div class="panel-title">Parametri iniziali</div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-label">x₀ — posizione orizzontale <span class="ctrl-val"><span id="vx0">0</span> m</span></div>
+      <input type="range" id="x0" min="0" max="20" value="0" step="1">
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-label">y₀ — posizione verticale <span class="ctrl-val"><span id="vy0">0</span> m</span></div>
+      <input type="range" id="y0" min="0" max="30" value="0" step="1">
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-label">v₀ — velocità iniziale <span class="ctrl-val"><span id="vv0">20</span> m/s</span></div>
+      <input type="range" id="v0" min="5" max="80" value="20" step="1">
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-label">θ — angolo di lancio <span class="ctrl-val"><span id="vtheta">45</span>°</span></div>
+      <input type="range" id="theta" min="0" max="89" value="45" step="1">
+    </div>
+
+    <hr class="divider">
+    <div class="panel-title">Grandezze cinematiche</div>
+
+    <div class="metrics">
+      <div class="metric m-L">
+        <div class="metric-label">Gittata L</div>
+        <div class="metric-val" id="mL">—</div>
+        <div class="metric-unit">metri</div>
+      </div>
+      <div class="metric m-h">
+        <div class="metric-label">h_max</div>
+        <div class="metric-val" id="mH">—</div>
+        <div class="metric-unit">metri</div>
+      </div>
+      <div class="metric m-T">
+        <div class="metric-label">Tempo volo</div>
+        <div class="metric-val" id="mT">—</div>
+        <div class="metric-unit">secondi</div>
+      </div>
+      <div class="metric m-v" style="grid-column: span 2;">
+        <div style="display:flex; gap:12px; justify-content:space-around;">
+          <div style="text-align:center;">
+            <div class="metric-label">v<sub>(0,x)</sub></div>
+            <div class="metric-val" id="mVx" style="font-size:1rem;">—</div>
+            <div class="metric-unit">m/s</div>
+          </div>
+          <div style="border-left:0.5px solid var(--border2);"></div>
+          <div style="text-align:center;">
+            <div class="metric-label">v<sub>(0,y)</sub></div>
+            <div class="metric-val" id="mVy" style="font-size:1rem;">—</div>
+            <div class="metric-unit">m/s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-panel">
+    <canvas id="cvs" height="400"></canvas>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-line" style="background:var(--accent-traj)"></div>traiettoria</div>
+      <div class="leg-item"><div class="leg-line" style="background:var(--accent-L);"></div>gittata L</div>
+      <div class="leg-item"><div class="leg-line" style="background:var(--accent-h);"></div>h_max</div>
+      <div class="leg-item"><div class="leg-line" style="background:var(--accent-vec);"></div>vettore v₀</div>
+    </div>
+  </div>
+</div>
+
+<div class="eq-section">
+  <div class="eq-card">
+    <div class="eq-label">Equazioni del moto</div>
+    <div class="eq-formula">
+      $x(t) = x_0 + v_0 \cos\theta \cdot t$<br><br>
+      $y(t) = y_0 + v_0 \sin\theta \cdot t - \dfrac{1}{2}g t^2$
+    </div>
+  </div>
+  <div class="eq-card">
+    <div class="eq-label">Altezza massima</div>
+    <div class="eq-formula">
+      $t_{\text{apice}} = \dfrac{v_0 \sin\theta}{g}$<br><br>
+      $h_{\max} = y_0 + \dfrac{(v_0 \sin\theta)^2}{2g}$
+    </div>
+  </div>
+  <div class="eq-card">
+    <div class="eq-label">Gittata (y₀ = 0)</div>
+    <div class="eq-formula">
+      $L = \dfrac{v_0^2 \sin 2\theta}{g}$<br><br>
+      $L_{\max} \text{ per } \theta = 45°$
+    </div>
+  </div>
+</div>
+<script>
+if (window.MathJax) MathJax.typesetPromise();
+</script>
+
+<script>
+const g = 9.81;
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+
+function getInputs() {
+  return {
+    x0: +document.getElementById('x0').value,
+    y0: +document.getElementById('y0').value,
+    v0: +document.getElementById('v0').value,
+    theta: +document.getElementById('theta').value * Math.PI / 180,
+  };
+}
+
+function compute({x0, y0, v0, theta}) {
+  const vx = v0 * Math.cos(theta);
+  const vy = v0 * Math.sin(theta);
+  const disc = Math.max(0, vy*vy + 2*g*y0);
+  const tFlight = (vy + Math.sqrt(disc)) / g;
+  const tApex = vy / g;
+  const hmax = y0 + vy*vy / (2*g);
+  const xLand = x0 + vx * tFlight;
+  return {vx, vy, tFlight, tApex, hmax, xLand, gittata: xLand - x0};
+}
+
+function getTrajectory(x0, y0, v0, theta, steps=400) {
+  const vx = v0 * Math.cos(theta);
+  const vy = v0 * Math.sin(theta);
+  const disc = Math.max(0, vy*vy + 2*g*y0);
+  const tFlight = (vy + Math.sqrt(disc)) / g;
+  const pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = (i / steps) * tFlight;
+    pts.push({x: x0 + vx*t, y: y0 + vy*t - 0.5*g*t*t});
+  }
+  return pts;
+}
+
+function draw() {
+  const inp = getInputs();
+  const comp = compute(inp);
+  const traj = getTrajectory(inp.x0, inp.y0, inp.v0, inp.theta);
+
+  const W = cvs.offsetWidth;
+  const H = 400;
+  cvs.width = W * devicePixelRatio;
+  cvs.height = H * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  const pad = {l:52, r:24, t:24, b:44};
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+
+  const allX = traj.map(p=>p.x);
+  const minX = 0;
+  // maxX basato sulla gittata massima teorica (θ=45°): L_max = v₀²/g
+  // così la scala x non cambia al variare dell'angolo
+  const gittataMax = (inp.v0 * inp.v0) / g;
+  const maxX = inp.x0 + gittataMax * 1.15 + 2;
+  const minY = 0;
+  // maxY basato sull'altezza massima teorica (θ=90°): h_max = y₀ + v₀²/(2g)
+  const hmaxTeor = inp.y0 + (inp.v0 * inp.v0) / (2 * g);
+  const maxY = hmaxTeor * 1.25 + 2;
+
+  const tx = x => pad.l + (x-minX)/(maxX-minX)*plotW;
+  const ty = y => pad.t + plotH - (y-minY)/(maxY-minY)*plotH;
+
+  ctx.clearRect(0,0,W,H);
+
+  // background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,W,H);
+
+  // grid
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  ctx.lineWidth = 0.5;
+  for (let i=0;i<=6;i++) {
+    const x = minX+(maxX-minX)*i/6;
+    ctx.beginPath(); ctx.moveTo(tx(x),pad.t); ctx.lineTo(tx(x),pad.t+plotH); ctx.stroke();
+  }
+  for (let i=0;i<=5;i++) {
+    const y = minY+(maxY-minY)*i/5;
+    ctx.beginPath(); ctx.moveTo(pad.l,ty(y)); ctx.lineTo(pad.l+plotW,ty(y)); ctx.stroke();
+  }
+
+  // axes
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+plotH);
+  ctx.lineTo(pad.l+plotW, pad.t+plotH);
+  ctx.stroke();
+
+  // tick labels
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.font = '10px "DM Mono", monospace';
+  ctx.textAlign = 'right';
+  for (let i=0;i<=5;i++) {
+    const y = minY+(maxY-minY)*i/5;
+    ctx.fillText(y.toFixed(0), pad.l-6, ty(y)+4);
+  }
+  ctx.textAlign = 'center';
+  for (let i=0;i<=6;i++) {
+    const x = minX+(maxX-minX)*i/6;
+    ctx.fillText(x.toFixed(0), tx(x), pad.t+plotH+16);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.font = '11px "DM Mono", monospace';
+  ctx.fillText('x (m)', pad.l+plotW/2, H-6);
+  ctx.save(); ctx.translate(13, pad.t+plotH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('y (m)', 0,0); ctx.restore();
+
+  // h_max lines
+  if (comp.hmax > 0.5) {
+    const xA = inp.x0 + inp.v0*Math.cos(inp.theta)*(inp.v0*Math.sin(inp.theta)/g);
+    ctx.strokeStyle = 'rgba(14,138,90,0.55)'; ctx.lineWidth=1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(tx(xA),ty(comp.hmax)); ctx.lineTo(tx(xA),ty(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.l+2,ty(comp.hmax)); ctx.lineTo(tx(xA),ty(comp.hmax)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(14,138,90,1)'; ctx.font='italic 12px "DM Mono", monospace'; ctx.textAlign='left';
+    ctx.fillText('h_max', pad.l+5, ty(comp.hmax)-6);
+  }
+
+  // gittata arrow
+  const yg = ty(0)+9;
+  ctx.strokeStyle='rgba(192,79,32,0.8)'; ctx.lineWidth=1.5;
+  ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(tx(inp.x0),yg); ctx.lineTo(tx(comp.xLand),yg); ctx.stroke();
+  ctx.setLineDash([]);
+  [[tx(inp.x0),1],[tx(comp.xLand),-1]].forEach(([cx,dir])=>{
+    ctx.beginPath(); ctx.moveTo(cx,yg);
+    ctx.lineTo(cx+dir*6,yg-4); ctx.lineTo(cx+dir*6,yg+4);
+    ctx.fillStyle='rgba(192,79,32,1)'; ctx.fill();
+  });
+  ctx.fillStyle='rgba(192,79,32,1)'; ctx.font='italic 12px "DM Mono", monospace'; ctx.textAlign='center';
+  ctx.fillText('L', (tx(inp.x0)+tx(comp.xLand))/2, yg+20);
+
+  // tangent velocity vectors along trajectory
+  // v(t) = (vx, vy0 - g*t) — tangente esatta alla parabola
+  const vx0c = inp.v0 * Math.cos(inp.theta);
+  const vy0c = inp.v0 * Math.sin(inp.theta);
+  const tFlight = comp.tFlight;
+
+  // Lunghezza fissa in pixel per il vettore v0: sempre 70px
+  // Tutti gli altri vettori scalano proporzionalmente a |v(t)| / v0
+  const VEC_BASE_PX = 70;
+  const scaleX = plotW / (maxX - minX);
+  const scaleY = plotH / (maxY - minY);
+
+  const nVecs = 5;
+  for (let k = 0; k < nVecs; k++) {
+    const t = (k / (nVecs - 1)) * tFlight;
+    const px = inp.x0 + vx0c * t;
+    const py = inp.y0 + vy0c * t - 0.5 * g * t * t;
+    const vxt = vx0c;
+    const vyt = vy0c - g * t;
+    const speed = Math.sqrt(vxt*vxt + vyt*vyt);
+
+    // direzione unitaria del vettore nello spazio canvas
+    // (teniamo conto delle scale diverse su x e y)
+    const dxCanvas = vxt * scaleX;
+    const dyCanvas = -vyt * scaleY;
+    const lenCanvas = Math.sqrt(dxCanvas*dxCanvas + dyCanvas*dyCanvas);
+    if (lenCanvas < 0.001) continue;
+
+    // lunghezza in pixel proporzionale alla velocità istantanea
+    const lenPx = VEC_BASE_PX * (speed / inp.v0);
+    const nx = dxCanvas / lenCanvas;
+    const ny = dyCanvas / lenCanvas;
+
+    const cx = tx(px);
+    const cy = ty(py);
+    const ex3 = cx + nx * lenPx;
+    const ey3 = cy + ny * lenPx;
+
+    const angle = Math.atan2(ey3 - cy, ex3 - cx);
+    const isFirst = k === 0;
+
+    ctx.strokeStyle = isFirst ? '#1a1a18' : '#444440';
+    ctx.lineWidth = isFirst ? 2.2 : 1.6;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex3, ey3); ctx.stroke();
+
+    const arrSize = isFirst ? 9 : 7;
+    ctx.fillStyle = isFirst ? '#1a1a18' : '#444440';
+    ctx.beginPath();
+    ctx.moveTo(ex3, ey3);
+    ctx.lineTo(ex3 - arrSize * Math.cos(angle - 0.38), ey3 - arrSize * Math.sin(angle - 0.38));
+    ctx.lineTo(ex3 - arrSize * Math.cos(angle + 0.38), ey3 - arrSize * Math.sin(angle + 0.38));
+    ctx.closePath(); ctx.fill();
+
+    if (isFirst) {
+      ctx.fillStyle = '#1a1a18';
+      ctx.font = 'bold 10px "DM Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('v₀='+inp.v0+' m/s', ex3+6, ey3-4);
+    }
+  }
+
+  // angle arc sul punto di partenza
+  ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.arc(tx(inp.x0),ty(inp.y0),22,-inp.theta,0); ctx.stroke();
+  ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.font='10px "DM Mono", monospace'; ctx.textAlign='left';
+  ctx.fillText('θ='+Math.round(inp.theta*180/Math.PI)+'°', tx(inp.x0)+26, ty(inp.y0)-2);
+
+  // trajectory glow
+  ctx.shadowColor='rgba(26,111,212,0.15)';
+  ctx.shadowBlur=4;
+  ctx.strokeStyle='rgba(26,111,212,1)'; ctx.lineWidth=2.2;
+  ctx.beginPath();
+  traj.forEach((p,i)=>{ i===0?ctx.moveTo(tx(p.x),ty(p.y)):ctx.lineTo(tx(p.x),ty(p.y)); });
+  ctx.stroke();
+  ctx.shadowBlur=0;
+
+  // points
+  const drawDot = (x,y,color,r=4.5) => {
+    ctx.fillStyle=color;
+    ctx.beginPath(); ctx.arc(tx(x),ty(y),r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(tx(x),ty(y),r,0,Math.PI*2); ctx.stroke();
+  };
+  const xA = inp.x0+inp.v0*Math.cos(inp.theta)*(inp.v0*Math.sin(inp.theta)/g);
+  drawDot(inp.x0, inp.y0, '#6d4fc0');
+  drawDot(xA, comp.hmax, '#0e8a5a');
+  drawDot(comp.xLand, 0, '#c04f20');
+
+  ctx.fillStyle='#6d4fc0'; ctx.font='10px "DM Mono", monospace'; ctx.textAlign='left';
+}
+
+function updateMetrics() {
+  const inp = getInputs();
+  const comp = compute(inp);
+  document.getElementById('mL').textContent = comp.gittata.toFixed(1);
+  document.getElementById('mH').textContent = comp.hmax.toFixed(1);
+  document.getElementById('mT').textContent = comp.tFlight.toFixed(2);
+  document.getElementById('mVx').textContent = comp.vx.toFixed(1);
+  document.getElementById('mVy').textContent = comp.vy.toFixed(1);
+  document.getElementById('vx0').textContent = inp.x0;
+  document.getElementById('vy0').textContent = inp.y0;
+  document.getElementById('vv0').textContent = inp.v0;
+  document.getElementById('vtheta').textContent = Math.round(inp.theta*180/Math.PI);
+}
+
+function update() { updateMetrics(); draw(); }
+
+['x0','y0','v0','theta'].forEach(id => {
+  document.getElementById(id).addEventListener('input', update);
+});
+window.addEventListener('resize', draw);
+update();
+</script>
+</body>
+</html>

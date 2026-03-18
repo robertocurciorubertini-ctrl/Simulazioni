@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Interferenza",
+  description: "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
+  category: "Onde",
+  icon: "≈",
+  order: 1,
+  tags: ["interferenza", "diffrazione", "sovrapposizione", "onde", "interferenza costruttiva", "interferenza distruttiva"],
+  level: "intermedio"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulazione Onde — Interferenza & Diffrazione</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+  :root {
+    --bg:#ffffff; --surface:#f8f9fb; --surface2:#f0f2f5;
+    --c1:#0077cc; --c2:#e0142a; --c3:#2e8b00;
+    --text:#0f172a; --dim:#64748b; --border:#cbd5e1;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden}
+
+  header{padding:2.5rem 3rem 1.8rem;border-bottom:1px solid var(--border)}
+  .hlabel{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--c1);letter-spacing:.25em;text-transform:uppercase;margin-bottom:.5rem}
+  h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;color:var(--text)}
+  .hsub{margin-top:.5rem;color:var(--dim);font-size:.8rem;font-family:'Space Mono',monospace;max-width:580px;line-height:1.6}
+
+  nav{display:flex;padding:0 3rem;border-bottom:1px solid var(--border);background:var(--surface)}
+  .tab{padding:.85rem 1.8rem;background:none;border:none;color:var(--dim);font-family:'Syne',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.05em;cursor:pointer;position:relative;transition:color .15s;text-transform:uppercase}
+  .tab::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--c1);transform:scaleX(0);transition:transform .15s}
+  .tab.on{color:var(--c1)}.tab.on::after{transform:scaleX(1)}.tab:hover{color:var(--text)}
+
+  .panel{display:none;padding:1.4rem 3rem 2.2rem}.panel.on{display:block}
+  .ptitle{font-size:1.25rem;font-weight:800;margin-bottom:.35rem}
+  .pdesc{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--dim);margin-bottom:1.1rem;line-height:1.7;max-width:680px}
+
+  .cw{background:var(--surface);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto}
+
+  .controls{display:flex;flex-wrap:wrap;gap:1.1rem 1.4rem;margin-top:1rem;align-items:flex-end}
+  .cg{display:flex;flex-direction:column;gap:.35rem}
+  .cl{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+  .cv{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--c1)}
+  input[type=range]{-webkit-appearance:none;width:150px;height:3px;background:var(--border);border-radius:2px;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--c1);cursor:pointer}
+
+  .btn{padding:.45rem 1rem;background:transparent;border:1px solid var(--c1);color:var(--c1);font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.06em;cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase}
+  .btn:hover{background:rgba(0,119,204,.08)}.btn.on{background:rgba(0,119,204,.12);font-weight:700}
+
+  .legend{display:flex;gap:1.4rem;margin-top:.8rem}
+  .li{display:flex;align-items:center;gap:.35rem;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--dim)}
+  .ld{width:9px;height:9px;border-radius:50%}
+
+  .fbox{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--c1);padding:.7rem 1rem;margin-top:1rem;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--dim);line-height:1.9;border-radius:0 2px 2px 0}
+  .fbox .a{color:var(--c1)}.fbox .b{color:var(--c2)}.fbox .g{color:var(--c3)}
+
+  .icard{background:var(--surface2);border:1px solid var(--border);padding:.9rem 1rem;margin-top:1rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--dim);line-height:1.8;max-width:680px}
+  .ms{display:flex;gap:.4rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hlabel">Fisica delle Onde · Simulazione Interattiva</div>
+  <h1>Interferenza &amp; Diffrazione</h1>
+  <p class="hsub">Visualizzazione in tempo reale: interferenza costruttiva, distruttiva e diffrazione attraverso aperture e ostacoli.</p>
+</header>
+
+<nav>
+  <button class="tab on" onclick="switchTab('rope',this)">① Corda 1D</button>
+  <button class="tab" onclick="switchTab('w2d',this)">② Interferenza 2D</button>
+  <button class="tab" onclick="switchTab('diff',this)">③ Diffrazione</button>
+</nav>
+
+<!-- ══ PANEL 1 ══ -->
+<div class="panel on" id="panel-rope">
+  <div class="ptitle">Onde su una corda — Interferenza 1D</div>
+  <p class="pdesc">Due onde sinusoidali si sovrappongono nella stessa corda. La corsia verde mostra la risultante (principio di sovrapposizione). Con φ=0° le ampiezze si sommano (costruttiva); con φ=180° si cancellano (distruttiva). Con frequenze diverse compaiono i battimenti.</p>
+  <div class="cw"><canvas id="cRope" width="900" height="420"></canvas></div>
+  <div class="controls">
+    <div class="cg">
+      <div class="cl">Frequenza Onda 1 — <span class="cv" id="f1v">1.00 Hz</span></div>
+      <input type="range" id="f1" min="0.2" max="8" step="0.05" value="1.00" oninput="rp()">
+    </div>
+    <div class="cg">
+      <div class="cl">Ampiezza Onda 1 — <span class="cv" id="a1v">1.00</span></div>
+      <input type="range" id="a1" min="0.1" max="1" step="0.05" value="1.0" oninput="rp()">
+    </div>
+    <div class="cg">
+      <div class="cl">Frequenza Onda 2 — <span class="cv" id="f2v">1.00 Hz</span></div>
+      <input type="range" id="f2" min="0.2" max="8" step="0.05" value="1.00" oninput="rp()">
+    </div>
+    <div class="cg">
+      <div class="cl">Ampiezza Onda 2 — <span class="cv" id="a2v">1.00</span></div>
+      <input type="range" id="a2" min="0.1" max="1" step="0.05" value="1.0" oninput="rp()">
+    </div>
+    <div class="cg">
+      <div class="cl">Differenza di fase — <span class="cv" id="phv">0°</span></div>
+      <input type="range" id="ph" min="0" max="360" step="1" value="0" oninput="rp()">
+    </div>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:var(--c1)"></div>Onda 1</div>
+    <div class="li"><div class="ld" style="background:var(--c2)"></div>Onda 2</div>
+    <div class="li"><div class="ld" style="background:var(--c3)"></div>Risultante y₁+y₂</div>
+  </div>
+  <div class="fbox">
+    <span class="a">y₁ = A₁·sin(kx − ω₁t)</span> &nbsp; <span class="b">y₂ = A₂·sin(kx − ω₂t + φ)</span> &nbsp; <span class="g">y_tot = y₁ + y₂</span><br>
+    Costruttiva: φ=0° → A_tot=A₁+A₂ &nbsp;|&nbsp; Distruttiva: φ=180° → A_tot=|A₁−A₂| &nbsp;|&nbsp; Battimenti: <span class="g">f_bat = |f₁−f₂|</span>
+  </div>
+</div>
+
+<!-- ══ PANEL 2 ══ -->
+<div class="panel" id="panel-w2d">
+  <div class="ptitle">Interferenza 2D — Pattern di Young</div>
+  <p class="pdesc">Due sorgenti coerenti generano onde circolari. Il pattern mostra iperboli di massimo (Δr=nλ) e minimo (Δr=(n+½)λ). Base dell'esperimento di Young con doppia fenditura.</p>
+  <div class="cw"><canvas id="cW2d" width="900" height="450"></canvas></div>
+  <div class="controls">
+    <div class="cg">
+      <div class="cl">Frequenza — <span class="cv" id="w2fv">1.0</span></div>
+      <input type="range" id="w2f" min="0.3" max="2.5" step="0.1" value="1.0" oninput="w2p()">
+    </div>
+    <div class="cg">
+      <div class="cl">Distanza sorgenti — <span class="cv" id="w2dv">150 px</span></div>
+      <input type="range" id="w2d" min="40" max="280" step="10" value="150" oninput="w2p()">
+    </div>
+    <div class="cg">
+      <div class="cl">Δ Fase — <span class="cv" id="w2phv">0°</span></div>
+      <input type="range" id="w2ph" min="0" max="360" step="5" value="0" oninput="w2p()">
+    </div>
+    <div class="cg">
+      <div class="cl">Visualizzazione</div>
+      <div class="ms">
+        <button class="btn on" id="bHeat" onclick="set2m('heat')">Heatmap</button>
+        <button class="btn" id="bFringe" onclick="set2m('fringe')">Frangie</button>
+      </div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:var(--c1)"></div>Massimo costruttivo</div>
+    <div class="li"><div class="ld" style="background:#e8edf2;border:1px solid #94a3b8"></div>Minimo distruttivo</div>
+    <div class="li"><div class="ld" style="background:var(--c2)"></div>Sorgente</div>
+  </div>
+  <div class="fbox">
+    <span class="a">Massimo</span>: Δr=nλ &nbsp;|&nbsp; <span class="b">Minimo</span>: Δr=(n+½)λ &nbsp;|&nbsp; Doppia fenditura: <span class="a">y_n = nλL/d</span>
+  </div>
+</div>
+
+<!-- ══ PANEL 3 ══ -->
+<div class="panel" id="panel-diff">
+  <div class="ptitle">Diffrazione — Principio di Huygens-Fresnel</div>
+  <p class="pdesc">Ogni punto della fenditura diventa sorgente secondaria (Huygens). Massima diffrazione con a≈λ. Con a≫λ l'onda passa quasi dritta; con a&lt;λ si espande quasi circolarmente.</p>
+  <div class="cw"><canvas id="cDiff" width="900" height="480"></canvas></div>
+  <div class="controls">
+    <div class="cg">
+      <div class="cl">Larghezza fenditura — <span class="cv" id="swv">80 px</span></div>
+      <input type="range" id="sw" min="10" max="200" step="5" value="80" oninput="dp()">
+    </div>
+    <div class="cg">
+      <div class="cl">Lunghezza d'onda — <span class="cv" id="lwv">40 px</span></div>
+      <input type="range" id="lw" min="15" max="80" step="5" value="40" oninput="dp()">
+    </div>
+    <div class="cg">
+      <div class="cl">Sorgenti Huygens — <span class="cv" id="hnv">8</span></div>
+      <input type="range" id="hn" min="2" max="16" step="1" value="8" oninput="dp()">
+    </div>
+    <div class="cg">
+      <div class="cl">Modalità</div>
+      <div class="ms">
+        <button class="btn on" id="bSingle" onclick="setDm('single')">Singola</button>
+        <button class="btn" id="bDouble" onclick="setDm('double')">Doppia</button>
+        <button class="btn" id="bObst" disabled style="opacity:0.35;cursor:not-allowed;border-color:#94a3b8;color:#94a3b8">Ostacolo</button>
+      </div>
+    </div>
+  </div>
+  <div class="icard">
+    <strong style="color:var(--c3)">Huygens (1678):</strong> ogni punto del fronte d'onda è sorgente di onde secondarie. Massima diffrazione quando a≈λ.<br>
+    <strong style="color:var(--c1)">Singola fenditura</strong>: minimo a sinθ=mλ/a &nbsp;|&nbsp;
+    <strong style="color:var(--c2)">a≫λ</strong>: poca diff. &nbsp;|&nbsp; <strong style="color:var(--c2)">a≈λ</strong>: massima &nbsp;|&nbsp; <strong style="color:var(--c2)">a&lt;λ</strong>: circolare
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// TAB
+// ══════════════════════════════════════════════
+let activeTab = 'rope';
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('panel-'+id).classList.add('on');
+  el.classList.add('on');
+  activeTab = id;
+}
+
+// ══════════════════════════════════════════════
+// ROPE 1D
+// ══════════════════════════════════════════════
+const RC = document.getElementById('cRope');
+const RX = RC.getContext('2d');
+const RW = RC.width, RH = RC.height;
+
+const LANE = RH / 3;
+const AXIS_PAD = 72;
+const RIGHT_PAD = 18;
+const PLOT_W = RW - AXIS_PAD - RIGHT_PAD;
+const AMP = LANE * 0.27;
+const NP = Math.floor(PLOT_W);
+
+const GC = document.createElement('canvas');
+GC.width = RW; GC.height = RH;
+const GX = GC.getContext('2d');
+
+function buildRopeGrid(){
+  GX.clearRect(0,0,RW,RH);
+  GX.fillStyle = '#f8f9fb';
+  GX.fillRect(0,0,RW,RH);
+
+  GX.strokeStyle = 'rgba(203,213,225,0.75)';
+  GX.lineWidth = 1;
+  GX.beginPath();
+  for (let y = 0; y < RH; y += 30) {
+    GX.moveTo(AXIS_PAD, y);
+    GX.lineTo(RW - RIGHT_PAD, y);
+  }
+  for (let x = AXIS_PAD; x < RW - RIGHT_PAD; x += 60) {
+    GX.moveTo(x, 0);
+    GX.lineTo(x, RH);
+  }
+  GX.stroke();
+
+  GX.strokeStyle = 'rgba(100,116,139,0.22)';
+  GX.beginPath();
+  GX.moveTo(AXIS_PAD, LANE * 0.5); GX.lineTo(RW - RIGHT_PAD, LANE * 0.5);
+  GX.moveTo(AXIS_PAD, LANE * 1.5); GX.lineTo(RW - RIGHT_PAD, LANE * 1.5);
+  GX.moveTo(AXIS_PAD, LANE * 2.5); GX.lineTo(RW - RIGHT_PAD, LANE * 2.5);
+  GX.stroke();
+
+  GX.strokeStyle = 'rgba(100,116,139,0.12)';
+  GX.beginPath();
+  GX.moveTo(AXIS_PAD, LANE); GX.lineTo(RW - RIGHT_PAD, LANE);
+  GX.moveTo(AXIS_PAD, 2 * LANE); GX.lineTo(RW - RIGHT_PAD, 2 * LANE);
+  GX.stroke();
+
+  GX.font = '11px Space Mono, monospace';
+  GX.fillStyle = 'rgba(0,119,204,0.60)';
+  GX.fillText('ONDA 1', AXIS_PAD + 8, 16);
+  GX.fillStyle = 'rgba(224,20,42,0.60)';
+  GX.fillText('ONDA 2', AXIS_PAD + 8, LANE + 16);
+  GX.fillStyle = 'rgba(46,139,0,0.65)';
+  GX.fillText('RISULTANTE  (y₁ + y₂)', AXIS_PAD + 8, 2 * LANE + 16);
+}
+buildRopeGrid();
+
+const XS = new Float32Array(NP);
+for (let i = 0; i < NP; i++) XS[i] = i / NP * Math.PI * 8;
+
+const Y1 = new Float32Array(NP);
+const Y2 = new Float32Array(NP);
+
+let ropeT = 0, ropePrev = null;
+let RP = {f1:1, a1:1, f2:1, a2:1, ph:0};
+
+function rp(){
+  RP.f1 = +document.getElementById('f1').value;
+  RP.a1 = +document.getElementById('a1').value;
+  RP.f2 = +document.getElementById('f2').value;
+  RP.a2 = +document.getElementById('a2').value;
+  RP.ph = +document.getElementById('ph').value;
+
+  document.getElementById('f1v').textContent = RP.f1.toFixed(2) + ' Hz';
+  document.getElementById('a1v').textContent = RP.a1.toFixed(2);
+  document.getElementById('f2v').textContent = RP.f2.toFixed(2) + ' Hz';
+  document.getElementById('a2v').textContent = RP.a2.toFixed(2);
+  document.getElementById('phv').textContent = RP.ph.toFixed(0) + '°';
+}
+
+function drawYAxis(ctx, x, yc, ampValue, color, pixScale){
+  const yTop = yc - ampValue * pixScale;
+  const yBot = yc + ampValue * pixScale;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(x, yTop);
+  ctx.lineTo(x, yBot);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(x - 5, yTop); ctx.lineTo(x + 5, yTop);
+  ctx.moveTo(x - 5, yc);   ctx.lineTo(x + 5, yc);
+  ctx.moveTo(x - 5, yBot); ctx.lineTo(x + 5, yBot);
+  ctx.stroke();
+
+  ctx.font = '10px Space Mono, monospace';
+  ctx.fillStyle = color;
+  ctx.textAlign = 'right';
+  ctx.fillText('+' + ampValue.toFixed(2), x - 8, yTop + 3);
+  ctx.fillText('0', x - 8, yc + 3);
+  ctx.fillText('−' + ampValue.toFixed(2), x - 8, yBot + 3);
+
+  ctx.save();
+  ctx.translate(x - 34, yc);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = 'rgba(100,116,139,0.95)';
+  ctx.fillText('amp.', 0, 0);
+  ctx.restore();
+
+  ctx.textAlign = 'left';
+}
+
+function drawRope(){
+  const {f1, a1, f2, a2, ph} = RP;
+  const o1 = Math.PI * 2 * f1 * ropeT;
+  const o2 = Math.PI * 2 * f2 * ropeT;
+  const phR = ph * Math.PI / 180;
+
+  for (let i = 0; i < NP; i++) {
+    Y1[i] = a1 * Math.sin(XS[i] - o1);
+    Y2[i] = a2 * Math.sin(XS[i] - o2 + phR);
+  }
+
+  RX.drawImage(GC, 0, 0);
+
+  const yC1 = LANE * 0.5;
+  const yC2 = LANE * 1.5;
+  const yCR = LANE * 2.5;
+
+  drawYAxis(RX, AXIS_PAD - 18, yC1, a1, '#0077cc', AMP);
+  drawYAxis(RX, AXIS_PAD - 18, yC2, a2, '#e0142a', AMP);
+  drawYAxis(RX, AXIS_PAD - 18, yCR, a1 + a2, '#2e8b00', AMP);
+
+  RX.strokeStyle = '#0077cc';
+  RX.lineWidth = 2.5;
+  RX.beginPath();
+  RX.moveTo(AXIS_PAD, yC1 - Y1[0] * AMP);
+  for (let i = 1; i < NP; i++) RX.lineTo(AXIS_PAD + i, yC1 - Y1[i] * AMP);
+  RX.stroke();
+
+  RX.strokeStyle = '#e0142a';
+  RX.lineWidth = 2.5;
+  RX.beginPath();
+  RX.moveTo(AXIS_PAD, yC2 - Y2[0] * AMP);
+  for (let i = 1; i < NP; i++) RX.lineTo(AXIS_PAD + i, yC2 - Y2[i] * AMP);
+  RX.stroke();
+
+  const maxAmp = (a1 + a2) * AMP;
+  RX.strokeStyle = 'rgba(46,139,0,0.28)';
+  RX.lineWidth = 1;
+  RX.setLineDash([6,4]);
+  RX.beginPath();
+  RX.moveTo(AXIS_PAD, yCR - maxAmp); RX.lineTo(RW - RIGHT_PAD, yCR - maxAmp);
+  RX.moveTo(AXIS_PAD, yCR + maxAmp); RX.lineTo(RW - RIGHT_PAD, yCR + maxAmp);
+  RX.stroke();
+  RX.setLineDash([]);
+
+  RX.strokeStyle = '#2e8b00';
+  RX.lineWidth = 3;
+  RX.beginPath();
+  RX.moveTo(AXIS_PAD, yCR - (Y1[0] + Y2[0]) * AMP);
+  for (let i = 1; i < NP; i++) RX.lineTo(AXIS_PAD + i, yCR - (Y1[i] + Y2[i]) * AMP);
+  RX.stroke();
+
+  const pn = ((ph % 360) + 360) % 360;
+  let lbl, col;
+  if (Math.abs(f1 - f2) > 0.12) {
+    lbl = 'BATTIMENTI  f_bat = ' + Math.abs(f1 - f2).toFixed(2) + ' Hz';
+    col = '#b45800';
+  } else if (pn < 30 || pn > 330) {
+    lbl = 'INTERFERENZA COSTRUTTIVA — A = A₁ + A₂';
+    col = '#0077cc';
+  } else if (pn > 150 && pn < 210) {
+    lbl = 'INTERFERENZA DISTRUTTIVA — A = |A₁ − A₂|';
+    col = '#e0142a';
+  } else {
+    lbl = 'INTERFERENZA PARZIALE  φ = ' + pn.toFixed(0) + '°';
+    col = '#7c4dff';
+  }
+
+  RX.font = '11px Space Mono, monospace';
+  const bw = RX.measureText(lbl).width + 22;
+  RX.fillStyle = 'rgba(248,249,251,0.94)';
+  RX.fillRect(RW / 2 - bw / 2, 5, bw, 20);
+  RX.strokeStyle = col;
+  RX.lineWidth = 1.5;
+  RX.strokeRect(RW / 2 - bw / 2, 5, bw, 20);
+  RX.fillStyle = col;
+  RX.fillText(lbl, RW / 2 - bw / 2 + 11, 19);
+}
+
+// ══════════════════════════════════════════════
+// 2D — rendered at half resolution then upscaled
+// ══════════════════════════════════════════════
+const W2C=document.getElementById('cW2d');
+const W2X=W2C.getContext('2d');
+const W2W=W2C.width,W2H=W2C.height;
+const SC=2;
+const SW=Math.floor(W2W/SC),SH=Math.floor(W2H/SC);
+const sC=document.createElement('canvas');sC.width=SW;sC.height=SH;
+const sX=sC.getContext('2d');
+W2X.imageSmoothingEnabled=true;W2X.imageSmoothingQuality='medium';
+
+let w2T=0,w2Prev=null;
+let W2P={freq:1,dist:150,ph:0};
+let w2Mode='heat';
+
+function w2p(){
+  W2P.freq=+document.getElementById('w2f').value;
+  W2P.dist=+document.getElementById('w2d').value;
+  W2P.ph=+document.getElementById('w2ph').value;
+  document.getElementById('w2fv').textContent=W2P.freq.toFixed(1);
+  document.getElementById('w2dv').textContent=W2P.dist.toFixed(0)+' px';
+  document.getElementById('w2phv').textContent=W2P.ph.toFixed(0)+'°';
+}
+function set2m(m){
+  w2Mode=m;
+  document.getElementById('bHeat').classList.toggle('on',m==='heat');
+  document.getElementById('bFringe').classList.toggle('on',m==='fringe');
+}
+
+function drawW2D(){
+  const{freq,dist,ph}=W2P;
+  const s1x=SW/2-dist/(2*SC),s1y=SH/2;
+  const s2x=SW/2+dist/(2*SC),s2y=SH/2;
+  const lam=80/freq/SC;
+  const k=Math.PI*2/lam,om=Math.PI*2*freq,phR=ph*Math.PI/180;
+  const img=sX.createImageData(SW,SH);
+  const d=img.data;
+  for(let py=0;py<SH;py++){
+    for(let px=0;px<SW;px++){
+      const r1=Math.sqrt((px-s1x)**2+(py-s1y)**2);
+      const r2=Math.sqrt((px-s2x)**2+(py-s2y)**2);
+      const a1=1/(1+r1*0.012),a2=1/(1+r2*0.012);
+      const v=(a1*Math.sin(k*r1-om*w2T)+a2*Math.sin(k*r2-om*w2T+phR))*0.5;
+      const ii=(py*SW+px)*4;
+      if(w2Mode==='heat'){
+        const n=Math.max(-1,Math.min(1,v));
+        if(n>0){
+          d[ii]=Math.round(255*(1-n));
+          d[ii+1]=Math.round(255*(1-n*0.6));
+          d[ii+2]=255;
+        } else {
+          const m=-n;
+          d[ii]=255;
+          d[ii+1]=Math.round(255*(1-m*0.85));
+          d[ii+2]=Math.round(255*(1-m));
+        }
+      } else {
+        const b=Math.min(255,Math.round(Math.abs(v)*510));
+        const inv=255-b;
+        d[ii]=inv;d[ii+1]=inv;d[ii+2]=inv;
+      }
+      d[ii+3]=255;
+    }
+  }
+  sX.putImageData(img,0,0);
+  W2X.drawImage(sC,0,0,W2W,W2H);
+  const fs1x=s1x*SC,fs2x=s2x*SC,fsy=W2H/2;
+  [fs1x,fs2x].forEach(sx=>{
+    W2X.beginPath();W2X.arc(sx,fsy,6,0,Math.PI*2);
+    W2X.fillStyle='#e0142a';W2X.fill();
+    W2X.strokeStyle='#fff';W2X.lineWidth=1.5;W2X.stroke();
+  });
+  W2X.strokeStyle='rgba(224,20,42,0.4)';W2X.lineWidth=1;
+  W2X.setLineDash([4,4]);
+  W2X.beginPath();W2X.moveTo(fs1x,fsy);W2X.lineTo(fs2x,fsy);W2X.stroke();
+  W2X.setLineDash([]);
+  W2X.fillStyle='rgba(224,20,42,0.9)';W2X.font='10px Space Mono,monospace';
+  W2X.fillText('d='+W2P.dist.toFixed(0)+'px',W2W/2-20,fsy-12);
+}
+
+// ══════════════════════════════════════════════
+// DIFFRACTION — half resolution
+// ══════════════════════════════════════════════
+const DC=document.getElementById('cDiff');
+const DX=DC.getContext('2d');
+const DW=DC.width,DH=DC.height;
+const DSC=2;
+const DSW=Math.floor(DW/DSC),DSH=Math.floor(DH/DSC);
+const dSC=document.createElement('canvas');dSC.width=DSW;dSC.height=DSH;
+const dSX=dSC.getContext('2d');
+DX.imageSmoothingEnabled=true;DX.imageSmoothingQuality='medium';
+
+let dT=0,dPrev=null;
+let DP={sw:80,lw:40,hn:8};
+let dMode='single';
+
+function dp(){
+  DP.sw=+document.getElementById('sw').value;
+  DP.lw=+document.getElementById('lw').value;
+  DP.hn=+document.getElementById('hn').value;
+  document.getElementById('swv').textContent=DP.sw.toFixed(0)+' px';
+  document.getElementById('lwv').textContent=DP.lw.toFixed(0)+' px';
+  document.getElementById('hnv').textContent=DP.hn;
+}
+function setDm(m){
+  dMode=m;
+  document.getElementById('bSingle').classList.toggle('on',m==='single');
+  document.getElementById('bDouble').classList.toggle('on',m==='double');
+  document.getElementById('bObst').classList.toggle('on',m==='obstacle');
+}
+
+function buildSrcs(wX,cY){
+  const{sw,hn}=DP;const srcs=[];
+  if(dMode==='single'){
+    for(let i=0;i<hn;i++) srcs.push({x:wX,y:cY-sw/2+sw/(hn-1||1)*i});
+  } else if(dMode==='double'){
+    const sep=Math.max(sw*1.6,60/DSC);
+    const h=Math.max(2,Math.floor(hn/2));
+    for(let s=0;s<2;s++){
+      const by=cY+(s===0?-sep/2:sep/2);
+      for(let i=0;i<h;i++) srcs.push({x:wX,y:by-sw/2+sw/(h-1||1)*i});
+    }
+  }
+  return srcs;
+}
+
+function fieldAt(px,py,srcs,k,om,t){
+  let re=0,im=0;
+  for(const s of srcs){
+    const r=Math.sqrt((px-s.x)**2+(py-s.y)**2);
+    if(r<0.5)continue;
+    const att=1/(1+r*0.008);
+    re+=att*Math.cos(k*r-om*t);
+    im+=att*Math.sin(k*r-om*t);
+  }
+  return{re,im};
+}
+
+function drawDiff(){
+  const{sw,lw,hn}=DP;
+  const wX=Math.round(DSW*0.35),cY=DSH/2;
+  const k=Math.PI*2/(lw/DSC),om=Math.PI*2;
+  const img=dSX.createImageData(DSW,DSH);
+  const d=img.data;
+
+  if(dMode==='obstacle'){
+    const edgeY1 = cY - sw/2;
+    const edgeY2 = cY + sw/2;
+
+    const edgeSrcs=[];
+    const nEdge = Math.max(hn, 12);
+    const edgeSpread = Math.max(4, (lw/DSC)*0.8);
+    for(let i=0;i<nEdge;i++){
+      const dy = -edgeSpread/2 + edgeSpread/(nEdge-1)*i;
+      edgeSrcs.push({x:wX, y:edgeY1+dy});
+      edgeSrcs.push({x:wX, y:edgeY2+dy});
+    }
+
+    for(let py=0;py<DSH;py++){
+      for(let px=0;px<DSW;px++){
+        const ii=(py*DSW+px)*4;
+        if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=248;d[ii+3]=255;continue;}
+
+        const inShadow = (py >= edgeY1 && py <= edgeY2);
+
+        let totRe = inShadow ? 0 : Math.cos(k*px - om*dT);
+        let totIm = inShadow ? 0 : Math.sin(k*px - om*dT);
+
+        const f = fieldAt(px,py,edgeSrcs,k,om,dT);
+        const norm = edgeSrcs.length * 0.5;
+        totRe += f.re / norm;
+        totIm += f.im / norm;
+
+        const amp = Math.min(1, Math.sqrt(totRe*totRe+totIm*totIm)*0.65);
+        d[ii]=Math.round(255*(1-amp*0.85));
+        d[ii+1]=Math.round(255*(1-amp*0.6));
+        d[ii+2]=255;
+        d[ii+3]=255;
+      }
+    }
+  } else {
+    const srcs=buildSrcs(wX,cY);
+    for(let py=0;py<DSH;py++){
+      for(let px=0;px<DSW;px++){
+        const ii=(py*DSW+px)*4;
+        if(px<=wX){d[ii]=d[ii+1]=d[ii+2]=248;d[ii+3]=255;continue;}
+        const f=fieldAt(px,py,srcs,k,om,dT);
+        const amp=Math.min(1,Math.sqrt(f.re*f.re+f.im*f.im)/srcs.length*2.8);
+        d[ii]=Math.round(255*(1-amp*0.85));
+        d[ii+1]=Math.round(255*(1-amp*0.6));
+        d[ii+2]=255;
+        d[ii+3]=255;
+      }
+    }
+  }
+
+  dSX.putImageData(img,0,0);
+  DX.drawImage(dSC,0,0,DW,DH);
+
+  const wXf=wX*DSC,spacing=lw,off=(dT*spacing)%spacing;
+  DX.strokeStyle='rgba(0,100,200,0.35)';DX.lineWidth=1.5;
+  for(let i=0;i*spacing<wXf+spacing;i++){
+    const x=wXf-i*spacing+off;
+    if(x<0||x>wXf)continue;
+    DX.beginPath();DX.moveTo(x,0);DX.lineTo(x,DH);DX.stroke();
+  }
+
+  const cYf=DH/2,swf=sw,sepf=Math.max(sw*1.6,60);
+  DX.fillStyle='#334155';
+  if(dMode==='single'){
+    DX.fillRect(wXf-5,0,10,cYf-swf/2);
+    DX.fillRect(wXf-5,cYf+swf/2,10,DH);
+  } else if(dMode==='double'){
+    DX.fillRect(wXf-5,0,10,cYf-sepf/2-swf/2);
+    DX.fillRect(wXf-5,cYf-sepf/2+swf/2,10,sepf-swf);
+    DX.fillRect(wXf-5,cYf+sepf/2+swf/2,10,DH);
+  } else {
+    DX.fillStyle='#334155';
+    DX.fillRect(wXf-6,cYf-swf/2,12,swf);
+    DX.strokeStyle='#0f172a';DX.lineWidth=1.5;
+    DX.strokeRect(wXf-6,cYf-swf/2,12,swf);
+  }
+
+  if(dMode!=='obstacle'){
+    const srcs=buildSrcs(wX,cY);
+    DX.fillStyle='rgba(46,139,0,0.9)';
+    for(const s of srcs){DX.beginPath();DX.arc(s.x*DSC,s.y*DSC,3,0,Math.PI*2);DX.fill();}
+  } else {
+    DX.fillStyle='rgba(224,20,42,0.9)';
+    DX.beginPath();DX.arc(wXf, cYf-swf/2, 5, 0, Math.PI*2);DX.fill();
+    DX.beginPath();DX.arc(wXf, cYf+swf/2, 5, 0, Math.PI*2);DX.fill();
+    DX.fillStyle='rgba(0,100,180,0.65)';DX.font='9px Space Mono,monospace';
+    DX.fillText('← bordi: sorgenti di diffrazione',wXf+10,cYf);
+  }
+
+  DX.fillStyle='rgba(71,85,105,0.8)';DX.font='10px Space Mono,monospace';
+  DX.fillText('← onda piana',10,18);
+  DX.fillText('onda diffratta →',wXf+10,18);
+
+  if(dMode==='obstacle'){
+    const r=(sw/lw).toFixed(2);
+    const rl=sw/lw>4?'ombra netta + diff. ai bordi':sw/lw>1?'diffrazione ai bordi evidente':'ostacolo≈λ: quasi trasparente';
+    DX.fillStyle='#0077cc';DX.font='bold 11px Syne,sans-serif';
+    DX.fillText('d/λ='+r+'  →  '+rl,wXf+10,DH-12);
+  } else {
+    const ratio=(sw/lw).toFixed(2);
+    const rl=sw/lw>4?'a≫λ: poca diffrazione':sw/lw>1.5?'a≈λ: forte diffrazione':'a<λ: onda quasi circolare';
+    DX.fillStyle='#2e8b00';DX.font='bold 11px Syne,sans-serif';
+    DX.fillText('a/λ='+ratio+'  →  '+rl,wXf+10,DH-12);
+  }
+}
+
+// ══════════════════════════════════════════════
+// SINGLE RAF LOOP — only active panel rendered
+// ══════════════════════════════════════════════
+const SPD={rope:0.55,w2d:0.5,diff:0.45};
+
+function loop(ts){
+  if(activeTab==='rope'){
+    if(ropePrev===null)ropePrev=ts;
+    ropeT+=Math.min((ts-ropePrev)*0.001,0.05)*SPD.rope;
+    ropePrev=ts;
+    drawRope();
+  } else { ropePrev=null; }
+
+  if(activeTab==='w2d'){
+    if(w2Prev===null)w2Prev=ts;
+    w2T+=Math.min((ts-w2Prev)*0.001,0.05)*SPD.w2d;
+    w2Prev=ts;
+    drawW2D();
+  } else { w2Prev=null; }
+
+  if(activeTab==='diff'){
+    if(dPrev===null)dPrev=ts;
+    dT+=Math.min((ts-dPrev)*0.001,0.05)*SPD.diff;
+    dPrev=ts;
+    drawDiff();
+  } else { dPrev=null; }
+
+  requestAnimationFrame(loop);
+}
+
+rp();
+w2p();
+dp();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

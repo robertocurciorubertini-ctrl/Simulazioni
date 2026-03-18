@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Indipendenza dei moti",
+  description: "Esplora l’indipendenza dei moti simultanei.",
+  category: "Meccanica",
+  icon: "↔️↕️",
+  order: 4,
+  tags: ["moti simultanei", "moto orizzontale", "moto verticale", "composizione dei moti", "cinematica"],
+  level: "base"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indipendenza dei Moti</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+:root {
+  --bg:#f4f1eb; --panel:#fff; --panel2:#f9f7f2; --border:#ddd8cc;
+  --accent:#1a1a2e; --accent2:#2e2e50;
+  --cx:#1a6fa4; --cy:#b83232; --cc:#2a7a44;
+  --cm:#b5610a; --ce:#16847a; --cr:#7c3aed;
+  --text:#1a1a1a; --muted:#8a8070;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+header{padding:14px 20px 12px;display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #e8e3d8}
+h1{font-size:clamp(1rem,3vw,1.5rem);font-weight:800;letter-spacing:-.02em}
+.sub{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.tabs{display:flex;padding:0 20px;border-bottom:1px solid var(--border);background:var(--panel2)}
+.tab-btn{font-family:'Syne',sans-serif;font-size:.76rem;font-weight:600;padding:9px 18px;border:none;border-bottom:3px solid transparent;background:transparent;color:var(--muted);cursor:pointer;margin-bottom:-1px;transition:all .14s}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--accent);font-weight:800}
+.tab-panel{padding:12px 20px 24px}
+.tab-panel.hidden{position:fixed;top:-9999px;left:-9999px;width:700px;visibility:hidden;pointer-events:none}
+.h-layout{display:grid;grid-template-columns:1.15fr 0.85fr;gap:10px}
+.h-right{display:flex;flex-direction:column;gap:10px}
+@media(max-width:600px){.h-layout{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:10px}
+.clabel{font-family:'Space Mono',monospace;font-size:.54rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+canvas{display:block;width:100%}
+.ibox{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:12px;font-family:'Space Mono',monospace;font-size:.62rem;line-height:1.85;color:var(--muted)}
+.ibox strong{color:var(--text)}
+.ibox .v{color:var(--cm);font-weight:700}
+.controls{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:10px}
+.cg{display:flex;flex-direction:column;gap:5px;min-width:110px;flex:1}
+.cg label{font-family:'Space Mono',monospace;font-size:.54rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.cg label span{color:var(--accent);font-weight:700}
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--border);outline:none;border-radius:2px;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--accent);border-radius:50%;cursor:pointer}
+.btn-row{display:flex;gap:7px;align-items:flex-end}
+.btn{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;padding:7px 16px;border-radius:3px;cursor:pointer;transition:all .12s;border:1.5px solid var(--accent);background:var(--accent);color:#f4f1eb;white-space:nowrap}
+.btn:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn.sec{background:transparent;color:var(--muted);border-color:var(--border)}
+.btn.sec:hover{border-color:var(--muted);color:var(--text)}
+.leg{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.li{font-family:'Space Mono',monospace;font-size:.54rem;display:flex;align-items:center;gap:5px;color:var(--muted)}
+.ll{width:13px;height:2px;flex-shrink:0}
+.tr{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ti{display:flex;align-items:center;gap:5px;cursor:pointer;font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.06em;color:var(--muted);user-select:none}
+.ti input{display:none}
+.tb{width:12px;height:12px;border:1.5px solid var(--border);border-radius:2px;background:var(--panel2);display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.ti input:checked+.tb{background:var(--accent);border-color:var(--accent)}
+.tb::after{content:'';display:none;width:4px;height:4px;background:#fff;border-radius:1px}
+.ti input:checked+.tb::after{display:block}
+.theory{margin-top:10px;padding:14px 16px;font-size:.95rem;line-height:1.55;color:var(--text)}
+.theory p{margin:0 0 10px 0}
+.theory p:last-child{margin-bottom:0}
+.theory strong{font-weight:800}
+.mjx-container{font-size:102% !important;}
+</style>
+
+<script>
+window.MathJax = {
+  tex: {inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head>
+<body>
+
+<header>
+  <h1>Indipendenza dei Moti</h1>
+  <span class="sub">Simulazione Fisica Interattiva</span>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tbtn-par" onclick="showTab('par')">① Moto Parabolico</button>
+  <button class="tab-btn" id="tbtn-ham" onclick="showTab('ham')">② Corpo Rigido in Volo</button>
+</div>
+
+<!-- ══ TAB 1 ══ -->
+<div class="tab-panel" id="tp-par">
+  <div class="card">
+    <div class="clabel"><span class="dot" style="background:var(--cc)"></span>Moto Parabolico — con assi proiezione</div>
+    <!-- canvas unico: contiene piano XY + asse-X satellite sotto + asse-Y satellite a sinistra -->
+    <canvas id="cvPar" height="420"></canvas>
+    <div class="leg" style="margin-top:8px">
+      <div class="li"><div class="ll" style="background:var(--cc)"></div>Traiettoria</div>
+      <div class="li"><div class="ll" style="background:var(--cx)"></div>Moto su X (MRU)</div>
+      <div class="li"><div class="ll" style="background:var(--cy)"></div>Moto su Y (MUA)</div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="cg"><label>v₀ <span id="lv0">18</span> m/s</label><input type="range" id="sv0" min="8" max="30" value="18" step="0.5"></div>
+    <div class="cg"><label>θ <span id="lth">45</span>°</label><input type="range" id="sth" min="10" max="80" value="45" step="1"></div>
+    <div class="cg"><label>g <span id="lgv">9.81</span> m/s²</label><input type="range" id="sgv" min="1" max="20" value="9.81" step="0.1"></div>
+    <div class="cg" style="min-width:150px">
+      <label style="margin-bottom:2px">Opzioni</label>
+      <div class="tr">
+        <label class="ti"><input type="checkbox" id="cktr" checked><div class="tb"></div>Traccia</label>
+        <label class="ti"><input type="checkbox" id="ckvc" checked><div class="tb"></div>Vettori v</label>
+        <label class="ti"><input type="checkbox" id="cksy" checked><div class="tb"></div>Linee sync</label>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn sec" onclick="parReset()">↺</button>
+      <button class="btn" id="bpar" onclick="parToggle()">▶ Avvia</button>
+    </div>
+  </div>
+
+  <div class="card theory">
+    <div class="clabel"><span class="dot" style="background:var(--cc)"></span>Spiegazione teorica</div>
+    <p>Nel <strong>moto parabolico</strong> un punto materiale lanciato con velocità iniziale \(v_0\) e angolo \(\theta\) può essere studiato scomponendo il moto lungo due direzioni indipendenti.</p>
+    <p>Lungo l'asse orizzontale \(x\) il moto è uniforme, perché in assenza di attrito non agisce alcuna forza orizzontale:</p>
+    \[
+    x(t)=v_0\cos\theta\, t
+    \]
+    <p>dove \(t\) è il tempo, \(v_0\) è il modulo della velocità iniziale e \(\theta\) è l'angolo di lancio rispetto all'orizzontale.</p>
+    <p>Lungo l'asse verticale \(y\) il moto è uniformemente accelerato per effetto della gravità:</p>
+    \[
+    y(t)=v_0\sin\theta\, t-\frac{1}{2}gt^2
+    \]
+    <p>dove \(g\) è il modulo dell'accelerazione di gravità.</p>
+    <p>La traiettoria risultante si ottiene eliminando il tempo tra le due equazioni e risulta una parabola:</p>
+    \[
+    y(x)=x\tan\theta-\frac{g}{2v_0^2\cos^2\theta}\,x^2
+    \]
+    <p>Questa simulazione mostra che il moto bidimensionale nasce dalla sovrapposizione di un <strong>moto rettilineo uniforme (MRU, Moto Rettilineo Uniforme)</strong> su \(x\) e di un <strong>moto rettilineo uniformemente accelerato (MUA, Moto Uniformemente Accelerato)</strong> su \(y\).</p>
+  </div>
+</div>
+
+<!-- ══ TAB 2 ══ -->
+<div class="tab-panel hidden" id="tp-ham">
+  <div class="h-layout">
+    <div class="card">
+      <div class="clabel"><span class="dot" style="background:var(--cm)"></span>Corpo Rigido — Asta in volo</div>
+      <canvas id="cvH" height="280"></canvas>
+      <div class="leg">
+        <div class="li"><div class="ll" style="background:var(--cm)"></div>Traiettoria del CM</div>
+        <div class="li"><div class="ll" style="background:var(--ce)"></div>Traiettoria dell'estremo A</div>
+      </div>
+    </div>
+    <div class="h-right">
+      <div class="card">
+        <div class="clabel"><span class="dot" style="background:var(--ce)"></span>Sistema solidale con il CM</div>
+        <canvas id="cvHv" height="150"></canvas>
+      </div>
+      <div class="ibox">
+        <strong>Decomposizione del moto</strong><br><br>
+        Nel sistema del laboratorio il <span style="color:var(--cm)">CM</span> segue una traiettoria parabolica.<br><br>
+        L'<span style="color:var(--ce)">estremo A</span> combina traslazione del CM e rotazione attorno al CM, quindi la sua traiettoria nel laboratorio non è una parabola semplice.<br><br>
+        Nel sistema di riferimento solidale con il <span style="color:var(--cm)">CM</span>, invece, l'estremo A descrive una circonferenza di raggio <em>L/2</em>.
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="cg"><label>v₀ <span id="lhv">15</span> m/s</label><input type="range" id="shv" min="10" max="35" value="15" step="0.5"></div>
+    <div class="cg"><label>θ <span id="lhth">60</span>°</label><input type="range" id="shth" min="15" max="75" value="60" step="1"></div>
+    <div class="cg"><label>ω <span id="lom">12.0</span> rad/s</label><input type="range" id="som" min="0.3" max="14" value="12" step="0.1"></div>
+    <div class="cg"><label>L <span id="lhl">2.0</span> m</label><input type="range" id="shl" min="0.5" max="4.0" value="2.0" step="0.1"></div>
+    <div class="cg" style="min-width:160px">
+      <label style="margin-bottom:2px">Opzioni</label>
+      <div class="tr">
+        <label class="ti"><input type="checkbox" id="ckhe" checked><div class="tb"></div>Traccia estremo</label>
+        <label class="ti"><input type="checkbox" id="ckhc"><div class="tb"></div>Marker CM</label>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn sec" onclick="hamReset()">↺</button>
+      <button class="btn sec" id="bhcm" onclick="hamToggleCMTrace()">Mostra traiettoria CM</button>
+      <button class="btn" id="bham" onclick="hamToggle()">▶ Avvia</button>
+    </div>
+  </div>
+
+  <div class="card theory">
+    <div class="clabel"><span class="dot" style="background:var(--cm)"></span>Spiegazione teorica</div>
+    <p>Per un <strong>corpo esteso</strong> in volo il moto si descrive separando la <strong>traslazione del centro di massa</strong> dalla <strong>rotazione attorno al centro di massa</strong>.</p>
+    <p>Se il centro di massa è lanciato con velocità iniziale \(v_0\) e angolo \(\theta\), il suo moto obbedisce alle stesse leggi del punto materiale:</p>
+    \[
+    x_{CM}(t)=v_0\cos\theta\, t, \qquad
+    y_{CM}(t)=v_0\sin\theta\, t-\frac{1}{2}gt^2
+    \]
+    <p>dove \(x_{CM}(t)\) e \(y_{CM}(t)\) sono le coordinate del centro di massa.</p>
+    <p>Se inoltre il corpo ruota con velocità angolare costante \(\omega\), la posizione di un estremo di un'asta di lunghezza \(L\), nel sistema di riferimento solidale con il centro di massa, è:</p>
+    \[
+    x'(t)=\frac{L}{2}\cos\bigl(\omega t+\phi_0\bigr), \qquad
+    y'(t)=\frac{L}{2}\sin\bigl(\omega t+\phi_0\bigr)
+    \]
+    <p>dove \(\phi_0\) è l'angolo iniziale dell'asta. In questo sistema la traiettoria dell'estremo è quindi una <strong>circonferenza</strong> di raggio \(L/2\).</p>
+    <p>Nel sistema del laboratorio, invece, la posizione dell'estremo si ottiene sommando il moto del centro di massa e il moto relativo di rotazione:</p>
+    \[
+    \vec r_A(t)=\vec r_{CM}(t)+\vec r\,'_A(t)
+    \]
+    <p>Per questo motivo il centro di massa segue una parabola, mentre l'estremo dell'asta descrive una traiettoria più complessa, che nasce dalla sovrapposizione di <strong>traslazione</strong> e <strong>rotazione</strong>.</p>
+  </div>
+</div>
+
+<script>
+const el = id => document.getElementById(id);
+
+function syncW(cv, fb) {
+  const w = cv.parentElement.offsetWidth - 20;
+  const safe = w > 30 ? w : (fb||500);
+  if(cv.width !== safe) cv.width = safe;
+  return {w:cv.width, h:cv.height};
+}
+function axLine(ctx,x1,y1,x2,y2,col,lw){
+  ctx.save();ctx.strokeStyle=col||'#c0b8a8';ctx.lineWidth=lw||1.1;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+}
+function arw(ctx,x1,y1,x2,y2,col,hs){
+  hs=hs||7;
+  const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);
+  if(len<2)return;
+  const nx=dx/len,ny=dy/len;
+  ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hs*nx+hs*.38*(-ny),y2-hs*ny+hs*.38*nx);
+  ctx.lineTo(x2-hs*nx-hs*.38*(-ny),y2-hs*ny-hs*.38*nx);
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+function circ(ctx,x,y,r,fill,stroke,lw){
+  ctx.save();ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=fill;ctx.fill();
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1.8;ctx.stroke();}
+  ctx.restore();
+}
+
+// ── TAB SWITCH ──
+function showTab(name){
+  el('tp-par').className='tab-panel'+(name==='par'?'':' hidden');
+  el('tp-ham').className='tab-panel'+(name==='ham'?'':' hidden');
+  el('tbtn-par').className='tab-btn'+(name==='par'?' active':'');
+  el('tbtn-ham').className='tab-btn'+(name==='ham'?' active':'');
+  setTimeout(()=>{parDraw();hamDraw(); if(window.MathJax && MathJax.typesetPromise){MathJax.typesetPromise();}},40);
+}
+
+// ══════════════════════════════════════════════════════
+//  TAB 1 — PARABOLA  (canvas unico con 3 zone)
+//
+//  Layout del canvas (w × h):
+//    ┌──────────────────────────────┐
+//    │ SY │       PIANO XY          │
+//    │    │                         │
+//    │    │                         │
+//    ├────┼─────────────────────────┤
+//    │    │        SX               │
+//    └────┴─────────────────────────┘
+//
+//  SY_W = larghezza strip asse Y  (a sinistra)
+//  SX_H = altezza strip asse X    (in basso)
+//  GAP  = spazio tra piano e strip
+// ══════════════════════════════════════════════════════
+let pRun=false,pRAF=null,pT=0,pTS=null,pTr=[];
+
+const SY_W = 46;  // px strip verticale sinistra
+const SX_H = 46;  // px strip orizzontale bassa
+const GAP  = 10;  // px gap tra piano e strip
+
+function pP(){
+  const v0=+el('sv0').value,th=+el('sth').value*Math.PI/180,g=+el('sgv').value;
+  return {v0,th,g,vx:v0*Math.cos(th),vy:v0*Math.sin(th)};
+}
+function pPos(t,p){return{x:p.vx*t,y:p.vy*t-.5*p.g*t*t};}
+function pFly(p){return 2*p.vy/p.g;}
+
+// Calcola la scala per il piano XY data la porzione disponibile
+function planoBounds(p, pw, ph){
+  // pw,ph = dimensioni della zona piano (esclude strips)
+  const T=pFly(p);
+  let xMin=0,xMax=0,yMin=0,yMax=0;
+  for(let i=0;i<=150;i++){
+    const t=T*i/150,{x,y}=pPos(t,p);
+    xMin=Math.min(xMin,x);xMax=Math.max(xMax,x);
+    yMin=Math.min(yMin,y);yMax=Math.max(yMax,y);
+  }
+  // padding per vettori velocità (~15% range)
+  const padX=(xMax-xMin)*0.12, padY=(yMax-yMin)*0.15;
+  xMin-=padX; xMax+=padX; yMin-=padY*0.5; yMax+=padY;
+  const mL=8,mR=14,mT=18,mB=8;
+  const sx=(pw-mL-mR)/(xMax-xMin||1);
+  const sy=(ph-mT-mB)/(yMax-yMin||1);
+  const s=Math.min(sx,sy);
+  // ox,oy: posizione px dell'origine (0,0) nel piano
+  const ox=mL-xMin*s;
+  const oy=ph-mB+yMin*s;
+  return {s,ox,oy};
+}
+
+function drawPar(t,p){
+  const cv=el('cvPar'),ctx=cv.getContext('2d');
+  const {w,h}=syncW(cv,480);
+  ctx.clearRect(0,0,w,h);
+
+  const T=pFly(p);
+  const tt=Math.min(t,T);
+  const {x,y}=pPos(tt,p);
+
+  // dimensioni zona piano
+  const pw = w - SY_W - GAP;
+  const ph = h - SX_H - GAP;
+  // offset angolo in alto a sinistra del piano
+  const plx = SY_W + GAP;  // left x del piano
+  const ply = 0;            // top y del piano
+
+  // === calcola scala ===
+  const {s,ox:ox_,oy:oy_} = planoBounds(p, pw, ph);
+  // ox,oy nel sistema coordinate assoluto del canvas
+  const ox = plx + ox_;
+  const oy = ply + oy_;
+
+  // coordinate pixel del punto mobile nel canvas
+  const px_pt = ox + x*s;
+  const py_pt = oy - y*s;
+
+  // estremi asse X nel piano: da x=0 a x=R
+  const R = p.vx * T;
+  const px_o = ox;           // x=0 nel canvas
+  const px_R = ox + R*s;     // x=R nel canvas
+  // asse Y nel piano: da y=0 a y=Hmax
+  const Hmax = p.vy*p.vy/(2*p.g);
+  const py_o = oy;           // y=0 nel canvas
+  const py_H = oy - Hmax*s;  // y=Hmax nel canvas
+
+  // === SFONDO LEGGERO STRIP ===
+  // strip asse X (basso)
+  ctx.save();
+  ctx.fillStyle='rgba(26,111,164,0.04)';
+  ctx.fillRect(plx, ph+GAP, pw, SX_H);
+  // strip asse Y (sinistra)
+  ctx.fillStyle='rgba(184,50,50,0.04)';
+  ctx.fillRect(0, ply, SY_W, ph);
+  ctx.restore();
+
+  // === GRIGLIA PIANO ===
+  ctx.save();
+  ctx.strokeStyle='#eae6d8';ctx.lineWidth=0.5;
+  const gs=s*Math.max(1,Math.ceil(R/6));
+  for(let gx=plx;gx<plx+pw;gx+=gs){ctx.beginPath();ctx.moveTo(gx,ply);ctx.lineTo(gx,ply+ph);ctx.stroke();}
+  for(let gy=ply;gy<ply+ph;gy+=gs){ctx.beginPath();ctx.moveTo(plx,gy);ctx.lineTo(plx+pw,gy);ctx.stroke();}
+  ctx.restore();
+
+  // === ASSI PIANO ===
+  axLine(ctx, plx, oy, plx+pw, oy);             // asse X del piano
+  axLine(ctx, ox, ply, ox, ply+ph);             // asse Y del piano
+  ctx.save();ctx.fillStyle='#b0a898';ctx.font='9px Space Mono';
+  ctx.fillText('x', plx+pw-12, oy-4);
+  ctx.fillText('y', ox+4, ply+12);
+  ctx.restore();
+
+  // === GHOST TRAIETTORIA ===
+  ctx.save();ctx.strokeStyle='rgba(42,122,68,.12)';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  for(let i=0;i<=200;i++){
+    const tt2=T*i/200,q=pPos(tt2,p);
+    const qx=ox+q.x*s, qy=oy-q.y*s;
+    i===0?ctx.moveTo(qx,qy):ctx.lineTo(qx,qy);
+  }
+  ctx.stroke();ctx.restore();
+
+  // === TRACCIA ===
+  if(el('cktr').checked&&pTr.length>1){
+    ctx.save();ctx.strokeStyle='#2a7a44';ctx.lineWidth=2.2;
+    ctx.beginPath();
+    pTr.forEach((q,i)=>{const qx=ox+q.x*s,qy=oy-q.y*s;i===0?ctx.moveTo(qx,qy):ctx.lineTo(qx,qy);});
+    ctx.stroke();ctx.restore();
+  }
+
+  // === LINEE DI SINCRONIZZAZIONE (verso le strip) ===
+  if(el('cksy').checked){
+    ctx.save();ctx.setLineDash([4,4]);ctx.lineWidth=1;
+    // verso strip X: linea verticale dal punto fino alla strip
+    ctx.strokeStyle='rgba(26,111,164,.35)';
+    ctx.beginPath();ctx.moveTo(px_pt,py_pt);ctx.lineTo(px_pt,ph+GAP);ctx.stroke();
+    // verso strip Y: linea orizzontale dal punto fino alla strip
+    ctx.strokeStyle='rgba(184,50,50,.35)';
+    ctx.beginPath();ctx.moveTo(px_pt,py_pt);ctx.lineTo(SY_W,py_pt);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+  }
+
+  // === VETTORI VELOCITÀ ===
+  if(el('ckvc').checked){
+    const vyc=p.vy-p.g*tt, sc=s*.2;
+    arw(ctx,px_pt,py_pt, px_pt+p.vx*sc,py_pt, '#1a6fa4');
+    arw(ctx,px_pt,py_pt, px_pt,py_pt-vyc*sc, '#b83232');
+    arw(ctx,px_pt,py_pt, px_pt+p.vx*sc,py_pt-vyc*sc, 'rgba(42,122,68,.8)',6);
+  }
+
+  // === PALLINA ===
+  circ(ctx, px_pt, py_pt, 8, '#2a7a44', '#fff', 2);
+
+  // info t
+  ctx.save();ctx.fillStyle='#8a8070';ctx.font='9px Space Mono';
+  ctx.fillText(`t=${tt.toFixed(2)}s  R=${R.toFixed(1)}m  H=${Hmax.toFixed(1)}m`, plx+4, ply+13);
+  ctx.restore();
+
+  // ═══════════════════════════════════════════
+  //  STRIP ASSE X (in basso)  — mostra x(t)
+  //  L'asse è una retta orizzontale al centro
+  //  della strip. Il punto blu scorre lungo x.
+  // ═══════════════════════════════════════════
+  const sx_y0 = ph + GAP + SX_H/2;  // y della retta nel canvas
+
+  // retta asse X satellite
+  axLine(ctx, plx, sx_y0, plx+pw, sx_y0, '#1a6fa4', 1.2);
+
+  // traccia x fino a adesso (puntini o linea sulla retta)
+  if(el('cktr').checked&&pTr.length>1){
+    ctx.save();ctx.strokeStyle='rgba(26,111,164,.55)';ctx.lineWidth=2.5;
+    ctx.beginPath();
+    pTr.forEach((q,i)=>{
+      const qx=plx+ox_+q.x*s;
+      i===0?ctx.moveTo(qx,sx_y0):ctx.lineTo(qx,sx_y0);
+    });
+    ctx.stroke();ctx.restore();
+  }
+
+  // punt sul­l'asse X satellite
+  const sx_pt = px_pt;  // stessa x del punto nel piano
+  circ(ctx, sx_pt, sx_y0, 7, '#1a6fa4', '#fff', 2);
+
+  // label e etichette asse X satellite
+  ctx.save();ctx.fillStyle='#1a6fa4';ctx.font='8px Space Mono';
+  ctx.fillText('X', plx+2, sx_y0-10);
+  ctx.fillText(`x = ${x.toFixed(1)} m`, sx_pt+10, sx_y0-2);
+  // tick su zero e su R
+  axLine(ctx, plx+ox_, sx_y0-5, plx+ox_, sx_y0+5, '#1a6fa4', 1);
+  axLine(ctx, plx+ox_+R*s, sx_y0-5, plx+ox_+R*s, sx_y0+5, '#aaa', 0.8);
+  ctx.fillStyle='#b0a898';ctx.fillText('0',plx+ox_-4,sx_y0+14);
+  ctx.fillText('R',plx+ox_+R*s-3,sx_y0+14);
+  ctx.restore();
+
+  // ═══════════════════════════════════════════
+  //  STRIP ASSE Y (a sinistra) — mostra y(t)
+  //  L'asse è una retta verticale al centro
+  //  della strip. Il punto rosso scorre lungo y.
+  // ═══════════════════════════════════════════
+  const sy_x0 = SY_W/2;  // x della retta nel canvas
+
+  // retta asse Y satellite
+  axLine(ctx, sy_x0, ply, sy_x0, ply+ph, '#b83232', 1.2);
+
+  // traccia y
+  if(el('cktr').checked&&pTr.length>1){
+    ctx.save();ctx.strokeStyle='rgba(184,50,50,.55)';ctx.lineWidth=2.5;
+    ctx.beginPath();
+    pTr.forEach((q,i)=>{
+      const qy=oy_-q.y*s;  // y relativo al piano (ply=0 quindi assoluto)
+      i===0?ctx.moveTo(sy_x0,qy):ctx.lineTo(sy_x0,qy);
+    });
+    ctx.stroke();ctx.restore();
+  }
+
+  // punto sull'asse Y satellite
+  const sy_pt = py_pt;  // stessa y del punto nel piano
+  circ(ctx, sy_x0, sy_pt, 7, '#b83232', '#fff', 2);
+
+  // label asse Y satellite
+  ctx.save();ctx.fillStyle='#b83232';ctx.font='8px Space Mono';
+  ctx.fillText('Y', sy_x0+8, ply+13);
+  ctx.fillText(`y=${y.toFixed(1)}m`, 2, sy_pt-9);
+  // tick su zero e Hmax
+  axLine(ctx, sy_x0-5, oy, sy_x0+5, oy, '#b83232', 1);
+  axLine(ctx, sy_x0-5, oy-Hmax*s, sy_x0+5, oy-Hmax*s, '#aaa', 0.8);
+  ctx.fillStyle='#b0a898';ctx.font='7px Space Mono';
+  ctx.fillText('0', sy_x0+6, oy+3);
+  ctx.fillText('H', sy_x0+6, oy-Hmax*s+3);
+  ctx.restore();
+
+  // === ANGOLO CORNER: connettore visivo tra le due strip ===
+  ctx.save();
+  ctx.fillStyle='rgba(230,225,215,0.6)';
+  ctx.fillRect(0, ph+GAP, SY_W, SX_H);
+  ctx.fillStyle='#b0a898';ctx.font='7px Space Mono';
+  ctx.fillText('O',SY_W/2-4, ph+GAP+SX_H/2+3);
+  ctx.restore();
+}
+
+function parDraw(){const p=pP();drawPar(pT,p);}
+
+function parFrame(ts){
+  if(!pRun)return;
+  if(pTS===null)pTS=ts;
+  const dt=Math.min((ts-pTS)/1000,.05);pTS=ts;
+  const p=pP(),T=pFly(p);
+  pT+=dt;
+  if(pT<=T)pTr.push(pPos(pT,p));
+  parDraw();
+  if(pT>=T){pT=T;pRun=false;el('bpar').textContent='▶ Avvia';pTS=null;return;}
+  pRAF=requestAnimationFrame(parFrame);
+}
+function parToggle(){
+  if(pRun){pRun=false;cancelAnimationFrame(pRAF);pTS=null;el('bpar').textContent='▶ Riprendi';}
+  else{if(pT>=pFly(pP())){pT=0;pTr=[];}pRun=true;el('bpar').textContent='⏸ Pausa';pRAF=requestAnimationFrame(parFrame);}
+}
+function parReset(){pRun=false;cancelAnimationFrame(pRAF);pT=0;pTr=[];pTS=null;el('bpar').textContent='▶ Avvia';parDraw();}
+
+// ══════════════════════════════════════════════════════
+//  TAB 2 — CORPO RIGIDO
+// ══════════════════════════════════════════════════════
+let hRun=false,hRAF=null,hT=0,hTS=null;
+let hShowCMTrace=false;
+let hTrCM=[],hTrE=[],hTrRel=[];
+const PHI0=Math.PI/5;
+
+function hP(){
+  const v0=+el('shv').value,th=+el('shth').value*Math.PI/180;
+  const om=+el('som').value,L=+el('shl').value,g=9.81;
+  return{v0,th,om,L,g,vx:v0*Math.cos(th),vy:v0*Math.sin(th)};
+}
+function hCM(t,p){return{x:p.vx*t,y:p.vy*t-.5*p.g*t*t};}
+function hFly(p){return 2*p.vy/p.g;}
+function hEndA(t,p){const c=hCM(t,p),a=p.om*t+PHI0;return{x:c.x+(p.L/2)*Math.cos(a),y:c.y+(p.L/2)*Math.sin(a)};}
+function hEndB(t,p){const c=hCM(t,p),a=p.om*t+PHI0;return{x:c.x-(p.L/2)*Math.cos(a),y:c.y-(p.L/2)*Math.sin(a)};}
+
+function hBounds(p,w,h){
+  const T=hFly(p);
+  let xMin=Infinity,xMax=-Infinity,yMin=Infinity,yMax=-Infinity;
+  for(let i=0;i<=300;i++){
+    const t=T*i/300;
+    [hCM(t,p),hEndA(t,p),hEndB(t,p)].forEach(q=>{
+      xMin=Math.min(xMin,q.x);xMax=Math.max(xMax,q.x);
+      yMin=Math.min(yMin,q.y);yMax=Math.max(yMax,q.y);
+    });
+  }
+  const padX=(xMax-xMin)*.07,padY=(yMax-yMin)*.12;
+  xMin-=padX;xMax+=padX;yMin-=padY;yMax+=padY;
+  const mL=12,mR=12,mT=20,mB=22;
+  const sx=(w-mL-mR)/(xMax-xMin||1);
+  const sy=(h-mT-mB)/(yMax-yMin||1);
+  const s=Math.min(sx,sy);
+  return{s,ox:mL-xMin*s,oy:h-mB+yMin*s};
+}
+
+function drawRod(ctx,eax,eay,ebx,eby){
+  const ang=Math.atan2(eby-eay,ebx-eax);
+  const len=Math.hypot(ebx-eax,eby-eay);
+  const mx=(eax+ebx)/2,my=(eay+eby)/2;
+  ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+  const hw=len/2,hh=5,rr=hh;
+  const grad=ctx.createLinearGradient(-hw,0,hw,0);
+  grad.addColorStop(0,'#5b21b6');grad.addColorStop(0.5,'#8b5cf6');grad.addColorStop(1,'#7c3aed');
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  ctx.moveTo(-hw+rr,-hh);ctx.lineTo(hw-rr,-hh);
+  ctx.arcTo(hw,-hh,hw,0,rr);ctx.arcTo(hw,hh,hw-rr,hh,rr);
+  ctx.lineTo(-hw+rr,hh);ctx.arcTo(-hw,hh,-hw,0,rr);ctx.arcTo(-hw,-hh,-hw+rr,-hh,rr);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.18)';
+  ctx.fillRect(-hw+rr,-hh,(hw-rr)*2,hh*.7);
+  ctx.restore();
+  // estremo A marker (verde)
+  circ(ctx,eax,eay,6,'#16847a','#fff',1.5);
+}
+
+function drawHam(t,p){
+  const cv=el('cvH'),ctx=cv.getContext('2d');
+  const {w,h}=syncW(cv,450);
+  ctx.clearRect(0,0,w,h);
+  const {s,ox,oy}=hBounds(p,w,h);
+  const T=hFly(p);
+
+  // griglia
+  ctx.save();ctx.strokeStyle='#eae6d8';ctx.lineWidth=0.4;
+  const gs=s*Math.max(1,Math.ceil(p.vx*T/5));
+  for(let gx=0;gx<w;gx+=gs){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,h);ctx.stroke();}
+  for(let gy=0;gy<h;gy+=gs){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();}
+  ctx.restore();
+
+  axLine(ctx,0,oy,w,oy);axLine(ctx,ox,0,ox,h);
+  ctx.save();ctx.fillStyle='rgba(200,192,175,.18)';ctx.fillRect(0,oy,w,h-oy);ctx.restore();
+
+  // ghost estremo A
+  ctx.save();ctx.strokeStyle='rgba(22,132,122,.07)';ctx.lineWidth=0.8;
+  ctx.beginPath();
+  for(let i=0;i<=600;i++){const tt=T*i/600,e=hEndA(tt,p);const qx=ox+e.x*s,qy=oy-e.y*s;i===0?ctx.moveTo(qx,qy):ctx.lineTo(qx,qy);}
+  ctx.stroke();ctx.restore();
+
+  if(hShowCMTrace&&hTrCM.length>1){
+    ctx.save();ctx.strokeStyle='#b5610a';ctx.lineWidth=2.2;
+    ctx.beginPath();hTrCM.forEach((q,i)=>{const qx=ox+q.x*s,qy=oy-q.y*s;i===0?ctx.moveTo(qx,qy):ctx.lineTo(qx,qy);});
+    ctx.stroke();ctx.restore();
+  }
+  if(el('ckhe').checked&&hTrE.length>1){
+    ctx.save();ctx.strokeStyle='#16847a';ctx.lineWidth=1.8;
+    ctx.beginPath();hTrE.forEach((q,i)=>{const qx=ox+q.x*s,qy=oy-q.y*s;i===0?ctx.moveTo(qx,qy):ctx.lineTo(qx,qy);});
+    ctx.stroke();ctx.restore();
+  }
+
+  const tt=Math.min(t,T);
+  const cm=hCM(tt,p),ea=hEndA(tt,p),eb=hEndB(tt,p);
+  const cxp=ox+cm.x*s,cyp=oy-cm.y*s;
+  const eax=ox+ea.x*s,eay=oy-ea.y*s;
+  const ebx=ox+eb.x*s,eby=oy-eb.y*s;
+
+  drawRod(ctx,eax,eay,ebx,eby);
+
+  const vyCM=p.vy-p.g*tt,vsc=s*.13;
+  if(hShowCMTrace) arw(ctx,cxp,cyp,cxp+p.vx*vsc,cyp-vyCM*vsc,'rgba(181,97,10,.9)',7);
+  const ang=p.om*tt+PHI0,rh=p.L/2;
+  const vAx=p.vx+p.om*rh*(-Math.sin(ang));
+  const vAy=vyCM+p.om*rh*Math.cos(ang);
+  arw(ctx,eax,eay,eax+vAx*vsc,eay-vAy*vsc,'rgba(22,132,122,.9)',7);
+
+  if(el('ckhc').checked){
+    circ(ctx,cxp,cyp,6,'#b5610a','#fff',2);
+    ctx.save();ctx.strokeStyle='rgba(181,97,10,.3)';ctx.lineWidth=.9;ctx.setLineDash([2,2]);
+    ctx.beginPath();ctx.moveTo(cxp-11,cyp);ctx.lineTo(cxp+11,cyp);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cxp,cyp-11);ctx.lineTo(cxp,cyp+11);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+  }
+
+  ctx.save();ctx.fillStyle='#8a8070';ctx.font='9px Space Mono';
+  ctx.fillText(`t=${tt.toFixed(2)}s  ω=${p.om.toFixed(1)}rad/s  L=${p.L.toFixed(1)}m`,8,14);ctx.restore();
+
+}
+
+function drawHv(p){
+  const cv=el('cvHv'),ctx=cv.getContext('2d');
+  const {w,h}=syncW(cv,350);
+  ctx.clearRect(0,0,w,h);
+
+  const m=18;
+  const side=Math.min(w-2*m,h-2*m);
+  const rMax=p.L/2;
+  const s=side/(2.6*(rMax||1));
+  const ox=w/2, oy=h/2;
+  const rpx=rMax*s;
+
+  // sfondo e griglia locale
+  ctx.save();
+  ctx.strokeStyle='#eae6d8';
+  ctx.lineWidth=0.5;
+  for(let k=-2;k<=2;k++){
+    ctx.beginPath();ctx.moveTo(ox+k*rpx, m);ctx.lineTo(ox+k*rpx, h-m);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(m, oy+k*rpx);ctx.lineTo(w-m, oy+k*rpx);ctx.stroke();
+  }
+  ctx.restore();
+
+  // assi del sistema del CM
+  axLine(ctx,m,oy,w-m,oy,'#c0b8a8',1.2);
+  axLine(ctx,ox,m,ox,h-m,'#c0b8a8',1.2);
+
+  // circonferenza teorica completa
+  ctx.save();
+  ctx.strokeStyle='rgba(22,132,122,.18)';
+  ctx.lineWidth=1.4;
+  ctx.beginPath();
+  ctx.arc(ox,oy,rpx,0,Math.PI*2);
+  ctx.stroke();
+  ctx.restore();
+
+  // traiettoria percorsa nel sistema del CM
+  if(hTrRel.length>1){
+    ctx.save();
+    ctx.strokeStyle='#16847a';
+    ctx.lineWidth=2.2;
+    ctx.beginPath();
+    hTrRel.forEach((q,i)=>{
+      const qx=ox+q.x*s, qy=oy-q.y*s;
+      i===0?ctx.moveTo(qx,qy):ctx.lineTo(qx,qy);
+    });
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // asta solidale con il CM
+  const tt=Math.min(hT,hFly(p));
+  const ang=p.om*tt+PHI0;
+  const rx=(p.L/2)*Math.cos(ang);
+  const ry=(p.L/2)*Math.sin(ang);
+  const eax=ox+rx*s, eay=oy-ry*s;
+  const ebx=ox-rx*s, eby=oy+ry*s;
+
+  drawRod(ctx,eax,eay,ebx,eby);
+  circ(ctx,ox,oy,6,'#b5610a','#fff',2);
+
+  // vettore posizione relativo dell'estremo A
+  arw(ctx,ox,oy,eax,eay,'rgba(22,132,122,.9)',7);
+
+  ctx.save();
+  ctx.fillStyle='#8a8070';
+  ctx.font='9px Space Mono';
+  ctx.fillText("Sistema di riferimento del CM",8,14);
+  ctx.fillText("Traiettoria relativa dell'estremo A",8,26);
+  ctx.fillText("x'",w-m-10,oy-6);
+  ctx.fillText("y'",ox+6,m+10);
+  ctx.restore();
+
+}
+
+function hamDraw(){const p=hP();drawHam(hT,p);drawHv(p);}
+
+function hamFrame(ts){
+  if(!hRun)return;
+  if(hTS===null)hTS=ts;
+  const dt=Math.min((ts-hTS)/1000,.05);hTS=ts;
+  const p=hP(),T=hFly(p);
+  hT+=dt;
+  if(hT<=T){
+    hTrCM.push(hCM(hT,p));
+    hTrE.push(hEndA(hT,p));
+    const a=p.om*hT+PHI0;
+    hTrRel.push({x:(p.L/2)*Math.cos(a), y:(p.L/2)*Math.sin(a)});
+  }
+  hamDraw();
+  if(hT>=T){hT=T;hRun=false;el('bham').textContent='▶ Avvia';hTS=null;return;}
+  hRAF=requestAnimationFrame(hamFrame);
+}
+
+function hamToggleCMTrace(){
+  hShowCMTrace=!hShowCMTrace;
+  el('bhcm').textContent=hShowCMTrace?'Nascondi traiettoria CM':'Mostra traiettoria CM';
+  hamDraw();
+}
+
+function hamToggle(){
+  if(hRun){hRun=false;cancelAnimationFrame(hRAF);hTS=null;el('bham').textContent='▶ Riprendi';}
+  else{if(hT>=hFly(hP())){hT=0;hTrCM=[];hTrE=[];hTrRel=[];}hRun=true;el('bham').textContent='⏸ Pausa';hRAF=requestAnimationFrame(hamFrame);}
+}
+function hamReset(){hRun=false;cancelAnimationFrame(hRAF);hT=0;hTrCM=[];hTrE=[];hTrRel=[];hTS=null;hShowCMTrace=false;el('bhcm').textContent='Mostra traiettoria CM';el('bham').textContent='▶ Avvia';hamDraw();}
+
+// ── Init ──
+window.addEventListener('load',()=>{
+  el('sv0').oninput=()=>{el('lv0').textContent=el('sv0').value;parReset();};
+  el('sth').oninput=()=>{el('lth').textContent=el('sth').value;parReset();};
+  el('sgv').oninput=()=>{el('lgv').textContent=(+el('sgv').value).toFixed(2);parReset();};
+  el('cktr').onchange=parDraw;el('ckvc').onchange=parDraw;el('cksy').onchange=parDraw;
+
+  el('shv').oninput=()=>{el('lhv').textContent=el('shv').value;hamReset();};
+  el('shth').oninput=()=>{el('lhth').textContent=el('shth').value;hamReset();};
+  el('som').oninput=()=>{el('lom').textContent=(+el('som').value).toFixed(1);hamReset();};
+  el('shl').oninput=()=>{el('lhl').textContent=(+el('shl').value).toFixed(1);hamReset();};
+  el('ckhe').onchange=hamDraw;el('ckhc').onchange=hamDraw;
+
+  window.onresize=()=>{parDraw();hamDraw();};
+  parDraw();hamDraw();
+  if(window.MathJax && MathJax.typesetPromise){MathJax.typesetPromise();}
+});
+</script>
+</body>
+</html>

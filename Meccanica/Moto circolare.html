@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Moto Circolare",
+  description: "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
+  category: "Meccanica",
+  icon: "◯",
+  order: 2,
+  tags: ["moto circolare uniforme", "velocità angolare", "accelerazione centripeta", "periodo", "traiettoria"],
+  level: "base"
+};
+</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulazione Moto Circolare</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f4f0;
+      --bg3: #eeede8;
+      --text: #1a1a18;
+      --text2: #73726c;
+      --text3: #9c9a92;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.22);
+      --blue: #378ADD;
+      --blue-dark: #185FA5;
+      --blue-label: #0C447C;
+      --red: #E24B4A;
+      --red-dark: #A32D2D;
+      --green: #639922;
+      --purple: #534AB7;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text2);
+      margin-bottom: 1.5rem;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .top-grid { grid-template-columns: 1fr; }
+      body { padding: 1rem; }
+    }
+
+    .card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+    .slider-row:last-child { margin-bottom: 0; }
+
+    .slider-row label {
+      font-size: 13px;
+      color: var(--text2);
+      min-width: 170px;
+    }
+
+    .slider-row input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: var(--bg3);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--text);
+      cursor: pointer;
+      border: 0.5px solid var(--border2);
+    }
+    .slider-row input[type=range]::-moz-range-thumb {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--text);
+      cursor: pointer;
+      border: 0.5px solid var(--border2);
+    }
+
+    .slider-val {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      min-width: 52px;
+      text-align: right;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric {
+      background: var(--bg2);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .metric-value {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .metric-unit {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .canvas-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem 1.25rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .vleg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text2);
+    }
+    .vleg-line {
+      width: 24px;
+      height: 3px;
+      border-radius: 2px;
+    }
+    .vleg-dashed {
+      width: 24px;
+      height: 0;
+      border-top: 2px dashed var(--green);
+    }
+
+    .formulas {
+      background: var(--bg2);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      border: 0.5px solid var(--border);
+    }
+    .formulas h2 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+    }
+    .formula-item {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.6rem 0.9rem;
+      min-height: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .formula-eq {
+      font-size: 15px;
+      color: var(--text);
+      margin-top: 4px;
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      font-size: 12px;
+      color: var(--text3);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Simulazione moto circolare uniforme</h1>
+  <p class="subtitle">Modifica velocità angolare e raggio per osservare come variano velocità tangenziale e accelerazione centripeta.</p>
+
+  <div class="top-grid">
+    <div class="card">
+      <div class="slider-row">
+        <label>ω — velocità angolare (rad/s)</label>
+        <input type="range" id="omega" min="0.1" max="5" step="0.1" value="1.5">
+        <span class="slider-val" id="omega-val">1.5</span>
+      </div>
+      <div class="slider-row">
+        <label>r — raggio (m)</label>
+        <input type="range" id="radius" min="0.5" max="4" step="0.1" value="2.0">
+        <span class="slider-val" id="radius-val">2.0</span>
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-label">Velocità tangenziale v</div>
+        <div class="metric-value" id="vt-val">3.000 <span class="metric-unit">m/s</span></div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Accelerazione centripeta a<sub>c</sub></div>
+        <div class="metric-value" id="ac-val">4.500 <span class="metric-unit">m/s²</span></div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Periodo T</div>
+        <div class="metric-value" id="T-val">4.189 <span class="metric-unit">s</span></div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Frequenza f</div>
+        <div class="metric-value" id="f-val">0.2387 <span class="metric-unit">Hz</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-card">
+    <canvas id="c" width="800" height="440"></canvas>
+    <div class="legend">
+      <div class="vleg"><div class="vleg-line" style="background:#378ADD;"></div> velocità tangenziale (v)</div>
+      <div class="vleg"><div class="vleg-line" style="background:#E24B4A;"></div> accelerazione centripeta (a<sub>c</sub>)</div>
+      <div class="vleg"><div class="vleg-dashed"></div> traiettoria</div>
+    </div>
+  </div>
+
+  <div class="formulas">
+    <h2>Relazioni fondamentali</h2>
+    <div class="formula-grid">
+      <div class="formula-item">
+        <div class="formula-name">Velocità tangenziale</div>
+        <div class="formula-eq">\( v = \omega \cdot r \)</div>
+      </div>
+      <div class="formula-item">
+        <div class="formula-name">Accelerazione centripeta</div>
+        <div class="formula-eq">\( a_c = \omega^2 \cdot r = \dfrac{v^2}{r} \)</div>
+      </div>
+      <div class="formula-item">
+        <div class="formula-name">Periodo</div>
+        <div class="formula-eq">\( T = \dfrac{2\pi}{\omega} \)</div>
+      </div>
+      <div class="formula-item">
+        <div class="formula-name">Frequenza</div>
+        <div class="formula-eq">\( f = \dfrac{1}{T} = \dfrac{\omega}{2\pi} \)</div>
+      </div>
+      <div class="formula-item">
+        <div class="formula-name">Posizione angolare</div>
+        <div class="formula-eq">\( \theta(t) = \theta_0 + \omega \cdot t \)</div>
+      </div>
+      <div class="formula-item">
+        <div class="formula-name">Direzione velocità tangenziale</div>
+        <div class="formula-eq">\( \hat{v} = (-\sin\theta,\; \cos\theta) \)</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Simulazione moto circolare uniforme &mdash; velocità angolare e accelerazione centripeta</footer>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const cx = W / 2, cy = H / 2;
+    const SCALE = 80;
+
+    let omega = 1.5, r = 2.0, angle = 0, lastTime = null;
+
+    function isDark() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    function getCSSVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function drawArrow(x1, y1, x2, y2, color, lw) {
+      const dx = x2 - x1, dy = y2 - y1;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      if (len < 2) return;
+      const ux = dx / len, uy = dy / len;
+      const hlen = Math.min(12, len * 0.38);
+      const px = -uy, py = ux;
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lw;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2 - ux * hlen * 0.5, y2 - uy * hlen * 0.5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - ux * hlen + px * hlen * 0.4, y2 - uy * hlen + py * hlen * 0.4);
+      ctx.lineTo(x2 - ux * hlen - px * hlen * 0.4, y2 - uy * hlen - py * hlen * 0.4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw(ts) {
+      if (lastTime === null) lastTime = ts;
+      const dt = Math.min((ts - lastTime) / 1000, 0.05);
+      lastTime = ts;
+      angle += omega * dt;
+
+      const gridCol   = 'rgba(0,0,0,0.05)';
+      const axisCol   = 'rgba(0,0,0,0.15)';
+      const textCol   = '#73726c';
+      const radCol    = 'rgba(0,0,0,0.15)';
+      const dotFill   = '#534AB7';
+      const dotStroke = 'rgba(0,0,0,0.18)';
+      const blueV     = '#378ADD';
+      const blueTxt   = '#0C447C';
+      const redA      = '#E24B4A';
+      const redTxt    = '#A32D2D';
+      const greenT    = '#639922';
+
+      ctx.clearRect(0, 0, W, H);
+
+      // griglia
+      ctx.strokeStyle = gridCol;
+      ctx.lineWidth = 0.5;
+      for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+      // assi
+      ctx.strokeStyle = axisCol;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+
+      // etichette assi
+      ctx.font = '12px system-ui, sans-serif';
+      ctx.fillStyle = textCol;
+      ctx.textAlign = 'center';
+      ctx.fillText('x', W - 14, cy - 8);
+      ctx.textAlign = 'left';
+      ctx.fillText('y', cx + 8, 16);
+
+      // origine
+      ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+      ctx.fillStyle = axisCol; ctx.fill();
+
+      // traiettoria tratteggiata
+      ctx.setLineDash([7, 5]);
+      ctx.strokeStyle = greenT;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(cx, cy, r * SCALE, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // posizione punto
+      const px = cx + Math.cos(angle) * r * SCALE;
+      const py = cy - Math.sin(angle) * r * SCALE;
+
+      // raggio
+      ctx.strokeStyle = radCol;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke();
+
+      // etichetta raggio
+      const rmx = cx + Math.cos(angle) * r * SCALE * 0.48;
+      const rmy = cy - Math.sin(angle) * r * SCALE * 0.48;
+      ctx.font = '12px system-ui, sans-serif';
+      ctx.fillStyle = textCol;
+      ctx.textAlign = 'center';
+      const rOffX = Math.cos(angle + Math.PI / 2) * 16;
+      const rOffY = -Math.sin(angle + Math.PI / 2) * 16;
+      ctx.fillText('r = ' + r.toFixed(1) + ' m', rmx + rOffX, rmy + rOffY);
+
+      // arco angolo θ
+      ctx.strokeStyle = axisCol;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 28, -angle, 0, angle > 0);
+      ctx.stroke();
+      ctx.font = '11px system-ui, sans-serif';
+      ctx.fillStyle = textCol;
+      ctx.textAlign = 'left';
+      const thetaDeg = ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) * 180 / Math.PI;
+      ctx.fillText('θ = ' + thetaDeg.toFixed(1) + '°', cx + 34, cy - 8);
+
+      // --- vettore velocità tangenziale ---
+      // Moto antiorario: v = ω·r·(-sinθ, cosθ) in coord fisiche
+      // Su canvas (y invertito): (-sinθ, -cosθ)
+      const vt = omega * r;
+      const vtDraw = Math.min(vt * SCALE * 0.26, 140);
+      const tvx = -Math.sin(angle) * vtDraw;
+      const tvy = -Math.cos(angle) * vtDraw;
+      drawArrow(px, py, px + tvx, py + tvy, blueV, 2.5);
+
+      ctx.font = '12px system-ui, sans-serif';
+      ctx.fillStyle = blueTxt;
+      let lvx = px + tvx + 9, lvy = py + tvy + 4;
+      if (lvx > W - 90) lvx = px + tvx - 90;
+      if (lvy < 14) lvy = 14;
+      if (lvy > H - 6) lvy = H - 6;
+      ctx.textAlign = 'left';
+      ctx.fillText('v = ' + vt.toFixed(2) + ' m/s', lvx, lvy);
+
+      // --- vettore accelerazione centripeta ---
+      const ac = omega * omega * r;
+      const acDraw = Math.min(ac * SCALE * 0.17, 120);
+      const dist = Math.hypot(cx - px, cy - py);
+      const ax2 = px + (cx - px) / dist * acDraw;
+      const ay2 = py + (cy - py) / dist * acDraw;
+      drawArrow(px, py, ax2, ay2, redA, 2.5);
+
+      ctx.font = '12px system-ui, sans-serif';
+      ctx.fillStyle = redTxt;
+      let lax = ax2 + 9, lay = ay2 + 16;
+      if (lax > W - 110) lax = ax2 - 110;
+      if (lay < 14) lay = 14;
+      if (lay > H - 6) lay = H - 6;
+      ctx.textAlign = 'left';
+      ctx.fillText('ac = ' + ac.toFixed(2) + ' m/s²', lax, lay);
+
+      // punto mobile
+      ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI * 2);
+      ctx.fillStyle = dotFill; ctx.fill();
+      ctx.strokeStyle = dotStroke; ctx.lineWidth = 1.5; ctx.stroke();
+
+      // ω in basso a destra
+      ctx.font = '12px system-ui, sans-serif';
+      ctx.fillStyle = textCol;
+      ctx.textAlign = 'right';
+      ctx.fillText('ω = ' + omega.toFixed(1) + ' rad/s', W - 12, H - 14);
+
+      requestAnimationFrame(draw);
+    }
+
+    function update() {
+      omega = parseFloat(document.getElementById('omega').value);
+      r     = parseFloat(document.getElementById('radius').value);
+      document.getElementById('omega-val').textContent  = omega.toFixed(1);
+      document.getElementById('radius-val').textContent = r.toFixed(1);
+      const vt = omega * r;
+      const ac = omega * omega * r;
+      const T  = (2 * Math.PI) / omega;
+      const f  = 1 / T;
+      document.getElementById('vt-val').innerHTML = vt.toFixed(3) + ' <span class="metric-unit">m/s</span>';
+      document.getElementById('ac-val').innerHTML = ac.toFixed(3) + ' <span class="metric-unit">m/s²</span>';
+      document.getElementById('T-val').innerHTML  = T.toFixed(3)  + ' <span class="metric-unit">s</span>';
+      document.getElementById('f-val').innerHTML  = f.toFixed(4)  + ' <span class="metric-unit">Hz</span>';
+    }
+
+    document.getElementById('omega').addEventListener('input', update);
+    document.getElementById('radius').addEventListener('input', update);
+    update();
+    requestAnimationFrame(draw);
+  </script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: true }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</body>
+</html>

@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+<script>
+window.SIM_METADATA = {
+  "title": "Conservazione dell'energia",
+  "description": "Visualizza le trasformazioni tra energia cinetica e potenziale.",
+  "category": "Meccanica",
+  "icon": "♻️",
+  "order": 8,
+  "tags": ["energia", "energia cinetica"],
+  "level": "base"
+};
+</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conservazione dell'Energia</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+
+    :root {
+      --bg:#ffffff;
+      --surface:#f8f9fb;
+      --surface2:#eef2f7;
+      --card:#ffffff;
+      --text:#0f172a;
+      --dim:#64748b;
+      --border:#cbd5e1;
+      --c1:#0077cc;
+      --c2:#e0142a;
+      --c3:#2e8b00;
+      --c4:#a855f7;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:18px;
+    }
+
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:'Syne',system-ui,sans-serif;
+      background:linear-gradient(180deg,#ffffff 0%,#f6f8fb 100%);
+      color:var(--text);
+    }
+
+    .page {
+      max-width:1400px;
+      margin:0 auto;
+      padding:22px;
+    }
+
+    .hero {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .title-wrap h1 {
+      margin:0;
+      font-size:clamp(1.9rem,3vw,3rem);
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .title-wrap p {
+      margin:8px 0 0;
+      color:var(--dim);
+      max-width:860px;
+      line-height:1.45;
+      font-size:0.98rem;
+    }
+
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:999px;
+      box-shadow:var(--shadow);
+      font-size:.86rem;
+      color:var(--dim);
+      white-space:nowrap;
+    }
+
+    .tabs {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:18px 0;
+    }
+
+    .tab {
+      border:none;
+      background:var(--card);
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:11px 16px;
+      font:600 .95rem 'Syne',sans-serif;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      transition:.18s ease;
+    }
+
+    .tab.active {
+      background:var(--text);
+      color:#fff;
+      transform:translateY(-1px);
+    }
+
+    .screen { display:none; }
+    .screen.active { display:block; }
+
+    .grid {
+      display:grid;
+      grid-template-columns:340px minmax(0,1fr) 300px;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .panel, .canvas-card, .theory {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .panel { padding:18px; }
+
+    .panel h2, .energy-panel h2, .theory h2 {
+      margin:0 0 12px;
+      font-size:1.08rem;
+      letter-spacing:.02em;
+    }
+
+    .group {
+      margin:0 0 16px;
+      padding:12px 12px 10px;
+      border-radius:14px;
+      background:var(--surface);
+      border:1px solid #e2e8f0;
+    }
+
+    .group h3 {
+      margin:0 0 10px;
+      font-size:.92rem;
+      color:var(--dim);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .control { margin-bottom:12px; }
+    .control:last-child { margin-bottom:0; }
+
+    .row-label {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:.9rem;
+      margin-bottom:6px;
+    }
+
+    .row-label span:last-child {
+      color:var(--c1);
+      font-family:'Space Mono',monospace;
+      font-size:.84rem;
+    }
+
+    input[type="range"], select { width:100%; }
+    input[type="range"] { accent-color:var(--c1); cursor:pointer; }
+
+    select, button {
+      font:600 .92rem 'Syne',sans-serif;
+      border-radius:12px;
+      border:1px solid var(--border);
+      padding:10px 12px;
+      background:#fff;
+      color:var(--text);
+    }
+
+    .btn-row {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .btn-wide {
+      width:100%;
+      margin-top:10px;
+      cursor:pointer;
+    }
+
+    button.primary {
+      background:var(--text);
+      color:#fff;
+      border-color:var(--text);
+      cursor:pointer;
+    }
+
+    .canvas-card {
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      min-height:640px;
+    }
+
+    .canvas-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:6px 8px 12px;
+    }
+
+    .canvas-title { font-size:1rem; font-weight:700; }
+    .canvas-sub { color:var(--dim); font-size:.88rem; }
+
+    .canvas-wrap {
+      position:relative;
+      flex:1;
+      min-height:500px;
+      background:linear-gradient(180deg,#f8fbff 0%,#f2f6fb 100%);
+      border:1px solid #d9e2ec;
+      border-radius:16px;
+      overflow:hidden;
+    }
+
+    canvas.main-canvas, canvas.graph-canvas {
+      display:block;
+      width:100%;
+      height:100%;
+    }
+
+    .energy-panel {
+      padding:18px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .stat {
+      margin-bottom:14px;
+      padding:12px;
+      border-radius:14px;
+      background:var(--surface);
+      border:1px solid #e2e8f0;
+    }
+
+    .stat .label {
+      color:var(--dim);
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:6px;
+    }
+
+    .stat .value {
+      font-family:'Space Mono',monospace;
+      font-size:1rem;
+    }
+
+    .bars {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:8px;
+    }
+
+    .bar-block { display:grid; gap:6px; }
+    .bar-line {
+      height:14px;
+      border-radius:999px;
+      overflow:hidden;
+      background:#e2e8f0;
+      border:1px solid #d0d8e2;
+    }
+    .bar-fill {
+      height:100%;
+      width:0%;
+      transition:width .08s linear;
+    }
+    .bar-meta {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:.86rem;
+    }
+    .mono { font-family:'Space Mono',monospace; }
+
+    .legend {
+      margin-top:16px;
+      display:grid;
+      gap:8px;
+      font-size:.86rem;
+      color:var(--dim);
+    }
+
+    .legend span { display:flex; align-items:center; gap:8px; }
+    .sw { width:14px; height:14px; border-radius:4px; display:inline-block; }
+
+    .graph-box {
+      height:220px;
+      margin-top:12px;
+      border:1px solid #d9e2ec;
+      border-radius:14px;
+      background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);
+      overflow:hidden;
+    }
+
+    .theory {
+      margin-top:18px;
+      padding:22px;
+    }
+
+    .theory p, .theory li {
+      color:#1e293b;
+      line-height:1.6;
+      font-size:.98rem;
+    }
+
+    .formula-box {
+      margin:14px 0;
+      padding:14px 16px;
+      border-radius:14px;
+      background:var(--surface);
+      border:1px solid #e2e8f0;
+      overflow-x:auto;
+      font-size:.92rem;
+    }
+
+    .small-note {
+      margin-top:8px;
+      color:var(--dim);
+      font-size:.82rem;
+      line-height:1.5;
+    }
+
+    @media (max-width:1180px) {
+      .grid { grid-template-columns:320px 1fr; }
+      .energy-panel { grid-column:1 / -1; }
+    }
+
+    @media (max-width:860px) {
+      .hero { flex-direction:column; }
+      .grid { grid-template-columns:1fr; }
+      .canvas-card { min-height:540px; }
+    }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(','\\)']],
+        displayMath: [['\\[','\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <div class="title-wrap">
+        <h1>Conservazione dell'Energia</h1>
+        <p>
+          Esplora in modo visivo come l'energia potenziale gravitazionale, l'energia cinetica e l'energia termica si trasformano durante il moto.
+          La simulazione mostra sia casi ideali sia casi dissipativi, con lettura diretta del bilancio energetico e grafici temporali.
+        </p>
+      </div>
+      <div class="badge">Interattivo · Energetica del moto</div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div id="screens"></div>
+  </div>
+
+  <script>
+    const screensConfig = [
+      { id:'track', icon:'⛰', title:'Guida curva', subtitle:'Scambio tra quota e velocità lungo una pista.', kind:'track' },
+      { id:'loop', icon:'🎢', title:'Loop energetico', subtitle:'Energia necessaria per affrontare un giro completo.', kind:'loop' },
+      { id:'pendulum', icon:'🕰', title:'Pendolo', subtitle:'Alternanza tra energia potenziale e cinetica.', kind:'pendulum' }
+    ];
+
+    const theoryText = {
+      track: {
+        title:'Quadro teorico — guida curva',
+        html:`
+          <p>
+            In assenza di attrito, l'energia meccanica del sistema resta costante. Se il corpo si trova ad altezza \(h\),
+            la sua energia potenziale gravitazionale vale \(E_p = mgh\), dove \(m\) è la massa,
+            \(g\) l'accelerazione di gravità e \(h\) la quota rispetto al livello di riferimento.
+          </p>
+          <div class="formula-box">\[E_{\text{tot}} = E_p + E_k = mgh + \tfrac{1}{2}mv^2 = \text{costante}\]</div>
+          <p>
+            Qui \(E_k = \tfrac{1}{2}mv^2\) è l'energia cinetica e \(v\) il modulo della velocità.
+            Quando il corpo scende, \(h\) diminuisce e una parte di \(E_p\) si trasforma in \(E_k\).
+            Se è presente attrito, una parte dell'energia meccanica si converte in energia termica \(E_{\text{th}}\).
+          </p>
+          <div class="formula-box">\[E_{\text{tot}} = E_p + E_k + E_{\text{th}}\]</div>
+          <p>
+            La somma totale rimane costante, ma l'energia meccanica \(E_m = E_p + E_k\) non si conserva più.
+          </p>
+        `
+      },
+      loop: {
+        title:'Quadro teorico — loop',
+        html:`
+          <p>
+            Nel loop il punto critico è la sommità. Per restare a contatto con la guida, la forza normale non deve annullarsi prima del necessario.
+            Alla quota massima, la condizione limite è che l'accelerazione centripeta sia fornita interamente dalla gravità.
+          </p>
+          <div class="formula-box">\[\frac{v_{\text{top}}^2}{R} = g\]</div>
+          <p>
+            Dove \(R\) è il raggio del loop e \(v_{\text{top}}\) la velocità in alto. Quindi serve almeno
+            \(v_{\text{top,min}} = \sqrt{gR}\). Applicando la conservazione dell'energia tra l'altezza iniziale e la cima del loop,
+            si ricava un'altezza minima di partenza dell'ordine di \(\tfrac{5}{2}R\) nel caso ideale.
+          </p>
+          <div class="formula-box">\[mgh_0 = mg(2R) + \tfrac{1}{2}mv_{\text{top}}^2\]</div>
+          <p>
+            Se compaiono dissipazioni, l'altezza necessaria aumenta perché una parte dell'energia iniziale si trasforma in calore.
+          </p>
+        `
+      },
+      pendulum: {
+        title:'Quadro teorico — pendolo',
+        html:`
+          <p>
+            Per un pendolo semplice di lunghezza \(L\), la quota dipende dall'angolo \(\theta\) rispetto alla verticale.
+            Se si assume come riferimento il punto più basso, la quota del bob è \(h = L(1 - \cos\theta)\).
+          </p>
+          <div class="formula-box">\[E_p = mgL(1 - \cos\theta)\]</div>
+          <p>
+            Nei punti estremi la velocità è nulla e l'energia è quasi tutta potenziale; al centro la quota è minima e l'energia è massimamente cinetica.
+            In presenza di attrito viscoso o dissipazioni, l'ampiezza diminuisce nel tempo e parte dell'energia meccanica si converte in energia termica.
+          </p>
+          <div class="formula-box">\[E_{\text{tot}} = E_p + E_k + E_{\text{th}}\]</div>
+          <p>
+            Questa schermata rende particolarmente evidente il carattere periodico dello scambio energetico.
+          </p>
+        `
+      }
+    };
+
+    function fmt(x, unit='') {
+      return `${Number(x).toFixed(2)} ${unit}`.trim();
+    }
+
+    function createTabs() {
+      const tabs = document.getElementById('tabs');
+      const screens = document.getElementById('screens');
+      screensConfig.forEach((cfg, idx) => {
+        const b = document.createElement('button');
+        b.className = 'tab' + (idx===0 ? ' active' : '');
+        b.dataset.target = cfg.id;
+        b.textContent = `${cfg.icon} ${cfg.title}`;
+        b.onclick = () => activateScreen(cfg.id);
+        tabs.appendChild(b);
+
+        const screen = document.createElement('section');
+        screen.className = 'screen' + (idx===0 ? ' active' : '');
+        screen.id = cfg.id;
+        screen.innerHTML = buildScreen(cfg);
+        screens.appendChild(screen);
+      });
+    }
+
+    function buildScreen(cfg) {
+      return `
+        <div class="grid">
+          <aside class="panel">
+            <h2>Controlli</h2>
+            <div class="group">
+              <h3>Parametri fisici</h3>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-mass">Massa \(m\)</label><span id="${cfg.id}-mass-val"></span></div>
+                <input id="${cfg.id}-mass" type="range" min="0.5" max="8" step="0.1" value="2.0">
+              </div>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-mu">Attrito / dissipazione \(\mu\)</label><span id="${cfg.id}-mu-val"></span></div>
+                <input id="${cfg.id}-mu" type="range" min="0" max="0.4" step="0.01" value="0.03">
+              </div>
+            </div>
+
+            ${cfg.kind==='track' ? `
+            <div class="group">
+              <h3>Guida</h3>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-shape">Forma della guida</label><span></span></div>
+                <select id="${cfg.id}-shape">
+                  <option value="valley">Valle dolce</option>
+                  <option value="double">Doppia ondulazione</option>
+                  <option value="ramp">Rampa asimmetrica</option>
+                </select>
+              </div>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-start">Posizione iniziale</label><span id="${cfg.id}-start-val"></span></div>
+                <input id="${cfg.id}-start" type="range" min="0.02" max="0.98" step="0.01" value="0.10">
+              </div>
+              <div class="control" id="${cfg.id}-kspring-control" style="display:none;">
+                <div class="row-label"><label for="${cfg.id}-kspring">Costante elastica molla \(k\)</label><span id="${cfg.id}-kspring-val"></span></div>
+                <input id="${cfg.id}-kspring" type="range" min="1200" max="8000" step="100" value="4200">
+              </div>
+            </div>` : ''}
+
+            ${cfg.kind==='loop' ? `
+            <div class="group">
+              <h3>Loop</h3>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-radius">Raggio \(R\)</label><span id="${cfg.id}-radius-val"></span></div>
+                <input id="${cfg.id}-radius" type="range" min="0.8" max="3.5" step="0.1" value="1.6">
+              </div>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-height">Altezza iniziale \(h_0\)</label><span id="${cfg.id}-height-val"></span></div>
+                <input id="${cfg.id}-height" type="range" min="0.8" max="10" step="0.1" value="4.6">
+              </div>
+            </div>` : ''}
+
+            ${cfg.kind==='pendulum' ? `
+            <div class="group">
+              <h3>Pendolo</h3>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-length">Lunghezza \(L\)</label><span id="${cfg.id}-length-val"></span></div>
+                <input id="${cfg.id}-length" type="range" min="0.8" max="4.0" step="0.1" value="2.0">
+              </div>
+              <div class="control">
+                <div class="row-label"><label for="${cfg.id}-angle">Angolo iniziale \(\theta_0\)</label><span id="${cfg.id}-angle-val"></span></div>
+                <input id="${cfg.id}-angle" type="range" min="5" max="80" step="1" value="42">
+              </div>
+            </div>` : ''}
+
+            <div class="group">
+              <h3>Animazione</h3>
+              <div class="btn-row">
+                <button id="${cfg.id}-play" class="primary">Avvia</button>
+                <button id="${cfg.id}-pause">Pausa</button>
+              </div>
+              <button id="${cfg.id}-reset" class="btn-wide">Reset</button>
+            </div>
+
+            <div class="small-note">
+              Le barre a destra mostrano i contributi energetici istantanei. Il grafico inferiore rappresenta l'andamento nel tempo delle energie.
+            </div>
+          </aside>
+
+          <section class="canvas-card">
+            <div class="canvas-head">
+              <div>
+                <div class="canvas-title">${cfg.title}</div>
+                <div class="canvas-sub">${cfg.subtitle}</div>
+              </div>
+              <div class="badge" id="${cfg.id}-status">Stato: pronto</div>
+            </div>
+            <div class="canvas-wrap" style="height:520px;">
+              <canvas class="main-canvas" id="${cfg.id}-canvas"></canvas>
+            </div>
+            <div class="graph-box">
+              <canvas class="graph-canvas" id="${cfg.id}-graph"></canvas>
+            </div>
+          </section>
+
+          <aside class="energy-panel">
+            <h2>Bilancio energetico</h2>
+            <div class="stat">
+              <div class="label">Velocità</div>
+              <div class="value" id="${cfg.id}-speed">0.00 m/s</div>
+            </div>
+            <div class="stat">
+              <div class="label">Quota</div>
+              <div class="value" id="${cfg.id}-height-read">0.00 m</div>
+            </div>
+            <div class="bars">
+              <div class="bar-block">
+                <div class="bar-meta"><span id="${cfg.id}-ep-label">Energia potenziale \(E_p\)</span><span class="mono" id="${cfg.id}-ep">0.00 J</span></div>
+                <div class="bar-line"><div class="bar-fill" id="${cfg.id}-ep-bar" style="background:var(--c1)"></div></div>
+              </div>
+              ${cfg.kind==='track' ? `
+              <div class="bar-block" id="${cfg.id}-eel-block" style="display:none;">
+                <div class="bar-meta"><span>Energia potenziale elastica \(E_{\text{el}}\)</span><span class="mono" id="${cfg.id}-eel">0.00 J</span></div>
+                <div class="bar-line"><div class="bar-fill" id="${cfg.id}-eel-bar" style="background:#f59e0b"></div></div>
+              </div>` : ''}
+              <div class="bar-block">
+                <div class="bar-meta"><span>Energia cinetica \(E_k\)</span><span class="mono" id="${cfg.id}-ek">0.00 J</span></div>
+                <div class="bar-line"><div class="bar-fill" id="${cfg.id}-ek-bar" style="background:var(--c2)"></div></div>
+              </div>
+              <div class="bar-block">
+                <div class="bar-meta"><span>Energia termica \(E_{\text{th}}\)</span><span class="mono" id="${cfg.id}-eth">0.00 J</span></div>
+                <div class="bar-line"><div class="bar-fill" id="${cfg.id}-eth-bar" style="background:var(--c3)"></div></div>
+              </div>
+              <div class="bar-block">
+                <div class="bar-meta"><span>Energia totale \(E_{\text{tot}}\)</span><span class="mono" id="${cfg.id}-etot">0.00 J</span></div>
+                <div class="bar-line"><div class="bar-fill" id="${cfg.id}-etot-bar" style="background:var(--c4)"></div></div>
+              </div>
+            </div>
+            <div class="legend">
+              <span><i class="sw" style="background:var(--c1)"></i> Energia potenziale gravitazionale</span>
+              ${cfg.kind==='track' ? `<span id="${cfg.id}-eel-legend" style="display:none;"><i class="sw" style="background:#f59e0b"></i> Energia potenziale elastica della molla</span>` : ''}
+              <span><i class="sw" style="background:var(--c2)"></i> Energia cinetica</span>
+              <span><i class="sw" style="background:var(--c3)"></i> Energia termica / dissipata</span>
+              <span><i class="sw" style="background:var(--c4)"></i> Energia totale del sistema</span>
+            </div>
+          </aside>
+        </div>
+
+        <section class="theory">
+          <h2>${theoryText[cfg.kind].title}</h2>
+          ${theoryText[cfg.kind].html}
+        </section>
+      `;
+    }
+
+    function queueTypeset(node) {
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetClear && MathJax.typesetClear([node]);
+        MathJax.typesetPromise([node]).catch(() => {});
+      }
+    }
+
+    function activateScreen(id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.target === id));
+      document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+      const screen = document.getElementById(id);
+      const sim = sims[id];
+      if (sim) {
+        sim.resize();
+        requestAnimationFrame(() => sim.resize());
+      }
+      queueTypeset(screen);
+    }
+
+    class BaseSim {
+      constructor(id, kind) {
+        this.id = id;
+        this.kind = kind;
+        this.canvas = document.getElementById(`${id}-canvas`);
+        this.graph = document.getElementById(`${id}-graph`);
+        this.ctx = this.canvas.getContext('2d');
+        this.gctx = this.graph.getContext('2d');
+        this.running = false;
+        this.time = 0;
+        this.history = [];
+        this.ethStored = 0;
+        this.maxHist = 320;
+        this.lastTs = null;
+        this.ui = {};
+        this.thermalRatio = 0;
+        this.ethStored = 0;
+        this.viewW = 1;
+        this.viewH = 1;
+        this.graphW = 1;
+        this.stopMessage = ''; 
+        this.graphH = 1;
+        this.bindCommon();
+        this.resize();
+        requestAnimationFrame((ts) => this.loop(ts));
+      }
+
+      bindCommon() {
+        ['mass','mu'].forEach(k => {
+          const el = document.getElementById(`${this.id}-${k}`);
+          this.ui[k] = el;
+          el.addEventListener('input', () => { this.updateLabels(); this.reset(false); });
+        });
+        this.ui.play = document.getElementById(`${this.id}-play`);
+        this.ui.pause = document.getElementById(`${this.id}-pause`);
+        this.ui.resetBtn = document.getElementById(`${this.id}-reset`);
+        this.ui.status = document.getElementById(`${this.id}-status`);
+        this.ui.play.onclick = () => { this.running = true; this.setStatus('in moto'); };
+        this.ui.pause.onclick = () => { this.running = false; this.setStatus('in pausa'); };
+        this.ui.resetBtn.onclick = () => this.reset();
+      }
+
+      mass() { return parseFloat(this.ui.mass.value); }
+      grav() { return 9.81; }
+      mu() { return parseFloat(this.ui.mu.value); }
+      setStatus(txt) { this.ui.status.textContent = `Stato: ${txt}`; }
+
+      resize() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.viewW = Math.max(10, rect.width);
+        this.viewH = Math.max(10, rect.height);
+        this.canvas.width = Math.round(this.viewW * dpr);
+        this.canvas.height = Math.round(this.viewH * dpr);
+        this.ctx.setTransform(dpr,0,0,dpr,0,0);
+
+        const grect = this.graph.parentElement.getBoundingClientRect();
+        this.graphW = Math.max(10, grect.width);
+        this.graphH = Math.max(10, grect.height);
+        this.graph.width = Math.round(this.graphW * dpr);
+        this.graph.height = Math.round(this.graphH * dpr);
+        this.gctx.setTransform(dpr,0,0,dpr,0,0);
+
+        if (typeof this.draw === 'function') this.draw();
+        if (typeof this.drawGraph === 'function') this.drawGraph();
+      }
+
+
+      getMonotonicThermal(rawEth) {
+        if (this.mu() === 0) {
+          this.ethStored = 0;
+          return 0;
+        }
+        this.ethStored = Math.max(this.ethStored || 0, Math.max(0, rawEth));
+        return this.ethStored;
+      }
+
+      updateEnergyUI(Ep, Ek, Eth, Etot, h, v, Eel=0) {
+        const maxE = Math.max(Etot, 1e-9);
+        this.thermalRatio = Math.max(0, Math.min(1, Eth / maxE));
+        const setBar = (key, val) => {
+          const valueEl = document.getElementById(`${this.id}-${key}`);
+          const barEl = document.getElementById(`${this.id}-${key}-bar`);
+          if (!valueEl || !barEl) return;
+          valueEl.textContent = `${val.toFixed(2)} J`;
+          barEl.style.width = `${Math.max(0, Math.min(100, 100*val/maxE))}%`;
+        };
+        document.getElementById(`${this.id}-speed`).textContent = `${v.toFixed(2)} m/s`;
+        document.getElementById(`${this.id}-height-read`).textContent = `${h.toFixed(2)} m`;
+        setBar('ep', Ep);
+        setBar('eel', Eel);
+        setBar('ek', Ek);
+        setBar('eth', Eth);
+        setBar('etot', Etot);
+      }
+
+      pushHistory(Ep, Ek, Eth, Etot, Eel=0) {
+        this.history.push({t:this.time, Ep, Ek, Eth, Etot, Eel});
+        if (this.history.length > this.maxHist) this.history.shift();
+      }
+
+      drawGraph() {
+        const ctx = this.gctx;
+        const w = this.graphW;
+        const h = this.graphH;
+        ctx.clearRect(0,0,w,h);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0,0,w,h);
+
+        ctx.strokeStyle = '#dbe3ee';
+        ctx.lineWidth = 1;
+        for (let i=0;i<5;i++) {
+          const y = 20 + i*(h-40)/4;
+          ctx.beginPath(); ctx.moveTo(40,y); ctx.lineTo(w-12,y); ctx.stroke();
+        }
+        ctx.beginPath(); ctx.moveTo(40,12); ctx.lineTo(40,h-22); ctx.lineTo(w-12,h-22); ctx.strokeStyle='#94a3b8'; ctx.stroke();
+
+        if (this.history.length < 2) return;
+        const t0 = this.history[0].t;
+        const t1 = this.history[this.history.length-1].t;
+        const dt = Math.max(1e-6, t1-t0);
+        const Emax = Math.max(...this.history.map(p => p.Etot), 1);
+
+        const plotLine = (key, color) => {
+          ctx.beginPath();
+          this.history.forEach((p, i) => {
+            const x = 40 + (w-56)*(p.t - t0)/dt;
+            const y = h-22 - (h-40)*(p[key]/Emax);
+            if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          });
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        };
+
+        plotLine('Ep', '#0077cc');
+        if (this.history.some(p => (p.Eel || 0) > 1e-6)) plotLine('Eel', '#f59e0b');
+        plotLine('Ek', '#e0142a');
+        plotLine('Eth', '#2e8b00');
+        plotLine('Etot', '#a855f7');
+      }
+
+      updateLabels() {
+        document.getElementById(`${this.id}-mass-val`).textContent = fmt(this.mass(),'kg');
+        document.getElementById(`${this.id}-mu-val`).textContent = this.mu().toFixed(2);
+      }
+
+      getHeatVisual() {
+        const r = Math.max(0, Math.min(1, this.thermalRatio || 0));
+        const mix = (a, b, t) => Math.round(a + (b - a) * t);
+        const shellColor = `rgb(${mix(15,255,r)}, ${mix(23,95,r)}, ${mix(42,20,r)})`;
+        const coreAlpha = 0.10 + 0.85*Math.pow(r, 1.35);
+        const glowAlpha = 0.07 + 0.42*Math.pow(r, 1.15);
+        return {
+          ratio: r,
+          shellColor,
+          coreColor: `rgba(255, 235, 150, ${coreAlpha.toFixed(3)})`,
+          glowColor: `rgba(255, 90, 20, ${glowAlpha.toFixed(3)})`,
+          haloRadius: 10 + 20*r
+        };
+      }
+
+      checkThermalStop(Eth, Etot, speed=0) {
+        if (this.mu() <= 0 || !Number.isFinite(Eth) || !Number.isFinite(Etot) || Etot <= 1e-9) return false;
+        const epsilon = 0.005;
+        const nearRest = Math.abs(speed) < 0.05;
+        if (Eth >= (1 - epsilon) * Etot && nearRest) {
+          this.running = false;
+          this.stopMessage = 'Sistema a riposo: energia dissipata in calore';
+          this.setStatus('energia quasi tutta termica');
+          return true;
+        }
+        if (Eth < (1 - 2*epsilon) * Etot) this.stopMessage = '';
+        return false;
+      }
+
+      drawStopMessage(ctx) {
+        if (!this.stopMessage) return;
+        const w = this.viewW;
+        const h = this.viewH;
+        ctx.save();
+        const padX = 14;
+        const padY = 10;
+        ctx.font = '600 14px Syne';
+        const textW = ctx.measureText(this.stopMessage).width;
+        const boxW = Math.min(w - 32, textW + 2*padX);
+        const boxH = 38;
+        const x = (w - boxW)/2;
+        const y = h - 54;
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        ctx.strokeStyle = 'rgba(15,23,42,0.18)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, x, y, boxW, boxH, 12, true, true);
+        ctx.fillStyle = '#7c2d12';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.stopMessage, w/2, y + boxH/2 + 1);
+        ctx.restore();
+      }
+
+      loop(ts) {
+        if (this.lastTs == null) this.lastTs = ts;
+        const dt = Math.min(0.03, (ts - this.lastTs)/1000);
+        this.lastTs = ts;
+        if (this.running) this.step(dt);
+        this.draw();
+        this.drawGraph();
+        requestAnimationFrame((t) => this.loop(t));
+      }
+    }
+
+    class TrackSim extends BaseSim {
+      constructor(id) {
+        super(id, 'track');
+        this.trackLength = 5.5;
+        this.kSpring = this.ui.kspring ? parseFloat(this.ui.kspring.value) : 4200;
+        this.springRest = 0.78;
+        this.kSpringControl = document.getElementById(`${this.id}-kspring-control`);
+        this.reset();
+      }
+
+      bindCommon() {
+        super.bindCommon();
+        this.ui.shape = document.getElementById(`${this.id}-shape`);
+        this.ui.start = document.getElementById(`${this.id}-start`);
+        this.ui.kspring = document.getElementById(`${this.id}-kspring`);
+        this.ui.epLabel = document.getElementById(`${this.id}-ep-label`);
+        this.ui.eelBlock = document.getElementById(`${this.id}-eel-block`);
+        this.ui.eelLegend = document.getElementById(`${this.id}-eel-legend`);
+        this.ui.shape.addEventListener('input', () => this.reset());
+        this.ui.start.addEventListener('input', () => { this.updateLabels(); this.reset(false); });
+        this.ui.kspring.addEventListener('input', () => {
+          this.kSpring = parseFloat(this.ui.kspring.value);
+          this.updateLabels();
+          this.reset(false);
+        });
+      }
+
+      updateSpringControlVisibility() {
+        if (!this.kSpringControl || !this.ui.shape) return;
+        const hasSpring = this.ui.shape.value === 'ramp';
+        this.kSpringControl.style.display = hasSpring ? '' : 'none';
+        if (this.ui.epLabel) this.ui.epLabel.textContent = hasSpring ? 'Energia potenziale gravitazionale \(E_{\text{pg}}\)' : 'Energia potenziale \(E_p\)';
+        if (this.ui.eelBlock) this.ui.eelBlock.style.display = hasSpring ? '' : 'none';
+        if (this.ui.eelLegend) this.ui.eelLegend.style.display = hasSpring ? '' : 'none';
+      }
+
+      shapeFunc(s) {
+        const mode = this.ui.shape.value;
+        if (mode === 'double') return 0.18 + 0.42*Math.pow(2*s-1,2) + 0.08*Math.cos(4*Math.PI*s);
+        if (mode === 'ramp') {
+          const yHigh = 0.75;
+          const yLow = 0.13;
+          const sFlat = 0.82;
+          if (s >= sFlat) return yLow;
+          const u = Math.max(0, Math.min(1, s / sFlat));
+          const smooth = u*u*u*(10 - 15*u + 6*u*u); // smoothstep quintico
+          return yHigh + (yLow - yHigh) * smooth;
+        }
+        return 0.16 + 0.58*Math.pow(2*s-1,2);
+      }
+
+      computeMinShape() {
+        let minVal = Infinity;
+        for (let i = 0; i <= 2000; i++) {
+          const s = i / 2000;
+          minVal = Math.min(minVal, this.shapeFunc(s));
+        }
+        return minVal;
+      }
+
+      dshape(s) {
+        const e = 1e-4;
+        return (this.shapeFunc(Math.min(1,s+e)) - this.shapeFunc(Math.max(0,s-e))) / (2*e);
+      }
+
+      d2shape(s) {
+        const e = 1e-4;
+        return (this.shapeFunc(Math.min(1,s+e)) - 2*this.shapeFunc(s) + this.shapeFunc(Math.max(0,s-e))) / (e*e);
+      }
+
+      hOf(s) { return 5.4*(this.shapeFunc(s) - this.minShape); }
+
+      slopeDx(s) {
+        return (5.4*this.dshape(s)) / this.trackLength;
+      }
+
+      springCompression(s) {
+        if (this.ui.shape.value !== 'ramp') return 0;
+        return Math.max(0, s - this.springRest);
+      }
+
+      springEnergy(s) {
+        const x = this.springCompression(s);
+        return 0.5 * this.kSpring * x * x;
+      }
+
+      accelAt(s, vx) {
+        const slope = this.slopeDx(s);
+        let accel = -this.grav()*slope/(1 + slope*slope);
+
+        const xSpring = this.springCompression(s);
+        if (xSpring > 0) {
+          accel -= (this.kSpring / this.mass()) * xSpring / this.trackLength;
+        }
+
+        if (this.mu() > 0) {
+          const sign = Math.abs(vx) > 1e-6 ? Math.sign(vx) : Math.sign(accel || 1);
+          accel -= this.mu()*this.grav()*sign/Math.sqrt(1 + slope*slope);
+        }
+        return accel;
+      }
+
+      projectEnergyConservation() {
+        const m = this.mass();
+        const g = this.grav();
+        const h = this.hOf(this.s);
+        const slope = this.slopeDx(this.s);
+        const Eel = this.springEnergy(this.s);
+        const available = Math.max(0, this.E0 - m*g*h - Eel);
+        const speedPath = Math.sqrt(2*available / Math.max(m, 1e-9));
+        const accel = this.accelAt(this.s, this.vx);
+        const atRightClamp = this.s >= 1 - 1e-9 && accel < 0;
+        const atLeftClamp = this.s <= 1e-9 && accel > 0;
+        const sign = speedPath < 1e-6
+          ? Math.sign(accel || -1)
+          : (atRightClamp ? -1 : (atLeftClamp ? 1 : (Math.abs(this.vx) > 1e-8 ? Math.sign(this.vx) : Math.sign(accel || -1))));
+        this.vx = sign * speedPath / Math.sqrt(1 + slope*slope);
+      }
+
+      projectDissipativeEnergyConservation(signHint=0) {
+        const m = this.mass();
+        const h = this.hOf(this.s);
+        const slope = this.slopeDx(this.s);
+        const Eel = this.springEnergy(this.s);
+        const available = Math.max(0, this.E0 - m*this.grav()*h - Eel - (this.ethCum || 0));
+        const speedPath = Math.sqrt(2*available / Math.max(m, 1e-9));
+        const accel = this.accelAt(this.s, this.vx);
+        const atRightClamp = this.s >= 1 - 1e-9 && accel < 0;
+        const atLeftClamp = this.s <= 1e-9 && accel > 0;
+        const sign = speedPath < 1e-6
+          ? Math.sign(accel || -1)
+          : (atRightClamp ? -1 : (atLeftClamp ? 1 : (Math.abs(signHint) > 1e-8 ? Math.sign(signHint) : (Math.abs(this.vx) > 1e-8 ? Math.sign(this.vx) : Math.sign(accel || -1)))));
+        this.vx = sign * speedPath / Math.sqrt(1 + slope*slope);
+      }
+
+      reset(startPaused=true) {
+        this.updateLabels();
+        document.getElementById(`${this.id}-start-val`).textContent = Number(this.ui.start.value).toFixed(2);
+        this.minShape = this.computeMinShape();
+        this.s = parseFloat(this.ui.start.value);
+        this.vx = 0;
+        this.v = 0;
+        this.time = 0;
+        this.history = [];
+        this.ethStored = 0;
+        this.ethCum = 0;
+        this.running = !startPaused ? this.running : false;
+        this.stopMessage = '';
+        this.setStatus('pronto');
+        this.updateSpringControlVisibility();
+        const h = this.hOf(this.s);
+        this.h0 = h;
+        this.E0 = this.mass()*this.grav()*this.h0 + this.springEnergy(this.s);
+        this.updateState();
+      }
+
+      step(dt) {
+        const sPrev = this.s;
+        const a1 = this.accelAt(this.s, this.vx);
+        const vxHalf = this.vx + 0.5*a1*dt;
+        this.s += (vxHalf*dt) / this.trackLength;
+
+        if (this.s <= 0) {
+          this.s = 0;
+          this.vx = -0.25*vxHalf;
+        } else {
+          if (this.s > 1) this.s = 1;
+          const a2 = this.accelAt(this.s, vxHalf);
+          this.vx = vxHalf + 0.5*a2*dt;
+        }
+
+        if (this.mu() === 0) {
+          this.projectEnergyConservation();
+        } else if (this.mu() > 0) {
+          const ds = Math.abs(this.s - sPrev);
+          const dL = this.trackLength * ds;
+          const dEth = this.mu() * this.mass() * this.grav() * dL;
+          this.ethCum = Math.min(this.E0, (this.ethCum || 0) + dEth);
+          this.projectDissipativeEnergyConservation(vxHalf);
+        }
+
+        const accelNow = this.accelAt(this.s, this.vx);
+        if (Math.abs(this.vx) < 0.005 && Math.abs(accelNow) < 0.05 && this.s > 0.45 && this.s < 0.55) {
+          this.vx = 0;
+          this.running = false;
+          this.setStatus('equilibrio raggiunto');
+        }
+
+        this.time += dt;
+        this.updateState();
+      }
+
+      updateState() {
+        const m = this.mass();
+        const g = this.grav();
+        const h = this.hOf(this.s);
+        const slope = this.slopeDx(this.s);
+        const Eel = this.springEnergy(this.s);
+        let speed = Math.abs(this.vx) * Math.sqrt(1 + slope*slope);
+        let Eth = 0;
+        let Ek = 0;
+
+        if (this.mu() === 0) {
+          Ek = Math.max(0, this.E0 - m*g*h - Eel);
+          speed = Math.sqrt(2*Ek / Math.max(m, 1e-9));
+          const sign = Math.abs(this.vx) > 1e-8 ? Math.sign(this.vx) : Math.sign(this.accelAt(this.s, this.vx) || -1);
+          this.vx = sign * speed / Math.sqrt(1 + slope*slope);
+        } else {
+          Eth = Math.min(this.E0, this.ethCum || 0);
+          Ek = Math.max(0, this.E0 - m*g*h - Eel - Eth);
+          speed = Math.sqrt(2*Ek / Math.max(m, 1e-9));
+          const sign = Math.abs(this.vx) > 1e-8 ? Math.sign(this.vx) : Math.sign(this.accelAt(this.s, this.vx) || -1);
+          this.vx = sign * speed / Math.sqrt(1 + slope*slope);
+        }
+
+        this.v = speed;
+        const Epg = m*g*h;
+        const Etot = this.E0;
+        this.updateEnergyUI(Epg, Ek, Eth, Etot, h, speed, Eel);
+        this.checkThermalStop(Eth, Etot, speed);
+        if (!this.running && this.stopMessage) {
+          this.vx = 0;
+        }
+        this.pushHistory(Epg, Ek, Eth, Etot, Eel);
+      }
+
+      draw() {
+        const ctx = this.ctx;
+        const w = this.viewW;
+        const h = this.viewH;
+        ctx.clearRect(0,0,w,h);
+
+        const sky = ctx.createLinearGradient(0,0,0,h);
+        sky.addColorStop(0,'#f8fbff');
+        sky.addColorStop(1,'#edf4fb');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0,0,w,h);
+
+        ctx.fillStyle = '#d8ecff';
+        ctx.beginPath();
+        ctx.arc(w*0.88, h*0.16, 34, 0, Math.PI*2);
+        ctx.fill();
+
+        const x0 = 52, y0 = h-56, sx = w-104, sy = h-138;
+        ctx.beginPath();
+        for (let i=0;i<=260;i++) {
+          const s = i/260;
+          const x = x0 + sx*s;
+          const y = y0 - sy*this.shapeFunc(s);
+          if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        for (let i=0;i<=4;i++) {
+          const yy = y0 - sy*(i/4)*0.8;
+          ctx.beginPath(); ctx.moveTo(18,yy); ctx.lineTo(w-20,yy); ctx.stroke();
+          ctx.fillStyle = '#64748b';
+          ctx.font = '12px Space Mono';
+          ctx.fillText(`${(5.4*(i/4)*0.8).toFixed(1)} m`, 22, yy-5);
+        }
+
+        const cx = x0 + sx*this.s;
+        const cy = y0 - sy*this.shapeFunc(this.s);
+        const rad = 14 + 2*Math.sqrt(this.mass());
+
+        if (this.ui.shape.value === 'ramp') {
+          const springY = y0 - sy*this.shapeFunc(1);
+          const wallX = x0 + sx + 18;
+          const restLeftX = x0 + sx*this.springRest;
+          const freeLeftX = Math.min(restLeftX, wallX - 22);
+          const blockFaceX = Math.min(cx + rad*0.92, wallX - 22);
+          const springLeftX = this.springCompression(this.s) > 0 ? Math.min(blockFaceX, wallX - 22) : freeLeftX;
+          const compressionRatio = Math.max(0, Math.min(1, this.springCompression(this.s) / Math.max(1 - this.springRest, 1e-6)));
+
+          ctx.save();
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(wallX, springY - 24);
+          ctx.lineTo(wallX, springY + 24);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(71,85,105,0.10)';
+          roundRect(ctx, wallX - 4, springY - 26, 10, 52, 3, true, false);
+
+          drawPseudo3DSpring(ctx, springLeftX, wallX, springY, compressionRatio);
+          ctx.restore();
+        }
+
+        drawHeatedMass(ctx, cx, cy, rad, this.getHeatVisual(), 'm');
+
+        const dh = this.dshape(this.s);
+        const tangent = {x:1, y:-sy*dh/sx};
+        const mag = Math.hypot(tangent.x,tangent.y) || 1;
+        const tx = tangent.x/mag, ty = tangent.y/mag;
+        const speedScale = Math.max(-80, Math.min(80, this.vx*26));
+        drawArrow(ctx, cx, cy-28, cx + tx*speedScale, cy-28 + ty*speedScale, '#e0142a', 3);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '600 14px Syne';
+        ctx.textAlign = 'left';
+        ctx.fillText('Quota di riferimento: y = 0', 18, h-18);
+        this.drawStopMessage(ctx);
+      }
+
+      updateLabels() {
+        super.updateLabels();
+        this.updateSpringControlVisibility();
+        document.getElementById(`${this.id}-start-val`).textContent = Number(this.ui.start.value).toFixed(2);
+        document.getElementById(`${this.id}-kspring-val`).textContent = `${Math.round(this.kSpring)} N/m`;
+      }
+    }
+
+    class LoopSim extends BaseSim {
+      constructor(id) {
+        super(id, 'loop');
+        this.reset();
+      }
+
+      bindCommon() {
+        super.bindCommon();
+        this.ui.radius = document.getElementById(`${this.id}-radius`);
+        this.ui.height = document.getElementById(`${this.id}-height`);
+        ['radius','height'].forEach(k => this.ui[k].addEventListener('input', () => { this.updateLabels(); this.reset(false); }));
+      }
+
+      radius() { return parseFloat(this.ui.radius.value); }
+      h0() { return parseFloat(this.ui.height.value); }
+
+      reset(startPaused=true) {
+        this.updateLabels();
+        this.phase = 'ramp';
+        this.phi = Math.PI;
+        this.sRamp = 0;
+        this.time = 0;
+        this.history = [];
+        this.ethStored = 0;
+        this.ethCum = 0;
+        this.running = !startPaused ? this.running : false;
+        this.stopMessage = '';
+        this.setStatus('pronto');
+        this.updateSpringControlVisibility();
+        const m = this.mass(), g = this.grav();
+        this.E0 = m*g*this.h0();
+        this.v = 0;
+        this.visual = {x:-2.6*this.radius(), y:this.h0()};
+        this.updateState();
+      }
+
+      step(dt) {
+        const R = this.radius();
+        const hLoop = 2*R;
+        const m = this.mass(), g = this.grav();
+
+        if (this.phase === 'ramp') {
+          this.sRamp += dt * Math.max(0.15, 0.22 + this.v*0.04);
+          const frac = Math.min(1, this.sRamp);
+          const h = this.h0()*(1-frac) + hLoop*frac;
+          const EthApprox = this.mu()*m*g*this.sRamp*R*0.9;
+          const Ek = Math.max(0, this.E0 - m*g*h - EthApprox);
+          this.v = Math.sqrt(2*Ek/m);
+          this.visual = {x:-2.6*R + 2.6*R*frac, y:h};
+          if (frac >= 1) this.phase = 'loop';
+        } else {
+          const EthApprox = this.mu()*m*g*(R + R*Math.abs(this.phi-Math.PI));
+          const available = Math.max(0, this.E0 - EthApprox);
+          const h = R*(1 - Math.cos(this.phi));
+          const Ek = Math.max(0, available - m*g*h);
+          this.v = Math.sqrt(2*Ek/m);
+          const omega = this.v / Math.max(R,1e-6);
+          this.phi += omega*dt;
+          this.visual = {x:R*Math.sin(this.phi), y:R*(1 - Math.cos(this.phi))};
+          if (this.phi >= Math.PI + 2*Math.PI) {
+            this.running = false;
+            this.setStatus('giro completato');
+          }
+          const vTopMin = Math.sqrt(g*R);
+          if (this.phi > 1.5*Math.PI && this.phi < 2.5*Math.PI) {
+            const hTop = 2*R;
+            const EkTop = Math.max(0, available - m*g*hTop);
+            const vTop = Math.sqrt(2*EkTop/m);
+            if (vTop < vTopMin*0.98) this.setStatus('contatto critico in sommità');
+          }
+        }
+        this.time += dt;
+        this.updateState();
+      }
+
+      updateState() {
+        const m = this.mass(), g = this.grav(), R = this.radius();
+        const h = this.visual ? this.visual.y : this.h0();
+        const pathDiss = this.phase==='ramp' ? this.sRamp*R : (R + R*Math.abs(this.phi - Math.PI));
+        const Eth = this.getMonotonicThermal(this.mu()*m*g*pathDiss);
+        const Ep = m*g*h;
+        const Ek = Math.max(0, this.E0 - Ep - Eth);
+        const Etot = Ep + Ek + Eth;
+        this.updateEnergyUI(Ep, Ek, Eth, Etot, h, this.v);
+        if (this.checkThermalStop(Eth, Etot, this.v)) this.v = 0;
+        this.pushHistory(Ep, Ek, Eth, Etot);
+      }
+
+      draw() {
+        const ctx = this.ctx;
+        const w = this.viewW;
+        const h = this.viewH;
+        ctx.clearRect(0,0,w,h);
+        ctx.fillStyle = '#f4f9ff';
+        ctx.fillRect(0,0,w,h);
+
+        const R = this.radius();
+        const scale = Math.min((w-120)/(6.2*R), (h-80)/(Math.max(this.h0(),2*R)+1.2));
+        const ox = w*0.42;
+        const oy = h-48;
+        const toX = x => ox + x*scale;
+        const toY = y => oy - y*scale;
+
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(toX(-2.8*R), toY(this.h0()));
+        ctx.lineTo(toX(0), toY(2*R));
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(toX(0), toY(R), R*scale, -Math.PI/2, 3*Math.PI/2);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        for (let i=0;i<=5;i++) {
+          const yy = toY(i*Math.max(this.h0(),2*R)/5);
+          ctx.beginPath(); ctx.moveTo(20,yy); ctx.lineTo(w-20,yy); ctx.stroke();
+        }
+
+        const px = toX(this.visual?.x ?? -2.8*R);
+        const py = toY(this.visual?.y ?? this.h0());
+        drawHeatedMass(ctx, px, py, 14 + 2*Math.sqrt(this.mass()), this.getHeatVisual());
+
+        drawArrow(ctx, px, py-28, px + 46, py-28, '#e0142a', 3);
+
+        const vTopMin = Math.sqrt(this.grav()*R);
+        const hMin = 2.5*R;
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '600 14px Syne';
+        ctx.fillText(`h₀,min ≈ ${hMin.toFixed(2)} m`, 24, 28);
+        ctx.fillText(`v_top,min = √(gR) ≈ ${vTopMin.toFixed(2)} m/s`, 24, 50);
+        this.drawStopMessage(ctx);
+      }
+
+      updateLabels() {
+        super.updateLabels();
+        document.getElementById(`${this.id}-radius-val`).textContent = fmt(this.radius(),'m');
+        document.getElementById(`${this.id}-height-val`).textContent = fmt(this.h0(),'m');
+      }
+    }
+
+    class PendulumSim extends BaseSim {
+      constructor(id) {
+        super(id, 'pendulum');
+        this.reset();
+      }
+
+      bindCommon() {
+        super.bindCommon();
+        this.ui.length = document.getElementById(`${this.id}-length`);
+        this.ui.angle = document.getElementById(`${this.id}-angle`);
+        ['length','angle'].forEach(k => this.ui[k].addEventListener('input', () => { this.updateLabels(); this.reset(false); }));
+      }
+
+      length() { return parseFloat(this.ui.length.value); }
+      angle0() { return parseFloat(this.ui.angle.value) * Math.PI/180; }
+
+      reset(startPaused=true) {
+        this.updateLabels();
+        this.theta = this.angle0();
+        this.omega = 0;
+        this.time = 0;
+        this.history = [];
+        this.ethStored = 0;
+        this.ethCum = 0;
+        this.running = !startPaused ? this.running : false;
+        this.stopMessage = '';
+        this.setStatus('pronto');
+        this.updateSpringControlVisibility();
+        const m = this.mass(), g = this.grav(), L = this.length();
+        this.E0 = m*g*L*(1-Math.cos(this.theta));
+        this.updateState();
+      }
+
+      step(dt) {
+        const g = this.grav(), L = this.length(), damp = this.mu()*1.8;
+        const alpha = -(g/L)*Math.sin(this.theta) - damp*this.omega;
+        this.omega += alpha*dt;
+        this.theta += this.omega*dt;
+        this.time += dt;
+        if (Math.abs(this.omega) < 0.003 && Math.abs(this.theta) < 0.01 && this.mu() > 0.02) {
+          this.running = false;
+          this.setStatus('oscillazione smorzata');
+        }
+        this.updateState();
+      }
+
+      updateState() {
+        const m = this.mass(), g = this.grav(), L = this.length();
+        const h = L*(1-Math.cos(this.theta));
+        const v = Math.abs(this.omega*L);
+        const Ep = m*g*h;
+        const Ek = 0.5*m*v*v;
+        const Eth = this.getMonotonicThermal(this.E0 - Ep - Ek);
+        const Etot = this.mu() === 0 ? (Ep + Ek) : (Ep + Ek + Eth);
+        this.updateEnergyUI(Ep, Ek, Eth, Etot, h, v);
+        if (this.checkThermalStop(Eth, Etot, v)) this.omega = 0;
+        this.pushHistory(Ep, Ek, Eth, Etot);
+      }
+
+      draw() {
+        const ctx = this.ctx;
+        const w = this.viewW;
+        const h = this.viewH;
+        ctx.clearRect(0,0,w,h);
+        ctx.fillStyle = '#f7fbff';
+        ctx.fillRect(0,0,w,h);
+
+        const L = this.length();
+        const scale = Math.min((h-120)/(L+0.6), (w-120)/(2.4*L));
+        const ox = w/2;
+        const oy = 54;
+        const bx = ox + L*scale*Math.sin(this.theta);
+        const by = oy + L*scale*Math.cos(this.theta);
+
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(ox, oy, L*scale, Math.PI/2 - this.angle0(), Math.PI/2 + this.angle0());
+        ctx.stroke();
+
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(bx,by); ctx.stroke();
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath(); ctx.arc(ox,oy,7,0,Math.PI*2); ctx.fill();
+        drawHeatedMass(ctx, bx, by, 16 + 2*Math.sqrt(this.mass()), this.getHeatVisual());
+
+        drawArrow(ctx, bx, by-28, bx + Math.cos(this.theta)*this.omega*L*22, by-28, '#e0142a', 3);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '600 14px Syne';
+        ctx.fillText(`θ = ${(this.theta*180/Math.PI).toFixed(1)}°`, 24, 28);
+        ctx.fillText(`L = ${L.toFixed(2)} m`, 24, 50);
+      }
+
+      updateLabels() {
+        super.updateLabels();
+        document.getElementById(`${this.id}-length-val`).textContent = fmt(this.length(),'m');
+        document.getElementById(`${this.id}-angle-val`).textContent = `${parseFloat(this.ui.angle.value).toFixed(0)}°`;
+      }
+    }
+
+    function drawPseudo3DSpring(ctx, xStart, xEnd, y, compressionRatio=0) {
+      const length = Math.max(10, xEnd - xStart);
+      const turns = Math.max(7, Math.round(length / 18));
+      const amp = 8 * (1 - 0.22*Math.max(0, Math.min(1, compressionRatio)));
+      const pts = Math.max(120, turns * 18);
+
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // ombra morbida
+      ctx.beginPath();
+      for (let i = 0; i <= pts; i++) {
+        const t = i / pts;
+        const x = xStart + t * length;
+        const phase = t * turns * 2 * Math.PI;
+        const envelope = 0.20 + 0.80*Math.sin(Math.PI * t);
+        const yy = y + 1.25*amp*envelope*Math.sin(phase);
+        if (i === 0) ctx.moveTo(x + 1.5, yy + 2.5);
+        else ctx.lineTo(x + 1.5, yy + 2.5);
+      }
+      ctx.strokeStyle = 'rgba(15,23,42,0.18)';
+      ctx.lineWidth = 5.5;
+      ctx.stroke();
+
+      // corpo principale della molla
+      const grad = ctx.createLinearGradient(xStart, y - amp, xStart, y + amp);
+      grad.addColorStop(0.00, '#fff7ed');
+      grad.addColorStop(0.18, '#fde68a');
+      grad.addColorStop(0.45, '#fb923c');
+      grad.addColorStop(0.72, '#c2410c');
+      grad.addColorStop(1.00, '#7c2d12');
+
+      ctx.beginPath();
+      for (let i = 0; i <= pts; i++) {
+        const t = i / pts;
+        const x = xStart + t * length;
+        const phase = t * turns * 2 * Math.PI;
+        const envelope = 0.20 + 0.80*Math.sin(Math.PI * t);
+        const yy = y + amp*envelope*Math.sin(phase);
+        if (i === 0) ctx.moveTo(x, yy);
+        else ctx.lineTo(x, yy);
+      }
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 4.2;
+      ctx.stroke();
+
+      // highlight superiore per effetto pseudo-3D
+      ctx.beginPath();
+      for (let i = 0; i <= pts; i++) {
+        const t = i / pts;
+        const x = xStart + t * length;
+        const phase = t * turns * 2 * Math.PI;
+        const envelope = 0.20 + 0.80*Math.sin(Math.PI * t);
+        const yy = y + amp*envelope*Math.sin(phase) - 1.2;
+        if (i === 0) ctx.moveTo(x, yy);
+        else ctx.lineTo(x, yy);
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.78)';
+      ctx.lineWidth = 1.25;
+      ctx.stroke();
+
+      // terminali metallici
+      ctx.strokeStyle = '#9a3412';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(xStart - 8, y);
+      ctx.lineTo(xStart, y);
+      ctx.moveTo(xEnd, y);
+      ctx.lineTo(xEnd + 8, y);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill=false, stroke=false) {
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawHeatedMass(ctx, x, y, r, heat, label='') {
+      ctx.save();
+
+      if (heat.ratio > 0.02) {
+        const halo = ctx.createRadialGradient(x, y, r*0.25, x, y, r + heat.haloRadius);
+        halo.addColorStop(0, heat.glowColor);
+        halo.addColorStop(1, 'rgba(255,90,20,0)');
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(x, y, r + heat.haloRadius, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = heat.shellColor;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI*2);
+      ctx.fill();
+
+      if (heat.ratio > 0.05) {
+        const core = ctx.createRadialGradient(x - 0.28*r, y - 0.32*r, 0, x, y, 0.95*r);
+        core.addColorStop(0, heat.coreColor);
+        core.addColorStop(0.55, `rgba(255, 170, 60, ${(0.10 + 0.45*heat.ratio).toFixed(3)})`);
+        core.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(x, y, 0.96*r, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = `rgba(255,255,255,${(0.08 + 0.30*heat.ratio).toFixed(3)})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(x - 0.12*r, y - 0.12*r, 0.7*r, 0.85*Math.PI, 1.55*Math.PI);
+      ctx.stroke();
+
+      if (label) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 12px Space Mono';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, x, y + 1);
+      }
+
+      ctx.restore();
+    }
+
+    function drawArrow(ctx, x1, y1, x2, y2, color, width=2) {
+      const dx = x2-x1, dy = y2-y1;
+      const ang = Math.atan2(dy,dx);
+      const len = Math.hypot(dx,dy);
+      if (len < 2) return;
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      const ah = 10;
+      ctx.beginPath();
+      ctx.moveTo(x2,y2);
+      ctx.lineTo(x2 - ah*Math.cos(ang - Math.PI/6), y2 - ah*Math.sin(ang - Math.PI/6));
+      ctx.lineTo(x2 - ah*Math.cos(ang + Math.PI/6), y2 - ah*Math.sin(ang + Math.PI/6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    createTabs();
+    const sims = {
+      track: new TrackSim('track'),
+      loop: new LoopSim('loop'),
+      pendulum: new PendulumSim('pendulum')
+    };
+
+    window.addEventListener('resize', () => Object.values(sims).forEach(s => s.resize()));
+    requestAnimationFrame(() => {
+      Object.values(sims).forEach(s => s.resize());
+      activateScreen('track');
+      queueTypeset(document.body);
+    });
+  </script>
+</body>
+</html>

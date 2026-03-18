@@ -32,7 +32,7 @@
       "description": "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
       "category": "Elettromagnetismo",
       "icon": "⚡",
-      "order": 1,
+      "order": 10,
       "tags": [
         "cariche elettriche",
         "campo elettrico",
@@ -47,7 +47,7 @@
       "description": "Simulazione dell'interazione gravitazionale tra masse con visualizzazione delle forze e del moto risultante secondo la legge di gravitazione universale.",
       "category": "Gravitazione",
       "icon": "🪐",
-      "order": 1,
+      "order": 10,
       "tags": [
         "gravità",
         "forza gravitazionale",
@@ -59,11 +59,27 @@
       "file": "Gravitazione/Gravità.html"
     },
     {
+      "title": "Indipendenza dei moti",
+      "description": "Esplora l’indipendenza dei moti simultanei.",
+      "category": "Meccanica",
+      "icon": "↔️↕️",
+      "order": 10,
+      "tags": [
+        "moti simultanei",
+        "moto orizzontale",
+        "moto verticale",
+        "composizione dei moti",
+        "cinematica"
+      ],
+      "level": "base",
+      "file": "Meccanica/Indipendenza moti.html"
+    },
+    {
       "title": "Moto Parabolico",
       "description": "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
       "category": "Meccanica",
       "icon": "➶",
-      "order": 1,
+      "order": 20,
       "tags": [
         "moto parabolico",
         "lancio di proiettili",
@@ -79,7 +95,7 @@
       "description": "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
       "category": "Meccanica",
       "icon": "◯",
-      "order": 2,
+      "order": 30,
       "tags": [
         "moto circolare uniforme",
         "velocità angolare",
@@ -95,7 +111,7 @@
       "description": "Simulazione del moto armonico semplice con analisi di posizione, velocità, accelerazione, periodo e ampiezza.",
       "category": "Meccanica",
       "icon": "∿",
-      "order": 3,
+      "order": 40,
       "tags": [
         "moto armonico semplice",
         "oscillazioni",
@@ -107,27 +123,11 @@
       "file": "Meccanica/Moto armonico.html"
     },
     {
-      "title": "Indipendenza dei moti",
-      "description": "Esplora l’indipendenza dei moti simultanei.",
-      "category": "Meccanica",
-      "icon": "↔️↕️",
-      "order": 4,
-      "tags": [
-        "moti simultanei",
-        "moto orizzontale",
-        "moto verticale",
-        "composizione dei moti",
-        "cinematica"
-      ],
-      "level": "base",
-      "file": "Meccanica/Indipendenza moti.html"
-    },
-    {
       "title": "Principi della Dinamica",
       "description": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
       "category": "Meccanica",
       "icon": "→",
-      "order": 5,
+      "order": 50,
       "tags": [
         "dinamica",
         "forza",
@@ -143,7 +143,7 @@
       "description": "Esplora il moto di un corpo su un piano inclinato variando angolo, massa, attrito e forza applicata. Osserva come cambiano accelerazione, velocità, forze lungo il piano e condizioni di equilibrio o di scorrimento.",
       "category": "Meccanica",
       "icon": "📐",
-      "order": 6,
+      "order": 60,
       "tags": [
         "piano inclinato",
         "forze",
@@ -159,7 +159,7 @@
       "description": "Esplorazione del momento di una forza e dell’equilibrio delle leve variando intensità della forza, posizione del fulcro e lunghezza del braccio.",
       "category": "Meccanica",
       "icon": "⚖",
-      "order": 7,
+      "order": 70,
       "tags": [
         "momento di una forza",
         "leve",
@@ -175,7 +175,7 @@
       "description": "Visualizza le trasformazioni tra energia cinetica e potenziale.",
       "category": "Meccanica",
       "icon": "♻️",
-      "order": 8,
+      "order": 80,
       "tags": [
         "energia",
         "energia cinetica"
@@ -188,7 +188,7 @@
       "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
       "category": "Onde",
       "icon": "≈",
-      "order": 1,
+      "order": 10,
       "tags": [
         "interferenza",
         "diffrazione",
@@ -205,7 +205,7 @@
       "description": "Esplora come la frequenza osservata di un’onda cambia quando la sorgente e/o l’osservatore sono in movimento.",
       "category": "Onde",
       "icon": "🔊",
-      "order": 2,
+      "order": 20,
       "tags": [
         "onde",
         "frequenza",
@@ -221,7 +221,7 @@
       "description": "Simulazione della rifrazione della luce tra mezzi diversi con visualizzazione degli angoli e del cambio di direzione.",
       "category": "Ottica",
       "icon": "↘",
-      "order": 1,
+      "order": 10,
       "tags": [
         "rifrazione",
         "luce",
@@ -237,7 +237,7 @@
       "description": "Studio della formazione delle immagini con specchi e lenti attraverso la costruzione geometrica dei raggi principali.",
       "category": "Ottica",
       "icon": "🔍",
-      "order": 2,
+      "order": 20,
       "tags": [
         "specchi",
         "lenti",

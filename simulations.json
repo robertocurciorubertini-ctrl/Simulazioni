@@ -59,6 +59,32 @@
       "file": "Gravitazione/Gravità.html"
     },
     {
+      "title": "Moto rettilineo uniforme",
+      "description": "Visualizza come la posizione varia linearmente nel tempo quando la velocità è costante, attraverso animazioni e grafici sincronizzati.",
+      "category": "Meccanica",
+      "icon": "➡️",
+      "order": 1,
+      "tags": [
+        "moto rettilineo",
+        "velocità costante",
+        "legge oraria",
+        "grafico posizione-tempo",
+        "cinematica"
+      ],
+      "level": "base",
+      "file": "Meccanica/Moto rettilineo uniforme.html"
+    },
+    {
+      "title": "Moto uniformemente accelerato",
+      "description": "Simulazione interattiva del moto uniformemente accelerato in una dimensione, con visualizzazione sincronizzata del moto dell’oggetto e dei grafici posizione-tempo e velocità-tempo. Include sia il caso lungo l’asse x sia il moto verticale sotto l’azione della gravità.",
+      "icon": "🚀",
+      "order": 5,
+      "category": "Meccanica",
+      "file": "Meccanica/Moto uniformemente accelerato.html",
+      "tags": [],
+      "level": ""
+    },
+    {
       "title": "Indipendenza dei moti",
       "description": "Esplora l’indipendenza dei moti simultanei.",
       "category": "Meccanica",
@@ -126,7 +152,7 @@
       "title": "Principi della Dinamica",
       "description": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
       "category": "Meccanica",
-      "icon": "→",
+      "icon": "➡️⬅️",
       "order": 50,
       "tags": [
         "dinamica",

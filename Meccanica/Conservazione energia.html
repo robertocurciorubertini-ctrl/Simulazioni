@@ -492,7 +492,7 @@ window.SIM_METADATA = {
                 <select id="${cfg.id}-shape">
                   <option value="valley">Valle dolce</option>
                   <option value="double">Doppia ondulazione</option>
-                  <option value="ramp">Rampa asimmetrica</option>
+                  <option value="ramp">Rampa con molla</option>
                 </select>
               </div>
               <div class="control">
@@ -913,6 +913,17 @@ window.SIM_METADATA = {
 
       hOf(s) { return 5.4*(this.shapeFunc(s) - this.minShape); }
 
+      visualShape(s) { return this.shapeFunc(s) - this.minShape; }
+
+      maxHeight() {
+        let maxVal = 0;
+        for (let i = 0; i <= 2000; i++) {
+          const s = i / 2000;
+          maxVal = Math.max(maxVal, this.hOf(s));
+        }
+        return maxVal;
+      }
+
       slopeDx(s) {
         return (5.4*this.dshape(s)) / this.trackLength;
       }
@@ -1085,11 +1096,14 @@ window.SIM_METADATA = {
         ctx.fill();
 
         const x0 = 52, y0 = h-56, sx = w-104, sy = h-138;
+        const maxH = Math.max(this.maxHeight(), 1e-6);
+        const hScale = sy / maxH;
+
         ctx.beginPath();
         for (let i=0;i<=260;i++) {
           const s = i/260;
           const x = x0 + sx*s;
-          const y = y0 - sy*this.shapeFunc(s);
+          const y = y0 - hScale*this.hOf(s);
           if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
         }
         ctx.strokeStyle = '#1e293b';
@@ -1099,19 +1113,20 @@ window.SIM_METADATA = {
         ctx.strokeStyle = '#94a3b8';
         ctx.lineWidth = 1;
         for (let i=0;i<=4;i++) {
-          const yy = y0 - sy*(i/4)*0.8;
+          const hGrid = (i/4)*maxH;
+          const yy = y0 - hScale*hGrid;
           ctx.beginPath(); ctx.moveTo(18,yy); ctx.lineTo(w-20,yy); ctx.stroke();
           ctx.fillStyle = '#64748b';
           ctx.font = '12px Space Mono';
-          ctx.fillText(`${(5.4*(i/4)*0.8).toFixed(1)} m`, 22, yy-5);
+          ctx.fillText(`${hGrid.toFixed(1)} m`, 22, yy-5);
         }
 
         const cx = x0 + sx*this.s;
-        const cy = y0 - sy*this.shapeFunc(this.s);
+        const cy = y0 - hScale*this.hOf(this.s);
         const rad = 14 + 2*Math.sqrt(this.mass());
 
         if (this.ui.shape.value === 'ramp') {
-          const springY = y0 - sy*this.shapeFunc(1);
+          const springY = y0 - hScale*this.hOf(1);
           const wallX = x0 + sx + 18;
           const restLeftX = x0 + sx*this.springRest;
           const freeLeftX = Math.min(restLeftX, wallX - 22);

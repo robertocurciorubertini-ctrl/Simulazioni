@@ -1,5 +1,33 @@
-[
-  {
+{
+"categories": [
+{
+"name": "Meccanica",
+"order": 1,
+"description": "Branca della fisica che studia il moto dei corpi e le cause che lo producono, come forze, energia e quantità di moto."
+},
+{
+"name": "Gravitazione",
+"order": 2,
+"description": "Studio dell’interazione gravitazionale tra masse e delle leggi che governano il moto dei corpi celesti."
+},
+{
+"name": "Onde",
+"order": 3,
+"description": "Studio dei fenomeni ondulatori e della propagazione delle perturbazioni nello spazio e nei mezzi materiali."
+},
+{
+"name": "Ottica",
+"order": 4,
+"description": "Branca della fisica che studia la luce, la sua propagazione e l’interazione con i materiali."
+},
+{
+"name": "Elettromagnetismo",
+"order": 5,
+"description": "Studio dei campi elettrici e magnetici e delle interazioni tra cariche elettriche."
+}
+],
+"simulations": [
+{ 
     "title": "Elettrostatica",
     "description": "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
     "category": "Elettromagnetismo",

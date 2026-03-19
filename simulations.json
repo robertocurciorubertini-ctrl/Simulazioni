@@ -1,278 +1,231 @@
-{
-  "categories": [
-    {
-      "name": "Meccanica",
-      "order": 1,
-      "description": "Branca della fisica che studia il moto dei corpi e le cause che lo producono, come forze, energia e quantità di moto."
-    },
-    {
-      "name": "Gravitazione",
-      "order": 2,
-      "description": "Studio dell’interazione gravitazionale tra masse e delle leggi che governano il moto dei corpi celesti."
-    },
-    {
-      "name": "Onde",
-      "order": 3,
-      "description": "Studio dei fenomeni ondulatori e della propagazione delle perturbazioni nello spazio e nei mezzi materiali."
-    },
-    {
-      "name": "Ottica",
-      "order": 4,
-      "description": "Branca della fisica che studia la luce, la sua propagazione e l’interazione con i materiali."
-    },
-    {
-      "name": "Elettromagnetismo",
-      "order": 5,
-      "description": "Studio dei campi elettrici e magnetici e delle interazioni tra cariche elettriche."
-    }
-  ],
-  "simulations": [
-    {
-      "title": "Elettrostatica",
-      "description": "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
-      "category": "Elettromagnetismo",
-      "icon": "⚡",
-      "order": 10,
-      "tags": [
-        "cariche elettriche",
-        "campo elettrico",
-        "forza elettrica",
-        "legge di Coulomb"
-      ],
-      "level": "intermedio",
-      "file": "Elettro-Magnetismo/Elettrostatica.html"
-    },
-    {
-      "title": "Gravità",
-      "description": "Simulazione dell'interazione gravitazionale tra masse con visualizzazione delle forze e del moto risultante secondo la legge di gravitazione universale.",
-      "category": "Gravitazione",
-      "icon": "🪐",
-      "order": 10,
-      "tags": [
-        "gravità",
-        "forza gravitazionale",
-        "masse",
-        "orbite",
-        "legge di gravitazione universale"
-      ],
-      "level": "intermedio",
-      "file": "Gravitazione/Gravità.html"
-    },
-    {
-      "title": "Moto rettilineo uniforme",
-      "description": "Visualizza come la posizione varia linearmente nel tempo quando la velocità è costante, attraverso animazioni e grafici sincronizzati.",
-      "category": "Meccanica",
-      "icon": "➡️",
-      "order": 1,
-      "tags": [
-        "moto rettilineo",
-        "velocità costante",
-        "legge oraria",
-        "grafico posizione-tempo",
-        "cinematica"
-      ],
-      "level": "base",
-      "file": "Meccanica/Moto rettilineo uniforme.html"
-    },
-    {
-      "title": "Moto uniformemente accelerato",
-      "description": "Simulazione interattiva del moto uniformemente accelerato in una dimensione.",
-      "icon": "🚀",
-      "order": 5,
-      "category": "Meccanica",
-      "file": "Meccanica/Moto uniformemente accelerato.html",
-      "tags": [],
-      "level": ""
-    },
-    {
-      "title": "Indipendenza dei moti",
-      "description": "Esplora l’indipendenza dei moti simultanei.",
-      "category": "Meccanica",
-      "icon": "↔️↕️",
-      "order": 10,
-      "tags": [
-        "moti simultanei",
-        "moto orizzontale",
-        "moto verticale",
-        "composizione dei moti",
-        "cinematica"
-      ],
-      "level": "base",
-      "file": "Meccanica/Indipendenza moti.html"
-    },
-    {
-      "title": "Moto Parabolico",
-      "description": "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
-      "category": "Meccanica",
-      "icon": "➶",
-      "order": 20,
-      "tags": [
-        "moto parabolico",
-        "lancio di proiettili",
-        "gittata",
-        "tempo di volo",
-        "composizione dei moti"
-      ],
-      "level": "base",
-      "file": "Meccanica/Moto parabolico.html"
-    },
-    {
-      "title": "Moto Circolare",
-      "description": "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
-      "category": "Meccanica",
-      "icon": "◯",
-      "order": 30,
-      "tags": [
-        "moto circolare uniforme",
-        "velocità angolare",
-        "accelerazione centripeta",
-        "periodo",
-        "traiettoria"
-      ],
-      "level": "base",
-      "file": "Meccanica/Moto circolare.html"
-    },
-    {
-      "title": "Moto Armonico",
-      "description": "Simulazione del moto armonico semplice con analisi di posizione, velocità, accelerazione, periodo e ampiezza.",
-      "category": "Meccanica",
-      "icon": "∿",
-      "order": 40,
-      "tags": [
-        "moto armonico semplice",
-        "oscillazioni",
-        "periodo",
-        "frequenza",
-        "ampiezza"
-      ],
-      "level": "intermedio",
-      "file": "Meccanica/Moto armonico.html"
-    },
-    {
-      "title": "Principi della Dinamica",
-      "description": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
-      "category": "Meccanica",
-      "icon": "➡️⬅️",
-      "order": 50,
-      "tags": [
-        "dinamica",
-        "forza",
-        "massa",
-        "inerzia",
-        "leggi di Newton"
-      ],
-      "level": "base",
-      "file": "Meccanica/Dinamica.html"
-    },
-    {
-      "title": "Piano inclinato",
-      "description": "Esplora il moto di un corpo su un piano inclinato variando angolo, massa, attrito e forza applicata. Osserva come cambiano accelerazione, velocità, forze lungo il piano e condizioni di equilibrio o di scorrimento.",
-      "category": "Meccanica",
-      "icon": "📐",
-      "order": 60,
-      "tags": [
-        "piano inclinato",
-        "forze",
-        "attrito",
-        "accelerazione",
-        "seconda legge di Newton"
-      ],
-      "level": "base",
-      "file": "Meccanica/Piano inclinato.html"
-    },
-    {
-      "title": "Momento di una forza",
-      "description": "Esplorazione del momento di una forza e dell’equilibrio delle leve variando intensità della forza, posizione del fulcro e lunghezza del braccio.",
-      "category": "Meccanica",
-      "icon": "⚖",
-      "order": 70,
-      "tags": [
-        "momento di una forza",
-        "leve",
-        "equilibrio",
-        "fulcro",
-        "braccio della forza"
-      ],
-      "level": "base",
-      "file": "Meccanica/Momento di una Forza.html"
-    },
-    {
-      "title": "Conservazione dell'energia",
-      "description": "Visualizza le trasformazioni tra energia cinetica e potenziale.",
-      "category": "Meccanica",
-      "icon": "♻️",
-      "order": 80,
-      "tags": [
-        "energia",
-        "energia cinetica"
-      ],
-      "level": "base",
-      "file": "Meccanica/Conservazione energia.html"
-    },
-    {
-      "title": "Interferenza",
-      "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
-      "category": "Onde",
-      "icon": "≈",
-      "order": 10,
-      "tags": [
-        "interferenza",
-        "diffrazione",
-        "sovrapposizione",
-        "onde",
-        "interferenza costruttiva",
-        "interferenza distruttiva"
-      ],
-      "level": "intermedio",
-      "file": "Onde/Interferenza onde.html"
-    },
-    {
-      "title": "Effetto Doppler",
-      "description": "Esplora come la frequenza osservata di un’onda cambia quando la sorgente e/o l’osservatore sono in movimento.",
-      "category": "Onde",
-      "icon": "🔊",
-      "order": 20,
-      "tags": [
-        "onde",
-        "frequenza",
-        "sorgente in moto",
-        "osservatore in moto",
-        "suono"
-      ],
-      "level": "intermedio",
-      "file": "Onde/Effetto Doppler.html"
-    },
-    {
-      "title": "Rifrazione",
-      "description": "Simulazione della rifrazione della luce tra mezzi diversi con visualizzazione degli angoli e del cambio di direzione.",
-      "category": "Ottica",
-      "icon": "↘",
-      "order": 10,
-      "tags": [
-        "rifrazione",
-        "luce",
-        "indice di rifrazione",
-        "legge di Snell",
-        "ottica geometrica"
-      ],
-      "level": "base",
-      "file": "Ottica/Rifrazione.html"
-    },
-    {
-      "title": "Specchi e Lenti",
-      "description": "Studio della formazione delle immagini con specchi e lenti attraverso la costruzione geometrica dei raggi principali.",
-      "category": "Ottica",
-      "icon": "🔍",
-      "order": 20,
-      "tags": [
-        "specchi",
-        "lenti",
-        "immagini",
-        "fuoco",
-        "ottica geometrica"
-      ],
-      "level": "base",
-      "file": "Ottica/Specchi e lenti.html"
-    }
-  ]
-}
+[
+  {
+    "title": "Elettrostatica",
+    "description": "Visualizzazione del campo elettrico generato da cariche puntiformi e studio delle forze elettrostatiche.",
+    "category": "Elettromagnetismo",
+    "icon": "⚡",
+    "order": 10,
+    "tags": [
+      "cariche elettriche",
+      "campo elettrico",
+      "forza elettrica",
+      "legge di Coulomb"
+    ],
+    "level": "intermedio"
+  },
+  {
+    "title": "Gravità",
+    "description": "Simulazione dell'interazione gravitazionale tra masse con visualizzazione delle forze e del moto risultante secondo la legge di gravitazione universale.",
+    "category": "Gravitazione",
+    "icon": "🪐",
+    "order": 10,
+    "tags": [
+      "gravità",
+      "forza gravitazionale",
+      "masse",
+      "orbite",
+      "legge di gravitazione universale"
+    ],
+    "level": "intermedio"
+  },
+  {
+    "title": "Conservazione dell'energia",
+    "description": "Visualizza le trasformazioni tra energia cinetica e potenziale.",
+    "category": "Meccanica",
+    "icon": "♻️",
+    "order": 80,
+    "tags": [
+      "energia",
+      "energia cinetica"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Principi della Dinamica",
+    "description": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
+    "category": "Meccanica",
+    "icon": "➡️⬅️",
+    "order": 50,
+    "tags": [
+      "dinamica",
+      "forza",
+      "massa",
+      "inerzia",
+      "leggi di Newton"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Indipendenza dei moti",
+    "description": "Esplora l’indipendenza dei moti simultanei.",
+    "category": "Meccanica",
+    "icon": "↔️↕️",
+    "order": 10,
+    "tags": [
+      "moti simultanei",
+      "moto orizzontale",
+      "moto verticale",
+      "composizione dei moti",
+      "cinematica"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Momento di una forza",
+    "description": "Esplorazione del momento di una forza e dell’equilibrio delle leve variando intensità della forza, posizione del fulcro e lunghezza del braccio.",
+    "category": "Meccanica",
+    "icon": "⚖",
+    "order": 70,
+    "tags": [
+      "momento di una forza",
+      "leve",
+      "equilibrio",
+      "fulcro",
+      "braccio della forza"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Moto Armonico",
+    "description": "Simulazione del moto armonico semplice con analisi di posizione, velocità, accelerazione, periodo e ampiezza.",
+    "category": "Meccanica",
+    "icon": "∿",
+    "order": 40,
+    "tags": [
+      "moto armonico semplice",
+      "oscillazioni",
+      "periodo",
+      "frequenza",
+      "ampiezza"
+    ],
+    "level": "intermedio"
+  },
+  {
+    "title": "Moto Circolare",
+    "description": "Studio del moto circolare uniforme con rappresentazione di velocità angolare, accelerazione centripeta e traiettoria.",
+    "category": "Meccanica",
+    "icon": "◯",
+    "order": 30,
+    "tags": [
+      "moto circolare uniforme",
+      "velocità angolare",
+      "accelerazione centripeta",
+      "periodo",
+      "traiettoria"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Moto Parabolico",
+    "description": "Simulazione del moto dei proiettili con traiettoria bidimensionale e analisi di velocità, tempo di volo e gittata.",
+    "category": "Meccanica",
+    "icon": "➶",
+    "order": 20,
+    "tags": [
+      "moto parabolico",
+      "lancio di proiettili",
+      "gittata",
+      "tempo di volo",
+      "composizione dei moti"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Moto rettilineo uniforme",
+    "description": "Visualizza il moto di uno o due corpi con velocità costante e osserva la relazione lineare tra posizione e tempo attraverso grafici sincronizzati.",
+    "category": "Meccanica",
+    "icon": "➡️",
+    "order": 1,
+    "tags": [
+      "moto rettilineo",
+      "velocità costante",
+      "legge oraria",
+      "grafico posizione-tempo",
+      "cinematica"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Moto uniformemente accelerato",
+    "description": "Simulazione interattiva del moto uniformemente accelerato in una dimensione, con visualizzazione sincronizzata del moto dell’oggetto e dei grafici posizione-tempo e velocità-tempo. Include sia il caso lungo l’asse x sia il moto verticale sotto l’azione della gravità.",
+    "icon": "📈",
+    "order": 5,
+    "category": "Meccanica"
+  },
+  {
+    "title": "Piano inclinato",
+    "description": "Esplora il moto di un corpo su un piano inclinato variando angolo, massa, attrito e forza applicata. Osserva come cambiano accelerazione, velocità, forze lungo il piano e condizioni di equilibrio o di scorrimento.",
+    "category": "Meccanica",
+    "icon": "📐",
+    "order": 60,
+    "tags": [
+      "piano inclinato",
+      "forze",
+      "attrito",
+      "accelerazione",
+      "seconda legge di Newton"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Effetto Doppler",
+    "description": "Esplora come la frequenza osservata di un’onda cambia quando la sorgente e/o l’osservatore sono in movimento.",
+    "category": "Onde",
+    "icon": "🔊",
+    "order": 20,
+    "tags": [
+      "onde",
+      "frequenza",
+      "sorgente in moto",
+      "osservatore in moto",
+      "suono"
+    ],
+    "level": "intermedio"
+  },
+  {
+    "title": "Interferenza",
+    "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
+    "category": "Onde",
+    "icon": "≈",
+    "order": 10,
+    "tags": [
+      "interferenza",
+      "diffrazione",
+      "sovrapposizione",
+      "onde",
+      "interferenza costruttiva",
+      "interferenza distruttiva"
+    ],
+    "level": "intermedio"
+  },
+  {
+    "title": "Rifrazione",
+    "description": "Simulazione della rifrazione della luce tra mezzi diversi con visualizzazione degli angoli e del cambio di direzione.",
+    "category": "Ottica",
+    "icon": "↘",
+    "order": 10,
+    "tags": [
+      "rifrazione",
+      "luce",
+      "indice di rifrazione",
+      "legge di Snell",
+      "ottica geometrica"
+    ],
+    "level": "base"
+  },
+  {
+    "title": "Specchi e Lenti",
+    "description": "Studio della formazione delle immagini con specchi e lenti attraverso la costruzione geometrica dei raggi principali.",
+    "category": "Ottica",
+    "icon": "🔍",
+    "order": 20,
+    "tags": [
+      "specchi",
+      "lenti",
+      "immagini",
+      "fuoco",
+      "ottica geometrica"
+    ],
+    "level": "base"
+  }
+]

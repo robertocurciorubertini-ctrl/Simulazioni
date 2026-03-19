@@ -184,8 +184,8 @@
 
   <section class="hero">
     <div class="eyebrow">Sezione teorica</div>
-    <h1>Meccanica</h1>
-    <p>
+    <h1 id="sectionTitle">Meccanica</h1>
+    <p id="sectionDescription">
       Sezione dedicata ai principali modelli della meccanica classica.
       I contenuti collegano formalismo teorico, interpretazione fisica e simulazioni.
     </p>
@@ -194,50 +194,149 @@
   <section>
     <h2 class="section-title">Argomenti</h2>
 
-    <div class="topics-grid">
+    <div id="topicsGrid" class="topics-grid">
 
       <div class="topic-card">
-        <h3>Moto rettilineo uniforme</h3>
+        <h3>Caricamento in corso</h3>
         <p>
-          Moto lungo una traiettoria rettilinea con velocità costante.
-          Introduzione alla legge oraria e all’interpretazione grafica.
+          Gli argomenti disponibili verranno letti automaticamente da <code>../theory.json</code>.
         </p>
-        <a class="btn btn-primary" href="moto-rettilineo-uniforme.html">Apri contenuto</a>
-      </div>
-
-      <div class="topic-card">
-        <h3>Moto uniformemente accelerato</h3>
-        <p>
-          Studio del moto con accelerazione costante e analisi delle leggi cinematiche.
-        </p>
-        <div class="btn btn-disabled">In sviluppo</div>
-      </div>
-
-      <div class="topic-card">
-        <h3>Caduta libera</h3>
-        <p>
-          Caso particolare di moto uniformemente accelerato in campo gravitazionale.
-        </p>
-        <div class="btn btn-disabled">In sviluppo</div>
-      </div>
-
-      <div class="topic-card">
-        <h3>Moto parabolico</h3>
-        <p>
-          Composizione dei moti e traiettoria bidimensionale.
-        </p>
-        <div class="btn btn-disabled">In sviluppo</div>
+        <div class="btn btn-disabled">Attendere</div>
       </div>
 
     </div>
   </section>
 
-  <div class="note">
-    Questa pagina funge da indice della sezione.  
+  <div id="noteBox" class="note">
+    Questa pagina funge da indice della sezione.
     Ogni argomento collegherà teoria e simulazioni corrispondenti.
   </div>
 
 </main>
+
+<script>
+const SECTION_SLUG = "meccanica";
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function buildTopicCard(topic) {
+  const title = escapeHtml(topic.title || "Argomento");
+  const description = escapeHtml(topic.description || "Contenuto teorico disponibile.");
+  const file = String(topic.file || "");
+  const level = String(topic.level || "").trim();
+
+  const isCurrentIndex = file.toLowerCase().endsWith("/index.html") || file.toLowerCase() === "index.html";
+  const isAvailable = file && !isCurrentIndex;
+
+  const actionHtml = isAvailable
+    ? `<a class="btn btn-primary" href="../${escapeHtml(file)}">Apri contenuto</a>`
+    : `<div class="btn btn-disabled">In sviluppo</div>`;
+
+  const levelHtml = level
+    ? `<div class="btn btn-disabled" style="width: fit-content; cursor: default;">Livello: ${escapeHtml(level)}</div>`
+    : "";
+
+  return `
+    <div class="topic-card">
+      <h3>${title}</h3>
+      <p>${description}</p>
+      ${levelHtml}
+      ${actionHtml}
+    </div>
+  `;
+}
+
+async function loadSectionIndex() {
+  const titleEl = document.getElementById("sectionTitle");
+  const descriptionEl = document.getElementById("sectionDescription");
+  const topicsGrid = document.getElementById("topicsGrid");
+  const noteBox = document.getElementById("noteBox");
+
+  try {
+    const response = await fetch("../theory.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const sections = Array.isArray(data.sections) ? data.sections : [];
+    const section = sections.find(s => String(s.slug || "").toLowerCase() === SECTION_SLUG);
+
+    if (!section) {
+      topicsGrid.innerHTML = `
+        <div class="topic-card">
+          <h3>Sezione non trovata</h3>
+          <p>
+            La sezione <code>${escapeHtml(SECTION_SLUG)}</code> non è presente in <code>../theory.json</code>.
+          </p>
+          <div class="btn btn-disabled">Verifica necessaria</div>
+        </div>
+      `;
+      noteBox.innerHTML = `
+        Questa pagina non ha trovato una sezione compatibile nel catalogo teorico.
+      `;
+      return;
+    }
+
+    titleEl.textContent = section.title || "Sezione teorica";
+    descriptionEl.textContent = section.description || "Sezione teorica disponibile nel catalogo.";
+
+    const topics = Array.isArray(section.topics) ? section.topics : [];
+    const visibleTopics = topics.filter(topic => {
+      const file = String(topic.file || "").toLowerCase();
+      return !(file === "index.html" || file.endsWith("/index.html"));
+    });
+
+    if (!visibleTopics.length) {
+      topicsGrid.innerHTML = `
+        <div class="topic-card">
+          <h3>Nessun argomento disponibile</h3>
+          <p>
+            La sezione è presente nel catalogo, ma non contiene ancora pagine teoriche consultabili.
+          </p>
+          <div class="btn btn-disabled">In sviluppo</div>
+        </div>
+      `;
+      noteBox.innerHTML = `
+        Questa pagina funge da indice della sezione.
+        Gli argomenti compariranno automaticamente quando saranno presenti nel file <code>../theory.json</code>.
+      `;
+      return;
+    }
+
+    topicsGrid.innerHTML = visibleTopics.map(buildTopicCard).join("");
+
+    const count = visibleTopics.length;
+    noteBox.innerHTML = `
+      Questa pagina funge da indice della sezione.
+      Attualmente sono disponibili ${count} ${count === 1 ? "argomento" : "argomenti"} teorici nel catalogo dinamico.
+    `;
+  } catch (error) {
+    topicsGrid.innerHTML = `
+      <div class="topic-card">
+        <h3>Errore nel caricamento</h3>
+        <p>
+          Non è stato possibile leggere <code>../theory.json</code>. Verifica che il file sia presente e valido.
+        </p>
+        <div class="btn btn-disabled">Errore</div>
+      </div>
+    `;
+    noteBox.innerHTML = `
+      Si è verificato un errore durante il caricamento del catalogo della sezione.
+    `;
+    console.error(error);
+  }
+}
+
+loadSectionIndex();
+</script>
 
 </body>
 </html>

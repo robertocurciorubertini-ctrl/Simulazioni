@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meccanica - Teoria di Fisica</title>
+  <style>
+    :root{
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --surface-2: #eef2f7;
+      --text: #1f2937;
+      --muted: #5b6472;
+      --border: #d7deea;
+      --primary: #1d4ed8;
+      --primary-dark: #163ea8;
+      --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --maxw: 1180px;
+    }
+
+    *{
+      box-sizing: border-box;
+    }
+
+    html, body{
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    a{
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(246, 248, 251, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-link{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-weight: 600;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .back-link:hover{
+      transform: translateY(-1px);
+      background: var(--surface-2);
+    }
+
+    .page{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .hero{
+      background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 34px 28px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow{
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1e3a8a;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    h1{
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.08;
+    }
+
+    .hero p{
+      margin: 0;
+      max-width: 850px;
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.7;
+    }
+
+    .section-title{
+      margin: 0 0 16px;
+      font-size: 1.5rem;
+    }
+
+    .topics-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .topic-card{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 220px;
+    }
+
+    .topic-card h3{
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .topic-card p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      flex-grow: 1;
+    }
+
+    .topic-actions{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-1px);
+    }
+
+    .btn-primary{
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover{
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary{
+      background: var(--surface-2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-disabled{
+      background: #f3f4f6;
+      color: #8a93a3;
+      border: 1px solid #e5e7eb;
+      cursor: default;
+    }
+
+    .note{
+      margin-top: 28px;
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .note strong{
+      color: var(--text);
+    }
+
+    @media (max-width: 640px){
+      .hero{
+        padding: 26px 20px;
+      }
+
+      .topic-card{
+        min-height: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="back-link" href="../index.html">← Teoria</a>
+      <a class="back-link" href="../../index.html">Simulazioni</a>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Sezione teorica</div>
+      <h1>Meccanica</h1>
+      <p>
+        Sezione dedicata ai principali argomenti della meccanica classica.
+        Qui troverai richiami teorici, definizioni, leggi fisiche, relazioni matematiche
+        e collegamenti alle simulazioni interattive corrispondenti.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="section-title">Argomenti della sezione</h2>
+
+      <div class="topics-grid">
+        <article class="topic-card">
+          <h3>Moto rettilineo uniforme</h3>
+          <p>
+            Studio del moto lungo una traiettoria rettilinea con velocità costante.
+            Introduzione alla legge oraria, al significato della velocità e
+            all’interpretazione del grafico posizione-tempo.
+          </p>
+          <div class="topic-actions">
+            <a class="btn btn-primary" href="moto-rettilineo-uniforme.html">Apri contenuto</a>
+          </div>
+        </article>
+
+        <article class="topic-card">
+          <h3>Moto uniformemente accelerato</h3>
+          <p>
+            Analisi del moto con accelerazione costante, con particolare attenzione
+            alle leggi cinematiche e ai grafici posizione-tempo e velocità-tempo.
+          </p>
+          <div class="topic-actions">
+            <span class="btn btn-disabled">In sviluppo</span>
+          </div>
+        </article>
+
+        <article class="topic-card">
+          <h3>Caduta libera</h3>
+          <p>
+            Applicazione del moto uniformemente accelerato al caso di un corpo soggetto
+            alla sola accelerazione di gravità, in approssimazione di attrito trascurabile.
+          </p>
+          <div class="topic-actions">
+            <span class="btn btn-disabled">In sviluppo</span>
+          </div>
+        </article>
+
+        <article class="topic-card">
+          <h3>Moto parabolico</h3>
+          <p>
+            Composizione tra moto orizzontale uniforme e moto verticale uniformemente accelerato,
+            con analisi della traiettoria e della dipendenza dalle condizioni iniziali.
+          </p>
+          <div class="topic-actions">
+            <span class="btn btn-disabled">In sviluppo</span>
+          </div>
+        </article>
+
+        <article class="topic-card">
+          <h3>Principi della dinamica</h3>
+          <p>
+            Introduzione alle leggi di Newton, al concetto di forza, di inerzia e
+            alla relazione tra forza risultante, massa e accelerazione.
+          </p>
+          <div class="topic-actions">
+            <span class="btn btn-disabled">In sviluppo</span>
+          </div>
+        </article>
+
+        <article class="topic-card">
+          <h3>Lavoro ed energia</h3>
+          <p>
+            Studio delle grandezze energetiche fondamentali, del lavoro di una forza
+            e dei principi di conservazione applicati ai sistemi meccanici.
+          </p>
+          <div class="topic-actions">
+            <span class="btn btn-disabled">In sviluppo</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div class="note">
+      <strong>Nota organizzativa.</strong> Questa pagina funziona come indice della sezione.
+      Ogni argomento può rimandare sia al contenuto teorico sia, in seguito, alla simulazione
+      corrispondente. Per ora puoi iniziare costruendo la prima pagina:
+      <code>moto-rettilineo-uniforme.html</code>.
+    </div>
+  </main>
+</body>
+</html>

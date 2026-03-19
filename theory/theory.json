@@ -1,0 +1,24 @@
+{
+  "sections": [
+    {
+      "title": "Meccanica",
+      "slug": "meccanica",
+      "description": "",
+      "order": 1,
+      "topics": [
+        {
+          "title": "Moto rettilineo uniforme",
+          "file": "meccanica/moto-rettilineo-uniforme.html",
+          "description": "Definizione, legge oraria e rappresentazione grafica del moto rettilineo uniforme.",
+          "order": 1,
+          "level": "base",
+          "tags": [
+            "cinematica",
+            "velocità costante",
+            "legge oraria"
+          ]
+        }
+      ]
+    }
+  ]
+}

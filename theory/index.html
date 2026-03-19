@@ -1,355 +1,354 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Teoria di Fisica</title>
-<style>
-:root {
---bg-1: #07111f;
---bg-2: #0d1b2a;
---bg-3: #10263d;
---card: rgba(255, 255, 255, 0.08);
---card-border: rgba(255, 255, 255, 0.14);
---panel: rgba(255, 255, 255, 0.05);
---text: #eaf2ff;
---muted: #b8c7e6;
---accent: #61dafb;
---accent-2: #7ef0c7;
---shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teoria di Fisica</title>
+  <style>
+    :root {
+      --bg-1: #07111f;
+      --bg-2: #0d1b2a;
+      --bg-3: #10263d;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.14);
+      --panel: rgba(255, 255, 255, 0.05);
+      --text: #eaf2ff;
+      --muted: #b8c7e6;
+      --accent: #61dafb;
+      --accent-2: #7ef0c7;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
 
-* { box-sizing: border-box; }
+    * { box-sizing: border-box; }
 
-body {
-margin: 0;
-min-height: 100vh;
-font-family: "Segoe UI", Arial, sans-serif;
-color: var(--text);
-background:
-radial-gradient(circle at top left, rgba(97, 218, 251, 0.15), transparent 30%),
-radial-gradient(circle at top right, rgba(126, 240, 199, 0.12), transparent 25%),
-linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
-overflow-x: hidden;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(97, 218, 251, 0.15), transparent 30%),
+        radial-gradient(circle at top right, rgba(126, 240, 199, 0.12), transparent 25%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+      overflow-x: hidden;
+    }
 
-.stars {
-position: fixed;
-inset: 0;
-pointer-events: none;
-opacity: 0.35;
-background-image:
-radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
-radial-gradient(2px 2px at 140px 80px, #ffffff, transparent),
-radial-gradient(1.5px 1.5px at 300px 120px, #ffffff, transparent),
-radial-gradient(2px 2px at 500px 40px, #ffffff, transparent),
-radial-gradient(1.5px 1.5px at 700px 150px, #ffffff, transparent),
-radial-gradient(2px 2px at 900px 70px, #ffffff, transparent),
-radial-gradient(1.5px 1.5px at 1100px 180px, #ffffff, transparent);
-background-size: 1200px 300px;
-animation: drift 20s linear infinite;
-}
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+        radial-gradient(2px 2px at 140px 80px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 300px 120px, #ffffff, transparent),
+        radial-gradient(2px 2px at 500px 40px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 700px 150px, #ffffff, transparent),
+        radial-gradient(2px 2px at 900px 70px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 1100px 180px, #ffffff, transparent);
+      background-size: 1200px 300px;
+      animation: drift 20s linear infinite;
+    }
 
-@keyframes drift {
-from { transform: translateY(0); }
-to { transform: translateY(30px); }
-}
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(30px); }
+    }
 
-.container {
-width: min(1200px, calc(100% - 32px));
-margin: 0 auto;
-padding: 48px 0 64px;
-position: relative;
-z-index: 1;
-}
+    .container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 64px;
+      position: relative;
+      z-index: 1;
+    }
 
-.top-nav {
-display: flex;
-justify-content: flex-start;
-align-items: center;
-margin-bottom: 18px;
-padding: 0 6px;
-}
+    .top-nav {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 0 6px;
+    }
 
-.top-link {
-display: inline-flex;
-align-items: center;
-gap: 10px;
-padding: 10px 16px;
-border-radius: 999px;
-text-decoration: none;
-color: var(--text);
-font-weight: 600;
-border: 1px solid rgba(255,255,255,0.14);
-background: rgba(255,255,255,0.06);
-backdrop-filter: blur(8px);
-transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
+    .top-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
 
-.top-link:hover {
-transform: translateY(-1px);
-border-color: rgba(97, 218, 251, 0.35);
-background: rgba(97, 218, 251, 0.08);
-}
+    .top-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(97, 218, 251, 0.35);
+      background: rgba(97, 218, 251, 0.08);
+    }
 
-.hero {
-text-align: center;
-padding: 26px 16px 10px;
-}
+    .hero {
+      text-align: center;
+      padding: 26px 16px 10px;
+    }
 
-.hero-badge {
-display: inline-block;
-padding: 8px 14px;
-border: 1px solid rgba(97, 218, 251, 0.35);
-border-radius: 999px;
-background: rgba(97, 218, 251, 0.08);
-color: var(--accent);
-font-size: 0.9rem;
-letter-spacing: 0.04em;
-margin-bottom: 18px;
-backdrop-filter: blur(8px);
-}
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid rgba(97, 218, 251, 0.35);
+      border-radius: 999px;
+      background: rgba(97, 218, 251, 0.08);
+      color: var(--accent);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+      backdrop-filter: blur(8px);
+    }
 
-h1 {
-margin: 0;
-font-size: clamp(2.2rem, 5vw, 4rem);
-font-weight: 700;
-letter-spacing: 0.02em;
-text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
 
-.subtitle {
-max-width: 860px;
-margin: 18px auto 0;
-font-size: 1.08rem;
-line-height: 1.7;
-color: var(--muted);
-}
+    .subtitle {
+      max-width: 860px;
+      margin: 18px auto 0;
+      font-size: 1.08rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
 
-.layout {
-margin-top: 28px;
-display: grid;
-grid-template-columns: 300px minmax(0, 1fr);
-gap: 22px;
-align-items: start;
-}
+    .layout {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
 
-.panel {
-padding: 24px;
-border: 1px solid var(--card-border);
-border-radius: 24px;
-background: var(--panel);
-backdrop-filter: blur(10px);
-box-shadow: var(--shadow);
-}
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
 
-.panel h2 {
-margin: 0 0 14px;
-font-size: 1.2rem;
-}
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+    }
 
-.panel p {
-margin: 0;
-color: var(--muted);
-line-height: 1.7;
-}
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
 
-.toc {
-display: grid;
-gap: 10px;
-}
+    .toc {
+      display: grid;
+      gap: 10px;
+    }
 
-.toc a {
-text-decoration: none;
-color: var(--text);
-padding: 12px 14px;
-border-radius: 14px;
-border: 1px solid rgba(255,255,255,0.1);
-background: rgba(255,255,255,0.04);
-transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
+    .toc a {
+      text-decoration: none;
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
 
-.toc a:hover {
-transform: translateY(-1px);
-border-color: rgba(97, 218, 251, 0.35);
-background: rgba(97, 218, 251, 0.08);
-}
+    .toc a:hover {
+      transform: translateY(-1px);
+      border-color: rgba(97, 218, 251, 0.35);
+      background: rgba(97, 218, 251, 0.08);
+    }
 
-.toc small {
-display: block;
-margin-top: 4px;
-color: var(--muted);
-line-height: 1.5;
-}
+    .toc small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
 
-.section-grid {
-display: grid;
-gap: 18px;
-}
+    .section-grid {
+      display: grid;
+      gap: 18px;
+    }
 
-.topic-card {
-border-radius: 20px;
-padding: 20px;
-border: 1px solid var(--card-border);
-background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
-box-shadow: var(--shadow);
-}
+    .topic-card {
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid var(--card-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      box-shadow: var(--shadow);
+    }
 
-.topic-head {
-display: flex;
-justify-content: space-between;
-gap: 14px;
-align-items: flex-start;
-flex-wrap: wrap;
-margin-bottom: 10px;
-}
+    .topic-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
 
-.topic-card h3 {
-margin: 0;
-font-size: 1.18rem;
-}
+    .topic-card h3 {
+      margin: 0;
+      font-size: 1.18rem;
+    }
 
-.pill {
-padding: 8px 12px;
-border-radius: 999px;
-background: rgba(97, 218, 251, 0.08);
-border: 1px solid rgba(97, 218, 251, 0.18);
-color: var(--accent);
-font-size: 0.88rem;
-white-space: nowrap;
-}
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(97, 218, 251, 0.08);
+      border: 1px solid rgba(97, 218, 251, 0.18);
+      color: var(--accent);
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
 
-.topic-card p {
-margin: 0 0 14px;
-color: var(--muted);
-line-height: 1.7;
-}
+    .topic-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
 
-.topic-links {
-display: flex;
-flex-wrap: wrap;
-gap: 10px;
-}
+    .topic-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-.topic-link {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-padding: 10px 14px;
-border-radius: 12px;
-text-decoration: none;
-color: var(--text);
-font-weight: 600;
-border: 1px solid rgba(255,255,255,0.12);
-background: rgba(255,255,255,0.06);
-}
+    .topic-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+    }
 
-.topic-link.primary {
-color: #00141f;
-background: linear-gradient(135deg, var(--accent), var(--accent-2));
-border: none;
-}
+    .topic-link.primary {
+      color: #00141f;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+    }
 
-.footer {
-text-align: center;
-margin-top: 28px;
-color: var(--muted);
-font-size: 0.92rem;
-opacity: 0.9;
-}
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      opacity: 0.9;
+    }
 
-@media (max-width: 900px) {
-.layout {
-grid-template-columns: 1fr;
-}
-}
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
 
-@media (max-width: 760px) {
-.container {
-width: min(100% - 20px, 1200px);
-padding-top: 26px;
-}
-}
-</style>
+    @media (max-width: 760px) {
+      .container {
+        width: min(100% - 20px, 1200px);
+        padding-top: 26px;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="stars"></div>
+  <div class="stars"></div>
 
-<div class="container">
-<div class="top-nav">
-<a class="top-link" href="../index.html" aria-label="Vai alle simulazioni">Simulazioni</a>
-</div>
+  <div class="container">
+    <div class="top-nav">
+      <a class="top-link" href="../index.html" aria-label="Vai alle simulazioni">Simulazioni</a>
+    </div>
 
-<section class="hero">
-<div class="hero-badge">Sezione teorica</div>
-<h1>Teoria di Fisica</h1>
-<p class="subtitle">
+    <section class="hero">
+      <div class="hero-badge">Sezione teorica</div>
+      <h1>Teoria di Fisica</h1>
+      <p class="subtitle">
         Raccolta di contenuti teorici sui principali argomenti della fisica, con definizioni, leggi e modelli interpretativi.
-</p>
-</section>
+      </p>
+    </section>
 
-<section class="layout">
-<aside class="panel">
-<h2>Indice rapido</h2>
-<div class="toc">
-<a href="#meccanica">Meccanica<small>Moto, forze, energia, quantità di moto.</small></a>
-<a href="#onde">Onde e suono<small>Propagazione, sovrapposizione, effetto Doppler.</small></a>
-<a href="#ottica">Ottica<small>Riflessione, rifrazione, lenti e fenomeni ottici.</small></a>
-<a href="#come-usare">Come usare questa sezione<small>Collega teoria, esercizi e simulazioni.</small></a>
-</div>
-</aside>
+    <section class="layout">
+      <aside class="panel">
+        <h2>Indice rapido</h2>
+        <div class="toc">
+          <a href="#meccanica">Meccanica<small>Moto, forze, energia, quantità di moto.</small></a>
+          <a href="#onde">Onde e suono<small>Propagazione, sovrapposizione, effetto Doppler.</small></a>
+          <a href="#ottica">Ottica<small>Riflessione, rifrazione, lenti e fenomeni ottici.</small></a>
+          <a href="#come-usare">Come usare questa sezione<small>Collega teoria, esercizi e simulazioni.</small></a>
+        </div>
+      </aside>
 
-<div class="section-grid">
-        
-        <section class="topic-card" id="meccanica">
+      <div class="section-grid">
            <section class="topic-card" id="meccanica">
-<div class="topic-head">
-<h3>Meccanica</h3>
-<span class="pill">Argomento base</span>
-</div>
-<p>
- Raccolta di contenuti teorici sui principali argomenti della fisica, con definizioni, leggi e modelli interpretativi.</p>
-<div class="topic-links">
-<a class="topic-link primary" href="meccanica/index.html">Apri sezione</a>
-<a class="topic-link" href="../index.html">Vai alle simulazioni collegate</a>
-</div>
-</section>
+          <div class="topic-head">
+            <h3>Meccanica</h3>
+            <span class="pill">Argomento base</span>
+          </div>
+          <p>
+            Raccolta di contenuti teorici sui principali argomenti della fisica, con definizioni, leggi e modelli interpretativi.
+          </p>
+          <div class="topic-links">
+            <a class="topic-link primary" href="meccanica/index.html">Apri sezione</a>
+            <a class="topic-link" href="../index.html">Vai alle simulazioni collegate</a>
+          </div>
+        </section>
 
-<section class="topic-card" id="onde">
-<div class="topic-head">
-<h3>Onde e suono</h3>
-<span class="pill">In sviluppo</span>
-</div>
-<p>
-Qui puoi raccogliere teoria su onde meccaniche, grandezze caratteristiche, interferenza, diffrazione
-ed effetto Doppler, con collegamenti alle relative visualizzazioni interattive.
-</p>
-<div class="topic-links">
-<a class="topic-link primary" href="onde/index.html">Apri sezione</a>
-<a class="topic-link" href="../index.html">Vai alle simulazioni collegate</a>
-</div>
-</section>
+        <section class="topic-card" id="onde">
+          <div class="topic-head">
+            <h3>Onde e suono</h3>
+            <span class="pill">In sviluppo</span>
+          </div>
+          <p>
+            Qui puoi raccogliere teoria su onde meccaniche, grandezze caratteristiche, interferenza, diffrazione
+            ed effetto Doppler, con collegamenti alle relative visualizzazioni interattive.
+          </p>
+          <div class="topic-links">
+            <a class="topic-link primary" href="onde/index.html">Apri sezione</a>
+            <a class="topic-link" href="../index.html">Vai alle simulazioni collegate</a>
+          </div>
+        </section>
 
-<section class="topic-card" id="ottica">
-<div class="topic-head">
-<h3>Ottica</h3>
-<span class="pill">In sviluppo</span>
-</div>
-<p>
-Sezione pensata per riflessione, rifrazione, indice di rifrazione, angolo critico, lenti e costruzione delle immagini.
-Può ospitare sia richiami teorici sia schemi e diagrammi da affiancare alle simulazioni.
-</p>
-<div class="topic-links">
-<a class="topic-link primary" href="ottica/index.html">Apri sezione</a>
-<a class="topic-link" href="../index.html">Vai alle simulazioni collegate</a>
-</div>
-</section>
-</div>
-</section>
+        <section class="topic-card" id="ottica">
+          <div class="topic-head">
+            <h3>Ottica</h3>
+            <span class="pill">In sviluppo</span>
+          </div>
+          <p>
+            Sezione pensata per riflessione, rifrazione, indice di rifrazione, angolo critico, lenti e costruzione delle immagini.
+            Può ospitare sia richiami teorici sia schemi e diagrammi da affiancare alle simulazioni.
+          </p>
+          <div class="topic-links">
+            <a class="topic-link primary" href="ottica/index.html">Apri sezione</a>
+            <a class="topic-link" href="../index.html">Vai alle simulazioni collegate</a>
+          </div>
+        </section>
+      </div>
+    </section>
 
-<div class="footer">
-Archivio teorico collegato alle simulazioni interattive del sito
-</div>
-</div>
+    <div class="footer">
+      Archivio teorico collegato alle simulazioni interattive del sito
+    </div>
+  </div>
 </body>
 </html>

@@ -17,6 +17,20 @@
             "velocità costante",
             "legge oraria"
           ]
+        },
+        {
+          "title": "Moto uniformemente accelerato",
+          "file": "meccanica/moto-uniformemente-accelerato.html",
+          "description": "Teoria essenziale del moto uniformemente accelerato con definizione, formule principali e interpretazione grafica.",
+          "order": 5,
+          "level": "base",
+          "tags": [
+            "cinematica",
+            "accelerazione costante",
+            "grafici",
+            "legge oraria",
+            "velocità"
+          ]
         }
       ]
     }

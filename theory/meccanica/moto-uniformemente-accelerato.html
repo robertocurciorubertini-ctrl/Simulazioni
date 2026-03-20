@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Moto uniformemente accelerato</title>
+  <meta name="description" content="Introduzione teorica al moto uniformemente accelerato: definizione, leggi orarie, grafici fondamentali e interpretazione fisica dell'accelerazione costante." />
+
+  <script>
+window.THEORY_METADATA = {
+  "title": "Moto uniformemente accelerato",
+  "description": "Teoria essenziale del moto uniformemente accelerato con definizione, formule principali e interpretazione grafica.",
+  "section": "Meccanica",
+  "sectionSlug": "meccanica",
+  "order": 5,
+  "level": "base",
+  "tags": ["cinematica", "accelerazione costante", "grafici", "legge oraria", "velocità"]
+};
+</script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-2: #f1f5f9;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #2563eb;
+      --border: #e2e8f0;
+      --maxw: 1000px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .container {
+      width: min(92%, var(--maxw));
+      margin: 0 auto;
+      padding: 2.5rem 0 4rem;
+    }
+
+    .hero {
+      margin-bottom: 2rem;
+      padding: 1.8rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.2;
+      margin-top: 0;
+      color: #0f172a;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 0.8rem;
+    }
+
+    p { margin: 0.8rem 0; }
+
+    .lead {
+      font-size: 1.08rem;
+      color: #1e293b;
+      max-width: 70ch;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.4rem;
+      margin-top: 1.2rem;
+    }
+
+    .formula {
+      background: var(--panel-2);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.1rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+      font-size: 1.05rem;
+    }
+
+    .vars {
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    figure {
+      margin: 1.4rem 0;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem;
+    }
+
+    figure img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin: 0 auto;
+      background: #ffffff;
+    }
+
+    figcaption {
+      margin-top: 0.8rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    ul { padding-left: 1.2rem; }
+
+    li { margin: 0.5rem 0; }
+
+    .note {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .footer-link {
+      margin-top: 2rem;
+      display: inline-block;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <section class="hero">
+      <div class="eyebrow">Meccanica • Teoria</div>
+      <h1>Moto uniformemente accelerato</h1>
+      <p class="lead">
+        Il moto uniformemente accelerato è un moto rettilineo nel quale l’accelerazione rimane costante nel tempo.
+        Questo implica una variazione lineare della velocità e una variazione quadratica della posizione.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>1. Definizione</h2>
+
+      <div class="formula">a = costante</div>
+
+      <p class="vars">
+        a = accelerazione (m/s²)
+      </p>
+
+      <p>
+        L’accelerazione rappresenta la derivata della velocità rispetto al tempo. In questo caso il suo valore non varia.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>2. Velocità nel tempo</h2>
+
+      <div class="formula">
+        v(t) = v₀ + a t
+      </div>
+
+      <p class="vars">
+        v(t) = velocità al tempo t,
+        v₀ = velocità iniziale,
+        a = accelerazione,
+        t = tempo
+      </p>
+
+      <p>
+        Il grafico v–t è una retta con pendenza pari all’accelerazione.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>3. Legge oraria</h2>
+
+      <div class="formula">
+        s(t) = s₀ + v₀ t + (1/2) a t²
+      </div>
+
+      <p class="vars">
+        s(t) = posizione,
+        s₀ = posizione iniziale
+      </p>
+
+      <p>
+        Il termine quadratico implica che il grafico spazio-tempo è una parabola.
+      </p>
+
+      <figure>
+        <img src="./spazio-tempo.png" alt="Grafico spazio-tempo" />
+        <figcaption>Andamento parabolico della posizione nel tempo</figcaption>
+      </figure>
+    </section>
+
+    <section class="card">
+      <h2>4. Relazione senza tempo</h2>
+
+      <div class="formula">
+        v² = v₀² + 2 a (s - s₀)
+      </div>
+
+      <p>
+        Utile quando il tempo non è noto.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>5. Caso fisico: caduta libera</h2>
+
+      <div class="formula">
+        g ≈ 9.81 m/s²
+      </div>
+
+      <p>
+        In prossimità della superficie terrestre, l’accelerazione è circa costante.
+      </p>
+    </section>
+
+    <a class="footer-link" href="../index.html">← Torna indietro</a>
+
+  </main>
+</body>
+</html>

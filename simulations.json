@@ -213,7 +213,7 @@
       "title": "Suono",
       "description": "Esplora forme d'onda, spettro in frequenza, ADSR e armoniche superiori con audio interattivo.",
       "category": "Onde",
-      "icon": "🔊",
+      "icon": "🚑",
       "order": 5,
       "tags": [
         "suono",

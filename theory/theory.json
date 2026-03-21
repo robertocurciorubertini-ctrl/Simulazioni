@@ -33,6 +33,31 @@
           ]
         }
       ]
+    },
+    {
+      "title": "Ottica",
+      "slug": "ottica",
+      "description": "",
+      "order": 1,
+      "topics": [
+        {
+          "title": "Luce e fenomeni ottici",
+          "file": "ottica/luce.html",
+          "description": "Introduzione alla luce come onda elettromagnetica: riflessione, rifrazione, diffusione, dispersione, interferenza e diffrazione.",
+          "order": 1,
+          "level": "base",
+          "tags": [
+            "luce",
+            "ottica",
+            "riflessione",
+            "rifrazione",
+            "diffrazione",
+            "interferenza",
+            "dispersione",
+            "colore"
+          ]
+        }
+      ]
     }
   ]
 }

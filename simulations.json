@@ -210,6 +210,25 @@
       "file": "Meccanica/Conservazione energia.html"
     },
     {
+      "title": "Suono",
+      "description": "Esplora forme d'onda, spettro in frequenza, ADSR e armoniche superiori con audio interattivo.",
+      "category": "Onde",
+      "icon": "🔊",
+      "order": 5,
+      "tags": [
+        "suono",
+        "forme d'onda",
+        "frequenza",
+        "lunghezza d'onda",
+        "PWM",
+        "FFT",
+        "ADSR",
+        "armoniche"
+      ],
+      "level": "intermedio",
+      "file": "Onde/suono.html"
+    },
+    {
       "title": "Interferenza",
       "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
       "category": "Onde",

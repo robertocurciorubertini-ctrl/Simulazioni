@@ -50,22 +50,17 @@ def js_object_to_json(js_text: str) -> str:
     Converte un oggetto JavaScript semplice in JSON valido.
     Supporta chiavi non quotate e virgole finali.
     """
-    # Rimuove commenti // e /* ... */ per evitare problemi nel parsing
     js_text = re.sub(r"/\*.*?\*/", "", js_text, flags=re.DOTALL)
     js_text = re.sub(r"//.*", "", js_text)
 
-    # Inserisce le virgolette attorno alle chiavi non quotate
     js_text = re.sub(
-        r'([{\s,])([A-Za-z_][A-Za-z0-9_]*)\s*:',
+        r'([{\[,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:',
         r'\1"\2":',
         js_text
     )
 
-    # Rimuove eventuali trailing comma
     js_text = TRAILING_COMMA_PATTERN.sub(r"\1", js_text)
-
     return js_text
-
 
 def extract_metadata(html_path: Path) -> Dict[str, Any] | None:
     text = html_path.read_text(encoding="utf-8")

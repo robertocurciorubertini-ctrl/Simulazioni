@@ -40,7 +40,7 @@
         "legge di Coulomb"
       ],
       "level": "intermedio",
-      "file": "Elettro-Magnetismo/Elettrostatica.html"
+      "file": "elettro-magnetismo/elettrostatica.html"
     },
     {
       "title": "Gravità",
@@ -56,7 +56,7 @@
         "legge di gravitazione universale"
       ],
       "level": "intermedio",
-      "file": "Gravitazione/Gravità.html"
+      "file": "gravitazione/gravità.html"
     },
     {
       "title": "Moto rettilineo uniforme",
@@ -72,7 +72,7 @@
         "cinematica"
       ],
       "level": "base",
-      "file": "Meccanica/Moto rettilineo uniforme.html"
+      "file": "meccanica/moto-rettilineo-uniforme.html"
     },
     {
       "title": "Moto uniformemente accelerato",
@@ -80,7 +80,7 @@
       "icon": "📈",
       "order": 5,
       "category": "Meccanica",
-      "file": "Meccanica/Moto uniformemente accelerato.html",
+      "file": "meccanica/moto-uniformemente-accelerato.html",
       "tags": [],
       "level": ""
     },
@@ -98,7 +98,7 @@
         "cinematica"
       ],
       "level": "base",
-      "file": "Meccanica/Indipendenza moti.html"
+      "file": "meccanica/indipendenza-moti.html"
     },
     {
       "title": "Moto Parabolico",
@@ -114,7 +114,7 @@
         "composizione dei moti"
       ],
       "level": "base",
-      "file": "Meccanica/Moto parabolico.html"
+      "file": "meccanica/moto-parabolico.html"
     },
     {
       "title": "Moto Circolare",
@@ -130,7 +130,7 @@
         "traiettoria"
       ],
       "level": "base",
-      "file": "Meccanica/Moto circolare.html"
+      "file": "meccanica/moto-circolare.html"
     },
     {
       "title": "Moto Armonico",
@@ -146,7 +146,7 @@
         "ampiezza"
       ],
       "level": "intermedio",
-      "file": "Meccanica/Moto armonico.html"
+      "file": "meccanica/moto-armonico.html"
     },
     {
       "title": "Principi della Dinamica",
@@ -162,7 +162,7 @@
         "leggi di Newton"
       ],
       "level": "base",
-      "file": "Meccanica/Dinamica.html"
+      "file": "meccanica/dinamica.html"
     },
     {
       "title": "Piano inclinato",
@@ -178,7 +178,7 @@
         "seconda legge di Newton"
       ],
       "level": "base",
-      "file": "Meccanica/Piano inclinato.html"
+      "file": "meccanica/piano-inclinato.html"
     },
     {
       "title": "Momento di una forza",
@@ -194,7 +194,7 @@
         "braccio della forza"
       ],
       "level": "base",
-      "file": "Meccanica/Momento di una Forza.html"
+      "file": "meccanica/momento-di-una-forza.html"
     },
     {
       "title": "Conservazione dell'energia",
@@ -207,13 +207,13 @@
         "energia cinetica"
       ],
       "level": "base",
-      "file": "Meccanica/Conservazione energia.html"
+      "file": "meccanica/conservazione-energia.html"
     },
     {
       "title": "Suono",
       "description": "Esplora forme d'onda, spettro in frequenza, ADSR e armoniche superiori con audio interattivo.",
       "category": "Onde",
-      "icon": "🚑",
+      "icon": "🔊",
       "order": 5,
       "tags": [
         "suono",
@@ -226,7 +226,7 @@
         "armoniche"
       ],
       "level": "intermedio",
-      "file": "Onde/suono.html"
+      "file": "onde/suono.html"
     },
     {
       "title": "Interferenza",
@@ -243,13 +243,13 @@
         "interferenza distruttiva"
       ],
       "level": "intermedio",
-      "file": "Onde/Interferenza onde.html"
+      "file": "onde/Interferenza-onde.html"
     },
     {
       "title": "Effetto Doppler",
       "description": "Esplora come la frequenza osservata di un’onda cambia quando la sorgente e/o l’osservatore sono in movimento.",
       "category": "Onde",
-      "icon": "🔊",
+      "icon": "🚑",
       "order": 20,
       "tags": [
         "onde",
@@ -259,7 +259,7 @@
         "suono"
       ],
       "level": "intermedio",
-      "file": "Onde/Effetto Doppler.html"
+      "file": "onde/effetto-doppler.html"
     },
     {
       "title": "Rifrazione",
@@ -275,7 +275,7 @@
         "ottica geometrica"
       ],
       "level": "base",
-      "file": "Ottica/Rifrazione.html"
+      "file": "ottica/rifrazione.html"
     },
     {
       "title": "Specchi e Lenti",
@@ -291,7 +291,7 @@
         "ottica geometrica"
       ],
       "level": "base",
-      "file": "Ottica/Specchi e lenti.html"
+      "file": "ottica/specchi-e-lenti.html"
     }
   ]
 }

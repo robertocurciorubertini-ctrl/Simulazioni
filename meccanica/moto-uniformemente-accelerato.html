@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moto uniformemente accelerato</title>
+
+  <script>
+    window.SIM_METADATA = {
+      title: "Moto uniformemente accelerato",
+      description: "Simulazione interattiva del moto uniformemente accelerato in una dimensione, con visualizzazione sincronizzata del moto dell’oggetto e dei grafici posizione-tempo e velocità-tempo. Include sia il caso lungo l’asse x sia il moto verticale sotto l’azione della gravità.",
+      icon: "📈",
+      order: 5,
+      category: "Meccanica"
+    };
+  </script>
+
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --panel:#ffffff;
+      --panel-soft:#f8fbff;
+      --text:#162033;
+      --muted:#627086;
+      --border:#d8e1ee;
+      --accent:#2563eb;
+      --accent-soft:#dbeafe;
+      --green:#059669;
+      --green-soft:#d1fae5;
+      --red:#dc2626;
+      --red-soft:#fee2e2;
+      --grid:#e9eef6;
+      --shadow:0 10px 30px rgba(15,23,42,0.08);
+      --radius:20px;
+      --radius-sm:14px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter, Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, #eef5ff 0%, transparent 30%),
+        radial-gradient(circle at top right, #f8fbff 0%, transparent 26%),
+        var(--bg);
+    }
+
+    .wrap{
+      max-width:1450px;
+      margin:0 auto;
+      padding:22px;
+    }
+
+    .hero{
+      margin-bottom:18px;
+      padding:22px 24px;
+      border:1px solid var(--border);
+      border-radius:24px;
+      background:linear-gradient(135deg, #ffffff 0%, #f6faff 100%);
+      box-shadow:var(--shadow);
+    }
+
+    .hero-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .title-wrap{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .title-icon{
+      width:56px;
+      height:56px;
+      display:grid;
+      place-items:center;
+      border-radius:18px;
+      background:linear-gradient(135deg, #dbeafe, #eff6ff);
+      font-size:1.7rem;
+      border:1px solid #cfe0ff;
+    }
+
+    h1{
+      margin:0;
+      font-size:2rem;
+      line-height:1.05;
+    }
+
+    .subtitle{
+      margin-top:8px;
+      color:var(--muted);
+      line-height:1.5;
+      max-width:980px;
+    }
+
+    .hero-badges{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--border);
+      color:#334155;
+      font-size:0.92rem;
+      font-weight:600;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:355px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .controls{
+      padding:18px;
+      position:sticky;
+      top:18px;
+    }
+
+    .controls h2{
+      margin:0 0 14px 0;
+      font-size:1.08rem;
+    }
+
+    .section-card{
+      background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+      margin-bottom:14px;
+    }
+
+    .section-card h3{
+      margin:0 0 10px 0;
+      font-size:0.98rem;
+    }
+
+    .control-group{
+      margin-bottom:14px;
+    }
+
+    .control-group:last-child{
+      margin-bottom:0;
+    }
+
+    .control-group label{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      font-size:0.95rem;
+      font-weight:700;
+      margin-bottom:7px;
+    }
+
+    .mini-note{
+      color:var(--muted);
+      font-size:0.78rem;
+      font-weight:500;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color:var(--accent);
+      cursor:pointer;
+    }
+
+    select, button{
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#fff;
+      color:var(--text);
+      font-size:0.95rem;
+      padding:10px 12px;
+    }
+
+    select{
+      width:100%;
+      font-weight:600;
+    }
+
+    .value{
+      min-width:95px;
+      text-align:right;
+      font-variant-numeric:tabular-nums;
+      color:var(--accent);
+      font-weight:800;
+      font-size:0.95rem;
+    }
+
+    .btns{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+    }
+
+    button{
+      cursor:pointer;
+      font-weight:800;
+      transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+    }
+
+    .primary{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+      box-shadow:0 8px 18px rgba(37,99,235,0.2);
+    }
+
+    .secondary{
+      background:#eef4ff;
+      border-color:#cfe0ff;
+      color:var(--accent);
+    }
+
+    .ghost{
+      background:#fff;
+    }
+
+    .metrics{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .metric{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 11px;
+      background:var(--panel-soft);
+    }
+
+    .metric-label{
+      font-size:0.8rem;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .metric-value{
+      font-size:1rem;
+      font-weight:800;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .formula{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px 13px;
+      background:#fcfdff;
+    }
+
+    .formula-title{
+      font-size:0.88rem;
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .formula code{
+      display:block;
+      white-space:pre-wrap;
+      font-family:"Courier New", monospace;
+      font-size:0.9rem;
+      line-height:1.55;
+      color:#1e293b;
+    }
+
+    .warning{
+      margin-top:10px;
+      min-height:1.2em;
+      color:var(--red);
+      font-weight:800;
+      font-size:0.9rem;
+    }
+
+    .controls-note{
+      margin-top:10px;
+      font-size:0.86rem;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .main{
+      display:grid;
+      gap:18px;
+    }
+
+    .top-grid{
+      display:grid;
+      grid-template-columns:1.2fr 1fr;
+      gap:18px;
+    }
+
+    .bottom-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .canvas-panel{
+      padding:14px;
+    }
+
+    .panel-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+
+    .panel-title{
+      font-weight:800;
+      font-size:1rem;
+    }
+
+    .panel-tag{
+      font-size:0.8rem;
+      color:#3b82f6;
+      background:#eff6ff;
+      border:1px solid #dbeafe;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:700;
+    }
+
+    canvas{
+      display:block;
+      width:100%;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.97), rgba(250,252,255,0.97));
+      border:1px solid var(--border);
+      border-radius:18px;
+    }
+
+    .panel-note{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:0.89rem;
+      line-height:1.5;
+    }
+
+    .didactic{
+      padding:4px 2px 2px 2px;
+      line-height:1.7;
+      color:#263244;
+    }
+
+    .didactic p{
+      margin:0 0 13px 0;
+    }
+
+    .didactic p:last-child{
+      margin-bottom:0;
+    }
+
+    .pill-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .pill{
+      padding:7px 11px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-size:0.84rem;
+      color:#334155;
+      font-weight:700;
+    }
+
+    @media (max-width:1200px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+
+      .controls{
+        position:relative;
+        top:auto;
+      }
+    }
+
+    @media (max-width:980px){
+      .top-grid,
+      .bottom-grid{
+        grid-template-columns:1fr;
+      }
+
+      .btns{
+        grid-template-columns:1fr;
+      }
+
+      .metrics{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width:640px){
+      .metrics{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="title-wrap">
+            <div>
+              <h1>Moto uniformemente accelerato</h1>
+              <div class="subtitle">
+                Simulazione interattiva di un moto in una dimensione con accelerazione costante.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <aside class="panel controls">
+        <h2>Controlli</h2>
+
+        <div class="section-card">
+          <h3>Impostazione del moto</h3>
+
+          <div class="control-group">
+            <label for="mode">Modalità</label>
+            <select id="mode">
+              <option value="x">Moto lungo x</option>
+              <option value="y">Moto verticale lungo y</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="s0">
+              <span>Posizione iniziale</span>
+              <span class="mini-note">\(x_0\) oppure \(y_0\)</span>
+            </label>
+            <div class="row">
+              <input type="range" id="s0" min="0" max="18" step="0.1" value="2">
+              <div class="value" id="s0Val">2.0 m</div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="v0">
+              <span>Velocità iniziale</span>
+              <span class="mini-note">\(v_0\)</span>
+            </label>
+            <div class="row">
+              <input type="range" id="v0" min="-20" max="20" step="0.1" value="4">
+              <div class="value" id="v0Val">4.0 m/s</div>
+            </div>
+          </div>
+
+          <div class="control-group" id="accGroup">
+            <label for="a">
+              <span>Accelerazione</span>
+              <span class="mini-note">solo lungo \(x\)</span>
+            </label>
+            <div class="row">
+              <input type="range" id="a" min="-12" max="12" step="0.1" value="2">
+              <div class="value" id="aVal">2.0 m/s²</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>Animazione</h3>
+          <div class="btns">
+            <button class="primary" id="playBtn">Avvia</button>
+            <button class="secondary" id="pauseBtn">Pausa</button>
+            <button class="ghost" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>Valori istantanei</h3>
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Tempo</div>
+              <div class="metric-value" id="tInfo">0.00 s</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label" id="sLabel">Posizione</div>
+              <div class="metric-value" id="sInfo">2.00 m</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label" id="vLabel">Velocità</div>
+              <div class="metric-value" id="vInfo">4.00 m/s</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label" id="aLabel">Accelerazione</div>
+              <div class="metric-value" id="aInfo">2.00 m/s²</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="formula">
+            <div class="formula-title">Equazioni del moto</div>
+            <code id="formulaText"></code>
+          </div>
+          <div class="warning" id="warningText"></div>
+          <div class="controls-note">
+            Nella modalità verticale si assume asse \(y\) positivo verso l’alto. Di conseguenza
+            l’accelerazione gravitazionale vale
+            \[
+            a_y=-g
+            \]
+            con
+            \[
+            g=9.81\ \mathrm{m/s^2}.
+            \]
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="top-grid">
+          <div class="panel canvas-panel">
+            <div class="panel-header">
+              <div class="panel-title">Simulazione del moto</div>
+              <div class="panel-tag">Scena fisica</div>
+            </div>
+            <canvas id="simCanvas" width="820" height="390"></canvas>
+            <div class="panel-note">
+              I punti semitrasparenti rappresentano posizioni dell’oggetto a intervalli di tempo uguali. Nel moto accelerato
+              le distanze tra punti successivi non restano costanti.
+            </div>
+          </div>
+
+          <div class="panel canvas-panel">
+            <div class="panel-header">
+              <div class="panel-title">Grafico posizione-tempo</div>
+              <div class="panel-tag">\(s(t)\)</div>
+            </div>
+            <canvas id="posCanvas" width="640" height="390"></canvas>
+            <div class="panel-note">
+              Il punto rosso segue l’istante attuale della simulazione. Per accelerazione costante il grafico della posizione è parabolico.
+            </div>
+          </div>
+        </section>
+
+        <section class="bottom-grid">
+          <div class="panel canvas-panel">
+            <div class="panel-header">
+              <div class="panel-title">Grafico velocità-tempo</div>
+              <div class="panel-tag">\(v(t)\)</div>
+            </div>
+            <canvas id="velCanvas" width="640" height="335"></canvas>
+            <div class="panel-note">
+              Con accelerazione costante la velocità varia linearmente nel tempo:
+              il grafico \(v(t)\) è una retta.
+            </div>
+          </div>
+
+          <div class="panel canvas-panel">
+            <div class="panel-header">
+              <div class="panel-title">Lettura didattica</div>
+              <div class="panel-tag">Interpretazione fisica</div>
+            </div>
+            <div class="didactic">
+              <p>
+                Nel moto uniformemente accelerato l’accelerazione è costante. Questo significa che, in intervalli di tempo uguali,
+                la velocità cambia sempre della stessa quantità.
+              </p>
+              <p>
+                Per questo motivo il grafico <strong>velocità-tempo</strong> è lineare:
+                \[
+                v(t)=v_0+at.
+                \]
+              </p>
+              <p>
+                La posizione invece dipende anche da un termine quadratico:
+                \[
+                s(t)=s_0+v_0 t+\frac{1}{2}at^2,
+                \]
+                quindi il grafico <strong>posizione-tempo</strong> ha andamento parabolico.
+              </p>
+              <p>
+                Nel moto verticale, se il verso positivo è verso l’alto, la gravità ha segno negativo. L’oggetto rallenta durante la salita,
+                si arresta all’altezza massima quando la velocità si annulla, poi ricade verso il suolo.
+              </p>
+            </div>
+
+            <div class="pill-row">
+              <div class="pill">accelerazione costante</div>
+              <div class="pill">parabola in \(s(t)\)</div>
+              <div class="pill">retta in \(v(t)\)</div>
+              <div class="pill">caduta verticale con gravità</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const g = 9.81;
+
+      const modeEl = document.getElementById("mode");
+      const s0El = document.getElementById("s0");
+      const v0El = document.getElementById("v0");
+      const aEl = document.getElementById("a");
+
+      const s0Val = document.getElementById("s0Val");
+      const v0Val = document.getElementById("v0Val");
+      const aVal = document.getElementById("aVal");
+
+      const playBtn = document.getElementById("playBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const resetBtn = document.getElementById("resetBtn");
+
+      const tInfo = document.getElementById("tInfo");
+      const sInfo = document.getElementById("sInfo");
+      const vInfo = document.getElementById("vInfo");
+      const aInfo = document.getElementById("aInfo");
+
+      const sLabel = document.getElementById("sLabel");
+      const vLabel = document.getElementById("vLabel");
+      const aLabel = document.getElementById("aLabel");
+      const warningText = document.getElementById("warningText");
+      const formulaText = document.getElementById("formulaText");
+      const accGroup = document.getElementById("accGroup");
+
+      const simCanvas = document.getElementById("simCanvas");
+      const posCanvas = document.getElementById("posCanvas");
+      const velCanvas = document.getElementById("velCanvas");
+
+      const simCtx = simCanvas.getContext("2d");
+      const posCtx = posCanvas.getContext("2d");
+      const velCtx = velCanvas.getContext("2d");
+
+      let running = false;
+      let t = 0;
+      let lastTs = null;
+
+      function fmt(x, digits = 2) {
+        return Number(x).toFixed(digits);
+      }
+
+      function currentMode() {
+        return modeEl.value;
+      }
+
+      function autoTimeMax(p) {
+        if (p.mode === "x") {
+          let scale = 8;
+          if (Math.abs(p.a) > 0.2) {
+            const tChar = Math.abs(p.v0 / p.a);
+            if (isFinite(tChar)) scale = Math.max(scale, 1.6 * tChar + 4);
+          }
+          return Math.max(6, Math.min(20, scale));
+        }
+
+        if (p.s0 <= 0 && p.v0 <= 0) return 3;
+
+        const A = 0.5 * p.a;
+        const B = p.v0;
+        const C = p.s0;
+        const disc = B * B - 4 * A * C;
+
+        if (disc < 0) return 8;
+
+        const r1 = (-B + Math.sqrt(disc)) / (2 * A);
+        const r2 = (-B - Math.sqrt(disc)) / (2 * A);
+        const candidates = [r1, r2].filter(x => x >= 0);
+
+        if (candidates.length === 0) return 8;
+
+        const tImpact = Math.max(...candidates);
+        return Math.max(3, Math.min(20, tImpact * 1.08));
+      }
+
+      function getParams() {
+        const mode = currentMode();
+        const s0 = parseFloat(s0El.value);
+        const v0 = parseFloat(v0El.value);
+        const a = (mode === "x") ? parseFloat(aEl.value) : -g;
+        const tMax = autoTimeMax({ mode, s0, v0, a });
+        return { mode, s0, v0, a, tMax };
+      }
+
+      function positionAt(time, p) {
+        return p.s0 + p.v0 * time + 0.5 * p.a * time * time;
+      }
+
+      function velocityAt(time, p) {
+        return p.v0 + p.a * time;
+      }
+
+      function maxUsefulTime(p) {
+        if (p.mode === "x") return p.tMax;
+
+        if (p.s0 <= 0 && p.v0 <= 0) return 0;
+
+        const A = 0.5 * p.a;
+        const B = p.v0;
+        const C = p.s0;
+        const disc = B * B - 4 * A * C;
+
+        if (disc < 0) return p.tMax;
+
+        const r1 = (-B + Math.sqrt(disc)) / (2 * A);
+        const r2 = (-B - Math.sqrt(disc)) / (2 * A);
+        const candidates = [r1, r2].filter(x => x >= 0);
+
+        if (candidates.length === 0) return p.tMax;
+        return Math.min(Math.max(...candidates), p.tMax);
+      }
+
+      function updateUI() {
+        const p = getParams();
+
+        s0Val.textContent = `${fmt(p.s0,1)} m`;
+        v0Val.textContent = `${fmt(p.v0,1)} m/s`;
+        aVal.textContent = `${fmt(p.a,1)} m/s²`;
+
+        const s = positionAt(t, p);
+        const v = velocityAt(t, p);
+
+        tInfo.textContent = `${fmt(t)} s`;
+        sInfo.textContent = `${fmt(s)} m`;
+        vInfo.textContent = `${fmt(v)} m/s`;
+        aInfo.textContent = `${fmt(p.a)} m/s²`;
+
+        if (p.mode === "x") {
+          sLabel.textContent = "Posizione x";
+          vLabel.textContent = "Velocità vx";
+          aLabel.textContent = "Accelerazione ax";
+          accGroup.style.opacity = "1";
+          accGroup.style.pointerEvents = "auto";
+          formulaText.textContent =
+`x(t) = x0 + v0 t + (1/2) a t²
+vx(t) = v0 + a t
+
+dove:
+x0 = posizione iniziale
+v0 = velocità iniziale lungo x
+a  = accelerazione costante lungo x`;
+          warningText.textContent = "";
+        } else {
+          sLabel.textContent = "Posizione y";
+          vLabel.textContent = "Velocità vy";
+          aLabel.textContent = "Accelerazione ay";
+          accGroup.style.opacity = "0.45";
+          accGroup.style.pointerEvents = "none";
+          formulaText.textContent =
+`y(t) = y0 + v0 t - (1/2) g t²
+vy(t) = v0 - g t
+
+dove:
+y0 = quota iniziale
+v0 = velocità iniziale verticale
+g  = accelerazione di gravità`;
+          warningText.textContent = "Modalità verticale: l’accelerazione è fissata dalla gravità.";
+        }
+      }
+
+      function resetSimulation() {
+        running = false;
+        t = 0;
+        lastTs = null;
+        redrawAll();
+      }
+
+      function getPositionRange(p) {
+        const n = 320;
+        let minS = Infinity;
+        let maxS = -Infinity;
+        const tEnd = maxUsefulTime(p);
+
+        for (let i = 0; i <= n; i++) {
+          const tt = tEnd * i / n;
+          const s = positionAt(tt, p);
+          minS = Math.min(minS, s);
+          maxS = Math.max(maxS, s);
+        }
+
+        if (p.mode === "y") {
+          minS = 0;
+          maxS = Math.max(maxS, p.s0, 1);
+        }
+
+        if (Math.abs(maxS - minS) < 1e-9) {
+          maxS += 1;
+          minS -= 1;
+        }
+
+        const pad = (p.mode === "y") ? 0.10 * (maxS - minS) : 0.12 * (maxS - minS);
+
+        return {
+          min: (p.mode === "y") ? 0 : minS - pad,
+          max: maxS + pad
+        };
+      }
+
+      function getVelocityRange(p) {
+        const n = 320;
+        let minV = Infinity;
+        let maxV = -Infinity;
+        const tEnd = maxUsefulTime(p);
+
+        for (let i = 0; i <= n; i++) {
+          const tt = tEnd * i / n;
+          const v = velocityAt(tt, p);
+          minV = Math.min(minV, v);
+          maxV = Math.max(maxV, v);
+        }
+
+        if (Math.abs(maxV - minV) < 1e-9) {
+          maxV += 1;
+          minV -= 1;
+        }
+
+        const pad = 0.18 * (maxV - minV);
+        return { min: minV - pad, max: maxV + pad };
+      }
+
+      function drawArrow(ctx, x1, y1, x2, y2, color, width = 3) {
+        const head = 10;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const ang = Math.atan2(dy, dx);
+
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - head * Math.cos(ang - Math.PI / 6), y2 - head * Math.sin(ang - Math.PI / 6));
+        ctx.lineTo(x2 - head * Math.cos(ang + Math.PI / 6), y2 - head * Math.sin(ang + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawGrid(ctx, left, top, right, bottom, xTicks = 8, yTicks = 6) {
+        ctx.save();
+        ctx.strokeStyle = "#e8eef7";
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= xTicks; i++) {
+          const x = left + (right - left) * i / xTicks;
+          ctx.beginPath();
+          ctx.moveTo(x, top);
+          ctx.lineTo(x, bottom);
+          ctx.stroke();
+        }
+
+        for (let i = 0; i <= yTicks; i++) {
+          const y = top + (bottom - top) * i / yTicks;
+          ctx.beginPath();
+          ctx.moveTo(left, y);
+          ctx.lineTo(right, y);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawAxesAndLabels(ctx, left, top, right, bottom, xLabel, yLabel) {
+        ctx.save();
+        ctx.strokeStyle = "#93a4ba";
+        ctx.lineWidth = 1.4;
+
+        ctx.beginPath();
+        ctx.moveTo(left, bottom);
+        ctx.lineTo(right, bottom);
+        ctx.moveTo(left, top);
+        ctx.lineTo(left, bottom);
+        ctx.stroke();
+
+        ctx.fillStyle = "#334155";
+        ctx.font = "13px Inter, Arial, sans-serif";
+        ctx.fillText(xLabel, right - 36, bottom - 9);
+
+        ctx.save();
+        ctx.translate(left + 15, top + 18);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(yLabel, 0, 0);
+        ctx.restore();
+
+        ctx.restore();
+      }
+
+      function drawPosGraph() {
+        const p = getParams();
+        const ctx = posCtx;
+        const w = posCanvas.width;
+        const h = posCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const m = { l: 60, r: 24, t: 26, b: 46 };
+        const left = m.l, right = w - m.r, top = m.t, bottom = h - m.b;
+
+        const sRange = getPositionRange(p);
+        const tEnd = maxUsefulTime(p);
+
+        drawGrid(ctx, left, top, right, bottom, 10, 8);
+        drawAxesAndLabels(ctx, left, top, right, bottom, "t (s)", p.mode === "x" ? "x (m)" : "y (m)");
+
+        const xMap = tt => left + (right - left) * (tt / Math.max(tEnd, 1e-6));
+        const yMap = ss => bottom - (bottom - top) * ((ss - sRange.min) / (sRange.max - sRange.min));
+
+        ctx.save();
+        const grad = ctx.createLinearGradient(left, top, right, bottom);
+        grad.addColorStop(0, "#1d4ed8");
+        grad.addColorStop(1, "#60a5fa");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 3.5;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        for (let i = 0; i <= 320; i++) {
+          const tt = tEnd * i / 320;
+          const ss = Math.max((p.mode === "y") ? 0 : -Infinity, positionAt(tt, p));
+          const x = xMap(tt);
+          const y = yMap(ss);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        const tDot = Math.min(t, tEnd);
+        const sDot = Math.max((p.mode === "y") ? 0 : -Infinity, positionAt(tDot, p));
+
+        ctx.save();
+        ctx.fillStyle = "#dc2626";
+        ctx.beginPath();
+        ctx.arc(xMap(tDot), yMap(sDot), 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.fillStyle = "#475569";
+        ctx.font = "12px Inter, Arial, sans-serif";
+        for (let i = 0; i <= 5; i++) {
+          const tt = tEnd * i / 5;
+          ctx.fillText(fmt(tt,1), xMap(tt) - 11, bottom + 20);
+        }
+        for (let i = 0; i <= 5; i++) {
+          const ss = sRange.min + (sRange.max - sRange.min) * i / 5;
+          ctx.fillText(fmt(ss,1), left - 44, yMap(ss) + 4);
+        }
+        ctx.restore();
+      }
+
+      function drawVelGraph() {
+        const p = getParams();
+        const ctx = velCtx;
+        const w = velCanvas.width;
+        const h = velCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const m = { l: 60, r: 24, t: 26, b: 46 };
+        const left = m.l, right = w - m.r, top = m.t, bottom = h - m.b;
+
+        const vRange = getVelocityRange(p);
+        const tEnd = maxUsefulTime(p);
+
+        drawGrid(ctx, left, top, right, bottom, 10, 8);
+        drawAxesAndLabels(ctx, left, top, right, bottom, "t (s)", p.mode === "x" ? "vx (m/s)" : "vy (m/s)");
+
+        const xMap = tt => left + (right - left) * (tt / Math.max(tEnd, 1e-6));
+        const yMap = vv => bottom - (bottom - top) * ((vv - vRange.min) / (vRange.max - vRange.min));
+
+        if (vRange.min < 0 && vRange.max > 0) {
+          const y0 = yMap(0);
+          ctx.save();
+          ctx.strokeStyle = "#94a3b8";
+          ctx.setLineDash([6, 6]);
+          ctx.beginPath();
+          ctx.moveTo(left, y0);
+          ctx.lineTo(right, y0);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        ctx.save();
+        const grad = ctx.createLinearGradient(left, top, right, bottom);
+        grad.addColorStop(0, "#059669");
+        grad.addColorStop(1, "#34d399");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 3.5;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        for (let i = 0; i <= 320; i++) {
+          const tt = tEnd * i / 320;
+          const vv = velocityAt(tt, p);
+          const x = xMap(tt);
+          const y = yMap(vv);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        const tDot = Math.min(t, tEnd);
+        const vDot = velocityAt(tDot, p);
+
+        ctx.save();
+        ctx.fillStyle = "#dc2626";
+        ctx.beginPath();
+        ctx.arc(xMap(tDot), yMap(vDot), 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.fillStyle = "#475569";
+        ctx.font = "12px Inter, Arial, sans-serif";
+        for (let i = 0; i <= 5; i++) {
+          const tt = tEnd * i / 5;
+          ctx.fillText(fmt(tt,1), xMap(tt) - 11, bottom + 20);
+        }
+        for (let i = 0; i <= 5; i++) {
+          const vv = vRange.min + (vRange.max - vRange.min) * i / 5;
+          ctx.fillText(fmt(vv,1), left - 46, yMap(vv) + 4);
+        }
+        ctx.restore();
+      }
+
+      function drawBackgroundSky(ctx, w, h) {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, "#f8fbff");
+        grad.addColorStop(1, "#eef5ff");
+        ctx.save();
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+      }
+
+      function drawSimulation() {
+        const p = getParams();
+        const ctx = simCtx;
+        const w = simCanvas.width;
+        const h = simCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const sRange = getPositionRange(p);
+        const tEnd = maxUsefulTime(p);
+        const s = positionAt(Math.min(t, tEnd), p);
+        const v = velocityAt(Math.min(t, tEnd), p);
+
+        drawBackgroundSky(ctx, w, h);
+
+        if (p.mode === "x") {
+          const left = 74, right = w - 56;
+          const axisY = h * 0.66;
+
+          ctx.save();
+          ctx.strokeStyle = "#9db0c8";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(left, axisY);
+          ctx.lineTo(right, axisY);
+          ctx.stroke();
+          ctx.restore();
+
+          for (let i = 0; i <= 10; i++) {
+            const x = left + (right - left) * i / 10;
+            ctx.save();
+            ctx.strokeStyle = "#c6d4e6";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(x, axisY - 10);
+            ctx.lineTo(x, axisY + 10);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          const mapS = val => left + (right - left) * ((val - sRange.min) / (sRange.max - sRange.min));
+
+          for (let i = 0; i <= 12; i++) {
+            const tt = tEnd * i / 12;
+            const ss = positionAt(tt, p);
+            const x = mapS(ss);
+            ctx.save();
+            ctx.fillStyle = "rgba(37,99,235,0.18)";
+            ctx.beginPath();
+            ctx.arc(x, axisY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          const xObj = mapS(s);
+          const yObj = axisY - 22;
+
+          ctx.save();
+          const grad = ctx.createLinearGradient(xObj - 18, yObj - 18, xObj + 18, yObj + 18);
+          grad.addColorStop(0, "#60a5fa");
+          grad.addColorStop(1, "#2563eb");
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.roundRect(xObj - 20, yObj - 20, 40, 40, 12);
+          ctx.fill();
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+
+          const velScale = 18;
+          const accScale = 10;
+
+          drawArrow(ctx, xObj, yObj - 38, xObj + v * velScale, yObj - 38, "#059669", 3.5);
+          drawArrow(ctx, xObj, yObj - 66, xObj + p.a * accScale, yObj - 66, "#dc2626", 3.5);
+
+          ctx.fillStyle = "#1f2937";
+          ctx.font = "13px Inter, Arial, sans-serif";
+          ctx.fillText("v", xObj + v * velScale + 8, yObj - 34);
+          ctx.fillText("a", xObj + p.a * accScale + 8, yObj - 62);
+          ctx.fillText("asse x", right - 48, axisY - 14);
+
+        } else {
+          const bottom = h - 48;
+          const top = 36;
+          const axisX = w * 0.42;
+
+          ctx.save();
+          ctx.strokeStyle = "#9db0c8";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(axisX, top);
+          ctx.lineTo(axisX, bottom);
+          ctx.stroke();
+          ctx.restore();
+
+          ctx.save();
+          ctx.strokeStyle = "#7b8796";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(axisX - 205, bottom);
+          ctx.lineTo(axisX + 205, bottom);
+          ctx.stroke();
+          ctx.restore();
+
+          ctx.save();
+          ctx.fillStyle = "#dbeafe";
+          ctx.fillRect(axisX - 205, bottom, 410, h - bottom);
+          ctx.restore();
+
+          for (let i = 0; i <= 10; i++) {
+            const y = bottom - (bottom - top) * i / 10;
+            ctx.save();
+            ctx.strokeStyle = "#c6d4e6";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(axisX - 10, y);
+            ctx.lineTo(axisX + 10, y);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          const yMaxForVisual = Math.max(p.s0, sRange.max, 1);
+          const mapS = val => bottom - (bottom - top) * (val / yMaxForVisual);
+
+          for (let i = 0; i <= 12; i++) {
+            const tt = tEnd * i / 12;
+            const ss = Math.max(0, positionAt(tt, p));
+            const y = mapS(ss);
+            ctx.save();
+            ctx.fillStyle = "rgba(37,99,235,0.18)";
+            ctx.beginPath();
+            ctx.arc(axisX, y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          const yObj = mapS(Math.max(0, s));
+          const xObj = axisX;
+
+          ctx.save();
+          const grad = ctx.createRadialGradient(xObj - 6, yObj - 8, 4, xObj, yObj, 22);
+          grad.addColorStop(0, "#93c5fd");
+          grad.addColorStop(1, "#2563eb");
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(xObj, yObj, 19, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+
+          const velScale = 10;
+          const accScale = 8;
+          drawArrow(ctx, xObj + 38, yObj, xObj + 38, yObj - v * velScale, "#059669", 3.5);
+          drawArrow(ctx, xObj + 68, yObj, xObj + 68, yObj - p.a * accScale, "#dc2626", 3.5);
+
+          ctx.fillStyle = "#1f2937";
+          ctx.font = "13px Inter, Arial, sans-serif";
+          ctx.fillText("v", xObj + 46, yObj - v * velScale - 8);
+          ctx.fillText("a", xObj + 76, yObj - p.a * accScale - 8);
+          ctx.fillText("asse y", axisX + 14, top + 14);
+          ctx.fillText("suolo", axisX + 215, bottom - 4);
+        }
+      }
+
+      function redrawAll() {
+        updateUI();
+        drawSimulation();
+        drawPosGraph();
+        drawVelGraph();
+      }
+
+      function animate(ts) {
+        if (!running) return;
+
+        if (lastTs == null) lastTs = ts;
+        const dt = Math.min((ts - lastTs) / 1000, 0.04);
+        lastTs = ts;
+
+        const p = getParams();
+        const tEnd = maxUsefulTime(p);
+
+        t += dt;
+
+        if (p.mode === "y") {
+          const s = positionAt(t, p);
+          if (s <= 0 && t > 0) {
+            t = tEnd;
+            running = false;
+          }
+        } else {
+          if (t >= tEnd) {
+            t = tEnd;
+            running = false;
+          }
+        }
+
+        redrawAll();
+
+        if (running) requestAnimationFrame(animate);
+      }
+
+      playBtn.addEventListener("click", () => {
+        if (!running) {
+          running = true;
+          lastTs = null;
+          requestAnimationFrame(animate);
+        }
+      });
+
+      pauseBtn.addEventListener("click", () => {
+        running = false;
+        lastTs = null;
+      });
+
+      resetBtn.addEventListener("click", resetSimulation);
+
+      [modeEl, s0El, v0El, aEl].forEach(el => {
+        el.addEventListener("input", () => {
+          if (currentMode() === "y" && parseFloat(s0El.value) < 0) s0El.value = 0;
+          resetSimulation();
+        });
+      });
+
+      resetSimulation();
+    })();
+  </script>
+</body>
+</html>

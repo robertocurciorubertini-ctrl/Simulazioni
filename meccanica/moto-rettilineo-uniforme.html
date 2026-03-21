@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moto rettilineo uniforme</title>
+<script>
+window.SIM_METADATA = {
+  title: "Moto rettilineo uniforme",
+  description: "Visualizza il moto di uno o due corpi con velocità costante e osserva la relazione lineare tra posizione e tempo attraverso grafici sincronizzati.",
+  category: "Meccanica",
+  icon: "➡️",
+  order: 1,
+  tags: ["moto rettilineo", "velocità costante", "legge oraria", "grafico posizione-tempo", "cinematica"],
+  level: "base"
+};
+</script>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --panel: #ffffff;
+    --panel2: #f8fafc;
+    --text: #111827;
+    --muted: #4b5563;
+    --border: #d1d5db;
+    --accent: #2563eb;
+    --accent2: #dc2626;
+    --ok: #059669;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .stack {
+    display: grid;
+    gap: 18px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+
+  .panel h2, .panel h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .controls {
+    display: grid;
+    gap: 12px;
+  }
+
+  .control-row {
+    display: grid;
+    gap: 6px;
+  }
+
+  .control-row label {
+    font-size: 0.95rem;
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
+
+  .inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .inline input[type="checkbox"] {
+    transform: translateY(1px);
+  }
+
+  .buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    border-radius: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  button:hover {
+    background: var(--panel2);
+  }
+
+  .readouts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .stat .label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .stat .value {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+
+  .theory p {
+    margin: 8px 0;
+    line-height: 1.45;
+  }
+
+  .formula {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: "Times New Roman", serif;
+    font-size: 1.08rem;
+    overflow-x: auto;
+  }
+
+  .note {
+    color: var(--muted);
+    font-size: 0.94rem;
+  }
+
+  @media (max-width: 980px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Moto rettilineo uniforme</h1>
+    <p class="subtitle">Osserva il moto di uno o due corpi lungo una retta e confronta animazione, legge oraria e grafici nel tempo.</p>
+  </header>
+
+  <div class="grid">
+    <div class="stack">
+      <section class="panel">
+        <h2>Scena del moto</h2>
+        <canvas id="motionCanvas" width="700" height="220"></canvas>
+        <div class="legend">
+          <span><span class="dot" style="background:#2563eb"></span>Corpo A</span>
+          <span><span class="dot" style="background:#dc2626"></span>Corpo B</span>
+          <span><span class="dot" style="background:#059669"></span>Punto di incontro</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Grafico posizione-tempo</h2>
+        <canvas id="graphX" width="700" height="280"></canvas>
+      </section>
+
+      <section class="panel">
+        <h2>Grafico velocità-tempo</h2>
+        <canvas id="graphV" width="700" height="220"></canvas>
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="panel controls">
+        <h2>Controlli</h2>
+
+        <div class="control-row">
+          <label for="x0A">Posizione iniziale corpo A, x<sub>0A</sub> = <strong><span id="x0AVal">0.0</span> m</strong></label>
+          <input type="range" id="x0A" min="-10" max="10" step="0.5" value="0">
+        </div>
+
+        <div class="control-row">
+          <label for="vA">Velocità corpo A, v<sub>A</sub> = <strong><span id="vAVal">2.0</span> m/s</strong></label>
+          <input type="range" id="vA" min="-6" max="6" step="0.5" value="2">
+        </div>
+
+        <div class="inline">
+          <label><input type="checkbox" id="secondBody"> Attiva secondo corpo</label>
+        </div>
+
+        <div id="secondBodyControls" style="display:none; gap:12px;">
+          <div class="control-row">
+            <label for="x0B">Posizione iniziale corpo B, x<sub>0B</sub> = <strong><span id="x0BVal">-4.0</span> m</strong></label>
+            <input type="range" id="x0B" min="-10" max="10" step="0.5" value="-4">
+          </div>
+
+          <div class="control-row">
+            <label for="vB">Velocità corpo B, v<sub>B</sub> = <strong><span id="vBVal">3.0</span> m/s</strong></label>
+            <input type="range" id="vB" min="-6" max="6" step="0.5" value="3">
+          </div>
+        </div>
+
+        <div class="control-row">
+          <label for="timeScale">Durata massima visualizzata = <strong><span id="timeScaleVal">10</span> s</strong></label>
+          <input type="range" id="timeScale" min="4" max="20" step="1" value="10">
+        </div>
+
+        <div class="buttons">
+          <button id="startBtn">Avvia</button>
+          <button id="pauseBtn">Pausa</button>
+          <button id="resetBtn">Reset</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Dati istantanei</h2>
+        <div class="readouts">
+          <div class="stat"><div class="label">Tempo</div><div class="value" id="tReadout">0.00 s</div></div>
+          <div class="stat"><div class="label">Posizione A</div><div class="value" id="xAReadout">0.00 m</div></div>
+          <div class="stat"><div class="label">Velocità A</div><div class="value" id="vAReadout">2.00 m/s</div></div>
+          <div class="stat"><div class="label">Spostamento A</div><div class="value" id="dxAReadout">0.00 m</div></div>
+          <div class="stat"><div class="label">Posizione B</div><div class="value" id="xBReadout">—</div></div>
+          <div class="stat"><div class="label">Velocità B</div><div class="value" id="vBReadout">—</div></div>
+          <div class="stat"><div class="label">Spostamento B</div><div class="value" id="dxBReadout">—</div></div>
+          <div class="stat"><div class="label">Incontro</div><div class="value" id="meetReadout">—</div></div>
+        </div>
+      </section>
+
+      <section class="panel theory">
+        <h2>Richiamo teorico</h2>
+        <p>Nel moto rettilineo uniforme un corpo si muove lungo una retta con velocità costante. In intervalli di tempo uguali compie spostamenti uguali.</p>
+        <div class="formula">x(t) = x<sub>0</sub> + v t</div>
+        <p>Qui <strong>x(t)</strong> è la posizione al tempo <strong>t</strong>, <strong>x<sub>0</sub></strong> è la posizione iniziale e <strong>v</strong> è la velocità costante.</p>
+        <p>Nel grafico posizione-tempo compare una retta. La sua pendenza coincide con la velocità. Nel grafico velocità-tempo, invece, compare una linea orizzontale perché la velocità non cambia nel tempo.</p>
+        <p class="note">Con due corpi attivi, l’intersezione tra le due rette nel grafico posizione-tempo rappresenta l’istante e la posizione di eventuale incontro.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const motionCanvas = document.getElementById('motionCanvas');
+  const motionCtx = motionCanvas.getContext('2d');
+  const graphXCanvas = document.getElementById('graphX');
+  const graphXCtx = graphXCanvas.getContext('2d');
+  const graphVCanvas = document.getElementById('graphV');
+  const graphVCtx = graphVCanvas.getContext('2d');
+
+  const x0AInput = document.getElementById('x0A');
+  const vAInput = document.getElementById('vA');
+  const x0BInput = document.getElementById('x0B');
+  const vBInput = document.getElementById('vB');
+  const secondBodyInput = document.getElementById('secondBody');
+  const secondBodyControls = document.getElementById('secondBodyControls');
+  const timeScaleInput = document.getElementById('timeScale');
+
+  const readouts = {
+    t: document.getElementById('tReadout'),
+    xA: document.getElementById('xAReadout'),
+    vA: document.getElementById('vAReadout'),
+    dxA: document.getElementById('dxAReadout'),
+    xB: document.getElementById('xBReadout'),
+    vB: document.getElementById('vBReadout'),
+    dxB: document.getElementById('dxBReadout'),
+    meet: document.getElementById('meetReadout')
+  };
+
+  const labels = {
+    x0A: document.getElementById('x0AVal'),
+    vA: document.getElementById('vAVal'),
+    x0B: document.getElementById('x0BVal'),
+    vB: document.getElementById('vBVal'),
+    timeScale: document.getElementById('timeScaleVal')
+  };
+
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  let simTime = 0;
+  let running = false;
+  let lastTimestamp = null;
+  const trailA = [];
+  const trailB = [];
+  const dtGraph = 0.05;
+
+  function fmt(n, digits = 2) {
+    return Number(n).toFixed(digits);
+  }
+
+  function getState() {
+    const x0A = parseFloat(x0AInput.value);
+    const vA = parseFloat(vAInput.value);
+    const activeB = secondBodyInput.checked;
+    const x0B = parseFloat(x0BInput.value);
+    const vB = parseFloat(vBInput.value);
+    const tMax = parseFloat(timeScaleInput.value);
+
+    const xA = x0A + vA * simTime;
+    const xB = x0B + vB * simTime;
+
+    return { x0A, vA, activeB, x0B, vB, tMax, xA, xB };
+  }
+
+  function updateDisplayedValues() {
+    labels.x0A.textContent = fmt(x0AInput.value, 1);
+    labels.vA.textContent = fmt(vAInput.value, 1);
+    labels.x0B.textContent = fmt(x0BInput.value, 1);
+    labels.vB.textContent = fmt(vBInput.value, 1);
+    labels.timeScale.textContent = timeScaleInput.value;
+    secondBodyControls.style.display = secondBodyInput.checked ? 'grid' : 'none';
+  }
+
+  function computeMeeting(x0A, vA, x0B, vB) {
+    const dv = vA - vB;
+    if (Math.abs(dv) < 1e-12) {
+      if (Math.abs(x0A - x0B) < 1e-12) {
+        return { type: 'coincidenti', t: 0, x: x0A };
+      }
+      return { type: 'mai' };
+    }
+
+    const t = (x0B - x0A) / dv;
+    const x = x0A + vA * t;
+    if (t < 0) return { type: 'passato', t, x };
+    return { type: 'futuro', t, x };
+  }
+
+  function updateReadouts() {
+    const s = getState();
+    readouts.t.textContent = `${fmt(simTime)} s`;
+    readouts.xA.textContent = `${fmt(s.xA)} m`;
+    readouts.vA.textContent = `${fmt(s.vA)} m/s`;
+    readouts.dxA.textContent = `${fmt(s.xA - s.x0A)} m`;
+
+    if (s.activeB) {
+      readouts.xB.textContent = `${fmt(s.xB)} m`;
+      readouts.vB.textContent = `${fmt(s.vB)} m/s`;
+      readouts.dxB.textContent = `${fmt(s.xB - s.x0B)} m`;
+      const meet = computeMeeting(s.x0A, s.vA, s.x0B, s.vB);
+      if (meet.type === 'coincidenti') {
+        readouts.meet.textContent = `Sovrapposti da t = 0 s`;
+      } else if (meet.type === 'mai') {
+        readouts.meet.textContent = `Nessun incontro`;
+      } else if (meet.type === 'passato') {
+        readouts.meet.textContent = `Incontro avvenuto per t < 0 s`;
+      } else {
+        readouts.meet.textContent = `t = ${fmt(meet.t)} s, x = ${fmt(meet.x)} m`;
+      }
+    } else {
+      readouts.xB.textContent = '—';
+      readouts.vB.textContent = '—';
+      readouts.dxB.textContent = '—';
+      readouts.meet.textContent = '—';
+    }
+  }
+
+  function worldBounds() {
+    const s = getState();
+    const positions = [s.x0A, s.xA, s.x0A + s.vA * s.tMax];
+    if (s.activeB) {
+      positions.push(s.x0B, s.xB, s.x0B + s.vB * s.tMax);
+      const meet = computeMeeting(s.x0A, s.vA, s.x0B, s.vB);
+      if (meet.type === 'futuro' && meet.t <= s.tMax) positions.push(meet.x);
+    }
+    let min = Math.min(...positions);
+    let max = Math.max(...positions);
+    if (Math.abs(max - min) < 1e-6) { min -= 1; max += 1; }
+    const pad = 0.15 * (max - min);
+    return { min: min - pad, max: max + pad };
+  }
+
+  function worldToCanvasX(x, bounds, width, padL, padR) {
+    return padL + (x - bounds.min) / (bounds.max - bounds.min) * (width - padL - padR);
+  }
+
+  function drawArrow(ctx, x1, y1, x2, y2, color) {
+    const head = 10;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const ang = Math.atan2(dy, dx);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - head * Math.cos(ang - Math.PI / 6), y2 - head * Math.sin(ang - Math.PI / 6));
+    ctx.lineTo(x2 - head * Math.cos(ang + Math.PI / 6), y2 - head * Math.sin(ang + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawMotionScene() {
+    const s = getState();
+    const ctx = motionCtx;
+    const w = motionCanvas.width;
+    const h = motionCanvas.height;
+    const padL = 50;
+    const padR = 20;
+    const axisY = 120;
+    const bounds = worldBounds();
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padL, axisY);
+    ctx.lineTo(w - padR, axisY);
+    ctx.stroke();
+
+    const nTicks = 10;
+    ctx.fillStyle = '#475569';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= nTicks; i++) {
+      const xw = bounds.min + (i / nTicks) * (bounds.max - bounds.min);
+      const xc = worldToCanvasX(xw, bounds, w, padL, padR);
+      ctx.beginPath();
+      ctx.moveTo(xc, axisY - 8);
+      ctx.lineTo(xc, axisY + 8);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillText(fmt(xw, 1), xc, axisY + 24);
+    }
+
+    const xAc = worldToCanvasX(s.xA, bounds, w, padL, padR);
+    ctx.fillStyle = '#2563eb';
+    ctx.beginPath();
+    ctx.arc(xAc, axisY, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#2563eb';
+    ctx.fillText('A', xAc, axisY - 18);
+
+    const arrowLenA = Math.max(14, Math.min(42, 10 + Math.abs(s.vA) * 5));
+    drawArrow(ctx, xAc, axisY - 30, xAc + Math.sign(s.vA || 1) * arrowLenA, axisY - 30, '#2563eb');
+
+    if (s.activeB) {
+      const xBc = worldToCanvasX(s.xB, bounds, w, padL, padR);
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(xBc, axisY + 36, 11, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#dc2626';
+      ctx.fillText('B', xBc, axisY + 65);
+      const arrowLenB = Math.max(14, Math.min(42, 10 + Math.abs(s.vB) * 5));
+      drawArrow(ctx, xBc, axisY + 6, xBc + Math.sign(s.vB || 1) * arrowLenB, axisY + 6, '#dc2626');
+
+      const meet = computeMeeting(s.x0A, s.vA, s.x0B, s.vB);
+      if (meet.type === 'futuro' && meet.t <= s.tMax) {
+        const xm = worldToCanvasX(meet.x, bounds, w, padL, padR);
+        ctx.strokeStyle = '#059669';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(xm, 40);
+        ctx.lineTo(xm, h - 30);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#059669';
+        ctx.fillText(`incontro`, xm, 28);
+      }
+    }
+
+    ctx.fillStyle = '#475569';
+    ctx.textAlign = 'left';
+    ctx.fillText('Posizione x (m)', 10, 20);
+  }
+
+  function drawAxes(ctx, w, h, pad, xLabel, yLabel, xMin, xMax, yMin, yMax) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, h - pad.bottom);
+    ctx.lineTo(w - pad.right, h - pad.bottom);
+    ctx.lineTo(w - pad.right, pad.top);
+    ctx.stroke();
+
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#475569';
+    ctx.textAlign = 'center';
+    const xTicks = 5;
+    for (let i = 0; i <= xTicks; i++) {
+      const x = pad.left + (i / xTicks) * (w - pad.left - pad.right);
+      const value = xMin + (i / xTicks) * (xMax - xMin);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.beginPath();
+      ctx.moveTo(x, pad.top);
+      ctx.lineTo(x, h - pad.bottom);
+      ctx.stroke();
+      ctx.fillText(fmt(value, 1), x, h - pad.bottom + 18);
+    }
+
+    const yTicks = 5;
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= yTicks; i++) {
+      const y = h - pad.bottom - (i / yTicks) * (h - pad.top - pad.bottom);
+      const value = yMin + (i / yTicks) * (yMax - yMin);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(w - pad.right, y);
+      ctx.stroke();
+      ctx.fillText(fmt(value, 1), pad.left - 8, y + 4);
+    }
+
+    ctx.save();
+    ctx.fillStyle = '#475569';
+    ctx.textAlign = 'center';
+    ctx.fillText(xLabel, (pad.left + w - pad.right) / 2, h - 8);
+    ctx.translate(16, (pad.top + h - pad.bottom) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+  }
+
+  function mapPoint(t, y, w, h, pad, xMin, xMax, yMin, yMax) {
+    const px = pad.left + (t - xMin) / (xMax - xMin) * (w - pad.left - pad.right);
+    const py = h - pad.bottom - (y - yMin) / (yMax - yMin) * (h - pad.top - pad.bottom);
+    return { px, py };
+  }
+
+  function drawLineGraph(ctx, points, color, w, h, pad, xMin, xMax, yMin, yMax) {
+    if (points.length === 0) return;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      const m = mapPoint(p.t, p.y, w, h, pad, xMin, xMax, yMin, yMax);
+      if (i === 0) ctx.moveTo(m.px, m.py);
+      else ctx.lineTo(m.px, m.py);
+    });
+    ctx.stroke();
+
+    const last = mapPoint(points[points.length - 1].t, points[points.length - 1].y, w, h, pad, xMin, xMax, yMin, yMax);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(last.px, last.py, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawGraphs() {
+    const s = getState();
+    const pad = { left: 58, right: 18, top: 18, bottom: 36 };
+    const wX = graphXCanvas.width;
+    const hX = graphXCanvas.height;
+    const wV = graphVCanvas.width;
+    const hV = graphVCanvas.height;
+    const tMax = s.tMax;
+
+    const xCandidates = [s.x0A, s.x0A + s.vA * tMax, s.xA];
+    if (s.activeB) xCandidates.push(s.x0B, s.x0B + s.vB * tMax, s.xB);
+    let xMin = Math.min(...xCandidates);
+    let xMax = Math.max(...xCandidates);
+    if (Math.abs(xMax - xMin) < 1e-9) { xMin -= 1; xMax += 1; }
+    const xPad = 0.15 * (xMax - xMin);
+    xMin -= xPad; xMax += xPad;
+
+    drawAxes(graphXCtx, wX, hX, pad, 'Tempo t (s)', 'Posizione x (m)', 0, tMax, xMin, xMax);
+
+    const pointsXA = [];
+    for (let tt = 0; tt <= Math.min(simTime, tMax) + 1e-9; tt += dtGraph) {
+      pointsXA.push({ t: tt, y: s.x0A + s.vA * tt });
+    }
+    drawLineGraph(graphXCtx, pointsXA, '#2563eb', wX, hX, pad, 0, tMax, xMin, xMax);
+
+    if (s.activeB) {
+      const pointsXB = [];
+      for (let tt = 0; tt <= Math.min(simTime, tMax) + 1e-9; tt += dtGraph) {
+        pointsXB.push({ t: tt, y: s.x0B + s.vB * tt });
+      }
+      drawLineGraph(graphXCtx, pointsXB, '#dc2626', wX, hX, pad, 0, tMax, xMin, xMax);
+
+      const meet = computeMeeting(s.x0A, s.vA, s.x0B, s.vB);
+      if (meet.type === 'futuro' && meet.t <= tMax) {
+        const m = mapPoint(meet.t, meet.x, wX, hX, pad, 0, tMax, xMin, xMax);
+        graphXCtx.fillStyle = '#059669';
+        graphXCtx.beginPath();
+        graphXCtx.arc(m.px, m.py, 5, 0, Math.PI * 2);
+        graphXCtx.fill();
+      }
+    }
+
+    let vMin = Math.min(s.vA, s.activeB ? s.vB : s.vA, 0);
+    let vMax = Math.max(s.vA, s.activeB ? s.vB : s.vA, 0);
+    if (Math.abs(vMax - vMin) < 1e-9) { vMin -= 1; vMax += 1; }
+    const vPad = Math.max(0.5, 0.2 * (vMax - vMin));
+    vMin -= vPad; vMax += vPad;
+
+    drawAxes(graphVCtx, wV, hV, pad, 'Tempo t (s)', 'Velocità v (m/s)', 0, tMax, vMin, vMax);
+
+    const pointsVA = [
+      { t: 0, y: s.vA },
+      { t: Math.min(simTime, tMax), y: s.vA }
+    ];
+    drawLineGraph(graphVCtx, pointsVA, '#2563eb', wV, hV, pad, 0, tMax, vMin, vMax);
+
+    if (s.activeB) {
+      const pointsVB = [
+        { t: 0, y: s.vB },
+        { t: Math.min(simTime, tMax), y: s.vB }
+      ];
+      drawLineGraph(graphVCtx, pointsVB, '#dc2626', wV, hV, pad, 0, tMax, vMin, vMax);
+    }
+  }
+
+  function redrawAll() {
+    updateDisplayedValues();
+    updateReadouts();
+    drawMotionScene();
+    drawGraphs();
+  }
+
+  function resetSimulation() {
+    simTime = 0;
+    lastTimestamp = null;
+    running = false;
+    trailA.length = 0;
+    trailB.length = 0;
+    redrawAll();
+  }
+
+  function animate(timestamp) {
+    if (!running) return;
+    if (lastTimestamp == null) lastTimestamp = timestamp;
+    const delta = Math.min(40, timestamp - lastTimestamp) / 1000;
+    lastTimestamp = timestamp;
+    simTime += delta;
+    const tMax = parseFloat(timeScaleInput.value);
+    if (simTime > tMax) simTime = tMax;
+    redrawAll();
+    if (simTime < tMax) {
+      requestAnimationFrame(animate);
+    } else {
+      running = false;
+      lastTimestamp = null;
+    }
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (running) return;
+    if (simTime >= parseFloat(timeScaleInput.value)) simTime = 0;
+    running = true;
+    lastTimestamp = null;
+    requestAnimationFrame(animate);
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    running = false;
+    lastTimestamp = null;
+  });
+
+  resetBtn.addEventListener('click', resetSimulation);
+
+  [x0AInput, vAInput, x0BInput, vBInput, secondBodyInput, timeScaleInput].forEach(el => {
+    el.addEventListener('input', () => {
+      if (simTime > parseFloat(timeScaleInput.value)) simTime = parseFloat(timeScaleInput.value);
+      redrawAll();
+    });
+    el.addEventListener('change', redrawAll);
+  });
+
+  redrawAll();
+})();
+</script>
+</body>
+</html>

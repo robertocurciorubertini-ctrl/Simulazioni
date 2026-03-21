@@ -101,6 +101,7 @@ def find_html_files(root: Path) -> list[Path]:
 
     return sorted(html_files)
 
+
 def extract_metadata_block(text: str) -> str | None:
     match = METADATA_REGEX.search(text)
     if not match:
@@ -113,16 +114,15 @@ def js_object_to_json(js_text: str) -> str:
     js_text = re.sub(r"/\*.*?\*/", "", js_text, flags=re.DOTALL)
 
     js_text = re.sub(
-        r'([{\s,])([A-Za-z_][A-Za-z0-9_\-]*)\s*:',
+        r'([\{\s,])([A-Za-z_][A-Za-z0-9_\-]*)\s*:',
         r'\1"\2":',
         js_text,
     )
 
-    js_text = re.sub(
-        r"'([^'\\]*(?:\\.[^'\\]*)*)'",
-        lambda m: json.dumps(bytes(m.group(1), "utf-8").decode("unicode_escape")),
-        js_text,
-    )
+    # Non convertire automaticamente stringhe tra apici singoli.
+    # Questa trasformazione rompe casi perfettamente validi come:
+    # "forme d'onda"
+    # quando l'apostrofo compare dentro una stringa già delimitata da doppi apici.
 
     js_text = re.sub(r",(\s*[}\]])", r"\1", js_text)
     return js_text

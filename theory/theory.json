@@ -31,40 +31,7 @@
             "legge oraria",
             "velocità"
           ]
-        }
-      ]
-    },
-    {
-      "title": "Ottica",
-      "slug": "ottica",
-      "description": "",
-      "order": 1,
-      "topics": [
-        {
-          "title": "Luce e fenomeni ottici",
-          "file": "ottica/luce.html",
-          "description": "Introduzione alla luce come onda elettromagnetica: riflessione, rifrazione, diffusione, dispersione, interferenza e diffrazione.",
-          "order": 1,
-          "level": "base",
-          "tags": [
-            "luce",
-            "ottica",
-            "riflessione",
-            "rifrazione",
-            "diffrazione",
-            "interferenza",
-            "dispersione",
-            "colore"
-          ]
-        }
-      ]
-    },
-    {
-      "title": "Senza sezione",
-      "slug": "senza-sezione",
-      "description": "",
-      "order": 6,
-      "topics": [
+        },
         {
           "title": "Moto parabolico",
           "file": "meccanica/moto-parabolico.html",
@@ -108,6 +75,31 @@
             "frequenza",
             "molla",
             "pendolo"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Ottica",
+      "slug": "ottica",
+      "description": "",
+      "order": 1,
+      "topics": [
+        {
+          "title": "Luce e fenomeni ottici",
+          "file": "ottica/luce.html",
+          "description": "Introduzione alla luce come onda elettromagnetica: riflessione, rifrazione, diffusione, dispersione, interferenza e diffrazione.",
+          "order": 1,
+          "level": "base",
+          "tags": [
+            "luce",
+            "ottica",
+            "riflessione",
+            "rifrazione",
+            "diffrazione",
+            "interferenza",
+            "dispersione",
+            "colore"
           ]
         }
       ]

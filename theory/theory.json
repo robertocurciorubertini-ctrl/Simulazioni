@@ -63,8 +63,22 @@
       "title": "Senza sezione",
       "slug": "senza-sezione",
       "description": "",
-      "order": 7,
+      "order": 6,
       "topics": [
+        {
+          "title": "Moto parabolico",
+          "file": "meccanica/moto-parabolico.html",
+          "description": "Spiegazione teorica del moto parabolico come composizione di un moto rettilineo uniforme orizzontale e di un moto uniformemente accelerato verticale.",
+          "order": 6,
+          "level": "intermedio",
+          "tags": [
+            "moto parabolico",
+            "lancio obliquo",
+            "composizione dei moti",
+            "gravità",
+            "cinematica"
+          ]
+        },
         {
           "title": "Moto circolare",
           "file": "meccanica/moto-circolare.html",
@@ -73,25 +87,25 @@
           "level": "intermedio",
           "tags": [
             "moto circolare",
-            "cinematica",
             "velocità angolare",
             "accelerazione centripeta",
             "periodo",
-            "frequenza"
+            "frequenza",
+            "cinematica"
           ]
         },
         {
           "title": "Moto armonico",
           "file": "meccanica/moto-armonico.html",
-          "description": "Spiegazione teorica del moto armonico con focus sui concetti fisici fondamentali, sul legame con le oscillazioni periodiche e sulle principali grandezze caratteristiche.",
+          "description": "Spiegazione teorica del moto armonico con focus sui concetti fondamentali delle oscillazioni periodiche, dell'equilibrio e della forza di richiamo.",
           "order": 8,
           "level": "intermedio",
           "tags": [
             "moto armonico",
             "oscillazioni",
+            "ampiezza",
             "periodo",
             "frequenza",
-            "ampiezza",
             "molla",
             "pendolo"
           ]

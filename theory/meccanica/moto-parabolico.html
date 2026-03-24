@@ -1,82 +1,257 @@
-  <aside class="card">
-      <div class="label x">asse $x$</div>
-      <div class="label y">asse $y$</div>
-      <div class="label h">quota massima</div>
+<!-- ========================= -->
+<!-- FILE: moto-parabolico.html -->
+<!-- ========================= -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moto parabolico | Teoria</title>
+
+  <script>
+    window.THEORY_METADATA = {
+      title: "Moto parabolico",
+      description: "Spiegazione teorica del moto parabolico come composizione di un moto rettilineo uniforme orizzontale e di un moto uniformemente accelerato verticale.",
+      category: "Meccanica",
+      icon: "🟠",
+      order: 6,
+      tags: ["moto parabolico", "lancio obliquo", "composizione dei moti", "gravità", "cinematica"],
+      level: "intermedio"
+    };
+  </script>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --text: #eaf0ff;
+      --muted: #b7c3e0;
+      --accent: #7cc4ff;
+      --accent-2: #9ef0c7;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 18px 40px rgba(0,0,0,0.28);
+      --radius: 18px;
+      --maxw: 1050px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124,196,255,0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(158,240,199,0.10), transparent 22%),
+        linear-gradient(180deg, #0a0f1e 0%, #0d1326 100%);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .container { width: min(var(--maxw), calc(100% - 32px)); margin: 0 auto; }
+    .hero { padding: 72px 0 34px; }
+    .eyebrow {
+      display: inline-block; padding: 6px 12px; border: 1px solid var(--border);
+      border-radius: 999px; background: rgba(255,255,255,0.04); color: var(--accent);
+      font-size: 0.92rem; margin-bottom: 18px;
+    }
+    h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.1; }
+    .subtitle { max-width: 850px; color: var(--muted); font-size: 1.08rem; margin: 0; }
+    .quick-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .quick-nav a {
+      text-decoration: none; color: var(--text); background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); padding: 10px 14px; border-radius: 999px;
+      font-size: 0.95rem;
+    }
+    main { padding-bottom: 60px; }
+    .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; margin-bottom: 20px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 24px; overflow: hidden;
+    }
+    .section { margin-bottom: 20px; }
+    h2 { margin: 0 0 14px; font-size: 1.55rem; }
+    h3 { margin: 22px 0 10px; font-size: 1.14rem; color: var(--accent-2); }
+    p { margin: 0 0 14px; }
+    .muted { color: var(--muted); }
+    ul { margin: 0; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .formula-box {
+      margin: 14px 0 16px; padding: 14px 16px; border-radius: 14px;
+      border: 1px solid rgba(124,196,255,0.22); background: rgba(124,196,255,0.07);
+      overflow-x: auto;
+    }
+    .highlight {
+      border-left: 4px solid var(--accent); padding: 12px 14px;
+      background: rgba(255,255,255,0.04); border-radius: 0 12px 12px 0;
+      color: var(--muted); margin: 14px 0 18px;
+    }
+    .diagram {
+      position: relative; min-height: 330px; border-radius: 16px;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)),
+        radial-gradient(circle at 18% 20%, rgba(124,196,255,0.09), transparent 30%),
+        rgba(10, 15, 30, 0.65);
+      overflow: hidden;
+    }
+    .axes-x, .axes-y, .path, .vector { position: absolute; }
+    .axes-x { left: 42px; right: 22px; bottom: 44px; height: 2px; background: rgba(255,255,255,0.65); }
+    .axes-y { left: 42px; top: 22px; bottom: 44px; width: 2px; background: rgba(255,255,255,0.65); }
+    .path {
+      left: 68px; top: 58px; width: 255px; height: 175px;
+      border-top: 3px solid var(--accent-2); border-right: 3px solid transparent;
+      border-radius: 78% 78% 0 0 / 100% 100% 0 0; transform: rotate(-7deg);
+    }
+    .launch-point {
+      position: absolute; left: 66px; bottom: 42px; width: 11px; height: 11px;
+      border-radius: 50%; background: var(--accent);
+    }
+    .vector {
+      left: 71px; bottom: 47px; width: 92px; height: 3px; background: var(--accent);
+      transform: rotate(-38deg); transform-origin: left center;
+    }
+    .vector::after {
+      content: ""; position: absolute; right: -2px; top: -4px;
+      border-left: 11px solid var(--accent); border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+    }
+    .label {
+      position: absolute; font-size: 0.92rem; color: var(--muted);
+      background: rgba(0,0,0,0.24); padding: 3px 8px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .label.v0 { left: 132px; bottom: 115px; }
+    .label.x { right: 26px; bottom: 50px; }
+    .label.y { left: 14px; top: 20px; }
+    .label.h { left: 202px; top: 64px; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .hero { padding-top: 56px; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <div class="eyebrow">Teoria · Meccanica</div>
+      <h1>Moto parabolico</h1>
+      <p class="subtitle">
+        Il moto parabolico descrive il movimento di un corpo lanciato con velocità iniziale obliqua rispetto all’orizzontale, quando l’unica accelerazione agente è quella di gravità.
+      </p>
+      <nav class="quick-nav">
+        <a href="#idea-base">Idea fisica</a>
+        <a href="#equazioni">Equazioni</a>
+        <a href="#traiettoria">Traiettoria</a>
+        <a href="#grandezze">Grandezze notevoli</a>
+        <a href="#energia">Energia</a>
+        <a href="#limiti">Limiti</a>
+      </nav>
     </div>
-    <p class="footer-note">
-      La traiettoria è una parabola solo nel modello ideale con gravità uniforme e assenza di resistenza del mezzo.
-    </p>
-  </aside>
-</section>
+  </header>
 
-<section class="card section" id="equazioni">
-  <h2>Equazioni orarie del moto</h2>
-  <p>
-    Supponiamo che il corpo parta dall’origine al tempo $t=0$ con velocità iniziale di modulo $v_0$ e angolo di lancio $\theta$ rispetto all’orizzontale.
-  </p>
+  <main class="container">
+    <section class="grid section" id="idea-base">
+      <article class="card">
+        <h2>Idea fisica fondamentale</h2>
+        <p>Il moto parabolico è la composizione di due moti indipendenti:</p>
+        <ul>
+          <li>un moto rettilineo uniforme lungo l’asse orizzontale $x$;</li>
+          <li>un moto uniformemente accelerato lungo l’asse verticale $y$.</li>
+        </ul>
+        <div class="highlight">
+          In assenza di attrito dell’aria, la forza peso agisce solo verticalmente. Per questo la componente orizzontale della velocità resta costante, mentre quella verticale varia nel tempo.
+        </div>
+        <div class="formula-box">
+          $$\vec a = (0,-g)$$
+        </div>
+        <p class="muted">Qui $g$ è il modulo dell’accelerazione di gravità.</p>
+      </article>
 
-  <h3>Componenti della velocità iniziale</h3>
-  <div class="formula-box">
-    $$v_{0x} = v_0 \cos\theta$$
-    $$v_{0y} = v_0 \sin\theta$$
-  </div>
-  <p>
-    dove:
-  </p>
-  <ul>
-    <li>$v_0$ è il modulo della velocità iniziale;</li>
-    <li>$\theta$ è l’angolo di lancio;</li>
-    <li>$v_{0x}$ è la componente orizzontale iniziale della velocità;</li>
-    <li>$v_{0y}$ è la componente verticale iniziale della velocità.</li>
-  </ul>
+      <aside class="card">
+        <h2>Schema qualitativo</h2>
+        <div class="diagram">
+          <div class="axes-x"></div>
+          <div class="axes-y"></div>
+          <div class="path"></div>
+          <div class="launch-point"></div>
+          <div class="vector"></div>
+          <div class="label v0">$\vec v_0$</div>
+          <div class="label x">asse $x$</div>
+          <div class="label y">asse $y$</div>
+          <div class="label h">quota massima</div>
+        </div>
+      </aside>
+    </section>
 
-  <h3>Legge oraria lungo l’asse orizzontale</h3>
-  <div class="formula-box">
-    $$x(t) = x_0 + v_{0x}t$$
-  </div>
-  <p>
-    Se il lancio avviene dall’origine, cioè se $x_0=0$, allora
-  </p>
-  <div class="formula-box">
-    $$x(t) = v_0\cos\theta\; t$$
-  </div>
+    <section class="card section" id="equazioni">
+      <h2>Equazioni del moto</h2>
+      <p>Se il modulo della velocità iniziale è $v_0$ e l’angolo di lancio è $\theta$, allora:</p>
 
-  <h3>Legge oraria lungo l’asse verticale</h3>
-  <div class="formula-box">
-    $$y(t) = y_0 + v_{0y}t - \frac{1}{2}gt^2$$
-  </div>
-  <p>
-    Se il lancio parte dall’origine, cioè se $y_0=0$, otteniamo
-  </p>
-  <div class="formula-box">
-    $$y(t) = v_0\sin\theta\; t - \frac{1}{2}gt^2$$
-  </div>
+      <div class="formula-box">
+        $$v_{0x}=v_0\cos\theta$$
+        $$v_{0y}=v_0\sin\theta$$
+      </div>
 
-  <h3>Componenti della velocità al tempo $t$</h3>
-  <div class="formula-box">
-    $$v_x(t)=v_0\cos\theta$$
-    $$v_y(t)=v_0\sin\theta-gt$$
-  </div>
-  <p>
-    La velocità orizzontale rimane costante, mentre la velocità verticale diminuisce linearmente nel tempo durante la salita, si annulla al punto più alto e poi cambia segno nella discesa.
-  </p>
-</section>
+      <div class="formula-box">
+        $$x(t)=v_0\cos\theta\; t$$
+        $$y(t)=v_0\sin\theta\; t-\frac{1}{2}gt^2$$
+      </div>
 
-<section class="card section" id="traiettoria">
-  <h2>Equazione della traiettoria</h2>
-  <p>
-    Per ottenere la forma della traiettoria nel piano cartesiano bisogna eliminare il tempo $t$ dalle equazioni parametriche. Dalla legge oraria orizzontale ricaviamo
-  </p>
-  <div class="formula-box">
-    $$t=\frac{x}{v_0\cos\theta}$$
-  </div>
-  <p>
-    Sostituendo questa espressione nella legge verticale si ottiene
-  </p>
-  <div class="formula-box">
-    $$y = x\tan\theta - \frac{g}{2v_0^2\cos^2\theta}\,x^2$$
-  </div>
-  <p>
-    Questa è l’equazione di una <strong>parabola con concavità rivolta verso il basso</strong>.
-  </p>
-</section>
+      <p>dove:</p>
+      <ul>
+        <li>$v_0$ è il modulo della velocità iniziale;</li>
+        <li>$\theta$ è l’angolo di lancio;</li>
+        <li>$t$ è il tempo;</li>
+        <li>$g$ è l’accelerazione di gravità.</li>
+      </ul>
+    </section>
+
+    <section class="card section" id="traiettoria">
+      <h2>Equazione della traiettoria</h2>
+      <p>Eliminando il tempo dalle equazioni parametriche si ottiene:</p>
+      <div class="formula-box">
+        $$y=x\tan\theta-\frac{g}{2v_0^2\cos^2\theta}\,x^2$$
+      </div>
+      <p>Questa è l’equazione di una parabola con concavità rivolta verso il basso.</p>
+    </section>
+
+    <section class="card section" id="grandezze">
+      <h2>Grandezze caratteristiche</h2>
+      <div class="formula-box">
+        $$t_{\text{max}}=\frac{v_0\sin\theta}{g}$$
+        $$H_{\text{max}}=\frac{v_0^2\sin^2\theta}{2g}$$
+        $$T=\frac{2v_0\sin\theta}{g}$$
+        $$R=\frac{v_0^2\sin(2\theta)}{g}$$
+      </div>
+      <p>
+        dove $t_{\text{max}}$ è il tempo per raggiungere l’altezza massima, $H_{\text{max}}$ è l’altezza massima, $T$ è il tempo totale di volo e $R$ è la gittata.
+      </p>
+    </section>
+
+    <section class="card section" id="energia">
+      <h2>Lettura energetica</h2>
+      <p>Trascurando l’attrito dell’aria, l’energia meccanica si conserva:</p>
+      <div class="formula-box">
+        $$E_{\text{mecc}}=K+U=\frac{1}{2}mv^2+mgy$$
+      </div>
+      <p>
+        dove $m$ è la massa del corpo, $v$ è il modulo della velocità, $K$ è l’energia cinetica, $U$ è l’energia potenziale gravitazionale e $y$ è la quota.
+      </p>
+    </section>
+
+    <section class="card section" id="limiti">
+      <h2>Limiti del modello</h2>
+      <ul>
+        <li>si trascura la resistenza dell’aria;</li>
+        <li>si assume $g$ costante;</li>
+        <li>si considera la superficie terrestre localmente piana.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

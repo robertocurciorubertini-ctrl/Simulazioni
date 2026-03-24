@@ -1,0 +1,82 @@
+  <aside class="card">
+      <div class="label x">asse $x$</div>
+      <div class="label y">asse $y$</div>
+      <div class="label h">quota massima</div>
+    </div>
+    <p class="footer-note">
+      La traiettoria è una parabola solo nel modello ideale con gravità uniforme e assenza di resistenza del mezzo.
+    </p>
+  </aside>
+</section>
+
+<section class="card section" id="equazioni">
+  <h2>Equazioni orarie del moto</h2>
+  <p>
+    Supponiamo che il corpo parta dall’origine al tempo $t=0$ con velocità iniziale di modulo $v_0$ e angolo di lancio $\theta$ rispetto all’orizzontale.
+  </p>
+
+  <h3>Componenti della velocità iniziale</h3>
+  <div class="formula-box">
+    $$v_{0x} = v_0 \cos\theta$$
+    $$v_{0y} = v_0 \sin\theta$$
+  </div>
+  <p>
+    dove:
+  </p>
+  <ul>
+    <li>$v_0$ è il modulo della velocità iniziale;</li>
+    <li>$\theta$ è l’angolo di lancio;</li>
+    <li>$v_{0x}$ è la componente orizzontale iniziale della velocità;</li>
+    <li>$v_{0y}$ è la componente verticale iniziale della velocità.</li>
+  </ul>
+
+  <h3>Legge oraria lungo l’asse orizzontale</h3>
+  <div class="formula-box">
+    $$x(t) = x_0 + v_{0x}t$$
+  </div>
+  <p>
+    Se il lancio avviene dall’origine, cioè se $x_0=0$, allora
+  </p>
+  <div class="formula-box">
+    $$x(t) = v_0\cos\theta\; t$$
+  </div>
+
+  <h3>Legge oraria lungo l’asse verticale</h3>
+  <div class="formula-box">
+    $$y(t) = y_0 + v_{0y}t - \frac{1}{2}gt^2$$
+  </div>
+  <p>
+    Se il lancio parte dall’origine, cioè se $y_0=0$, otteniamo
+  </p>
+  <div class="formula-box">
+    $$y(t) = v_0\sin\theta\; t - \frac{1}{2}gt^2$$
+  </div>
+
+  <h3>Componenti della velocità al tempo $t$</h3>
+  <div class="formula-box">
+    $$v_x(t)=v_0\cos\theta$$
+    $$v_y(t)=v_0\sin\theta-gt$$
+  </div>
+  <p>
+    La velocità orizzontale rimane costante, mentre la velocità verticale diminuisce linearmente nel tempo durante la salita, si annulla al punto più alto e poi cambia segno nella discesa.
+  </p>
+</section>
+
+<section class="card section" id="traiettoria">
+  <h2>Equazione della traiettoria</h2>
+  <p>
+    Per ottenere la forma della traiettoria nel piano cartesiano bisogna eliminare il tempo $t$ dalle equazioni parametriche. Dalla legge oraria orizzontale ricaviamo
+  </p>
+  <div class="formula-box">
+    $$t=\frac{x}{v_0\cos\theta}$$
+  </div>
+  <p>
+    Sostituendo questa espressione nella legge verticale si ottiene
+  </p>
+  <div class="formula-box">
+    $$y = x\tan\theta - \frac{g}{2v_0^2\cos^2\theta}\,x^2$$
+  </div>
+  <p>
+    Questa è l’equazione di una <strong>parabola con concavità rivolta verso il basso</strong>.
+  </p>
+</section>

@@ -58,6 +58,45 @@
           ]
         }
       ]
+    },
+    {
+      "title": "Senza sezione",
+      "slug": "senza-sezione",
+      "description": "",
+      "order": 7,
+      "topics": [
+        {
+          "title": "Moto circolare",
+          "file": "meccanica/moto-circolare.html",
+          "description": "Spiegazione teorica del moto circolare, con introduzione delle grandezze angolari, della velocità tangenziale e dell'accelerazione centripeta.",
+          "order": 7,
+          "level": "intermedio",
+          "tags": [
+            "moto circolare",
+            "cinematica",
+            "velocità angolare",
+            "accelerazione centripeta",
+            "periodo",
+            "frequenza"
+          ]
+        },
+        {
+          "title": "Moto armonico",
+          "file": "meccanica/moto-armonico.html",
+          "description": "Spiegazione teorica del moto armonico con focus sui concetti fisici fondamentali, sul legame con le oscillazioni periodiche e sulle principali grandezze caratteristiche.",
+          "order": 8,
+          "level": "intermedio",
+          "tags": [
+            "moto armonico",
+            "oscillazioni",
+            "periodo",
+            "frequenza",
+            "ampiezza",
+            "molla",
+            "pendolo"
+          ]
+        }
+      ]
     }
   ]
 }

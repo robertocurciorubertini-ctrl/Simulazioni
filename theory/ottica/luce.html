@@ -138,6 +138,17 @@
       .grid-2, .summary-grid { grid-template-columns: 1fr; }
     }
   </style>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 </head>
 <body>
   <div class="page">
@@ -176,7 +187,7 @@
           </p>
           <div class="formula-box">
             <h3>Relazioni fondamentali</h3>
-            <div class="equation">c = λ·f &nbsp;&nbsp;&nbsp; f = 1/T &nbsp;&nbsp;&nbsp; λ = c/f</div>
+            <div class="equation">\[ c = \lambda f \qquad f = \frac{1}{T} \qquad \lambda = \frac{c}{f} \]</div>
             <div class="var-list">
               <div><strong>c</strong>: velocità della luce nel vuoto ≈ 2.998 × 10⁸ m/s.</div>
               <div><strong>λ</strong>: lunghezza d'onda, distanza tra due creste consecutive (m).</div>
@@ -239,7 +250,7 @@
           </p>
           <div class="formula-box">
             <h3>Leggi della riflessione</h3>
-            <div class="equation">θ<sub>i</sub> = θ<sub>r</sub></div>
+            <div class="equation">\[ \theta_i = \theta_r \]</div>
             <div class="var-list">
               <div><strong>θ<sub>i</sub></strong>: angolo di incidenza rispetto alla <em>normale</em> alla superficie (non rispetto alla superficie stessa).</div>
               <div><strong>θ<sub>r</sub></strong>: angolo di riflessione rispetto alla normale.</div>
@@ -318,8 +329,8 @@
 
           <div class="formula-box">
             <h3>Legge di Snell-Cartesio</h3>
-            <div class="equation">n<sub>1</sub> sin θ<sub>i</sub> = n<sub>2</sub> sin θ<sub>t</sub></div>
-            <div class="equation">n = c / v</div>
+            <div class="equation">\[ n_1 \sin \theta_i = n_2 \sin \theta_t \]</div>
+            <div class="equation">\[ n = \frac{c}{v} \]</div>
             <div class="var-list">
               <div><strong>n₁</strong>, <strong>n₂</strong>: indici di rifrazione dei due mezzi (adimensionali, ≥ 1).</div>
               <div><strong>θ<sub>i</sub></strong>: angolo di incidenza rispetto alla normale alla superficie di separazione.</div>
@@ -343,7 +354,7 @@
               <p>
                 Quando la luce cerca di passare da un mezzo più denso otticamente a uno meno denso ($n_1 > n_2$), l'angolo di rifrazione $\theta_t$ cresce al crescere di $\theta_i$. Esiste un <strong>angolo critico</strong> $\theta_c$ oltre il quale non esiste soluzione reale per $\theta_t$: tutta la luce viene riflessa internamente.
               </p>
-              <div class="equation">sin θ<sub>c</sub> = n<sub>2</sub> / n<sub>1</sub> &nbsp; (con n<sub>1</sub> &gt; n<sub>2</sub>)</div>
+              <div class="equation">\[ \sin \theta_c = \frac{n_2}{n_1} \qquad (\text{con } n_1 > n_2) \]</div>
               <p>Per il vetro-aria: $\theta_c \approx 42°$. Questo fenomeno è alla base delle <strong>fibre ottiche</strong> e dei prismi nei binocoli.</p>
             </div>
             <div class="image-slot">
@@ -398,9 +409,9 @@
 
           <div class="formula-box">
             <h3>Esperimento della doppia fenditura (Young)</h3>
-            <div class="equation">δ = d sin θ</div>
-            <div class="equation">δ = m λ &nbsp;&nbsp;&nbsp; (massimi, m = 0, ±1, ±2, …)</div>
-            <div class="equation">δ = (m + ½) λ &nbsp;&nbsp;&nbsp; (minimi)</div>
+            <div class="equation">\[ \delta = d \sin \theta \]</div>
+            <div class="equation">\[ \delta = m\lambda \qquad (\text{massimi, } m = 0, \pm 1, \pm 2, \ldots) \]</div>
+            <div class="equation">\[ \delta = \left(m + \frac{1}{2}\right)\lambda \qquad (\text{minimi}) \]</div>
             <div class="var-list">
               <div><strong>δ</strong>: differenza di cammino tra i raggi provenienti dalle due fenditure.</div>
               <div><strong>d</strong>: distanza tra le due fenditure.</div>
@@ -414,7 +425,7 @@
             La posizione delle frange luminose sullo schermo (a distanza $L$ dalle fenditure) è:
           </p>
           <div class="formula-box">
-            <div class="equation">y_m = m λ L / d &nbsp;&nbsp;&nbsp; (per piccoli angoli)</div>
+            <div class="equation">\[ y_m = \frac{m\lambda L}{d} \qquad (\text{per piccoli angoli}) \]</div>
             <div class="var-list">
               <div><strong>y_m</strong>: posizione della frangia di ordine m sullo schermo.</div>
               <div><strong>L</strong>: distanza tra le fenditure e lo schermo.</div>
@@ -446,7 +457,7 @@
 
           <div class="formula-box">
             <h3>Fenditura singola: minimi di diffrazione</h3>
-            <div class="equation">a sin θ = m λ &nbsp;&nbsp;&nbsp; (m = ±1, ±2, … — posizione dei minimi)</div>
+            <div class="equation">\[ a \sin \theta = m\lambda \qquad (m = \pm 1, \pm 2, \ldots\; \text{— posizione dei minimi}) \]</div>
             <div class="var-list">
               <div><strong>a</strong>: larghezza della fenditura.</div>
               <div><strong>θ</strong>: angolo rispetto alla direzione centrale.</div>
@@ -467,7 +478,7 @@
               <p>
                 La diffrazione impone un limite fisico fondamentale alla risoluzione di qualunque strumento ottico (microscopi, telescopi, fotocamere). Secondo il <strong>criterio di Rayleigh</strong>, due sorgenti puntiformi sono appena distinguibili quando il massimo centrale della figura di diffrazione dell'una cade sul primo minimo dell'altra. Per un'apertura circolare di diametro $D$:
               </p>
-              <div class="equation">θ<sub>min</sub> ≈ 1.22 λ / D</div>
+              <div class="equation">\[ \theta_{\text{min}} \approx 1.22\,\frac{\lambda}{D} \]</div>
               <p>
                 Più grande è l'apertura e più piccola è la lunghezza d'onda, migliore è la risoluzione. È per questo che i radiotelescopi devono avere dimensioni enormi nonostante osservino lunghezze d'onda molto maggiori di quelle visibili.
               </p>

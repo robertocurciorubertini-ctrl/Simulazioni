@@ -3,21 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Moto uniformemente accelerato</title>
   <meta name="description" content="Introduzione teorica al moto uniformemente accelerato: definizione, leggi orarie, grafici fondamentali e interpretazione fisica dell'accelerazione costante." />
 
   <script>
-window.THEORY_METADATA = {
-  "title": "Moto uniformemente accelerato",
-  "description": "Teoria essenziale del moto uniformemente accelerato con definizione, formule principali e interpretazione grafica.",
-  "section": "Meccanica",
-  "sectionSlug": "meccanica",
-  "order": 5,
-  "level": "base",
-  "tags": ["cinematica", "accelerazione costante", "grafici", "legge oraria", "velocità"]
-};
-</script>
+    window.THEORY_METADATA = {
+      title: "Moto uniformemente accelerato",
+      description: "Teoria del moto uniformemente accelerato con definizione, leggi orarie, grafici e interpretazione fisica dell'accelerazione costante.",
+      section: "Meccanica",
+      sectionSlug: "meccanica",
+      order: 5,
+      level: "base",
+      tags: ["cinematica", "accelerazione costante", "grafici", "legge oraria", "velocità"]
+    };
+  </script>
 
   <style>
     :root {
@@ -27,12 +26,13 @@ window.THEORY_METADATA = {
       --text: #0f172a;
       --muted: #475569;
       --accent: #2563eb;
+      --accent-soft: #eff6ff;
       --border: #e2e8f0;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
       --maxw: 1000px;
     }
-
     * { box-sizing: border-box; }
-
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -40,223 +40,264 @@ window.THEORY_METADATA = {
       color: var(--text);
       line-height: 1.65;
     }
-
+    a { color: inherit; text-decoration: none; }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(248, 250, 252, 0.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .nav-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-radius: 999px;
+      background: var(--panel); border: 1px solid var(--border);
+      box-shadow: var(--shadow); font-weight: 700;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+    .nav-link:hover { transform: translateY(-1px); background: var(--panel-2); }
+    .nav-link.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .nav-link.primary:hover { background: #1d4ed8; }
     .container {
       width: min(92%, var(--maxw));
       margin: 0 auto;
       padding: 2.5rem 0 4rem;
     }
-
     .hero {
-      margin-bottom: 2rem;
-      padding: 1.8rem;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      margin-bottom: 2rem; padding: 1.8rem;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
+      box-shadow: var(--shadow);
     }
-
     .eyebrow {
-      display: inline-block;
-      font-size: 0.85rem;
-      color: var(--accent);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-      font-weight: 700;
+      display: inline-block; font-size: 0.85rem; color: var(--accent);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      margin-bottom: 0.5rem; font-weight: 700;
     }
-
-    h1, h2, h3 {
-      line-height: 1.2;
-      margin-top: 0;
-      color: #0f172a;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin-bottom: 0.75rem;
-    }
-
-    h2 {
-      font-size: 1.5rem;
-      margin-top: 2rem;
-      margin-bottom: 0.8rem;
-    }
-
+    h1, h2, h3 { line-height: 1.2; margin-top: 0; color: #0f172a; }
+    h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 0.75rem; }
+    h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 0.8rem; }
+    h3 { font-size: 1.1rem; margin-top: 1.6rem; margin-bottom: 0.6rem; color: #1e40af; }
     p { margin: 0.8rem 0; }
-
-    .lead {
-      font-size: 1.08rem;
-      color: #1e293b;
-      max-width: 70ch;
-    }
-
+    ul { padding-left: 1.2rem; margin: 0.6rem 0 1rem; }
+    li { margin: 0.5rem 0; }
+    .lead { font-size: 1.08rem; color: #1e293b; max-width: 70ch; }
     .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 1.4rem;
-      margin-top: 1.2rem;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 18px; padding: 1.4rem; margin-top: 1.2rem;
+      box-shadow: var(--shadow);
     }
-
     .formula {
       background: var(--panel-2);
       border-left: 4px solid var(--accent);
-      padding: 1rem 1.1rem;
-      border-radius: 12px;
-      overflow-x: auto;
-      margin: 1rem 0;
+      padding: 1rem 1.1rem; border-radius: 12px;
+      overflow-x: auto; margin: 1rem 0;
       font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
       font-size: 1.05rem;
     }
-
-    .vars {
-      color: var(--muted);
-      font-size: 0.98rem;
+    .vars { color: var(--muted); font-size: 0.98rem; margin-top: 0.5rem; }
+    .highlight {
+      background: #fffbea; border: 1px solid #f6e7a8;
+      border-radius: 14px; padding: 16px 18px; margin: 1rem 0;
     }
-
-    figure {
-      margin: 1.4rem 0;
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1rem;
-    }
-
-    figure img {
-      display: block;
-      max-width: 100%;
-      height: auto;
-      border-radius: 12px;
-      margin: 0 auto;
-      background: #ffffff;
-    }
-
-    figcaption {
-      margin-top: 0.8rem;
-      color: var(--muted);
-      font-size: 0.95rem;
-      text-align: center;
-    }
-
-    ul { padding-left: 1.2rem; }
-
-    li { margin: 0.5rem 0; }
-
     .note {
-      margin-top: 1rem;
-      padding: 1rem;
-      border-radius: 12px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e3a8a;
+      margin-top: 1rem; padding: 1rem; border-radius: 12px;
+      background: var(--accent-soft); border: 1px solid #bfdbfe; color: #1e3a8a;
     }
-
-    .footer-link {
-      margin-top: 2rem;
-      display: inline-block;
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
+    .grid-2 {
+      display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 1rem;
     }
-
-    .footer-link:hover {
-      text-decoration: underline;
+    .mini-card {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px;
     }
+    .mini-card h3 { margin-top: 0; }
+    figure {
+      margin: 1.4rem 0; background: #f8fafc;
+      border: 1px solid var(--border); border-radius: 16px; padding: 1rem;
+    }
+    figure img { display: block; max-width: 100%; height: auto; border-radius: 12px; margin: 0 auto; background: #fff; }
+    figcaption { margin-top: 0.8rem; color: var(--muted); font-size: 0.95rem; text-align: center; }
+    .cta-box {
+      background: var(--accent-soft); border: 1px solid #bfd2fb;
+      border-radius: 16px; padding: 20px 22px; margin-top: 1.5rem;
+    }
+    .cta-box h3 { margin-top: 0; color: #163ea8; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
-
 <body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="nav-link" href="index.html">← Meccanica</a>
+      <a class="nav-link" href="../index.html">Teoria</a>
+      <a class="nav-link" href="../../index.html">Simulazioni</a>
+      <a class="nav-link primary" href="../../meccanica/moto-uniformemente-accelerato.html">Apri simulazione</a>
+    </div>
+  </header>
+
   <main class="container">
 
     <section class="hero">
-      <div class="eyebrow">Meccanica • Teoria</div>
+      <div class="eyebrow">Meccanica · Teoria</div>
       <h1>Moto uniformemente accelerato</h1>
       <p class="lead">
-        Il moto uniformemente accelerato è un moto rettilineo nel quale l’accelerazione rimane costante nel tempo.
-        Questo implica una variazione lineare della velocità e una variazione quadratica della posizione.
+        Il moto uniformemente accelerato (MUA) è un moto rettilineo nel quale l'accelerazione rimane costante nel tempo. Questa condizione implica che la velocità varia linearmente con il tempo e che la posizione varia come una funzione quadratica. È il modello che descrive, per esempio, la caduta libera vicino alla superficie terrestre.
       </p>
     </section>
 
     <section class="card">
-      <h2>1. Definizione</h2>
-
+      <h2>1. Definizione e significato dell'accelerazione costante</h2>
       <div class="formula">a = costante</div>
-
-      <p class="vars">
-        a = accelerazione (m/s²)
-      </p>
-
+      <p class="vars">a = accelerazione (m/s²)</p>
       <p>
-        L’accelerazione rappresenta la derivata della velocità rispetto al tempo. In questo caso il suo valore non varia.
+        L'<strong>accelerazione</strong> è la derivata della velocità rispetto al tempo: $a = dv/dt$. Dire che $a$ è costante significa che la velocità cresce (o decresce) della stessa quantità in ogni uguale intervallo di tempo. Se $a > 0$, la velocità aumenta nella direzione positiva; se $a < 0$, la velocità diminuisce (il corpo sta decelerando se si muove nella direzione positiva, oppure sta accelerando nella direzione negativa).
+      </p>
+      <div class="highlight">
+        Attenzione: "accelerazione negativa" non significa necessariamente "il corpo sta rallentando". Un corpo che si muove nella direzione negativa con $a < 0$ sta in realtà <em>aumentando</em> la propria rapidità. La relazione tra segno di $a$ e variazione di rapidità dipende anche dal segno della velocità.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. Legge della velocità nel tempo</h2>
+      <div class="formula">v(t) = v₀ + a·t</div>
+      <p class="vars">
+        v(t) = velocità all'istante t (m/s) &nbsp;|&nbsp;
+        v₀ = velocità iniziale (m/s) &nbsp;|&nbsp;
+        a = accelerazione (m/s²) &nbsp;|&nbsp;
+        t = tempo (s)
+      </p>
+      <p>
+        Questa relazione si ottiene integrando $a = dv/dt$ con la condizione iniziale $v(0) = v_0$. La velocità è una funzione <strong>lineare</strong> del tempo: nel grafico $v$-$t$ il MUA è rappresentato da una retta con pendenza pari all'accelerazione $a$. L'intercetta verticale è $v_0$.
+      </p>
+      <p>
+        L'area trapezoidale (o triangolare) delimitata dalla retta $v(t)$ e l'asse del tempo nell'intervallo $[0, t]$ è numericamente uguale allo spostamento, in accordo con la legge oraria del punto successivo.
       </p>
     </section>
 
     <section class="card">
-      <h2>2. Velocità nel tempo</h2>
-
-      <div class="formula">
-        v(t) = v₀ + a t
-      </div>
-
+      <h2>3. Legge oraria della posizione</h2>
+      <div class="formula">s(t) = s₀ + v₀·t + ½·a·t²</div>
       <p class="vars">
-        v(t) = velocità al tempo t,
-        v₀ = velocità iniziale,
-        a = accelerazione,
-        t = tempo
+        s(t) = posizione all'istante t (m) &nbsp;|&nbsp;
+        s₀ = posizione iniziale (m)
       </p>
-
       <p>
-        Il grafico v–t è una retta con pendenza pari all’accelerazione.
+        Si ottiene integrando la legge della velocità: $s(t) = s_0 + \int_0^t v(\tau)\,d\tau = s_0 + v_0 t + \frac{1}{2}at^2$. Il termine quadratico in $t$ fa sì che il grafico $s$-$t$ sia una <strong>parabola</strong>. La concavità è rivolta verso l'alto se $a > 0$, verso il basso se $a < 0$.
       </p>
-    </section>
-
-    <section class="card">
-      <h2>3. Legge oraria</h2>
-
-      <div class="formula">
-        s(t) = s₀ + v₀ t + (1/2) a t²
-      </div>
-
-      <p class="vars">
-        s(t) = posizione,
-        s₀ = posizione iniziale
-      </p>
-
       <p>
-        Il termine quadratico implica che il grafico spazio-tempo è una parabola.
+        La pendenza della curva $s(t)$ in ogni punto è la velocità istantanea $v(t)$: inizialmente la curva sale (o scende) con la pendenza $v_0$, poi la pendenza varia uniformemente a causa dell'accelerazione.
       </p>
 
       <figure>
-        <img src="./spazio-tempo.png" alt="Grafico spazio-tempo" />
-        <figcaption>Andamento parabolico della posizione nel tempo</figcaption>
+        <img src="./spazio-tempo.png" alt="Grafico spazio-tempo per il moto uniformemente accelerato" />
+        <figcaption>Andamento parabolico della posizione nel tempo per il MUA con $a > 0$ e $v_0 > 0$.</figcaption>
       </figure>
     </section>
 
     <section class="card">
-      <h2>4. Relazione senza tempo</h2>
-
-      <div class="formula">
-        v² = v₀² + 2 a (s - s₀)
-      </div>
-
+      <h2>4. Relazione velocità-spostamento (senza il tempo)</h2>
+      <div class="formula">v² = v₀² + 2·a·(s − s₀)</div>
       <p>
-        Utile quando il tempo non è noto.
+        Questa formula si ricava eliminando il tempo tra le equazioni della velocità e della posizione. È particolarmente utile quando il tempo non è noto o non è richiesto. Fisicamente rappresenta il <strong>teorema lavoro-energia</strong> per forza costante: il lavoro della forza $F = ma$ sullo spostamento $\Delta s = s - s_0$ è uguale alla variazione di energia cinetica $\Delta K = \frac{1}{2}m(v^2 - v_0^2)$.
       </p>
+
+      <h3>Le tre leggi del MUA in sintesi</h3>
+      <div class="grid-2">
+        <div class="mini-card">
+          <h3>$v(t) = v_0 + at$</h3>
+          <p>Velocità in funzione del tempo. Valida sempre nel MUA.</p>
+        </div>
+        <div class="mini-card">
+          <h3>$s(t) = s_0 + v_0 t + \frac{1}{2}at^2$</h3>
+          <p>Posizione in funzione del tempo. La parabola del moto.</p>
+        </div>
+        <div class="mini-card">
+          <h3>$v^2 = v_0^2 + 2a\,\Delta s$</h3>
+          <p>Relazione diretta tra velocità e spostamento, senza il tempo.</p>
+        </div>
+        <div class="mini-card">
+          <h3>$\bar{v} = \frac{v_0 + v}{2}$</h3>
+          <p>Velocità media (valida solo per accelerazione costante): uguale alla media aritmetica delle velocità iniziale e finale.</p>
+        </div>
+      </div>
     </section>
 
     <section class="card">
-      <h2>5. Caso fisico: caduta libera</h2>
+      <h2>5. Grafici fondamentali</h2>
 
-      <div class="formula">
-        g ≈ 9.81 m/s²
-      </div>
-
+      <h3>Grafico v-t (velocità-tempo)</h3>
       <p>
-        In prossimità della superficie terrestre, l’accelerazione è circa costante.
+        È una retta di pendenza $a$ e intercetta $v_0$. La pendenza è positiva se il corpo accelera nella direzione positiva, negativa se decelera. Il punto in cui la retta taglia l'asse del tempo è l'istante in cui la velocità si annulla (inversione del moto se il corpo continua ad accelerare).
       </p>
+
+      <h3>Grafico s-t (posizione-tempo)</h3>
+      <p>
+        È una parabola. La tangente alla curva in ogni punto ha pendenza uguale alla velocità istantanea. Il vertice della parabola corrisponde all'istante di velocità nulla.
+      </p>
+
+      <h3>Grafico a-t (accelerazione-tempo)</h3>
+      <p>
+        Nel MUA è una retta orizzontale al valore costante $a$. L'area sotto la curva $a(t)$ nell'intervallo $[t_1, t_2]$ è uguale alla variazione di velocità $\Delta v = a \cdot \Delta t$.
+      </p>
+
+      <div class="note">
+        La pendenza nel grafico $s$-$t$ dà la velocità; la pendenza nel grafico $v$-$t$ dà l'accelerazione; l'area nel grafico $v$-$t$ dà lo spostamento; l'area nel grafico $a$-$t$ dà la variazione di velocità. Queste relazioni derivano dalla definizione di derivata e integrale.
+      </div>
     </section>
 
-    <a class="footer-link" href="../index.html">← Torna indietro</a>
+    <section class="card">
+      <h2>6. Caso fisico fondamentale: caduta libera</h2>
+      <p>
+        In prossimità della superficie terrestre, in assenza di resistenza dell'aria, qualunque corpo in caduta libera subisce un'accelerazione costante diretta verso il basso:
+      </p>
+      <div class="formula">g ≈ 9.81 m/s²</div>
+      <p>
+        Galileo Galilei dimostrò sperimentalmente (e in seguito Newton lo giustificò teoricamente) che questa accelerazione è la stessa per tutti i corpi, indipendentemente dalla loro massa. Scegliendo l'asse $y$ verso l'alto, l'accelerazione nella caduta libera è $a = -g$, e le tre equazioni del MUA diventano:
+      </p>
+      <div class="formula">
+        v(t) = v₀ − g·t &nbsp;&nbsp;&nbsp;
+        y(t) = y₀ + v₀·t − ½·g·t² &nbsp;&nbsp;&nbsp;
+        v² = v₀² − 2g·(y − y₀)
+      </div>
+      <p>
+        Un corpo lanciato verticalmente verso l'alto con velocità $v_0$ raggiunge la quota massima $H_{\max} = v_0^2/(2g)$ dopo un tempo $t_{\text{apice}} = v_0/g$, e ritorna alla quota di partenza dopo il doppio di quel tempo.
+      </p>
+
+      <div class="grid-2">
+        <div class="mini-card">
+          <h3>Corpo che cade da fermo</h3>
+          <p>$v_0 = 0$, quindi $v(t) = gt$ e $y(t) = y_0 - \frac{1}{2}gt^2$. Dopo $t$ secondi ha velocità $v = gt$ e ha percorso una distanza $\frac{1}{2}gt^2$.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Lancio verticale verso l'alto</h3>
+          <p>$v_0 > 0$, $a = -g$. Il corpo sale fino a $H_{\max}$, poi scende. Per simmetria del moto, alla stessa quota la rapidità è la stessa sia in salita sia in discesa.</p>
+        </div>
+      </div>
+
+      <div class="cta-box">
+        <h3>Simulazione interattiva</h3>
+        <p>Esplora il moto uniformemente accelerato variando velocità iniziale e accelerazione. Osserva i grafici x-t, v-t e a-t aggiornarsi in tempo reale.</p>
+        <div class="button-row">
+          <a class="nav-link primary" href="../../meccanica/moto-uniformemente-accelerato.html">Apri simulazione</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>7. Errori concettuali comuni</h2>
+      <ul>
+        <li><strong>Confondere accelerazione negativa con decelerazione.</strong> L'accelerazione negativa indica solo il verso dell'accelerazione rispetto all'asse scelto. Un corpo può avere $a < 0$ e stare aumentando la propria rapidità se si muove nella direzione negativa.</li>
+        <li><strong>Pensare che a = 0 implichi il corpo fermo.</strong> Accelerazione nulla significa velocità costante, non necessariamente zero. Il corpo può muoversi uniformemente.</li>
+        <li><strong>Usare le formule del MUA quando l'accelerazione non è costante.</strong> Le tre equazioni valgono solo se $a = \text{costante}$ per tutto l'intervallo di tempo considerato.</li>
+        <li><strong>Confondere spostamento e distanza percorsa quando il moto inverte il verso.</strong> Se la velocità si annulla e cambia segno durante l'intervallo, la distanza percorsa è maggiore del valore assoluto dello spostamento.</li>
+        <li><strong>Interpretare la parabola nel grafico s-t come traiettoria fisica.</strong> Il grafico s-t mostra la posizione in funzione del tempo, non la forma della traiettoria nello spazio: la traiettoria del MUA è sempre rettilinea.</li>
+      </ul>
+    </section>
 
   </main>
 </body>

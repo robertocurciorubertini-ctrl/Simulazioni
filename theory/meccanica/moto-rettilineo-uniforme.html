@@ -8,7 +8,7 @@
   <script>
     window.THEORY_METADATA = {
       title: "Moto rettilineo uniforme",
-      description: "Definizione, legge oraria e rappresentazione grafica del moto rettilineo uniforme.",
+      description: "Definizione, legge oraria, rappresentazione grafica e interpretazione fisica del moto rettilineo uniforme.",
       section: "Meccanica",
       sectionSlug: "meccanica",
       order: 1,
@@ -17,9 +17,8 @@
     };
   </script>
 
-
   <style>
-    :root{
+    :root {
       --bg: #f8fafc;
       --surface: #ffffff;
       --surface-2: #f1f5f9;
@@ -33,240 +32,103 @@
       --radius: 18px;
       --maxw: 980px;
     }
-
-    *{
-      box-sizing: border-box;
-    }
-
-    html{
-      scroll-behavior: smooth;
-    }
-
-    body{
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.7;
     }
-
-    a{
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .topbar{
-      position: sticky;
-      top: 0;
-      z-index: 50;
+    a { color: inherit; text-decoration: none; }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
       background: rgba(248, 250, 252, 0.94);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
     }
-
-    .topbar-inner{
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+    .topbar-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     }
-
-    .nav-link{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      font-weight: 700;
+    .nav-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: var(--shadow); font-weight: 700;
       transition: transform 0.18s ease, background 0.18s ease;
     }
-
-    .nav-link:hover{
-      transform: translateY(-1px);
-      background: var(--surface-2);
-    }
-
-    .nav-link.primary{
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    .nav-link.primary:hover{
-      background: var(--primary-dark);
-    }
-
-    .page{
-      max-width: var(--maxw);
-      margin: 0 auto;
-      padding: 28px 20px 60px;
-    }
-
-    .hero{
+    .nav-link:hover { transform: translateY(-1px); background: var(--surface-2); }
+    .nav-link.primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .nav-link.primary:hover { background: var(--primary-dark); }
+    .page { max-width: var(--maxw); margin: 0 auto; padding: 28px 20px 60px; }
+    .hero {
       background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      padding: 34px 28px;
-      margin-bottom: 26px;
+      border: 1px solid var(--border); border-radius: 28px;
+      box-shadow: var(--shadow); padding: 34px 28px; margin-bottom: 26px;
     }
-
-    .eyebrow{
-      display: inline-block;
-      margin-bottom: 12px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: var(--accent);
-      color: #1e3a8a;
-      font-size: 0.88rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
+    .eyebrow {
+      display: inline-block; margin-bottom: 12px; padding: 7px 12px;
+      border-radius: 999px; background: var(--accent); color: #1e3a8a;
+      font-size: 0.88rem; font-weight: 700; letter-spacing: 0.02em;
     }
-
-    h1{
-      margin: 0 0 10px;
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.08;
+    h1 { margin: 0 0 10px; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.08; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 1.05rem; max-width: 780px; }
+    .quick-links { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .chip {
+      display: inline-flex; align-items: center; padding: 8px 12px;
+      border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
+      font-size: 0.95rem; font-weight: 600;
     }
-
-    .subtitle{
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 780px;
+    .section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 22px; box-shadow: var(--shadow);
+      padding: 28px 24px; margin-bottom: 22px;
     }
-
-    .quick-links{
-      margin-top: 18px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    h2 { margin-top: 0; margin-bottom: 14px; font-size: 1.5rem; line-height: 1.2; }
+    h3 { margin-top: 24px; margin-bottom: 10px; font-size: 1.12rem; }
+    p { margin: 0 0 14px; }
+    ul { margin: 0 0 14px 20px; padding: 0; }
+    li { margin-bottom: 8px; }
+    .formula-box {
+      margin: 18px 0; padding: 18px 20px;
+      border-radius: 16px; background: #f8fbff; border: 1px solid #cfe0ff;
     }
-
-    .chip{
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      font-size: 0.95rem;
-      font-weight: 600;
+    .formula {
+      font-size: 1.35rem; font-weight: 700; color: #163ea8;
+      text-align: center; margin: 8px 0;
     }
-
-    .section{
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 28px 24px;
-      margin-bottom: 22px;
+    .vars {
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid #dbeafe; color: var(--muted);
     }
-
-    h2{
-      margin-top: 0;
-      margin-bottom: 14px;
-      font-size: 1.5rem;
-      line-height: 1.2;
+    .highlight {
+      background: #fffbea; border: 1px solid #f6e7a8;
+      border-radius: 14px; padding: 16px 18px;
     }
-
-    h3{
-      margin-top: 24px;
-      margin-bottom: 10px;
-      font-size: 1.12rem;
+    .grid-2 {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px;
     }
-
-    p{
-      margin: 0 0 14px;
+    .mini-card {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px 16px;
     }
-
-    ul{
-      margin: 0 0 14px 20px;
-      padding: 0;
+    .mini-card h3 { margin-top: 0; }
+    code {
+      background: #eef2f7; border: 1px solid var(--border);
+      border-radius: 8px; padding: 2px 6px; font-size: 0.95em;
     }
-
-    li{
-      margin-bottom: 8px;
+    .cta-box {
+      background: #eff5ff; border: 1px solid #bfd2fb;
+      border-radius: 16px; padding: 20px 22px; margin-top: 8px;
     }
-
-    .formula-box{
-      margin: 18px 0;
-      padding: 18px 20px;
-      border-radius: 16px;
-      background: #f8fbff;
-      border: 1px solid #cfe0ff;
-    }
-
-    .formula{
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #163ea8;
-      text-align: center;
-      margin: 8px 0;
-    }
-
-    .vars{
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #dbeafe;
-      color: var(--muted);
-    }
-
-    .highlight{
-      background: #fffbea;
-      border: 1px solid #f6e7a8;
-      border-radius: 14px;
-      padding: 16px 18px;
-    }
-
-    .grid-2{
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .mini-card{
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px 16px;
-    }
-
-    .mini-card h3{
-      margin-top: 0;
-    }
-
-    .footer-note{
-      color: var(--muted);
-      font-size: 0.96rem;
-    }
-
-    code{
-      background: #eef2f7;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 2px 6px;
-      font-size: 0.95em;
-    }
-
-    @media (max-width: 760px){
-      .grid-2{
-        grid-template-columns: 1fr;
-      }
-
-      .hero{
-        padding: 26px 20px;
-      }
-
-      .section{
-        padding: 22px 18px;
-      }
+    .cta-box h3 { margin-top: 0; color: #163ea8; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    @media (max-width: 760px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .hero { padding: 26px 20px; }
+      .section { padding: 22px 18px; }
     }
   </style>
 </head>
@@ -277,8 +139,6 @@
       <a class="nav-link" href="index.html">← Meccanica</a>
       <a class="nav-link" href="../index.html">Teoria</a>
       <a class="nav-link" href="../../index.html">Simulazioni</a>
-
-      <!-- SOSTITUISCI l'href con il percorso reale della tua simulazione -->
       <a class="nav-link primary" href="../../meccanica/moto-rettilineo-uniforme.html">Apri simulazione</a>
     </div>
   </header>
@@ -288,78 +148,54 @@
       <div class="eyebrow">Dispensa teorica</div>
       <h1>Moto rettilineo uniforme</h1>
       <p class="subtitle">
-        Il moto rettilineo uniforme è il modello cinematico più semplice: un corpo si muove lungo una traiettoria rettilinea con velocità costante nel tempo. È il punto di partenza naturale per introdurre posizione, intervallo di tempo, velocità e rappresentazione grafica del moto.
+        Il moto rettilineo uniforme (MRU) è il modello cinematico più semplice: un corpo si muove lungo una traiettoria rettilinea con velocità costante nel tempo. È il punto di partenza naturale per introdurre posizione, spostamento, velocità e rappresentazione grafica del moto. Fisicamente, realizza la prima legge di Newton: in assenza di forze nette, il corpo mantiene il proprio stato di moto.
       </p>
-
       <div class="quick-links">
         <a class="chip" href="#definizione">Definizione</a>
+        <a class="chip" href="#grandezze">Grandezze</a>
         <a class="chip" href="#legge-oraria">Legge oraria</a>
         <a class="chip" href="#grafici">Grafici</a>
+        <a class="chip" href="#segno">Segno della velocità</a>
         <a class="chip" href="#esempio">Esempio</a>
         <a class="chip" href="#errori-comuni">Errori comuni</a>
       </div>
     </section>
 
     <section class="section" id="definizione">
-      <h2>Definizione</h2>
+      <h2>Definizione e basi fisiche</h2>
       <p>
-        Si parla di <strong>moto rettilineo uniforme</strong> quando un corpo si muove lungo una traiettoria rettilinea mantenendo costante la propria velocità.
+        Si parla di <strong>moto rettilineo uniforme</strong> (MRU) quando un corpo si muove lungo una traiettoria rettilinea mantenendo costante nel tempo la propria velocità. Le tre condizioni equivalenti sono: il modulo della velocità non cambia, la direzione del moto resta la stessa, il corpo percorre spazi uguali in intervalli di tempo uguali.
       </p>
       <p>
-        Dire che la velocità è costante significa che:
+        Dal punto di vista dinamico, il MRU è la realizzazione cinematica della <strong>prima legge di Newton</strong> (principio di inerzia): un corpo su cui agisce una forza risultante nulla continua a muoversi con velocità costante (oppure rimane fermo). In questo modello l'accelerazione è nulla:
       </p>
-      <ul>
-        <li>il <strong>modulo</strong> della velocità non cambia;</li>
-        <li>la <strong>direzione</strong> del moto resta la stessa;</li>
-        <li>il corpo percorre <strong>spazi uguali in tempi uguali</strong>.</li>
-      </ul>
-      <p>
-        In questo modello l’accelerazione è nulla. In simboli:
-      </p>
-
       <div class="formula-box">
         <div class="formula">a = 0</div>
-        <div class="vars">
-          <strong>a</strong> = accelerazione del corpo.
-        </div>
+        <div class="vars"><strong>a</strong> = accelerazione del corpo (m/s²)</div>
       </div>
-
       <p>
-        Dal punto di vista fisico, questo moto rappresenta un caso ideale. Nella realtà, per osservare una velocità rigorosamente costante occorre che la risultante delle forze sia nulla oppure che gli effetti delle forze si compensino.
+        Nella realtà, per ottenere una velocità rigorosamente costante occorre che la risultante delle forze applicate al corpo sia esattamente zero: ciò avviene per esempio quando la forza motrice bilancia esattamente gli attriti, oppure in assenza di qualsiasi interazione (come nel vuoto dello spazio interstellare).
       </p>
     </section>
 
     <section class="section" id="grandezze">
       <h2>Grandezze coinvolte</h2>
-
       <div class="grid-2">
         <div class="mini-card">
-          <h3>Posizione</h3>
-          <p>
-            La posizione del corpo lungo la traiettoria si indica con <strong>x</strong>.
-            Essa dipende dal sistema di riferimento scelto e dall’origine fissata sull’asse del moto.
-          </p>
+          <h3>Posizione $x$</h3>
+          <p>Indica dove si trova il corpo lungo l'asse di moto, misurata rispetto a un'origine fissa. È la grandezza che descrive lo stato del sistema in ogni istante. Dipende dalla scelta del sistema di riferimento.</p>
         </div>
-
         <div class="mini-card">
-          <h3>Tempo</h3>
-          <p>
-            Il tempo si indica con <strong>t</strong> ed è la variabile indipendente rispetto alla quale si descrive l’evoluzione del moto.
-          </p>
+          <h3>Tempo $t$</h3>
+          <p>È la variabile indipendente: descrive l'evoluzione temporale del moto. Si misura in secondi (s) a partire da un istante iniziale scelto convenzionalmente.</p>
         </div>
-
         <div class="mini-card">
-          <h3>Posizione iniziale</h3>
-          <p>
-            La posizione al tempo iniziale si indica con <strong>x₀</strong>. Rappresenta il punto in cui si trova il corpo all’istante iniziale scelto.
-          </p>
+          <h3>Posizione iniziale $x_0$</h3>
+          <p>La posizione del corpo all'istante $t = 0$. Può avere qualsiasi valore: non è necessario che il corpo parta dall'origine del sistema di riferimento.</p>
         </div>
-
         <div class="mini-card">
-          <h3>Velocità costante</h3>
-          <p>
-            La velocità si indica con <strong>v</strong>. Nel moto rettilineo uniforme essa è costante nel tempo.
-          </p>
+          <h3>Velocità $v$</h3>
+          <p>Nel MRU è costante nel tempo. Rappresenta la variazione di posizione per unità di tempo: $v = \Delta x / \Delta t$. Si misura in m/s. Può essere positiva, negativa o nulla.</p>
         </div>
       </div>
     </section>
@@ -367,138 +203,125 @@
     <section class="section" id="legge-oraria">
       <h2>Legge oraria</h2>
       <p>
-        La legge oraria del moto rettilineo uniforme descrive la posizione <strong>x</strong> del corpo al variare del tempo <strong>t</strong>.
+        La <strong>legge oraria</strong> è l'equazione che dà la posizione del corpo in funzione del tempo. Per il MRU si ottiene integrando l'equazione $v = \Delta x / \Delta t = \text{costante}$:
       </p>
-
       <div class="formula-box">
-        <div class="formula">x = x₀ + v t</div>
+        <div class="formula">x(t) = x₀ + v·t</div>
         <div class="vars">
-          <strong>x</strong> = posizione al tempo <strong>t</strong><br>
-          <strong>x₀</strong> = posizione iniziale<br>
-          <strong>v</strong> = velocità costante<br>
-          <strong>t</strong> = tempo trascorso dall’istante iniziale
+          <strong>x(t)</strong> = posizione al tempo t (m)<br>
+          <strong>x₀</strong> = posizione iniziale (m)<br>
+          <strong>v</strong> = velocità costante (m/s)<br>
+          <strong>t</strong> = tempo trascorso dall'istante iniziale (s)
         </div>
       </div>
-
       <p>
-        Questa relazione mostra che la posizione varia <strong>linearmente</strong> con il tempo. Se la velocità è positiva, la posizione aumenta nel tempo; se la velocità è negativa, la posizione diminuisce.
+        La posizione varia <strong>linearmente</strong> con il tempo. Se $v > 0$, la posizione cresce; se $v < 0$, decresce; se $v = 0$, il corpo è fermo.
       </p>
 
-      <h3>Spostamento</h3>
+      <h3>Spostamento e distanza percorsa</h3>
       <p>
-        Se consideriamo due istanti, un istante iniziale e un istante successivo, lo spostamento è dato da:
+        Lo <strong>spostamento</strong> $\Delta x$ è la variazione di posizione tra due istanti, ed è un vettore (in una dimensione, un numero con segno):
       </p>
-
       <div class="formula-box">
-        <div class="formula">Δx = v Δt</div>
+        <div class="formula">Δx = x(t₂) − x(t₁) = v·Δt</div>
         <div class="vars">
-          <strong>Δx</strong> = variazione di posizione<br>
-          <strong>v</strong> = velocità costante<br>
-          <strong>Δt</strong> = intervallo di tempo considerato
+          <strong>Δt</strong> = t₂ − t₁ = intervallo di tempo
         </div>
       </div>
-
       <p>
-        Questa formula esprime in modo diretto l’idea fisica fondamentale del moto rettilineo uniforme: a velocità costante, lo spazio percorso è proporzionale al tempo trascorso.
+        La <strong>distanza percorsa</strong> (grandezza scalare, sempre positiva) coincide con il valore assoluto dello spostamento solo se il verso del moto non cambia durante l'intervallo considerato.
       </p>
-    </section>
-
-    <section class="section">
-      <h2>Interpretazione fisica del segno della velocità</h2>
-      <p>
-        Il segno della velocità non indica quanto il corpo “vada veloce” in senso colloquiale, ma indica il <strong>verso del moto</strong> rispetto all’asse scelto.
-      </p>
-      <ul>
-        <li>Se <strong>v &gt; 0</strong>, il corpo si muove nel verso positivo dell’asse.</li>
-        <li>Se <strong>v &lt; 0</strong>, il corpo si muove nel verso opposto.</li>
-        <li>Se <strong>v = 0</strong>, il corpo è fermo rispetto al sistema di riferimento scelto.</li>
-      </ul>
 
       <div class="highlight">
-        La velocità può essere negativa senza che questo abbia nulla di “anomalo”: significa semplicemente che il moto avviene nel verso opposto a quello scelto come positivo.
+        Attenzione: lo spostamento e la distanza percorsa coincidono solo se il corpo si muove sempre nello stesso verso durante l'intervallo. Se la velocità cambia segno (impossibile nel MRU, ma rilevante in altri moti), le due quantità differiscono.
       </div>
+    </section>
+
+    <section class="section" id="segno">
+      <h2>Interpretazione fisica del segno della velocità</h2>
+      <p>
+        Il segno della velocità non indica quanto il corpo "vada veloce" in senso colloquiale, ma indica il <strong>verso del moto</strong> rispetto all'asse scelto. Questo dipende dalla convenzione adottata, non da una proprietà intrinseca del moto.
+      </p>
+      <ul>
+        <li>Se <strong>v &gt; 0</strong>, il corpo si muove nel verso positivo dell'asse (per esempio verso destra, o verso l'alto).</li>
+        <li>Se <strong>v &lt; 0</strong>, il corpo si muove nel verso opposto (verso sinistra, o verso il basso).</li>
+        <li>Se <strong>v = 0</strong>, il corpo è fermo rispetto al sistema di riferimento scelto.</li>
+      </ul>
+      <div class="highlight">
+        Una velocità negativa non ha nulla di "anomalo": indica semplicemente un moto nel verso opposto a quello scelto come positivo. La stessa traiettoria, vista con l'asse orientato al contrario, avrebbe velocità positiva.
+      </div>
+      <p>
+        Il <strong>modulo</strong> della velocità (o <em>rapidità</em>) è invece sempre positivo ed è la grandezza che il tachimetro di un'auto misura.
+      </p>
     </section>
 
     <section class="section" id="grafici">
       <h2>Rappresentazione grafica</h2>
 
-      <h3>Grafico posizione-tempo</h3>
+      <h3>Grafico posizione-tempo (x-t)</h3>
       <p>
-        Nel grafico della posizione <strong>x</strong> in funzione del tempo <strong>t</strong>, il moto rettilineo uniforme è rappresentato da una <strong>retta</strong>.
-      </p>
-      <ul>
-        <li>l’intercetta sull’asse verticale è la posizione iniziale <strong>x₀</strong>;</li>
-        <li>la pendenza della retta coincide con la velocità <strong>v</strong>.</li>
-      </ul>
-
-      <h3>Grafico velocità-tempo</h3>
-      <p>
-        Nel grafico della velocità <strong>v</strong> in funzione del tempo <strong>t</strong>, il moto rettilineo uniforme è rappresentato da una <strong>retta orizzontale</strong>, perché la velocità è costante.
+        Nel grafico $x(t)$, il MRU è rappresentato da una <strong>retta</strong>. L'intercetta sull'asse verticale è la posizione iniziale $x_0$, mentre la pendenza della retta è la velocità $v$. Pendenza maggiore (in valore assoluto) significa velocità maggiore. Rette con pendenza positiva indicano moto nel verso positivo; rette con pendenza negativa indicano moto nel verso opposto. Una retta orizzontale ($v = 0$) indica corpo fermo.
       </p>
 
-      <h3>Grafico accelerazione-tempo</h3>
+      <h3>Grafico velocità-tempo (v-t)</h3>
       <p>
-        Nel grafico dell’accelerazione <strong>a</strong> in funzione del tempo <strong>t</strong>, compare una retta coincidente con il valore zero, perché:
+        Nel grafico $v(t)$, il MRU è una <strong>retta orizzontale</strong>: la velocità non cambia. L'area della regione compresa tra la retta $v = \text{costante}$ e l'asse del tempo, in un intervallo $[t_1, t_2]$, è numericamente uguale allo spostamento $\Delta x = v \cdot \Delta t$.
       </p>
 
-      <div class="formula-box">
-        <div class="formula">a = 0</div>
-      </div>
+      <h3>Grafico accelerazione-tempo (a-t)</h3>
+      <p>
+        Il grafico dell'accelerazione è la retta $a = 0$, coincidente con l'asse del tempo.
+      </p>
     </section>
 
     <section class="section" id="esempio">
-      <h2>Esempio</h2>
+      <h2>Esempio numerico</h2>
       <p>
-        Un corpo si trova inizialmente nella posizione
-        <strong>x₀ = 2 m</strong>
-        e si muove con velocità costante
-        <strong>v = 3 m/s</strong>.
+        Un corpo si trova inizialmente nella posizione <strong>x₀ = 2 m</strong> e si muove con velocità costante <strong>v = −3 m/s</strong> (verso il verso negativo dell'asse).
       </p>
-      <p>
-        La legge oraria diventa:
-      </p>
-
+      <p>La legge oraria è:</p>
       <div class="formula-box">
-        <div class="formula">x = 2 + 3t</div>
+        <div class="formula">x(t) = 2 − 3t</div>
       </div>
-
       <p>
-        Dopo <strong>4 s</strong>, la posizione del corpo è:
+        Dopo <strong>t = 4 s</strong> la posizione è:
       </p>
-
       <div class="formula-box">
-        <div class="formula">x = 2 + 3 · 4 = 14 m</div>
+        <div class="formula">x(4) = 2 − 3 · 4 = 2 − 12 = −10 m</div>
       </div>
-
       <p>
-        Quindi, al tempo <strong>t = 4 s</strong>, il corpo si trova a <strong>14 m</strong> dall’origine del sistema di riferimento.
+        Il corpo si trova a 10 m dall'origine, dal lato negativo dell'asse. Lo spostamento è stato $\Delta x = -12$ m, ma la distanza percorsa è 12 m.
+      </p>
+      <p>
+        Il corpo attraversa l'origine quando $x(t) = 0$, cioè $2 - 3t = 0$, quindi a $t = 2/3 \approx 0.67$ s.
       </p>
     </section>
 
     <section class="section">
       <h2>Condizioni di validità del modello</h2>
       <p>
-        Il moto rettilineo uniforme è un modello idealizzato. Funziona bene quando:
+        Il MRU è un modello ideale. Funziona bene in pratica quando la traiettoria può essere approssimata come rettilinea su scala del problema in esame, la velocità resta praticamente costante nell'intervallo di tempo considerato, e gli effetti delle forze agenti producono variazioni della velocità trascurabili. In molte situazioni reali il MRU descrive bene un tratto di moto, anche se non il fenomeno nella sua interezza.
       </p>
-      <ul>
-        <li>la traiettoria può essere approssimata come rettilinea;</li>
-        <li>la velocità resta praticamente costante nell’intervallo di tempo considerato;</li>
-        <li>gli effetti delle forze non producono variazioni apprezzabili della velocità.</li>
-      </ul>
-      <p>
-        In molti casi reali questo modello descrive bene un tratto di moto, anche se non l’intero fenomeno.
-      </p>
+
+      <div class="cta-box">
+        <h3>Simulazione interattiva</h3>
+        <p>Esplora il moto rettilineo uniforme variando posizione iniziale e velocità, e osserva i grafici x-t e v-t aggiornarsi in tempo reale.</p>
+        <div class="button-row">
+          <a class="nav-link primary" href="../../meccanica/moto-rettilineo-uniforme.html">Apri simulazione</a>
+        </div>
+      </div>
     </section>
 
     <section class="section" id="errori-comuni">
       <h2>Errori concettuali comuni</h2>
       <ul>
-        <li>Confondere <strong>posizione</strong> e <strong>spazio percorso</strong>.</li>
-        <li>Pensare che una velocità negativa significhi una velocità “minore” in senso assoluto, invece indica solo un verso opposto.</li>
-        <li>Credere che il corpo debba partire necessariamente dall’origine, mentre la posizione iniziale può essere qualunque valore.</li>
-        <li>Confondere la linearità della legge oraria con un moto accelerato: una retta nel grafico posizione-tempo indica velocità costante, non accelerazione.</li>
+        <li><strong>Confondere posizione e spostamento.</strong> La posizione $x$ indica "dove si trova" il corpo; lo spostamento $\Delta x$ indica "di quanto si è spostato" in un intervallo. Sono grandezze diverse.</li>
+        <li><strong>Pensare che velocità negativa significhi velocità minore.</strong> Il segno indica il verso, non il modulo. Un corpo con $v = -5$ m/s si muove con la stessa rapidità di uno con $v = +5$ m/s, ma in direzione opposta.</li>
+        <li><strong>Credere che il corpo parta necessariamente dall'origine.</strong> La posizione iniziale $x_0$ può essere qualsiasi valore, anche negativo.</li>
+        <li><strong>Confondere linearità nel grafico x-t con moto accelerato.</strong> Una retta nel grafico posizione-tempo indica velocità costante, non accelerazione. È il grafico v-t che mostra una retta non orizzontale quando c'è accelerazione.</li>
+        <li><strong>Identificare distanza percorsa e spostamento.</strong> Sono uguali solo se il verso del moto non cambia nell'intervallo considerato.</li>
       </ul>
     </section>
-</main>
+  </main>
 </body>
 </html>

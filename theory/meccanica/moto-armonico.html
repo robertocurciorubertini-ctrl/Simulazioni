@@ -12,7 +12,7 @@
     window.THEORY_METADATA = {
       title: "Moto armonico",
       description: "Spiegazione teorica del moto armonico con focus sui concetti fondamentali delle oscillazioni periodiche, dell'equilibrio e della forza di richiamo.",
-          section: "Meccanica",
+      section: "Meccanica",
       sectionSlug: "meccanica",
       icon: "〰️",
       order: 8,
@@ -34,13 +34,13 @@
 
   <style>
     :root {
-      --bg: #0b1020;
-      --text: #eaf0ff;
-      --muted: #b7c3e0;
-      --accent: #7cc4ff;
-      --accent-2: #9ef0c7;
-      --border: rgba(255,255,255,0.10);
-      --shadow: 0 18px 40px rgba(0,0,0,0.28);
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #2563eb;
+      --accent-2: #1e40af;
+      --border: #dbe3ee;
+      --shadow: 0 10px 28px rgba(15,23,42,0.08);
       --radius: 18px;
       --maxw: 1050px;
     }
@@ -49,10 +49,7 @@
     body {
       margin: 0;
       font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(124,196,255,0.14), transparent 28%),
-        radial-gradient(circle at top right, rgba(158,240,199,0.10), transparent 22%),
-        linear-gradient(180deg, #0a0f1e 0%, #0d1326 100%);
+      background: radial-gradient(circle at top left, #ffffff 0%, #f8faff 35%, #f1f4f9 100%);
       color: var(--text);
       line-height: 1.7;
     }
@@ -60,19 +57,19 @@
     .hero { padding: 72px 0 34px; }
     .eyebrow {
       display: inline-block; padding: 6px 12px; border: 1px solid var(--border);
-      border-radius: 999px; background: rgba(255,255,255,0.04); color: var(--accent);
+      border-radius: 999px; background: #e0ecff; color: #1e3a8a;
       font-size: 0.92rem; margin-bottom: 18px;
     }
     h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.1; }
     .subtitle { max-width: 850px; color: var(--muted); font-size: 1.08rem; margin: 0; }
     .quick-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
     .quick-nav a {
-      text-decoration: none; color: var(--text); background: rgba(255,255,255,0.04);
+      text-decoration: none; color: var(--text); background: #ffffff;
       border: 1px solid var(--border); padding: 10px 14px; border-radius: 999px; font-size: 0.95rem;
     }
     main { padding-bottom: 60px; }
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+      background: #ffffff;
       border: 1px solid var(--border); border-radius: var(--radius);
       box-shadow: var(--shadow); padding: 24px; overflow: hidden; margin-bottom: 20px;
     }
@@ -84,25 +81,50 @@
     li { margin-bottom: 8px; }
     .formula-box {
       margin: 14px 0 16px; padding: 14px 16px; border-radius: 14px;
-      border: 1px solid rgba(124,196,255,0.22); background: rgba(124,196,255,0.07);
+      border: 1px solid #cfe0ff; background: #f8fbff;
       overflow-x: auto;
     }
     .highlight {
       border-left: 4px solid var(--accent); padding: 12px 14px;
-      background: rgba(255,255,255,0.04); border-radius: 0 12px 12px 0;
+      background: #fffbea; border: 1px solid #f6e7a8; border-radius: 0 12px 12px 0;
       color: var(--muted); margin: 14px 0 18px;
     }
     .image-block {
       margin: 18px 0 8px; padding: 16px; border-radius: 16px;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); background: #f1f5f9;
     }
     .image-frame {
       width: 100%; min-height: 240px; border-radius: 14px;
-      border: 1px dashed rgba(124,196,255,0.35); background: rgba(10,15,30,0.45);
+      border: 1px dashed #93c5fd; background: #f0f7ff;
       display: flex; align-items: center; justify-content: center; overflow: hidden;
     }
     .image-frame img { width: 100%; height: auto; display: block; object-fit: contain; }
     .image-caption { margin-top: 10px; color: var(--muted); font-size: 0.96rem; }
+    .cta-box {
+      margin-top: 28px; padding: 20px; border-radius: 14px;
+      border: 1px solid #bfd2fb; background: #eff5ff;
+    }
+    .cta-box h3 { margin-top: 0; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    .nav-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; padding: 11px 20px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700;
+      border: 1px solid #bfd2fb;
+      background: linear-gradient(180deg,#eff5ff,#e7f0ff); color: #194aa5;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .nav-link:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+    .nav-link.primary {
+      background: var(--accent); color: #ffffff; border-color: var(--accent);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .info-box {
+      padding: 16px; border-radius: 14px;
+      border: 1px solid var(--border); background: #f1f5f9;
+    }
+    .info-box h3 { margin-top: 0; font-size: 1rem; }
+    @media (max-width: 680px) { .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -111,113 +133,241 @@
       <div class="eyebrow">Teoria · Meccanica</div>
       <h1>Moto armonico</h1>
       <p class="subtitle">
-        Il moto armonico è un modello fondamentale per descrivere oscillazioni periodiche attorno a una posizione di equilibrio.
+        Il moto armonico è il modello fondamentale per descrivere oscillazioni periodiche attorno a una posizione di equilibrio stabile. Nasce ogni volta che la forza di richiamo è proporzionale allo spostamento, e descrive con ottima approssimazione sistemi molto diversi: molle, pendoli, circuiti elettrici risonanti e molecole nei cristalli.
       </p>
       <nav class="quick-nav">
         <a href="#idea-base">Idea fisica</a>
-        <a href="#caratteristiche">Caratteristiche</a>
+        <a href="#equazione-del-moto">Equazione del moto</a>
+        <a href="#soluzione">Soluzione</a>
         <a href="#grandezze">Grandezze principali</a>
-        <a href="#forza">Forza di richiamo</a>
+        <a href="#velocita-accelerazione">Velocità e accelerazione</a>
         <a href="#energia">Energia</a>
+        <a href="#esempi">Esempi fisici</a>
         <a href="#immagini">Immagini</a>
       </nav>
     </div>
   </header>
 
   <main class="container">
+
     <section class="card" id="idea-base">
       <h2>Idea fisica fondamentale</h2>
       <p>
-        Il moto armonico è un moto oscillatorio in cui un corpo si muove avanti e indietro attorno a una posizione di equilibrio.
+        Il moto armonico semplice (MAS) nasce da un meccanismo molto preciso: ogni volta che il corpo si allontana dalla posizione di equilibrio, interviene una forza che lo spinge di nuovo verso di essa, e questa forza è tanto più intensa quanto maggiore è lo spostamento. Questa caratteristica — forza proporzionale allo spostamento e diretta verso l'equilibrio — è l'unica ingrediente fisico necessario per generare un'oscillazione armonica.
       </p>
       <p>
-        Quando il corpo viene allontanato dall’equilibrio, agisce una forza che tende a riportarlo verso tale posizione.
+        Il risultato è un moto che si ripete identico a sé stesso dopo un intervallo di tempo fisso chiamato <strong>periodo</strong>. La posizione del corpo varia nel tempo come una sinusoide, motivo per cui il moto armonico è spesso detto "oscillazione sinusoidale".
       </p>
       <div class="highlight">
-        Il punto essenziale è che il sistema oscilla attorno a un equilibrio stabile e ripete il suo stato dopo intervalli di tempo regolari.
+        Punto essenziale: in un oscillatore armonico ideale, il periodo di oscillazione non dipende dall'ampiezza. Un pendolo di piccole oscillazioni impiega lo stesso tempo a completare un'oscillazione ampia o una piccola. Questa proprietà si chiama <strong>isocronismo</strong>.
       </div>
     </section>
 
-    <section class="card" id="caratteristiche">
-      <h2>Caratteristiche del moto armonico</h2>
+    <section class="card" id="equazione-del-moto">
+      <h2>Forza di richiamo ed equazione del moto</h2>
+      <p>
+        Nel modello ideale, la forza agente sul corpo è:
+      </p>
+      <div class="formula-box">
+        $$F = -kx$$
+      </div>
+      <p>
+        dove $k > 0$ è la costante elastica del sistema (misurata in N/m), e $x$ è lo spostamento dalla posizione di equilibrio. Il segno meno garantisce che la forza sia sempre diretta verso l'equilibrio: se $x > 0$ allora $F < 0$, e viceversa. Questa è la <strong>legge di Hooke</strong>.
+      </p>
+      <p>
+        Applicando il secondo principio della dinamica ($F = ma$, dove $a = \ddot{x}$) si ottiene l'<strong>equazione differenziale del moto armonico</strong>:
+      </p>
+      <div class="formula-box">
+        $$\ddot{x} + \omega_0^2\, x = 0$$
+      </div>
+      <p>
+        dove si è definita la <strong>pulsazione propria</strong> (o frequenza angolare propria):
+      </p>
+      <div class="formula-box">
+        $$\omega_0 = \sqrt{\frac{k}{m}}$$
+      </div>
+      <p class="muted">
+        $\omega_0$ è misurata in radianti al secondo (rad/s), $k$ in newton su metro (N/m) e $m$ in chilogrammi (kg).
+      </p>
+      <div class="highlight">
+        L'equazione $\ddot{x} + \omega_0^2 x = 0$ è una delle equazioni differenziali più importanti della fisica. Appare in meccanica classica, in elettromagnetismo (circuiti LC), in ottica e in meccanica quantistica, il che spiega la centralità del moto armonico nell'intero edificio della fisica.
+      </div>
+    </section>
+
+    <section class="card" id="soluzione">
+      <h2>Soluzione: la legge oraria</h2>
+      <p>
+        La soluzione generale dell'equazione del moto è una funzione sinusoidale del tempo. La forma più compatta è:
+      </p>
+      <div class="formula-box">
+        $$x(t) = A\cos(\omega_0 t + \varphi)$$
+      </div>
+      <p>
+        Le tre costanti $A$, $\omega_0$ e $\varphi$ hanno significati fisici distinti e precisi:
+      </p>
       <ul>
-        <li>esiste una posizione di equilibrio;</li>
-        <li>il moto avviene tra due posizioni estreme;</li>
-        <li>la velocità è massima in equilibrio;</li>
-        <li>la velocità si annulla agli estremi.</li>
+        <li><strong>$A$</strong> è l'<em>ampiezza</em>, cioè la massima distanza raggiunta dalla posizione di equilibrio. È determinata dalle condizioni iniziali (posizione e velocità a $t=0$) e non cambia nel tempo in assenza di attrito.</li>
+        <li><strong>$\omega_0$</strong> è la <em>pulsazione propria</em> del sistema, che dipende solo dai parametri fisici del sistema ($k$ e $m$) e non dalle condizioni iniziali.</li>
+        <li><strong>$\varphi$</strong> è la <em>fase iniziale</em>, che dipende dal modo in cui il moto viene avviato. Se il corpo parte dall'ampiezza massima con velocità nulla, allora $\varphi = 0$; se parte dall'equilibrio con velocità massima, allora $\varphi = -\pi/2$.</li>
       </ul>
+      <p>
+        L'ampiezza si calcola dalle condizioni iniziali $x_0 = x(0)$ e $v_0 = \dot{x}(0)$ come:
+      </p>
+      <div class="formula-box">
+        $$A = \sqrt{x_0^2 + \left(\frac{v_0}{\omega_0}\right)^2}$$
+      </div>
     </section>
 
     <section class="card" id="grandezze">
-      <h2>Grandezze principali</h2>
-      <p>Le grandezze più importanti sono ampiezza, periodo e frequenza.</p>
+      <h2>Grandezze principali: periodo, frequenza e pulsazione</h2>
+      <p>
+        Le tre grandezze che caratterizzano la periodicità del moto sono legate da relazioni semplici ma fondamentali. Il <strong>periodo</strong> $T$ è il tempo necessario affinché il moto si ripeta identico a sé stesso; la <strong>frequenza</strong> $f$ è il numero di oscillazioni complete nell'unità di tempo; la <strong>pulsazione</strong> $\omega_0$ rappresenta la velocità con cui la fase avanza, espressa in radianti al secondo.
+      </p>
       <div class="formula-box">
-        $$f=\frac{1}{T}$$
+        $$T = \frac{2\pi}{\omega_0} \qquad f = \frac{1}{T} = \frac{\omega_0}{2\pi} \qquad \omega_0 = 2\pi f$$
       </div>
       <p>
-        dove $f$ è la frequenza e $T$ è il periodo.
+        Per il sistema massa-molla, sostituendo $\omega_0 = \sqrt{k/m}$:
       </p>
-      <p>
-        L’ampiezza, spesso indicata con $A$, è la massima distanza dalla posizione di equilibrio.
-      </p>
-    </section>
-
-    <section class="card" id="forza">
-      <h2>Forza di richiamo</h2>
-      <p>Nel modello ideale, la forza di richiamo è proporzionale allo spostamento dall’equilibrio e ha verso opposto:</p>
       <div class="formula-box">
-        $$F=-kx$$
+        $$T = 2\pi\sqrt{\frac{m}{k}}$$
       </div>
-      <p>
-        dove $F$ è la forza di richiamo, $k$ è una costante positiva e $x$ è lo spostamento dalla posizione di equilibrio.
+      <p class="muted">
+        $T$ è misurato in secondi (s), $f$ in hertz (Hz) con 1 Hz = 1/s, $\omega_0$ in rad/s.
       </p>
       <div class="highlight">
-        Il segno meno indica che la forza punta sempre verso l’equilibrio.
+        Il periodo cresce con la massa (sistemi più pesanti oscillano più lentamente) e decresce con la costante elastica (sistemi più rigidi oscillano più velocemente). In entrambi i casi, il periodo non dipende dall'ampiezza: questa è la proprietà di isocronismo.
+      </div>
+    </section>
+
+    <section class="card" id="velocita-accelerazione">
+      <h2>Velocità e accelerazione nel moto armonico</h2>
+      <p>
+        Derivando la legge oraria $x(t) = A\cos(\omega_0 t + \varphi)$ rispetto al tempo si ottengono velocità e accelerazione istantanee:
+      </p>
+      <div class="formula-box">
+        $$v(t) = \dot{x}(t) = -A\omega_0 \sin(\omega_0 t + \varphi)$$
+        $$a(t) = \ddot{x}(t) = -A\omega_0^2 \cos(\omega_0 t + \varphi) = -\omega_0^2\, x(t)$$
+      </div>
+      <p>
+        Emerge un risultato importante: <strong>l'accelerazione è sempre proporzionale a $x$ e di segno opposto</strong>, in accordo con la forza di richiamo. I valori massimi (in modulo) di velocità e accelerazione sono:
+      </p>
+      <div class="formula-box">
+        $$v_{\max} = A\omega_0 \qquad a_{\max} = A\omega_0^2$$
+      </div>
+      <p>
+        La velocità è massima nel passaggio per l'equilibrio ($x = 0$) e si annulla alle posizioni estreme ($x = \pm A$). L'accelerazione è massima agli estremi e si annulla in equilibrio. Le tre grandezze $x$, $v$ e $a$ sono quindi in quadratura di fase: sono sfasate l'una rispetto all'altra di $\pi/2$.
+      </p>
+
+      <div class="grid-2">
+        <div class="info-box">
+          <h3>In equilibrio ($x = 0$)</h3>
+          <p>Posizione nulla, velocità massima ($v = A\omega_0$), accelerazione nulla. L'energia è tutta cinetica.</p>
+        </div>
+        <div class="info-box">
+          <h3>Agli estremi ($x = \pm A$)</h3>
+          <p>Posizione massima, velocità nulla, accelerazione massima ($a = A\omega_0^2$). L'energia è tutta potenziale.</p>
+        </div>
       </div>
     </section>
 
     <section class="card" id="energia">
-      <h2>Lettura energetica</h2>
+      <h2>Energia nel moto armonico</h2>
       <p>
-        In un oscillatore ideale l’energia meccanica si conserva e si trasforma continuamente tra energia cinetica ed energia potenziale.
+        In un oscillatore armonico ideale (senza attrito) l'energia meccanica totale si conserva. Essa è distribuita continuamente tra energia cinetica ed energia potenziale elastica:
       </p>
-      <ul>
-        <li>in prossimità dell’equilibrio prevale l’energia cinetica;</li>
-        <li>agli estremi prevale l’energia potenziale.</li>
-      </ul>
+      <div class="formula-box">
+        $$E_k = \frac{1}{2}mv^2 = \frac{1}{2}mA^2\omega_0^2\sin^2(\omega_0 t + \varphi)$$
+        $$E_p = \frac{1}{2}kx^2 = \frac{1}{2}kA^2\cos^2(\omega_0 t + \varphi)$$
+      </div>
+      <p>
+        Usando $k = m\omega_0^2$, la somma delle due è costante:
+      </p>
+      <div class="formula-box">
+        $$E = E_k + E_p = \frac{1}{2}kA^2 = \frac{1}{2}m\omega_0^2 A^2$$
+      </div>
+      <p class="muted">
+        $E$ è misurata in joule (J), $k$ in N/m, $A$ in metri (m).
+      </p>
+      <div class="highlight">
+        L'energia totale è proporzionale al <em>quadrato</em> dell'ampiezza. Raddoppiare l'ampiezza significa quadruplicare l'energia immagazzinata nel sistema. Questo fatto ha conseguenze importanti in acustica, in elettromagnetismo e in meccanica quantistica.
+      </div>
+      <p>
+        Dalla conservazione dell'energia si può ricavare la velocità in funzione della posizione, senza passare per le derivate della legge oraria:
+      </p>
+      <div class="formula-box">
+        $$v = \pm\,\omega_0\sqrt{A^2 - x^2}$$
+      </div>
+      <p>
+        Il segno $\pm$ indica che, alla stessa posizione $x$, il corpo può muoversi in un verso o nell'altro a seconda della fase del moto.
+      </p>
+    </section>
+
+    <section class="card" id="esempi">
+      <h2>Esempi fisici rilevanti</h2>
+
+      <h3>Sistema massa-molla</h3>
+      <p>
+        È il prototipo dell'oscillatore armonico. Una massa $m$ è collegata a una molla di costante elastica $k$. Se la molla è ideale (obbedisce alla legge di Hooke per qualsiasi allungamento) e si trascura l'attrito, il moto è esattamente armonico con $\omega_0 = \sqrt{k/m}$.
+      </p>
+
+      <h3>Pendolo semplice (piccole oscillazioni)</h3>
+      <p>
+        Un corpo di massa $m$ appeso a un filo di lunghezza $L$ oscilla sotto l'effetto della componente tangenziale della forza peso. Per angoli piccoli ($\theta \ll 1$ rad, cioè $\theta \lesssim 10°$) si può approssimare $\sin\theta \approx \theta$, e il moto diventa armonico con:
+      </p>
+      <div class="formula-box">
+        $$\omega_0 = \sqrt{\frac{g}{L}} \qquad T = 2\pi\sqrt{\frac{L}{g}}$$
+      </div>
+      <p>
+        Notare che il periodo del pendolo dipende solo dalla lunghezza $L$ e dall'accelerazione di gravità $g$, non dalla massa. Questo spiega perché il pendolo è stato storicamente usato come riferimento per la misura del tempo.
+      </p>
+
+      <h3>Oscillatore smorzato</h3>
+      <p>
+        Se è presente una forza di attrito viscoso proporzionale alla velocità ($F_{\text{att}} = -b\dot{x}$), l'ampiezza delle oscillazioni diminuisce nel tempo. Il sistema non è più un oscillatore armonico semplice ma un <strong>oscillatore smorzato</strong>. In questo caso l'energia si dissipa progressivamente e il moto cessa. Lo smorzamento è caratterizzato dal fattore $\gamma = b/(2m)$, e si distinguono tre regimi: sottosmorzato (oscillazioni con ampiezza decrescente), sovrasmorzato (ritorno monotono all'equilibrio) e criticamente smorzato (ritorno all'equilibrio nel tempo minimo possibile).
+      </p>
+
+      <div class="cta-box">
+        <h3>Simulazione interattiva</h3>
+        <p>Esplora il moto armonico variando massa, costante elastica e condizioni iniziali direttamente nella simulazione.</p>
+        <div class="button-row">
+          <a class="nav-link primary" href="../../meccanica/moto-armonico.html">Apri simulazione</a>
+        </div>
+      </div>
     </section>
 
     <section class="card" id="immagini">
-      <h2>Spazi per immagini e schemi</h2>
+      <h2>Schemi e immagini</h2>
 
       <div class="image-block">
         <div class="image-frame">
-          <img src="./massa-molla-equilibrio.png" alt="Sistema massa molla in equilibrio e oscillazione" />
+          <img src="./massa-molla-equilibrio.png" alt="Sistema massa-molla in equilibrio e oscillazione" />
         </div>
-        <div class="image-caption">Sistema massa-molla con posizione di equilibrio e posizioni estreme.</div>
+        <div class="image-caption">Sistema massa-molla: posizione di equilibrio, spostamento $x$ e forza di richiamo $F = -kx$.</div>
       </div>
 
       <div class="image-block">
         <div class="image-frame">
           <img src="./grafico-moto-armonico.png" alt="Grafico qualitativo del moto armonico" />
         </div>
-        <div class="image-caption">Andamento qualitativo della posizione nel tempo.</div>
+        <div class="image-caption">Andamento di $x(t)$, $v(t)$ e $a(t)$: le tre curve sono sfasate di $\pi/2$ l'una rispetto all'altra.</div>
       </div>
 
       <div class="image-block">
         <div class="image-frame">
           <img src="./energia-moto-armonico.png" alt="Scambio energetico nel moto armonico" />
         </div>
-        <div class="image-caption">Scambio tra energia cinetica ed energia potenziale.</div>
+        <div class="image-caption">Energia cinetica $E_k$ ed energia potenziale $E_p$ in funzione del tempo: la loro somma è costante.</div>
       </div>
 
       <div class="image-block">
         <div class="image-frame">
           <img src="./pendolo-piccole-oscillazioni.png" alt="Pendolo per piccole oscillazioni" />
         </div>
-        <div class="image-caption">Pendolo semplice nel regime di piccole oscillazioni.</div>
+        <div class="image-caption">Pendolo semplice nel regime di piccole oscillazioni: la componente tangenziale della forza peso agisce come forza di richiamo proporzionale all'angolo.</div>
       </div>
     </section>
+
   </main>
 </body>
 </html>

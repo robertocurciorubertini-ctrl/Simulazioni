@@ -12,7 +12,7 @@
     window.THEORY_METADATA = {
       title: "Moto circolare",
       description: "Spiegazione teorica del moto circolare, con introduzione delle grandezze angolari, della velocità tangenziale e dell'accelerazione centripeta.",
-          section: "Meccanica",
+      section: "Meccanica",
       sectionSlug: "meccanica",
       icon: "⭕",
       order: 7,
@@ -34,13 +34,13 @@
 
   <style>
     :root {
-      --bg: #0b1020;
-      --text: #eaf0ff;
-      --muted: #b7c3e0;
-      --accent: #7cc4ff;
-      --accent-2: #9ef0c7;
-      --border: rgba(255,255,255,0.10);
-      --shadow: 0 18px 40px rgba(0,0,0,0.28);
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #2563eb;
+      --accent-2: #1e40af;
+      --border: #dbe3ee;
+      --shadow: 0 10px 28px rgba(15,23,42,0.08);
       --radius: 18px;
       --maxw: 1050px;
     }
@@ -49,10 +49,7 @@
     body {
       margin: 0;
       font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(124,196,255,0.14), transparent 28%),
-        radial-gradient(circle at top right, rgba(158,240,199,0.10), transparent 22%),
-        linear-gradient(180deg, #0a0f1e 0%, #0d1326 100%);
+      background: radial-gradient(circle at top left, #ffffff 0%, #f8faff 35%, #f1f4f9 100%);
       color: var(--text);
       line-height: 1.7;
     }
@@ -60,20 +57,20 @@
     .hero { padding: 72px 0 34px; }
     .eyebrow {
       display: inline-block; padding: 6px 12px; border: 1px solid var(--border);
-      border-radius: 999px; background: rgba(255,255,255,0.04); color: var(--accent);
+      border-radius: 999px; background: #e0ecff; color: #1e3a8a;
       font-size: 0.92rem; margin-bottom: 18px;
     }
     h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.1; }
     .subtitle { max-width: 850px; color: var(--muted); font-size: 1.08rem; margin: 0; }
     .quick-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
     .quick-nav a {
-      text-decoration: none; color: var(--text); background: rgba(255,255,255,0.04);
+      text-decoration: none; color: var(--text); background: #ffffff;
       border: 1px solid var(--border); padding: 10px 14px; border-radius: 999px; font-size: 0.95rem;
     }
     main { padding-bottom: 60px; }
     .grid { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 20px; margin-bottom: 20px; }
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+      background: #ffffff;
       border: 1px solid var(--border); border-radius: var(--radius);
       box-shadow: var(--shadow); padding: 24px; overflow: hidden;
     }
@@ -86,26 +83,54 @@
     li { margin-bottom: 8px; }
     .formula-box {
       margin: 14px 0 16px; padding: 14px 16px; border-radius: 14px;
-      border: 1px solid rgba(124,196,255,0.22); background: rgba(124,196,255,0.07);
+      border: 1px solid #cfe0ff; background: #f8fbff;
       overflow-x: auto;
     }
     .highlight {
       border-left: 4px solid var(--accent); padding: 12px 14px;
-      background: rgba(255,255,255,0.04); border-radius: 0 12px 12px 0;
+      background: #fffbea; border: 1px solid #f6e7a8; border-radius: 0 12px 12px 0;
       color: var(--muted); margin: 14px 0 18px;
     }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .info-box {
+      padding: 16px; border-radius: 14px;
+      border: 1px solid var(--border); background: #f1f5f9;
+    }
+    .info-box h3 { margin-top: 0; font-size: 1rem; }
     .image-block {
       margin: 18px 0 8px; padding: 16px; border-radius: 16px;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); background: #f1f5f9;
     }
     .image-frame {
       width: 100%; min-height: 240px; border-radius: 14px;
-      border: 1px dashed rgba(124,196,255,0.35); background: rgba(10,15,30,0.45);
+      border: 1px dashed #93c5fd; background: #f0f7ff;
       display: flex; align-items: center; justify-content: center; overflow: hidden;
     }
     .image-frame img { width: 100%; height: auto; display: block; object-fit: contain; }
     .image-caption { margin-top: 10px; color: var(--muted); font-size: 0.96rem; }
-    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .hero { padding-top: 56px; } }
+    .cta-box {
+      margin-top: 28px; padding: 20px; border-radius: 14px;
+      border: 1px solid #bfd2fb; background: #eff5ff;
+    }
+    .cta-box h3 { margin-top: 0; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    .nav-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; padding: 11px 20px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700;
+      border: 1px solid #bfd2fb;
+      background: linear-gradient(180deg,#eff5ff,#e7f0ff); color: #194aa5;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .nav-link:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+    .nav-link.primary {
+      background: var(--accent); color: #ffffff; border-color: var(--accent);
+    }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .hero { padding-top: 56px; }
+    }
   </style>
 </head>
 <body>
@@ -114,120 +139,208 @@
       <div class="eyebrow">Teoria · Meccanica</div>
       <h1>Moto circolare</h1>
       <p class="subtitle">
-        Il moto circolare descrive il movimento di un corpo che si muove lungo una circonferenza. Anche quando il modulo della velocità resta costante, la sua direzione cambia continuamente.
+        Il moto circolare descrive il movimento di un corpo lungo una traiettoria circolare. Anche quando il modulo della velocità resta costante, la sua direzione cambia continuamente: questo implica l'esistenza di un'accelerazione, detta centripeta, diretta verso il centro della traiettoria.
       </p>
       <nav class="quick-nav">
         <a href="#idea-base">Idea fisica</a>
         <a href="#grandezze-angolari">Grandezze angolari</a>
-        <a href="#velocita">Velocità</a>
-        <a href="#accelerazione">Accelerazione</a>
-        <a href="#uniforme">Moto uniforme</a>
+        <a href="#velocita">Velocità tangenziale</a>
+        <a href="#accelerazione">Accelerazione centripeta</a>
+        <a href="#uniforme">MCU</a>
+        <a href="#non-uniforme">MCNU</a>
+        <a href="#forza">Forza centripeta</a>
         <a href="#immagini">Immagini</a>
       </nav>
     </div>
   </header>
 
   <main class="container">
+
     <section class="card section" id="idea-base">
       <h2>Idea fisica fondamentale</h2>
-      <p>Nel moto circolare la posizione del corpo varia lungo una traiettoria circolare di raggio $r$.</p>
+      <p>
+        Nel moto circolare il corpo percorre una traiettoria chiusa di raggio $r$ costante. La posizione lungo la traiettoria può essere descritta in modo conveniente dall'angolo $\theta$ spazzato rispetto a una direzione di riferimento fissa. La relazione tra arco percorso $s$ e angolo è:
+      </p>
       <div class="formula-box">
-        $$s=r\theta$$
+        $$s = r\theta$$
       </div>
       <p>
-        dove $s$ è l’arco percorso, $r$ è il raggio e $\theta$ è l’angolo in radianti.
+        dove $\theta$ è espresso in <strong>radianti</strong>. Un radiante corrisponde all'angolo che sottende un arco di lunghezza pari al raggio; una rivoluzione completa corrisponde a $2\pi$ radianti.
       </p>
       <div class="highlight">
-        Anche se il modulo della velocità può restare costante, il vettore velocità cambia direzione in ogni istante. Per questo il moto circolare implica accelerazione.
+        Il punto concettualmente più delicato del moto circolare è il seguente: anche se il corpo si muove a velocità costante in modulo, il <em>vettore</em> velocità cambia direzione ad ogni istante. Una variazione del vettore velocità — indipendentemente che sia di modulo, di direzione o di verso — è per definizione un'accelerazione. Il moto circolare uniforme implica quindi necessariamente un'accelerazione, anche se il "senso comune" potrebbe suggerire il contrario.
       </div>
     </section>
 
     <section class="card section" id="grandezze-angolari">
       <h2>Grandezze angolari</h2>
+      <p>
+        Per descrivere la cinematica del moto circolare è utile introdurre le grandezze angolari, analoghe alle grandezze lineari del moto rettilineo.
+      </p>
       <div class="formula-box">
-        $$\omega=\frac{d\theta}{dt}$$
-        $$\alpha=\frac{d\omega}{dt}$$
+        $$\omega = \frac{d\theta}{dt} \qquad \alpha = \frac{d\omega}{dt} = \frac{d^2\theta}{dt^2}$$
       </div>
       <p>
-        dove $\omega$ è la velocità angolare, $\alpha$ è l’accelerazione angolare, $\theta$ è la posizione angolare e $t$ è il tempo.
+        La <strong>velocità angolare</strong> $\omega$ (misurata in rad/s) descrive quanto rapidamente varia l'angolo nel tempo. L'<strong>accelerazione angolare</strong> $\alpha$ (misurata in rad/s²) descrive la variazione della velocità angolare. Le relazioni di proporzionalità tra grandezze angolari e lineari — mediate dal raggio $r$ — sono:
       </p>
+      <div class="formula-box">
+        $$s = r\theta \qquad v = r\omega \qquad a_t = r\alpha$$
+      </div>
+      <p class="muted">
+        dove $a_t$ è l'accelerazione tangenziale (componente dell'accelerazione nella direzione del moto).
+      </p>
+
+      <div class="grid-2">
+        <div class="info-box">
+          <h3>Analogia con il moto rettilineo</h3>
+          <p>Posizione $\leftrightarrow$ angolo $\theta$, velocità $\leftrightarrow$ velocità angolare $\omega$, accelerazione $\leftrightarrow$ accelerazione angolare $\alpha$. Le equazioni del moto circolare uniformemente accelerato hanno la stessa forma di quelle del moto rettilineo uniformemente accelerato.</p>
+        </div>
+        <div class="info-box">
+          <h3>Segno di $\omega$</h3>
+          <p>Per convenzione $\omega > 0$ indica rotazione in senso antiorario, $\omega < 0$ in senso orario. Il verso di $\omega$ è quello dell'asse di rotazione nel formalismo vettoriale.</p>
+        </div>
+      </div>
     </section>
 
     <section class="card section" id="velocita">
       <h2>Velocità tangenziale</h2>
+      <p>
+        La velocità tangenziale $v$ è il modulo del vettore velocità del corpo; è sempre diretta nella direzione tangente alla traiettoria circolare nel punto considerato, perpendicolare al raggio. Vale:
+      </p>
       <div class="formula-box">
-        $$v=r\omega$$
+        $$v = r\omega$$
       </div>
       <p>
-        dove $v$ è il modulo della velocità tangenziale, $r$ è il raggio e $\omega$ è la velocità angolare.
+        A parità di velocità angolare, un punto più lontano dal centro (raggio maggiore) ha una velocità tangenziale maggiore. Questo spiega, per esempio, perché la velocità lineare di un punto sulla superficie terrestre aumenta avvicinandosi all'equatore.
       </p>
 
       <h3>Periodo e frequenza</h3>
-      <div class="formula-box">
-        $$T=\frac{2\pi}{\omega}$$
-        $$f=\frac{1}{T}$$
-        $$\omega=2\pi f$$
-      </div>
       <p>
-        dove $T$ è il periodo e $f$ è la frequenza.
+        Il tempo impiegato a completare una rivoluzione completa è il <strong>periodo</strong> $T$. In un periodo il corpo percorre l'intera circonferenza $2\pi r$, quindi:
+      </p>
+      <div class="formula-box">
+        $$v = \frac{2\pi r}{T} \qquad T = \frac{2\pi}{\omega} \qquad f = \frac{1}{T} = \frac{\omega}{2\pi} \qquad \omega = 2\pi f$$
+      </div>
+      <p class="muted">
+        $T$ in secondi (s), $f$ in hertz (Hz), $\omega$ in rad/s, $v$ in m/s, $r$ in m.
       </p>
     </section>
 
     <section class="card section" id="accelerazione">
       <h2>Accelerazione centripeta</h2>
-      <p>L’accelerazione è diretta verso il centro della circonferenza.</p>
+      <p>
+        Il cambiamento continuo di direzione del vettore velocità produce un'accelerazione diretta <em>verso il centro</em> della circonferenza, chiamata <strong>accelerazione centripeta</strong> (dal latino <em>centrum petere</em>, "tendere verso il centro"). Si può dimostrare geometricamente che il suo modulo è:
+      </p>
       <div class="formula-box">
-        $$a_c=\frac{v^2}{r}$$
-        $$a_c=r\omega^2$$
+        $$a_c = \frac{v^2}{r} = r\omega^2$$
       </div>
       <p>
-        dove $a_c$ è il modulo dell’accelerazione centripeta, $v$ è la velocità tangenziale, $r$ è il raggio e $\omega$ è la velocità angolare.
+        L'accelerazione centripeta è sempre perpendicolare alla velocità e punta verso il centro della traiettoria. Non modifica il modulo della velocità, ma ne cambia continuamente la direzione.
+      </p>
+      <div class="highlight">
+        È fondamentale non confondere l'accelerazione centripeta con la "forza centrifuga". La forza centrifuga è una <em>forza fittizia</em> che appare solo in un sistema di riferimento non inerziale (rotante). In un sistema di riferimento inerziale esiste solo la forza reale diretta verso il centro — la forza centripeta — che produce l'accelerazione centripeta.
+      </div>
+
+      <h3>Accelerazione totale nel moto circolare non uniforme</h3>
+      <p>
+        Se la velocità angolare varia nel tempo (moto circolare non uniforme), l'accelerazione totale ha due componenti perpendicolari tra loro:
+      </p>
+      <div class="formula-box">
+        $$\vec{a} = \vec{a}_c + \vec{a}_t$$
+        $$|\vec{a}| = \sqrt{a_c^2 + a_t^2} = \sqrt{(r\omega^2)^2 + (r\alpha)^2}$$
+      </div>
+      <p>
+        La componente tangenziale $a_t = r\alpha$ è responsabile della variazione del modulo della velocità; quella centripeta $a_c = r\omega^2$ è responsabile della variazione di direzione.
       </p>
     </section>
 
     <section class="card section" id="uniforme">
-      <h2>Moto circolare uniforme</h2>
-      <p>Nel moto circolare uniforme la velocità angolare è costante.</p>
+      <h2>Moto circolare uniforme (MCU)</h2>
+      <p>
+        Nel moto circolare uniforme (MCU) la velocità angolare è costante nel tempo ($\alpha = 0$). Le leggi del moto si riducono a:
+      </p>
       <div class="formula-box">
-        $$\omega=\text{costante}$$
-        $$\theta(t)=\theta_0+\omega t$$
+        $$\omega = \text{costante} \qquad \theta(t) = \theta_0 + \omega t$$
       </div>
       <p>
-        dove $\theta_0$ è la posizione angolare iniziale.
+        Le coordinate cartesiane del corpo variano sinusoidalmente nel tempo:
+      </p>
+      <div class="formula-box">
+        $$x(t) = r\cos(\omega t + \theta_0) \qquad y(t) = r\sin(\omega t + \theta_0)$$
+      </div>
+      <div class="highlight">
+        Il moto circolare uniforme è strettamente legato al moto armonico: la proiezione del moto circolare uniforme su un asse è esattamente un moto armonico semplice con la stessa pulsazione $\omega$. Questa connessione è alla base della rappresentazione fasoriale usata in elettronica e in teoria delle oscillazioni.
+      </div>
+    </section>
+
+    <section class="card section" id="non-uniforme">
+      <h2>Moto circolare non uniforme (MCNU)</h2>
+      <p>
+        Nel moto circolare non uniforme (MCNU) la velocità angolare varia nel tempo ($\alpha \neq 0$). Nel caso in cui $\alpha$ sia costante (moto circolare uniformemente accelerato), le equazioni sono del tutto analoghe a quelle del moto rettilineo uniformemente accelerato:
+      </p>
+      <div class="formula-box">
+        $$\omega(t) = \omega_0 + \alpha t$$
+        $$\theta(t) = \theta_0 + \omega_0 t + \tfrac{1}{2}\alpha t^2$$
+        $$\omega^2 = \omega_0^2 + 2\alpha(\theta - \theta_0)$$
+      </div>
+      <p class="muted">
+        $\omega_0$ è la velocità angolare iniziale, $\theta_0$ l'angolo iniziale, $\alpha$ l'accelerazione angolare (costante).
       </p>
     </section>
 
+    <section class="card section" id="forza">
+      <h2>Forza centripeta</h2>
+      <p>
+        Per mantenere un corpo su una traiettoria circolare, la risultante delle forze deve avere una componente diretta verso il centro di modulo pari a $ma_c$. Questa componente della risultante si chiama <strong>forza centripeta</strong>:
+      </p>
+      <div class="formula-box">
+        $$F_c = ma_c = \frac{mv^2}{r} = mr\omega^2$$
+      </div>
+      <p>
+        La forza centripeta non è una forza a sé stante: è il nome dato alla risultante (o alla componente centripeta della risultante) di forze fisicamente reali. A seconda del contesto, questa forza può essere la forza gravitazionale (orbite), la tensione di un filo (pallina su un piano), la reazione normale di una curva stradale sopraelevata, la forza elettrica o magnetica.
+      </p>
+
+      <div class="cta-box">
+        <h3>Simulazione interattiva</h3>
+        <p>Esplora il moto circolare variando raggio, velocità angolare e visualizzando in tempo reale le componenti dell'accelerazione.</p>
+        <div class="button-row">
+          <a class="nav-link primary" href="../../meccanica/moto-circolare.html">Apri simulazione</a>
+        </div>
+      </div>
+    </section>
+
     <section class="card section" id="immagini">
-      <h2>Spazi per immagini e schemi</h2>
+      <h2>Schemi e immagini</h2>
 
       <div class="image-block">
         <div class="image-frame">
           <img src="./traiettoria-circolare.png" alt="Schema della traiettoria circolare" />
         </div>
-        <div class="image-caption">Schema della traiettoria con centro e raggio.</div>
+        <div class="image-caption">Traiettoria circolare di raggio $r$: angolo $\theta$, arco $s = r\theta$, vettore posizione.</div>
       </div>
 
       <div class="image-block">
         <div class="image-frame">
           <img src="./velocita-tangenziale.png" alt="Schema della velocità tangenziale" />
         </div>
-        <div class="image-caption">Vettore velocità tangente alla traiettoria.</div>
+        <div class="image-caption">Il vettore velocità $\vec{v}$ è sempre tangente alla traiettoria e perpendicolare al raggio.</div>
       </div>
 
       <div class="image-block">
         <div class="image-frame">
           <img src="./accelerazione-centripeta.png" alt="Schema dell'accelerazione centripeta" />
         </div>
-        <div class="image-caption">Accelerazione centripeta diretta verso il centro.</div>
+        <div class="image-caption">Accelerazione centripeta $\vec{a}_c$ diretta verso il centro; nel MCNU si aggiunge la componente tangenziale $\vec{a}_t$.</div>
       </div>
 
       <div class="image-block">
         <div class="image-frame">
-          <img src="./periodo-frequenza-moto-circolare.png" alt="Relazione tra periodo frequenza e velocità angolare" />
+          <img src="./periodo-frequenza-moto-circolare.png" alt="Relazione tra periodo, frequenza e velocità angolare" />
         </div>
-        <div class="image-caption">Schema riassuntivo delle grandezze principali.</div>
+        <div class="image-caption">Schema riassuntivo delle relazioni tra $T$, $f$, $\omega$ e $v$.</div>
       </div>
     </section>
+
   </main>
 </body>
 </html>

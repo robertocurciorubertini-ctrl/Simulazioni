@@ -247,7 +247,7 @@ window.SIM_METADATA = {
       </div>
       <div class="slider-row">
         <label>r — raggio (m)</label>
-        <input type="range" id="radius" min="0.5" max="4" step="0.1" value="2.0">
+        <input type="range" id="radius" min="0.5" max="20" step="0.5" value="2.0">
         <span class="slider-val" id="radius-val">2.0</span>
       </div>
     </div>
@@ -318,7 +318,7 @@ window.SIM_METADATA = {
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
     const cx = W / 2, cy = H / 2;
-    const SCALE = 80;
+    const SCALE = 38;
 
     let omega = 1.5, r = 2.0, angle = 0, lastTime = null;
 

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ottica Geometrica — Simulatore</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b0e14;
+    --surface: #12161f;
+    --border: #1e2535;
+    --accent: #f0c040;
+    --accent2: #3ecfcf;
+    --accent3: #e06060;
+    --text: #c8d0e0;
+    --dim: #5a6278;
+    --panel-w: 280px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── PANNELLO LATERALE ── */
+  #panel {
+    width: var(--panel-w);
+    min-width: var(--panel-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  #panel h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 20px 18px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: .62rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 10px;
+  }
+
+  label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .72rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  label span { color: var(--accent); min-width: 36px; text-align: right; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 8px 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: .68rem;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
+    margin-bottom: 6px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+
+  .color-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .color-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color .15s, transform .15s;
+  }
+  .color-dot:hover { transform: scale(1.15); }
+  .color-dot.sel { border-color: #fff; }
+
+  .info-box {
+    background: rgba(240,192,64,.06);
+    border: 1px solid rgba(240,192,64,.15);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: .65rem;
+    line-height: 1.6;
+    color: var(--dim);
+    margin-top: 6px;
+  }
+  .info-box b { color: var(--accent2); }
+
+  /* ── CANVAS AREA ── */
+  #canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #hint {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .62rem;
+    color: var(--dim);
+    letter-spacing: .08em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* tooltips dragging */
+  #tooltip {
+    position: absolute;
+    pointer-events: none;
+    font-size: .6rem;
+    color: var(--accent);
+    background: rgba(11,14,20,.85);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 7px;
+    display: none;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── PANNELLO ── -->
+<div id="panel">
+  <h1>Ottica Geometrica</h1>
+
+  <div class="section">
+    <div class="section-title">Sorgente luminosa</div>
+    <label>Numero raggi <span id="vRaggi">60</span></label>
+    <input type="range" id="rRaggi" min="4" max="120" value="60" step="2">
+    <label>Angolo apertura <span id="vApertura">360</span>°</label>
+    <input type="range" id="rApertura" min="10" max="360" value="360">
+    <label>Angolo direzione <span id="vDirezione">0</span>°</label>
+    <input type="range" id="rDirezione" min="-180" max="180" value="0">
+    <div class="section-title" style="margin-top:6px">Colore raggi</div>
+    <div class="color-row" id="colorRow"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Diaframma</div>
+    <label>Apertura diaframma <span id="vDiaframma">60</span>%</label>
+    <input type="range" id="rDiaframma" min="0" max="100" value="60">
+    <label>Posizione X <span id="vDiafX">40</span>%</label>
+    <input type="range" id="rDiafX" min="5" max="75" value="40">
+    <div class="info-box">
+      Le due <b>lame opache</b> bloccano i raggi che non rientrano nell'apertura.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Lente convergente</div>
+    <label>Lunghezza focale f <span id="vFocale">160</span>px</label>
+    <input type="range" id="rFocale" min="40" max="500" value="160">
+    <label>Posizione X <span id="vLenteX">65</span>%</label>
+    <input type="range" id="rLenteX" min="20" max="90" value="65">
+    <label>Altezza lente <span id="vLenteH">180</span>px</label>
+    <input type="range" id="rLenteH" min="40" max="400" value="180">
+    <button class="btn" id="btnLente">Lente: ATTIVA</button>
+    <div class="info-box">
+      Modello <b>thin lens</b>: ogni raggio che attraversa la lente viene deviato secondo la legge dei piani focali. I raggi paralleli all'asse convergono nel fuoco posteriore F'.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Mostra elementi</div>
+    <button class="btn active" id="btnAsse">Asse ottico</button>
+    <button class="btn active" id="btnFuochi">Fuochi F, F'</button>
+    <button class="btn active" id="btnGriglia">Griglia</button>
+  </div>
+</div>
+
+<!-- ── CANVAS ── -->
+<div id="canvas-wrap">
+  <canvas id="c"></canvas>
+  <div id="hint">Trascina la sorgente · Trascina la lente · Scorri le barre per modificare i parametri</div>
+  <div id="tooltip"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  SETUP
+// ════════════════════════════════════════════════════
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const wrap = document.getElementById('canvas-wrap');
+const tooltip = document.getElementById('tooltip');
+
+// Scala device pixel ratio
+let DPR = window.devicePixelRatio || 1;
+let W, H;
+
+function resize() {
+  const r = wrap.getBoundingClientRect();
+  W = r.width; H = r.height;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  draw();
+}
+window.addEventListener('resize', resize);
+
+// ════════════════════════════════════════════════════
+//  STATO
+// ════════════════════════════════════════════════════
+const state = {
+  src: { x: 0.18, y: 0.5 },   // posizione sorgente (frazione)
+  raggi: 60,
+  apertura: 360,               // gradi
+  direzione: 0,                // gradi
+  colore: '#f0c040',
+  diaframma: 60,               // % apertura
+  diafX: 0.40,
+  focale: 160,
+  lenteX: 0.65,
+  lenteH: 180,
+  lenteOn: true,
+  showAsse: true,
+  showFuochi: true,
+  showGriglia: true,
+};
+
+// ════════════════════════════════════════════════════
+//  COLORI DISPONIBILI
+// ════════════════════════════════════════════════════
+const COLORI = [
+  '#f0c040','#ff6633','#ff3366','#cc44ff',
+  '#4488ff','#33ddaa','#ffffff','#ff9900',
+];
+const colorRow = document.getElementById('colorRow');
+COLORI.forEach(c => {
+  const d = document.createElement('div');
+  d.className = 'color-dot' + (c === state.colore ? ' sel' : '');
+  d.style.background = c;
+  d.addEventListener('click', () => {
+    document.querySelectorAll('.color-dot').forEach(x => x.classList.remove('sel'));
+    d.classList.add('sel');
+    state.colore = c;
+    draw();
+  });
+  colorRow.appendChild(d);
+});
+
+// ════════════════════════════════════════════════════
+//  CONTROLLI
+// ════════════════════════════════════════════════════
+function bindSlider(id, valId, key, transform, postfix='') {
+  const sl = document.getElementById(id);
+  const vl = document.getElementById(valId);
+  sl.addEventListener('input', () => {
+    const v = transform ? transform(+sl.value) : +sl.value;
+    state[key] = v;
+    vl.textContent = sl.value + postfix;
+    draw();
+  });
+}
+bindSlider('rRaggi','vRaggi','raggi', null);
+bindSlider('rApertura','vApertura','apertura', null, '');
+bindSlider('rDirezione','vDirezione','direzione', null, '');
+bindSlider('rDiaframma','vDiaframma','diaframma', null, '%');
+bindSlider('rDiafX','vDiafX','diafX', v => v/100, '%');
+bindSlider('rFocale','vFocale','focale', null);
+bindSlider('rLenteX','vLenteX','lenteX', v => v/100, '%');
+bindSlider('rLenteH','vLenteH','lenteH', null);
+
+// toggle lente
+const btnLente = document.getElementById('btnLente');
+btnLente.addEventListener('click', () => {
+  state.lenteOn = !state.lenteOn;
+  btnLente.textContent = 'Lente: ' + (state.lenteOn ? 'ATTIVA' : 'DISATTIVA');
+  btnLente.classList.toggle('active', state.lenteOn);
+  draw();
+});
+
+function toggleBtn(id, key) {
+  const b = document.getElementById(id);
+  b.addEventListener('click', () => {
+    state[key] = !state[key];
+    b.classList.toggle('active', state[key]);
+    draw();
+  });
+}
+toggleBtn('btnAsse','showAsse');
+toggleBtn('btnFuochi','showFuochi');
+toggleBtn('btnGriglia','showGriglia');
+
+// ════════════════════════════════════════════════════
+//  DRAG — sorgente e lente
+// ════════════════════════════════════════════════════
+let drag = null;
+
+function hitRadius(ex, ey, fx, fy, r=18) {
+  const dx = ex - fx*W, dy = ey - fy*H;
+  return Math.hypot(dx,dy) < r;
+}
+
+wrap.addEventListener('mousedown', e => {
+  const r = wrap.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  if (hitRadius(mx,my, state.src.x, state.src.y, 22)) drag = 'src';
+  else if (state.lenteOn && Math.abs(mx - state.lenteX*W) < 16) drag = 'lente';
+});
+wrap.addEventListener('mousemove', e => {
+  const r = wrap.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  if (drag === 'src')   { state.src.x = Math.max(.02,Math.min(.95,mx/W)); state.src.y = Math.max(.02,Math.min(.98,my/H)); draw(); }
+  if (drag === 'lente') { state.lenteX = Math.max(.2,Math.min(.9,mx/W)); document.getElementById('rLenteX').value = Math.round(state.lenteX*100); document.getElementById('vLenteX').textContent = Math.round(state.lenteX*100)+'%'; draw(); }
+  // tooltip
+  if (hitRadius(mx,my, state.src.x, state.src.y, 22)) showTip(mx, my, 'Sorgente');
+  else if (state.lenteOn && Math.abs(mx - state.lenteX*W) < 16) showTip(mx, my, 'Lente');
+  else hideTip();
+});
+wrap.addEventListener('mouseup', () => { drag = null; });
+wrap.addEventListener('mouseleave', () => { drag = null; hideTip(); });
+
+// touch
+wrap.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const r = wrap.getBoundingClientRect();
+  const t = e.touches[0];
+  const mx = t.clientX - r.left, my = t.clientY - r.top;
+  if (hitRadius(mx,my, state.src.x, state.src.y, 28)) drag = 'src';
+  else if (state.lenteOn && Math.abs(mx - state.lenteX*W) < 20) drag = 'lente';
+}, {passive:false});
+wrap.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const r = wrap.getBoundingClientRect();
+  const t = e.touches[0];
+  const mx = t.clientX - r.left, my = t.clientY - r.top;
+  if (drag === 'src')   { state.src.x = Math.max(.02,Math.min(.95,mx/W)); state.src.y = Math.max(.02,Math.min(.98,my/H)); draw(); }
+  if (drag === 'lente') { state.lenteX = Math.max(.2,Math.min(.9,mx/W)); draw(); }
+}, {passive:false});
+wrap.addEventListener('touchend', () => drag = null);
+
+function showTip(x,y,txt) {
+  tooltip.style.display='block';
+  tooltip.style.left = (x+12)+'px';
+  tooltip.style.top  = (y-20)+'px';
+  tooltip.textContent = txt;
+}
+function hideTip() { tooltip.style.display='none'; }
+
+// ════════════════════════════════════════════════════
+//  GEOMETRIA — funzioni ausiliarie
+// ════════════════════════════════════════════════════
+
+// Intersezione raggio con segmento verticale x=xv, tra y1 e y2
+// Raggio: origine (ox,oy) direzione (dx,dy)
+// Restituisce t>0 se c'è intersezione
+function intersectVertical(ox, oy, dx, dy, xv, y1, y2) {
+  if (Math.abs(dx) < 1e-9) return null;
+  const t = (xv - ox) / dx;
+  if (t <= 1e-4) return null;
+  const y = oy + t * dy;
+  if (y < y1 || y > y2) return null;
+  return { t, x: xv, y };
+}
+
+// Rifrazione thin lens: dato un raggio che entra nella lente con posizione y_hit
+// (rispetto all'asse) e direzione (dx,dy), restituisce la nuova direzione (dx2,dy2)
+// usando la formula della thin lens: il raggio uscente punta verso (o proviene da)
+// il fuoco posteriore F' = (lx + f, cy) per raggi paralleli, oppure applica
+// la trasformazione generale delle matrici ABCD di ottica gaussiana.
+//
+// Approccio con matrici ABCD (ray transfer matrix):
+//  [ y2 ]   [ 1    0 ] [ 1  d1 ] [ y1 ]
+//  [ u2 ] = [ -1/f  1 ] [ 0  1  ] [ u1 ]
+// ma qui non propaghiamo tra piani, applichiamo solo la lente:
+//  u2 = u1 - y/f   (angolo dopo lente = angolo prima - y/f)
+// dove u = dy/dx (pendenza del raggio, positiva verso il basso)
+function refractLens(dy, dx, yHit, f) {
+  // pendenza in ingresso (radianti piccoli non necessari, lavoriamo con slope)
+  const slopeIn = dy / (Math.abs(dx) < 1e-9 ? 1e-9 : dx);
+  // applicazione thin lens: deflection = -yHit / f
+  const slopeOut = slopeIn - yHit / f;
+  // ricostruiamo direzione normalizzata
+  const len = Math.hypot(1, slopeOut);
+  // il segno di dx deve rimanere lo stesso (il raggio continua nella stessa metà)
+  const sign = dx >= 0 ? 1 : -1;
+  return { dx: sign / len, dy: sign * slopeOut / len };
+}
+
+// Intersezione raggio con bordo superiore/inferiore canvas
+function intersectBounds(ox, oy, dx, dy) {
+  let tMin = 1e9;
+  // bordi
+  const borders = [
+    { t: dy > 0 ? (H-oy)/dy : (dy < 0 ? (-oy)/dy : 1e9) },
+    { t: dx > 0 ? (W-ox)/dx : (dx < 0 ? (-ox)/dx : 1e9) },
+  ];
+  for (const b of borders) if (b.t > 1e-4 && b.t < tMin) tMin = b.t;
+  return tMin;
+}
+
+// ════════════════════════════════════════════════════
+//  DISEGNO
+// ════════════════════════════════════════════════════
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  const sx = state.src.x * W;
+  const sy = state.src.y * H;
+  const cx = W / 2; // non serve, l'asse è a sy
+  // asse ottico: y della sorgente (per semplicità l'asse passa per la sorgente)
+  // In un sistema più rigoroso l'asse è fisso, ma renderlo passante per la sorgente
+  // rende la simulazione più intuitiva didatticamente.
+  // L'asse ottico è la linea orizzontale y = sy.
+  const axisY = sy;
+
+  const lx = state.lenteX * W;
+  const f  = state.focale;
+  const lh = state.lenteH / 2; // semi-apertura lente
+
+  const dafX = state.diafX * W;
+  // Apertura diaframma: la gap totale è diaframma% dell'altezza dello schermo
+  const gapTotal = (state.diaframma / 100) * H;
+  const gapTop    = axisY - gapTotal / 2;   // bordo superiore dell'apertura
+  const gapBottom = axisY + gapTotal / 2;   // bordo inferiore dell'apertura
+
+  // ── GRIGLIA ──
+  if (state.showGriglia) {
+    ctx.strokeStyle = 'rgba(30,37,53,.7)';
+    ctx.lineWidth = 1;
+    const step = 40;
+    for (let x=0; x<W; x+=step) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y=0; y<H; y+=step) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  }
+
+  // ── ASSE OTTICO ──
+  if (state.showAsse) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(62,207,207,.35)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6,5]);
+    ctx.beginPath(); ctx.moveTo(0, axisY); ctx.lineTo(W, axisY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // ── DIAFRAMMA ──
+  // Lama superiore: da y=0 a y=gapTop
+  // Lama inferiore: da y=gapBottom a y=H
+  const lamW = 10;
+  // sfondo opaco
+  ctx.fillStyle = 'rgba(15,18,26,.92)';
+  ctx.fillRect(dafX - lamW/2, 0, lamW, gapTop);
+  ctx.fillRect(dafX - lamW/2, gapBottom, lamW, H - gapBottom);
+  // bordi luminosi lame
+  ctx.strokeStyle = '#3a4560';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(dafX - lamW/2, 0, lamW, gapTop);
+  ctx.strokeRect(dafX - lamW/2, gapBottom, lamW, H - gapBottom);
+  // puntini di indicazione apertura
+  ctx.strokeStyle = 'rgba(62,207,207,.6)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(dafX - lamW/2 - 8, gapTop); ctx.lineTo(dafX + lamW/2 + 8, gapTop); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(dafX - lamW/2 - 8, gapBottom); ctx.lineTo(dafX + lamW/2 + 8, gapBottom); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── LENTE ──
+  if (state.lenteOn) {
+    // corpo lente (rettangolo trasparente)
+    const lw = 12;
+    ctx.save();
+    ctx.fillStyle = 'rgba(100,200,255,.10)';
+    ctx.strokeStyle = 'rgba(100,200,255,.6)';
+    ctx.lineWidth = 1.5;
+    // disegno forma biconvessa stilizzata
+    ctx.beginPath();
+    const top = axisY - lh, bot = axisY + lh;
+    const bulge = lw * 1.8;
+    ctx.moveTo(lx, top);
+    ctx.bezierCurveTo(lx + bulge, top + lh*0.3, lx + bulge, bot - lh*0.3, lx, bot);
+    ctx.bezierCurveTo(lx - bulge, bot - lh*0.3, lx - bulge, top + lh*0.3, lx, top);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // fuochi
+    if (state.showFuochi) {
+      const fp = lx + f, fm = lx - f;
+      [fp, fm].forEach((fx2, i) => {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(240,192,64,.7)';
+        ctx.fillStyle   = 'rgba(240,192,64,.9)';
+        ctx.lineWidth = 1;
+        // croce
+        const sz = 6;
+        ctx.beginPath(); ctx.moveTo(fx2-sz, axisY); ctx.lineTo(fx2+sz, axisY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(fx2, axisY-sz); ctx.lineTo(fx2, axisY+sz); ctx.stroke();
+        ctx.font = '11px Space Mono, monospace';
+        ctx.fillText(i===0 ? "F'" : "F", fx2+8, axisY - 8);
+        ctx.restore();
+      });
+    }
+  }
+
+  // ── RAGGI ──
+  const N = state.raggi;
+  const halfAp = (state.apertura / 2) * Math.PI / 180;
+  const dirRad = state.direzione * Math.PI / 180;
+
+  // colore con alpha
+  const col = state.colore;
+  // parse colore hex → rgb
+  let cr=255,cg=200,cb=60;
+  if (col.startsWith('#')) {
+    cr = parseInt(col.slice(1,3),16);
+    cg = parseInt(col.slice(3,5),16);
+    cb = parseInt(col.slice(5,7),16);
+  }
+
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i < N; i++) {
+    // angolo del raggio i
+    let angle;
+    if (N === 1) {
+      angle = dirRad;
+    } else {
+      angle = dirRad - halfAp + (2 * halfAp * i) / (N - 1);
+    }
+    let dx = Math.cos(angle);
+    let dy = Math.sin(angle);
+
+    // punti da disegnare: array di segmenti
+    const pts = [{ x: sx, y: sy }];
+    let ox = sx, oy = sy;
+    let blocked = false;
+
+    // ──────────────────────────────────────────────
+    // Fase 1: raggio verso il diaframma
+    // ──────────────────────────────────────────────
+    if (dx > 0) { // raggio verso destra (diaframma è a destra della sorgente)
+      const hitDiaf = intersectVertical(ox, oy, dx, dy, dafX, 0, H);
+      if (hitDiaf) {
+        const yh = hitDiaf.y;
+        if (yh >= gapTop && yh <= gapBottom) {
+          // passa dal diaframma
+          pts.push({ x: dafX, y: yh });
+          ox = dafX; oy = yh;
+        } else {
+          // bloccato dalle lame
+          pts.push({ x: dafX, y: yh });
+          blocked = true;
+        }
+      }
+    } else {
+      // raggio verso sinistra: non intercetta il diaframma né la lente
+      // propaga fino al bordo
+    }
+
+    // ──────────────────────────────────────────────
+    // Fase 2: raggio verso la lente (se non bloccato)
+    // ──────────────────────────────────────────────
+    if (!blocked && state.lenteOn && dx > 0) {
+      const hitLente = intersectVertical(ox, oy, dx, dy, lx, axisY - lh, axisY + lh);
+      if (hitLente) {
+        const yh = hitLente.y;
+        pts.push({ x: lx, y: yh });
+        // Rifrazione: yHit è la distanza dall'asse
+        const yRel = yh - axisY;
+        const refracted = refractLens(dy, dx, yRel, f);
+        dx = refracted.dx; dy = refracted.dy;
+        ox = lx; oy = yh;
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // Fase 3: propagazione fino al bordo canvas
+    // ──────────────────────────────────────────────
+    if (!blocked) {
+      const tEnd = intersectBounds(ox, oy, dx, dy);
+      pts.push({ x: ox + dx * tEnd, y: oy + dy * tEnd });
+    }
+
+    // ─── DISEGNO RAGGIO ───
+    // alpha in funzione dell'angolo rispetto alla direzione principale
+    const angleDiff = Math.abs(angle - dirRad);
+    const alphaNorm = Math.max(0, 1 - angleDiff / (halfAp + 0.01));
+    const alpha = 0.18 + 0.62 * alphaNorm;
+
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(${cr},${cg},${cb},${alpha.toFixed(2)})`;
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let k=1; k<pts.length; k++) ctx.lineTo(pts[k].x, pts[k].y);
+    ctx.stroke();
+  }
+
+  // ── SORGENTE ──
+  // alone luminoso
+  const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, 28);
+  grad.addColorStop(0, `rgba(${cr},${cg},${cb},0.55)`);
+  grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+  ctx.fillStyle = grad;
+  ctx.beginPath(); ctx.arc(sx, sy, 28, 0, Math.PI*2); ctx.fill();
+  // nucleo
+  ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
+  ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI*2); ctx.stroke();
+}
+
+// ════════════════════════════════════════════════════
+//  AVVIO
+// ════════════════════════════════════════════════════
+resize();
+</script>
+</body>
+</html>

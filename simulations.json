@@ -41,6 +41,7 @@
       "description": "Studio del moto dei fluidi e delle leggi che governano flusso, pressione ed energia nei mezzi continui."
     }
   ],
+
   "simulations": [
     {
       "title": "Elettrostatica",

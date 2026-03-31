@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Fluidodinamica",
+  "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
+  "category": "Fluidodinamica",
+  "icon": "🌊",
+  "order": 1,
+  "tags": ["fluidi", "Bernoulli", "continuità", "flusso", "pressione"],
+  "level": "intermedio"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluidodinamica — Simulazioni Didattiche</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f1eb;
+    --surface: #faf8f3;
+    --border: #d4cfc4;
+    --ink: #1a1814;
+    --ink2: #4a4640;
+    --ink3: #8a8480;
+    --accent: #1a5fa8;
+    --accent2: #c84b1a;
+    --accent3: #1a8a5a;
+    --water: #4a9fd4;
+    --water-light: #a8d4f0;
+    --water-dark: #1a5a8a;
+    --gold: #c8941a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 2rem 3rem;
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    border-bottom: 3px solid var(--accent);
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+  }
+
+  header span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--water-light);
+    letter-spacing: 0.1em;
+  }
+
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav::-webkit-scrollbar { display: none; }
+
+  nav button {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.2rem;
+    border: none;
+    background: none;
+    color: var(--ink3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  nav button:hover { color: var(--ink); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 500;
+  }
+
+  .module { display: none; padding: 2.5rem 3rem; max-width: 1100px; margin: 0 auto; }
+  .module.active { display: block; }
+
+  .module-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .module-header .formula {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    background: #e8f0f8;
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    margin-bottom: 0.8rem;
+  }
+
+  .module-header p {
+    font-size: 0.9rem;
+    color: var(--ink2);
+    line-height: 1.6;
+    max-width: 700px;
+  }
+
+  .sim-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  canvas {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    display: block;
+    width: 100%;
+  }
+
+  .controls {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+  }
+
+  .controls h3 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 1.2rem;
+  }
+
+  .control-group {
+    margin-bottom: 1.2rem;
+  }
+
+  .control-group label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--ink2);
+    margin-bottom: 0.4rem;
+  }
+
+  .control-group label span {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    font-size: 0.78rem;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .info-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #e8f0f8;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .info-box .val-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #c8d8e8;
+  }
+
+  .info-box .val-row:last-child { border-bottom: none; }
+
+  .info-box .val-row span:first-child { color: var(--ink2); }
+  .info-box .val-row span:last-child {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--accent);
+    background: none;
+    color: var(--accent);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s;
+    margin-top: 0.5rem;
+  }
+
+  .btn:hover { background: var(--accent); color: white; }
+
+  .legend {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--ink2);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .note {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #fef9ec;
+    border-left: 3px solid var(--gold);
+    font-size: 0.82rem;
+    color: var(--ink2);
+    line-height: 1.6;
+    border-radius: 0 4px 4px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fluidodinamica</h1>
+  <span>Simulazioni Didattiche Interattive</span>
+</header>
+
+<nav id="nav">
+  <button class="active" onclick="showModule(0)">Archimede</button>
+  <button onclick="showModule(1)">Press. Idrostatica</button>
+  <button onclick="showModule(2)">Pressa Idraulica</button>
+  <button onclick="showModule(3)">Continuità</button>
+  <button onclick="showModule(4)">Venturi</button>
+  <button onclick="showModule(5)">Portata</button>
+  <button onclick="showModule(6)">Magnus</button>
+</nav>
+
+<!-- ===================== MODULE 0: ARCHIMEDE ===================== -->
+<div class="module active" id="mod0">
+  <div class="module-header">
+    <h2>Spinta di Archimede</h2>
+    <div class="formula">F_A = ρ_f · g · V_sommerso</div>
+    <p>Un corpo immerso in un fluido riceve una spinta verticale verso l'alto pari al peso del fluido spostato. Se la densità del corpo è minore di quella del fluido, galleggia; altrimenti affonda. Il galleggiamento parziale si raggiunge quando le due forze si equilibrano.</p>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <canvas id="c0" width="680" height="440"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#e05050"></div> Peso (F_g)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1a8a5a"></div> Spinta di Archimede (F_A)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c89a20"></div> Forza risultante</div>
+      </div>
+    </div>
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-group">
+        <label>Densità corpo (ρ_c) <span id="v0a">500</span> kg/m³</label>
+        <input type="range" id="r0a" min="100" max="2000" value="500" oninput="update0()">
+      </div>
+      <div class="control-group">
+        <label>Densità fluido (ρ_f) <span id="v0b">1000</span> kg/m³</label>
+        <input type="range" id="r0b" min="700" max="13600" value="1000" oninput="update0()">
+      </div>
+      <div class="control-group">
+        <label>Lato cubo (L) <span id="v0c">0.20</span> m</label>
+        <input type="range" id="r0c" min="5" max="30" value="20" oninput="update0()">
+      </div>
+      <div class="info-box">
+        <div class="val-row"><span>Volume</span><span id="i0vol">—</span></div>
+        <div class="val-row"><span>Peso F_g</span><span id="i0fg">—</span></div>
+        <div class="val-row"><span>Spinta F_A</span><span id="i0fa">—</span></div>
+        <div class="val-row"><span>Risultante</span><span id="i0fr">—</span></div>
+        <div class="val-row"><span>Stato</span><span id="i0st">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 1: PRESSIONE IDROSTATICA ===================== -->
+<div class="module" id="mod1">
+  <div class="module-header">
+    <h2>Pressione Idrostatica</h2>
+    <div class="formula">P(h) = P₀ + ρ · g · h</div>
+    <p>La pressione in un fluido in quiete cresce linearmente con la profondità. Il termine ρ·g·h rappresenta la pressione dovuta al peso della colonna di fluido sovrastante. Trascina il sensore in profondità per misurare la pressione in diversi punti.</p>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <canvas id="c1" width="680" height="440"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4a9fd4"></div> Fluido</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e05050"></div> Sensore di pressione</div>
+      </div>
+    </div>
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-group">
+        <label>Densità fluido (ρ) <span id="v1a">1000</span> kg/m³</label>
+        <input type="range" id="r1a" min="700" max="13600" value="1000" oninput="update1()">
+      </div>
+      <div class="control-group">
+        <label>Pressione atm. (P₀) <span id="v1b">101325</span> Pa</label>
+        <input type="range" id="r1b" min="0" max="200000" value="101325" oninput="update1()">
+      </div>
+      <div class="control-group">
+        <label>Profondità sensore <span id="v1c">2.0</span> m</label>
+        <input type="range" id="r1c" min="0" max="100" value="20" oninput="update1()">
+      </div>
+      <div class="info-box">
+        <div class="val-row"><span>Profondità h</span><span id="i1h">—</span></div>
+        <div class="val-row"><span>P₀</span><span id="i1p0">—</span></div>
+        <div class="val-row"><span>ρ·g·h</span><span id="i1pgh">—</span></div>
+        <div class="val-row"><span>P totale</span><span id="i1pt">—</span></div>
+        <div class="val-row"><span>P (atm)</span><span id="i1patm">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 2: PRESSA IDRAULICA ===================== -->
+<div class="module" id="mod2">
+  <div class="module-header">
+    <h2>Pressa Idraulica — Principio di Pascal</h2>
+    <div class="formula">F₁/A₁ = F₂/A₂  →  F₂ = F₁ · A₂/A₁</div>
+    <p>Il principio di Pascal afferma che una variazione di pressione applicata in un punto di un fluido incomprimibile si trasmette integralmente in ogni altro punto. La pressa idraulica sfrutta questo per moltiplicare la forza: un pistone piccolo con poca forza muove un pistone grande con forza amplificata.</p>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <canvas id="c2" width="680" height="440"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#e05050"></div> Forza applicata (F₁)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1a8a5a"></div> Forza risultante (F₂)</div>
+      </div>
+    </div>
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-group">
+        <label>Raggio pistone piccolo (r₁) <span id="v2a">0.05</span> m</label>
+        <input type="range" id="r2a" min="1" max="20" value="5" oninput="update2()">
+      </div>
+      <div class="control-group">
+        <label>Raggio pistone grande (r₂) <span id="v2b">0.20</span> m</label>
+        <input type="range" id="r2b" min="5" max="50" value="20" oninput="update2()">
+      </div>
+      <div class="control-group">
+        <label>Forza applicata (F₁) <span id="v2c">100</span> N</label>
+        <input type="range" id="r2c" min="10" max="1000" value="100" oninput="update2()">
+      </div>
+      <div class="info-box">
+        <div class="val-row"><span>Area A₁</span><span id="i2a1">—</span></div>
+        <div class="val-row"><span>Area A₂</span><span id="i2a2">—</span></div>
+        <div class="val-row"><span>Rapporto A₂/A₁</span><span id="i2rap">—</span></div>
+        <div class="val-row"><span>Pressione P</span><span id="i2p">—</span></div>
+        <div class="val-row"><span>Forza F₂</span><span id="i2f2">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 3: CONTINUITÀ ===================== -->
+<div class="module" id="mod3">
+  <div class="module-header">
+    <h2>Equazione di Continuità</h2>
+    <div class="formula">A₁ · v₁ = A₂ · v₂ = Q (costante)</div>
+    <p>In un fluido incomprimibile in moto stazionario, il prodotto tra sezione trasversale e velocità è costante lungo tutto il condotto. Dove il condotto si restringe, il fluido accelera. Le particelle animate mostrano visivamente questa accelerazione nel tratto stretto.</p>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <canvas id="c3" width="680" height="440"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#1a5fa8"></div> Particelle di fluido</div>
+      </div>
+    </div>
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-group">
+        <label>Raggio sezione larga (r₁) <span id="v3a">60</span> px</label>
+        <input type="range" id="r3a" min="30" max="90" value="60" oninput="update3()">
+      </div>
+      <div class="control-group">
+        <label>Raggio sezione stretta (r₂) <span id="v3b">25</span> px</label>
+        <input type="range" id="r3b" min="10" max="55" value="25" oninput="update3()">
+      </div>
+      <div class="control-group">
+        <label>Velocità ingresso (v₁) <span id="v3c">1.0</span> m/s</label>
+        <input type="range" id="r3c" min="1" max="50" value="10" oninput="update3()">
+      </div>
+      <div class="info-box">
+        <div class="val-row"><span>A₁ (prop.)</span><span id="i3a1">—</span></div>
+        <div class="val-row"><span>A₂ (prop.)</span><span id="i3a2">—</span></div>
+        <div class="val-row"><span>v₁</span><span id="i3v1">—</span></div>
+        <div class="val-row"><span>v₂ = v₁·A₁/A₂</span><span id="i3v2">—</span></div>
+        <div class="val-row"><span>Portata Q</span><span id="i3q">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 4: VENTURI ===================== -->
+<div class="module" id="mod4">
+  <div class="module-header">
+    <h2>Effetto Venturi — Teorema di Bernoulli</h2>
+    <div class="formula">P + ½ρv² + ρgh = costante</div>
+    <p>Il teorema di Bernoulli afferma che in un flusso stazionario, la somma di pressione statica, pressione dinamica e pressione idrostatica è costante lungo una linea di flusso. Nell'effetto Venturi, il restringimento aumenta la velocità e riduce la pressione statica — il manometro lo mostra in tempo reale.</p>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <canvas id="c4" width="680" height="440"></canvas>
+    </div>
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-group">
+        <label>Velocità ingresso (v₁) <span id="v4a">2.0</span> m/s</label>
+        <input type="range" id="r4a" min="5" max="50" value="20" oninput="update4()">
+      </div>
+      <div class="control-group">
+        <label>Rapporto sezioni (A₁/A₂) <span id="v4b">4.0</span></label>
+        <input type="range" id="r4b" min="10" max="80" value="40" oninput="update4()">
+      </div>
+      <div class="control-group">
+        <label>Densità fluido (ρ) <span id="v4c">1000</span> kg/m³</label>
+        <input type="range" id="r4c" min="700" max="2000" value="1000" oninput="update4()">
+      </div>
+      <div class="info-box">
+        <div class="val-row"><span>v₁</span><span id="i4v1">—</span></div>
+        <div class="val-row"><span>v₂</span><span id="i4v2">—</span></div>
+        <div class="val-row"><span>P₁ (relativa)</span><span id="i4p1">—</span></div>
+        <div class="val-row"><span>P₂ (relativa)</span><span id="i4p2">—</span></div>
+        <div class="val-row"><span>ΔP = P₁ - P₂</span><span id="i4dp">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 5: PORTATA ===================== -->
+<div class="module" id="mod5">
+  <div class="module-header">
+    <h2>Portata Volumetrica</h2>
+    <div class="formula">Q = A · v  [m³/s]</div>
+    <p>La portata volumetrica Q rappresenta il volume di fluido che attraversa una sezione nell'unità di tempo. Dipende sia dalla velocità del flusso che dall'area della sezione. La portata massica è G = ρ·Q. Visualizzazione con svuotamento di un serbatoio.</p>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <canvas id="c5" width="680" height="440"></canvas>
+    </div>
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-group">
+        <label>Diametro uscita (d) <span id="v5a">0.05</span> m</label>
+        <input type="range" id="r5a" min="1" max="20" value="5" oninput="update5()">
+      </div>
+      <div class="control-group">
+        <label>Altezza serbatoio (H) <span id="v5b">5.0</span> m</label>
+        <input type="range" id="r5b" min="10" max="200" value="50" oninput="update5()">
+      </div>
+      <div class="control-group">
+        <label>Densità (ρ) <span id="v5c">1000</span> kg/m³</label>
+        <input type="range" id="r5c" min="700" max="2000" value="1000" oninput="update5()">
+      </div>
+      <button class="btn" onclick="resetSerbatoio()">↺ Ricarica serbatoio</button>
+      <div class="info-box">
+        <div class="val-row"><span>Livello h</span><span id="i5h">—</span></div>
+        <div class="val-row"><span>Vel. uscita (Torricelli)</span><span id="i5v">—</span></div>
+        <div class="val-row"><span>Area uscita A</span><span id="i5a">—</span></div>
+        <div class="val-row"><span>Portata Q</span><span id="i5q">—</span></div>
+        <div class="val-row"><span>Portata massica G</span><span id="i5g">—</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <strong>Teorema di Torricelli:</strong> La velocità del getto in uscita da un foro sul fondo è v = √(2gh), derivabile direttamente dal teorema di Bernoulli applicato alla superficie libera e al foro di uscita.
+  </div>
+</div>
+
+<!-- ===================== MODULE 6: MAGNUS ===================== -->
+<div class="module" id="mod6">
+  <div class="module-header">
+    <h2>Effetto Magnus</h2>
+    <div class="formula">F_L = ρ · Γ · L = ρ · (2π r² ω) · v_∞ · L</div>
+    <p>Quando una sfera rotante si muove in un fluido, la rotazione trascina lo strato limite: sul lato dove la rotazione è concorde con il flusso la velocità è maggiore e la pressione minore (Bernoulli); sul lato opposto avviene il contrario. Ne risulta una forza di portanza perpendicolare al moto — l'effetto Magnus. È la base del tiro curvo nel calcio e nel baseball.</p>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <canvas id="c6" width="680" height="440"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#1a5fa8"></div> Linee di flusso</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1a8a5a"></div> Forza di Magnus (F_M)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e05050"></div> Vel. libera (v_∞)</div>
+      </div>
+    </div>
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-group">
+        <label>Velocità flusso (v_∞) <span id="v6a">10</span> m/s</label>
+        <input type="range" id="r6a" min="1" max="40" value="10" oninput="update6()">
+      </div>
+      <div class="control-group">
+        <label>Velocità angolare (ω) <span id="v6b">5</span> rad/s</label>
+        <input type="range" id="r6b" min="-30" max="30" value="5" oninput="update6()">
+      </div>
+      <div class="control-group">
+        <label>Raggio sfera (r) <span id="v6c">0.11</span> m</label>
+        <input type="range" id="r6c" min="3" max="20" value="11" oninput="update6()">
+      </div>
+      <div class="info-box">
+        <div class="val-row"><span>v_∞</span><span id="i6v">—</span></div>
+        <div class="val-row"><span>ω</span><span id="i6w">—</span></div>
+        <div class="val-row"><span>Γ (circolazione)</span><span id="i6g">—</span></div>
+        <div class="val-row"><span>F_Magnus (prop.)</span><span id="i6f">—</span></div>
+        <div class="val-row"><span>Direzione</span><span id="i6d">—</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <strong>Nota:</strong> Le linee di flusso mostrate sono quelle del flusso potenziale attorno a un cilindro con circolazione — modello 2D che cattura l'asimmetria essenziale dell'effetto Magnus. Nel caso tridimensionale reale entrano in gioco effetti viscosi e separazione dello strato limite.
+  </div>
+</div>
+
+<script>
+const g = 9.81;
+
+// ============================================================
+// UTILS
+// ============================================================
+function fmt(v, dec=2) {
+  if (Math.abs(v) >= 1e6) return (v/1e6).toFixed(dec) + ' M';
+  if (Math.abs(v) >= 1e3) return (v/1e3).toFixed(dec) + ' k';
+  return v.toFixed(dec);
+}
+
+function arrow(ctx, x1,y1, x2,y2, color, label, lw=2.5) {
+  const dx = x2-x1, dy = y2-y1;
+  const len = Math.sqrt(dx*dx+dy*dy);
+  if (len < 2) return;
+  const ux = dx/len, uy = dy/len;
+  const hw = 8, hl = 14;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = lw;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2 - ux*hl, y2 - uy*hl);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - ux*hl - uy*hw, y2 - uy*hl + ux*hw);
+  ctx.lineTo(x2 - ux*hl + uy*hw, y2 - uy*hl - ux*hw);
+  ctx.closePath();
+  ctx.fill();
+  if (label) {
+    ctx.fillStyle = color;
+    ctx.font = '500 13px DM Sans';
+    ctx.fillText(label, x2 + 6*ux + 6, y2 + 6*uy + 4);
+  }
+  ctx.restore();
+}
+
+// ============================================================
+// NAV
+// ============================================================
+const modules = document.querySelectorAll('.module');
+const navBtns = document.querySelectorAll('nav button');
+function showModule(i) {
+  modules.forEach((m,j) => m.classList.toggle('active', j===i));
+  navBtns.forEach((b,j) => b.classList.toggle('active', j===i));
+  if (i===3 && !anim3) startAnim3();
+  if (i===4 && !anim4) startAnim4();
+  if (i===5 && !anim5) startAnim5();
+  if (i===6 && !anim6) startAnim6();
+}
+
+// ============================================================
+// MODULE 0 — ARCHIMEDE (simulazione dinamica)
+// ============================================================
+// Stato fisico del cubo: posizione y del centro in metri fisici
+// y = 0 è la superficie libera, y positivo verso il basso
+const arch = {
+  y: -0.30,    // posizione centro cubo (m), relativa alla superficie libera
+  vy: 0,       // velocità verticale (m/s)
+  anim: null,
+  lastT: null,
+  // parametri correnti (aggiornati da update0)
+  rhoc: 500, rhof: 1000, L: 0.20
+};
+
+function archReset() {
+  // Ricomincia da sopra la superficie
+  arch.y = -arch.L * 0.5 - 0.05;
+  arch.vy = 0;
+  arch.lastT = null;
+}
+
+function update0() {
+  arch.rhoc = +document.getElementById('r0a').value;
+  arch.rhof = +document.getElementById('r0b').value;
+  arch.L    = +document.getElementById('r0c').value / 100;
+  document.getElementById('v0a').textContent = arch.rhoc;
+  document.getElementById('v0b').textContent = arch.rhof;
+  document.getElementById('v0c').textContent = arch.L.toFixed(2);
+  // Quando cambiano i parametri, reset posizione
+  archReset();
+  if (!arch.anim) startAnim0();
+}
+
+function startAnim0() {
+  const cvs = document.getElementById('c0');
+  const ctx = cvs.getContext('2d');
+
+  function frame(ts) {
+    arch.anim = requestAnimationFrame(frame);
+    if (!arch.lastT) arch.lastT = ts;
+    let dt = Math.min((ts - arch.lastT) / 1000, 0.04); // max 40ms step
+    arch.lastT = ts;
+
+    const { rhoc, rhof, L } = arch;
+    const V  = L * L * L;
+    const m  = rhoc * V;          // massa del cubo
+    const Fg = m * g;             // peso (verso il basso, +y)
+
+    // Calcola volume sommerso in funzione della posizione corrente del centro
+    // y = 0: superficie libera. y > 0: centro sotto la superficie.
+    // Il cubo va da (arch.y - L/2) a (arch.y + L/2) in coordinate fisiche.
+    const top  = arch.y - L / 2;  // coordinata y della faccia superiore
+    const bot  = arch.y + L / 2;  // coordinata y della faccia inferiore
+
+    // Volume sommerso: intersezione tra [top, bot] e [0, +∞)
+    // immH = altezza della parte del cubo che sta sotto y=0 (superficie libera)
+    // top = arch.y - L/2,  bot = arch.y + L/2
+    // Parte sommersa = da max(top, 0) a bot, clampata a [0, L]
+    const immH = Math.max(0, Math.min(bot - Math.max(top, 0), L));
+    const Vsub = immH * L * L;  // volume sommerso (m³)
+
+    const FA = rhof * Vsub * g;   // spinta di Archimede (verso l'alto, -y)
+    const Fr = Fg - FA;           // risultante (+ = verso il basso)
+
+    // Viscosità artificiale proporzionale alla velocità (attrito idrodinamico)
+    // F_drag = -k_drag * vy,  k_drag calibrato per smorzamento visibile
+    const k_drag = 6 * Math.PI * 0.001 * (L / 2) * 200; // Stokes-like, amplificato
+    const Fdrag = -k_drag * arch.vy;
+
+    const a = (Fr + Fdrag) / m;
+
+    // Integrazione semi-implicita Euler
+    arch.vy += a * dt;
+    arch.y  += arch.vy * dt;
+
+    // Vincoli: non scende sotto il fondo del serbatoio, non sale troppo in aria
+    const floorY  =  0.35;   // fondo del serbatoio in coordinate fisiche
+    const ceilingY = -L - 0.10; // tetto (aria): il cubo non vola via
+    if (arch.y + L/2 >= floorY) {
+      arch.y  = floorY - L/2;
+      arch.vy = Math.min(0, arch.vy * -0.2); // rimbalzo smorzato
+    }
+    if (arch.y - L/2 <= ceilingY) {
+      arch.y  = ceilingY + L/2;
+      arch.vy = Math.max(0, arch.vy * -0.1);
+    }
+
+    // Aggiorna pannello valori
+    const statoStr = Fr < -0.5 ? '↑ Sale' : Fr > 0.5 ? '↓ Affonda' : '⇔ Equilibrio';
+    document.getElementById('i0vol').textContent = fmt(V, 4) + ' m³';
+    document.getElementById('i0fg').textContent  = fmt(Fg, 2) + ' N';
+    document.getElementById('i0fa').textContent  = fmt(FA, 2) + ' N';
+    document.getElementById('i0fr').textContent  = fmt(Math.abs(Fr), 2) + ' N';
+    document.getElementById('i0st').textContent  = statoStr;
+
+    draw0(ctx, cvs.width, cvs.height);
+  }
+  frame(performance.now());
+}
+
+function draw0(ctx, W, H) {
+  ctx.clearRect(0, 0, W, H);
+
+  const { rhoc, rhof, L } = arch;
+  const waterTop = 100;   // pixel y della superficie libera
+  const waterBot = H - 50;
+  const pxPerM   = (waterBot - waterTop) / 0.40; // 0.40 m di profondità visibile → pixel
+  const cxc      = W / 2;
+  const pxL      = Math.min(L * pxPerM, 200);    // lato cubo in pixel
+
+  // --- Sfondo acqua ---
+  const waterGrad = ctx.createLinearGradient(0, waterTop, 0, waterBot);
+  waterGrad.addColorStop(0, '#b8dcf4');
+  waterGrad.addColorStop(1, '#4a80b0');
+  ctx.fillStyle = waterGrad;
+  ctx.fillRect(60, waterTop, W - 120, waterBot - waterTop);
+  ctx.strokeStyle = '#4a9fd4';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(60, waterTop, W - 120, waterBot - waterTop);
+
+  // --- Etichetta fluido ---
+  ctx.fillStyle = '#1a5a8a';
+  ctx.font = '13px DM Mono';
+  ctx.fillText(`ρ_f = ${rhof} kg/m³`, 70, waterTop + 22);
+
+  // --- Superficie libera tratteggiata ---
+  ctx.strokeStyle = '#1a9ad4';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([7, 4]);
+  ctx.beginPath();
+  ctx.moveTo(60, waterTop); ctx.lineTo(W - 60, waterTop);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#1a5a8a';
+  ctx.font = '12px DM Mono';
+  ctx.fillText('superficie libera  (y = 0)', 65, waterTop - 9);
+
+  // --- Posizione cubo in pixel ---
+  // arch.y in metri, y=0 è la superficie libera, y>0 è sotto
+  const cubeCenterPx = waterTop + arch.y * pxPerM;
+  const cy0px = cubeCenterPx - pxL / 2;   // top-left y del cubo
+  const cx0px = cxc - pxL / 2;
+
+  // --- Parte sommersa evidenziata ---
+  const cubeTopPx = cy0px;
+  const cubeBotPx = cy0px + pxL;
+  if (cubeBotPx > waterTop) {
+    const subTopPx = Math.max(cubeTopPx, waterTop);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(cx0px + 1, subTopPx, pxL - 2, cubeBotPx - subTopPx);
+    ctx.clip();
+    ctx.fillStyle = 'rgba(26,90,138,0.28)';
+    ctx.fillRect(cx0px + 1, subTopPx, pxL - 2, cubeBotPx - subTopPx);
+    ctx.restore();
+    const fracImm = (cubeBotPx - subTopPx) / pxL * 100;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = '10px DM Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${fracImm.toFixed(0)}% somm.`, cxc, subTopPx + (cubeBotPx - subTopPx) / 2 + 4);
+    ctx.textAlign = 'left';
+  }
+
+  // --- Cubo ---
+  const rVal = Math.min(240, Math.round(70 + rhoc / 8));
+  ctx.fillStyle = `rgba(${rVal},85,35,0.90)`;
+  ctx.strokeStyle = '#2a0e00';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.rect(cx0px, cy0px, pxL, pxL);
+  ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '12px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(`ρ_c=${rhoc}`, cxc, cubeCenterPx - 7);
+  ctx.fillText('kg/m³', cxc, cubeCenterPx + 9);
+  ctx.textAlign = 'left';
+
+  // --- Frecce forze ---
+  const V   = L * L * L;
+  const m   = rhoc * V;
+  const Fg2 = m * g;
+  const top2  = arch.y - L / 2;
+  const bot2  = arch.y + L / 2;
+  const immH2 = Math.max(0, Math.min(bot2 - Math.max(top2, 0), L));
+  const Vsub2 = immH2 * L * L;
+  const FA2 = rhof * Vsub2 * g;
+  const Fr2 = Fg2 - FA2;
+
+  const fScale = Math.min(80 / Math.max(Fg2, 1), 8);
+  const bodyCyPx = cubeCenterPx;
+
+  // Peso ↓
+  const fgLen = Math.min(Fg2 * fScale, 110);
+  arrow(ctx, cxc, bodyCyPx, cxc, bodyCyPx + fgLen, '#e05050', `F_g=${fmt(Fg2,1)}N`);
+  // Archimede ↑
+  const faLen = Math.min(FA2 * fScale, 110);
+  if (faLen > 3) arrow(ctx, cxc - 36, bodyCyPx, cxc - 36, bodyCyPx - faLen, '#1a8a5a', `F_A=${fmt(FA2,1)}N`);
+  // Risultante
+  if (Math.abs(Fr2) > 0.3) {
+    const frLen = Math.min(Math.abs(Fr2) * fScale, 80);
+    const frDir = Fr2 > 0 ? 1 : -1;
+    arrow(ctx, cxc + 36, bodyCyPx, cxc + 36, bodyCyPx + frDir * frLen, '#c89a20', `|Fr|=${fmt(Math.abs(Fr2),1)}N`);
+  }
+
+  // --- Velocità e scala ---
+  ctx.fillStyle = '#4a4640';
+  ctx.font = '11px DM Mono';
+  ctx.fillText(`v = ${arch.vy.toFixed(2)} m/s`, W - 180, H - 20);
+}
+
+update0();
+
+// ============================================================
+// MODULE 1 — PRESSIONE IDROSTATICA
+// ============================================================
+function update1() {
+  const rho = +document.getElementById('r1a').value;
+  const P0  = +document.getElementById('r1b').value;
+  const h   = +document.getElementById('r1c').value / 10;
+  document.getElementById('v1a').textContent = rho;
+  document.getElementById('v1b').textContent = Math.round(P0);
+  document.getElementById('v1c').textContent = h.toFixed(1);
+
+  const pgh = rho * g * h;
+  const Ptot = P0 + pgh;
+
+  document.getElementById('i1h').textContent    = h.toFixed(1) + ' m';
+  document.getElementById('i1p0').textContent   = fmt(P0/1000,1) + ' kPa';
+  document.getElementById('i1pgh').textContent  = fmt(pgh/1000,2) + ' kPa';
+  document.getElementById('i1pt').textContent   = fmt(Ptot/1000,1) + ' kPa';
+  document.getElementById('i1patm').textContent = (Ptot/101325).toFixed(2) + ' atm';
+
+  draw1(rho, P0, h, pgh, Ptot);
+}
+
+function draw1(rho, P0, h, pgh, Ptot) {
+  const cvs = document.getElementById('c1');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  ctx.clearRect(0,0,W,H);
+
+  const maxH = 10; // metres shown
+  const tankX = 80, tankW = 200;
+  const tankTop = 50, tankBot = H - 60;
+  const tankH = tankBot - tankTop;
+
+  // tank background
+  ctx.fillStyle = '#e0f4ff';
+  ctx.strokeStyle = '#4a9fd4';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.rect(tankX, tankTop, tankW, tankH);
+  ctx.fill(); ctx.stroke();
+
+  // gradient depth
+  const grad = ctx.createLinearGradient(0, tankTop, 0, tankBot);
+  grad.addColorStop(0, 'rgba(74,159,212,0.1)');
+  grad.addColorStop(1, 'rgba(26,90,138,0.5)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(tankX+1, tankTop+1, tankW-2, tankH-2);
+
+  // depth markers on left
+  for (let d = 0; d <= maxH; d += 2) {
+    const y = tankTop + (d/maxH)*tankH;
+    ctx.strokeStyle = '#4a9fd4';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(tankX - 8, y);
+    ctx.lineTo(tankX, y);
+    ctx.stroke();
+    ctx.fillStyle = '#1a5a8a';
+    ctx.font = '11px DM Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText(d + 'm', tankX - 12, y + 4);
+    ctx.textAlign = 'left';
+  }
+
+  // sensor
+  const sH = Math.min(h, maxH);
+  const sy = tankTop + (sH/maxH)*tankH;
+  ctx.fillStyle = '#e05050';
+  ctx.beginPath();
+  ctx.arc(tankX + tankW/2, sy, 10, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('P', tankX + tankW/2, sy+4);
+  ctx.textAlign = 'left';
+
+  // manometer bar chart (right side)
+  const barX = tankX + tankW + 60;
+  const barMaxH = tankH - 40;
+  const maxP = P0 + rho * g * maxH;
+
+  const drawBar = (x, val, maxVal, color, label, sub) => {
+    const bh = (val/maxVal)*barMaxH;
+    ctx.fillStyle = '#f0f0ec';
+    ctx.strokeStyle = '#d4cfc4';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.rect(x, tankTop + 20, 50, barMaxH);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.rect(x, tankTop + 20 + barMaxH - bh, 50, bh);
+    ctx.fill();
+    ctx.fillStyle = '#1a1814';
+    ctx.font = '500 11px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x+25, tankTop + 16);
+    ctx.fillStyle = color;
+    ctx.font = '500 10px DM Mono';
+    ctx.fillText(sub, x+25, tankTop + 28 + barMaxH - bh - 5);
+    ctx.textAlign = 'left';
+  };
+
+  drawBar(barX,    P0,   maxP, '#8ab0d8', 'P₀', fmt(P0/1000,0)+'k');
+  drawBar(barX+70, pgh,  maxP, '#4a9fd4', 'ρgh', fmt(pgh/1000,1)+'k');
+  drawBar(barX+140,Ptot, maxP, '#1a5a8a', 'P tot', fmt(Ptot/1000,1)+'k');
+
+  // Pa labels below
+  [P0, pgh, Ptot].forEach((v,i) => {
+    ctx.fillStyle = '#4a4640';
+    ctx.font = '10px DM Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('Pa', barX + i*70 + 25, tankBot + 14);
+    ctx.textAlign = 'left';
+  });
+
+  // depth line to sensor
+  ctx.strokeStyle = '#e05050';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  ctx.moveTo(tankX + tankW, sy);
+  ctx.lineTo(barX + 145, sy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // surface label
+  ctx.fillStyle = '#1a5a8a';
+  ctx.font = '12px DM Mono';
+  ctx.fillText('P₀', tankX + tankW + 5, tankTop + 14);
+  ctx.fillText('h = ' + sH.toFixed(1) + ' m', tankX + 5, sy - 14);
+}
+update1();
+
+// ============================================================
+// MODULE 2 — PRESSA IDRAULICA
+// ============================================================
+function update2() {
+  const r1 = +document.getElementById('r2a').value / 100;
+  const r2 = +document.getElementById('r2b').value / 100;
+  const F1 = +document.getElementById('r2c').value;
+  document.getElementById('v2a').textContent = r1.toFixed(2);
+  document.getElementById('v2b').textContent = r2.toFixed(2);
+  document.getElementById('v2c').textContent = Math.round(F1);
+
+  const A1 = Math.PI * r1 * r1;
+  const A2 = Math.PI * r2 * r2;
+  const P  = F1 / A1;
+  const F2 = P * A2;
+  const rap = A2/A1;
+
+  document.getElementById('i2a1').textContent = (A1*1e4).toFixed(1) + ' cm²';
+  document.getElementById('i2a2').textContent = (A2*1e4).toFixed(1) + ' cm²';
+  document.getElementById('i2rap').textContent = rap.toFixed(1) + 'x';
+  document.getElementById('i2p').textContent  = fmt(P/1000,1) + ' kPa';
+  document.getElementById('i2f2').textContent = fmt(F2) + ' N';
+
+  draw2(r1, r2, F1, F2, A1, A2, P);
+}
+
+function draw2(r1, r2, F1, F2, A1, A2, P) {
+  const cvs = document.getElementById('c2');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  ctx.clearRect(0,0,W,H);
+
+  const scale = 900;
+  const pw1 = Math.max(20, Math.min(r1*scale, 90));
+  const pw2 = Math.max(30, Math.min(r2*scale, 180));
+  const fluidY = H - 90;
+  const baseY  = H - 55;
+
+  // fluid channel
+  ctx.fillStyle = '#c8e8f8';
+  ctx.strokeStyle = '#4a9fd4';
+  ctx.lineWidth = 2;
+
+  const p1x = 130, p2x = W - 130;
+  // left cylinder
+  ctx.fillRect(p1x - pw1/2, fluidY - 120, pw1, 120);
+  ctx.strokeRect(p1x - pw1/2, fluidY - 120, pw1, 120);
+  // right cylinder
+  ctx.fillRect(p2x - pw2/2, fluidY - 120, pw2, 120);
+  ctx.strokeRect(p2x - pw2/2, fluidY - 120, pw2, 120);
+  // connecting pipe
+  ctx.fillStyle = '#c8e8f8';
+  ctx.fillRect(p1x + pw1/2, fluidY - 30, p2x - pw2/2 - p1x - pw1/2, 30);
+  ctx.strokeStyle = '#4a9fd4';
+  ctx.beginPath();
+  ctx.moveTo(p1x + pw1/2, fluidY - 30);
+  ctx.lineTo(p2x - pw2/2, fluidY - 30);
+  ctx.moveTo(p1x + pw1/2, fluidY);
+  ctx.lineTo(p2x - pw2/2, fluidY);
+  ctx.stroke();
+
+  // fluid label
+  ctx.fillStyle = '#1a5a8a';
+  ctx.font = '12px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('fluido incomprimibile', W/2, fluidY - 10);
+  ctx.textAlign = 'left';
+
+  // piston 1
+  ctx.fillStyle = '#7a4a2a';
+  ctx.fillRect(p1x - pw1/2 + 2, fluidY - 140, pw1 - 4, 22);
+  ctx.strokeStyle = '#3a1a00';
+  ctx.strokeRect(p1x - pw1/2 + 2, fluidY - 140, pw1 - 4, 22);
+
+  // piston 2
+  const frac = Math.min(F2/F1, 16);
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(p2x - pw2/2 + 2, fluidY - 140, pw2 - 4, 22);
+  ctx.strokeStyle = '#3a1a00';
+  ctx.strokeRect(p2x - pw2/2 + 2, fluidY - 140, pw2 - 4, 22);
+
+  // piston labels
+  ctx.fillStyle = '#3a1a00';
+  ctx.font = '500 12px DM Sans';
+  ctx.textAlign = 'center';
+  ctx.fillText('A₁ = '+(A1*1e4).toFixed(1)+'cm²', p1x, fluidY + 25);
+  ctx.fillText('A₂ = '+(A2*1e4).toFixed(1)+'cm²', p2x, fluidY + 25);
+  ctx.textAlign = 'left';
+
+  // force arrows
+  const fScale = 80 / Math.max(F1, F2);
+  const f1Len = Math.min(F1 * fScale, 100);
+  const f2Len = Math.min(F2 * fScale, 120);
+  arrow(ctx, p1x, fluidY - 162, p1x, fluidY - 162 - f1Len, '#e05050', '');
+  ctx.fillStyle = '#e05050'; ctx.font = '500 12px DM Sans'; ctx.textAlign = 'center';
+  ctx.fillText(`F₁ = ${fmt(F1)}N`, p1x, fluidY - 166 - f1Len);
+  ctx.textAlign = 'left';
+
+  arrow(ctx, p2x, fluidY - 162, p2x, fluidY - 162 - f2Len, '#1a8a5a', '');
+  ctx.fillStyle = '#1a8a5a'; ctx.font = '500 12px DM Sans'; ctx.textAlign = 'center';
+  ctx.fillText(`F₂ = ${fmt(F2,0)}N`, p2x, fluidY - 166 - f2Len);
+  ctx.textAlign = 'left';
+
+  // pressure label
+  ctx.fillStyle = '#1a5a8a';
+  ctx.font = 'italic 12px DM Serif Display';
+  ctx.textAlign = 'center';
+  ctx.fillText(`P = F₁/A₁ = F₂/A₂ = ${fmt(P/1000,1)} kPa`, W/2, baseY);
+  ctx.textAlign = 'left';
+
+  // multiplication factor
+  ctx.fillStyle = '#c84b1a';
+  ctx.font = '700 16px DM Mono';
+  ctx.textAlign = 'center';
+  const rap = A2/A1;
+  ctx.fillText(`moltiplicazione forza: ×${rap.toFixed(1)}`, W/2, baseY + 22);
+  ctx.textAlign = 'left';
+}
+update2();
+
+// ============================================================
+// MODULE 3 — CONTINUITÀ (animated)
+// ============================================================
+let anim3 = null;
+let particles3 = [];
+let r3a_val = 60, r3b_val = 25, r3c_val = 1.0;
+
+function buildConduit3() {
+  const r1 = r3a_val, r2 = r3b_val;
+  const W = 680, H = 440;
+  const cy = H/2;
+  // sections: left(0..200) -> taper(200..320) -> narrow(320..480) -> flare(480..600)
+  return { r1, r2, cy, W, H };
+}
+
+function getConduitRadius(x, c) {
+  const { r1, r2 } = c;
+  if (x < 180) return r1;
+  if (x < 300) return r1 + (r2-r1)*(x-180)/120;
+  if (x < 440) return r2;
+  if (x < 560) return r2 + (r1-r2)*(x-440)/120;
+  return r1;
+}
+
+function getConduitSpeed(x, c, v1) {
+  const r1 = c.r1, r2 = c.r2;
+  const rc = getConduitRadius(x, c);
+  return v1 * (r1*r1) / (rc*rc);
+}
+
+function spawnParticle3(c, v1) {
+  const y = c.cy + (Math.random()-0.5)*2*(c.r1-4);
+  return { x: 0, y, oy: y - c.cy };
+}
+
+function update3() {
+  r3a_val = +document.getElementById('r3a').value;
+  r3b_val = Math.min(+document.getElementById('r3b').value, r3a_val - 5);
+  r3c_val = +document.getElementById('r3c').value / 10;
+  document.getElementById('v3a').textContent = r3a_val;
+  document.getElementById('v3b').textContent = r3b_val;
+  document.getElementById('v3c').textContent = r3c_val.toFixed(1);
+
+  const c = buildConduit3();
+  const A1 = Math.PI * r3a_val * r3a_val;
+  const A2 = Math.PI * r3b_val * r3b_val;
+  const v2 = r3c_val * A1 / A2;
+  const Q  = A1 * r3c_val;
+
+  document.getElementById('i3a1').textContent = fmt(A1/1e6,4);
+  document.getElementById('i3a2').textContent = fmt(A2/1e6,4);
+  document.getElementById('i3v1').textContent = r3c_val.toFixed(2) + ' m/s';
+  document.getElementById('i3v2').textContent = v2.toFixed(2) + ' m/s';
+  document.getElementById('i3q').textContent  = fmt(Q/1e6,4) + ' m³/s';
+  particles3 = [];
+}
+
+function startAnim3() {
+  const c = buildConduit3();
+  for (let i=0; i<40; i++) particles3.push(spawnParticle3(c, r3c_val));
+  const cvs = document.getElementById('c3');
+  const ctx = cvs.getContext('2d');
+
+  function frame() {
+    anim3 = requestAnimationFrame(frame);
+    const c = buildConduit3();
+    const W = cvs.width, H = cvs.height;
+    ctx.clearRect(0,0,W,H);
+    drawConduitBg(ctx, c, W, H);
+
+    // update & draw particles
+    const dt = 0.016;
+    const vScale = 3;
+    particles3.forEach(p => {
+      const spd = getConduitSpeed(p.x, c, r3c_val) * vScale;
+      p.x += spd * dt * 60;
+      if (p.x > W + 10) {
+        Object.assign(p, spawnParticle3(c, r3c_val));
+        p.x = 0;
+      }
+      // track y to conduit center ± oy scaled
+      const rc = getConduitRadius(p.x, c);
+      const frac = (c.r1 > 0) ? rc / c.r1 : 1;
+      p.y = c.cy + p.oy * frac;
+
+      // color by speed
+      const s = getConduitSpeed(p.x, c, r3c_val);
+      const maxS = r3c_val * (c.r1*c.r1)/(c.r2*c.r2);
+      const t = Math.min(s/maxS, 1);
+      const r = Math.round(26 + t*(200-26));
+      const g2 = Math.round(95 + t*(50-95));
+      const b = Math.round(212 + t*(30-212));
+      ctx.fillStyle = `rgb(${r},${g2},${b})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    // spawn
+    if (Math.random() < 0.3) particles3.push(spawnParticle3(c, r3c_val));
+    if (particles3.length > 80) particles3.splice(0, particles3.length - 80);
+
+    drawConduitLabels(ctx, c, W, H);
+  }
+  frame();
+}
+
+function drawConduitBg(ctx, c, W, H) {
+  ctx.fillStyle = '#f4f1eb';
+  ctx.fillRect(0,0,W,H);
+
+  // conduit shape
+  ctx.fillStyle = '#d4e8f4';
+  ctx.beginPath();
+  ctx.moveTo(0, c.cy - getConduitRadius(0,c));
+  for (let x=0; x<=W; x+=2) {
+    ctx.lineTo(x, c.cy - getConduitRadius(x,c));
+  }
+  for (let x=W; x>=0; x-=2) {
+    ctx.lineTo(x, c.cy + getConduitRadius(x,c));
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#4a9fd4';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(0, c.cy - getConduitRadius(0,c));
+  for (let x=0; x<=W; x+=2) ctx.lineTo(x, c.cy - getConduitRadius(x,c));
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(0, c.cy + getConduitRadius(0,c));
+  for (let x=0; x<=W; x+=2) ctx.lineTo(x, c.cy + getConduitRadius(x,c));
+  ctx.stroke();
+}
+
+function drawConduitLabels(ctx, c, W, H) {
+  const v1 = r3c_val;
+  const v2 = v1 * (c.r1*c.r1)/(c.r2*c.r2);
+  // section lines
+  [180, 300, 440, 560].forEach(x => {
+    ctx.strokeStyle = '#8a8480';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();
+    ctx.moveTo(x, 20);
+    ctx.lineTo(x, H - 20);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+  // labels
+  ctx.fillStyle = '#1a1814';
+  ctx.font = '500 12px DM Sans';
+  ctx.textAlign = 'center';
+  ctx.fillText(`v₁ = ${v1.toFixed(1)} m/s`, 90, c.cy - c.r1 - 14);
+  ctx.fillText(`r₁ = ${c.r1}`, 90, c.cy - c.r1 - 1);
+  ctx.fillText(`v₂ = ${v2.toFixed(1)} m/s`, 370, c.cy - c.r2 - 14);
+  ctx.fillText(`r₂ = ${c.r2}`, 370, c.cy - c.r2 - 1);
+  ctx.textAlign = 'left';
+}
+
+update3();
+
+// ============================================================
+// MODULE 4 — VENTURI (animated)
+// ============================================================
+let anim4 = null;
+let venturiPhase = 0;
+
+function update4() {
+  const v1  = +document.getElementById('r4a').value / 10;
+  const rap = +document.getElementById('r4b').value / 10;
+  const rho = +document.getElementById('r4c').value;
+  document.getElementById('v4a').textContent = v1.toFixed(1);
+  document.getElementById('v4b').textContent = rap.toFixed(1);
+  document.getElementById('v4c').textContent = rho;
+
+  const v2 = v1 * rap;
+  const dP = 0.5 * rho * (v2*v2 - v1*v1);
+  const P1rel = 0.5 * rho * v2 * v2;
+  const P2rel = 0.5 * rho * v1 * v1;
+
+  document.getElementById('i4v1').textContent = v1.toFixed(2) + ' m/s';
+  document.getElementById('i4v2').textContent = v2.toFixed(2) + ' m/s';
+  document.getElementById('i4p1').textContent = fmt(P1rel/1000,1) + ' kPa';
+  document.getElementById('i4p2').textContent = fmt(P2rel/1000,1) + ' kPa';
+  document.getElementById('i4dp').textContent = fmt(dP/1000,1) + ' kPa';
+}
+
+function startAnim4() {
+  const cvs = document.getElementById('c4');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+
+  function frame() {
+    anim4 = requestAnimationFrame(frame);
+    venturiPhase += 0.03;
+    ctx.clearRect(0,0,W,H);
+
+    const v1  = +document.getElementById('r4a').value / 10;
+    const rap = +document.getElementById('r4b').value / 10;
+    const rho = +document.getElementById('r4c').value;
+    const v2  = v1 * rap;
+    const dP  = 0.5 * rho * (v2*v2 - v1*v1);
+
+    // conduit
+    const cy = H/2 - 20;
+    const r1 = 55, r2 = Math.max(10, r1/Math.sqrt(rap));
+    const conduit = {r1, r2, cy};
+    drawConduitBg(ctx, conduit, W, H-40);
+
+    // streamlines
+    const nLines = 7;
+    for (let i=0; i<nLines; i++) {
+      const frac = (i+0.5)/nLines;
+      const phase = venturiPhase * (v1*2);
+      ctx.strokeStyle = `rgba(26,95,168,${0.3 + 0.3*frac})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      let first = true;
+      for (let x=0; x<W; x+=3) {
+        const rc = getConduitRadius(x, conduit);
+        const yr = cy + (frac*2-1)*rc*0.9;
+        const spd = getConduitSpeed(x, conduit, v1);
+        const wave = Math.sin(x*0.05 - phase*spd/v1) * 2 * (rc/r1);
+        if (first) { ctx.moveTo(x, yr+wave); first=false; }
+        else ctx.lineTo(x, yr+wave);
+      }
+      ctx.stroke();
+    }
+
+    // manometers
+    const mxPositions = [90, 370, 590];
+    const xLabels = ['sezione 1', 'strozzatura', 'sezione 1'];
+    const maxP = 0.5 * rho * v2 * v2;
+    const Pvals = [
+      0.5*rho*v1*v1,
+      0.5*rho*v2*v2,
+      0.5*rho*v1*v1
+    ].map(pkin => maxP - pkin + 0.5*rho*v1*v1); // static pressure ∝ (maxP - pkin)
+    // Actually: P_static = Bernoulli constant - 0.5ρv²
+    const Pstatic = [
+      maxP - 0.5*rho*v1*v1 + 0.5*rho*v1*v1,
+      maxP - 0.5*rho*v2*v2 + 0.5*rho*v1*v1,
+      maxP - 0.5*rho*v1*v1 + 0.5*rho*v1*v1
+    ];
+    const Ps1 = maxP;
+    const Ps2 = maxP - dP;
+    const PsArr = [Ps1, Ps2, Ps1];
+    const maxPS = Ps1;
+
+    mxPositions.forEach((mx, idx) => {
+      const tubH = 90;
+      const tubY = cy - r1 - tubH - 10;
+      const h = (PsArr[idx]/maxPS) * tubH;
+      // tube
+      ctx.fillStyle = '#e0f4ff';
+      ctx.strokeStyle = '#4a9fd4';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.rect(mx-10, tubY, 20, tubH);
+      ctx.fill(); ctx.stroke();
+      // fluid level
+      ctx.fillStyle = '#4a9fd4';
+      ctx.fillRect(mx-9, tubY + tubH - h, 18, h);
+      // label
+      ctx.fillStyle = '#1a1814';
+      ctx.font = '11px DM Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(fmt(PsArr[idx]/1000,0)+'k', mx, tubY - 4);
+      ctx.fillText('Pa', mx, tubY - 15);
+      ctx.font = '10px DM Sans';
+      ctx.fillText(xLabels[idx], mx, cy + r1 + 20);
+      ctx.textAlign = 'left';
+    });
+
+    // labels on conduit
+    ctx.fillStyle = '#1a1814';
+    ctx.font = '500 12px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText(`v₁ = ${v1.toFixed(1)} m/s`, 90, cy + r1 + 40);
+    ctx.fillText(`v₂ = ${v2.toFixed(1)} m/s`, 370, cy + r2 + 40);
+    ctx.fillText(`ΔP = ${fmt(dP/1000,1)} kPa`, W/2, H - 14);
+    ctx.textAlign = 'left';
+  }
+  frame();
+}
+
+update4();
+
+// ============================================================
+// MODULE 5 — PORTATA (Torricelli, animated)
+// ============================================================
+let anim5 = null;
+let waterLevel5 = 1.0; // fraction 0..1
+let lastTime5 = null;
+
+function update5() {
+  document.getElementById('v5a').textContent = (+document.getElementById('r5a').value/100).toFixed(2);
+  document.getElementById('v5b').textContent = (+document.getElementById('r5b').value/10).toFixed(1);
+  document.getElementById('v5c').textContent = +document.getElementById('r5c').value;
+}
+
+function resetSerbatoio() {
+  waterLevel5 = 1.0;
+  lastTime5 = null;
+}
+
+function startAnim5() {
+  const cvs = document.getElementById('c5');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  let jetParticles = [];
+
+  function frame(ts) {
+    anim5 = requestAnimationFrame(frame);
+    if (!lastTime5) lastTime5 = ts;
+    const dtReal = Math.min((ts - lastTime5)/1000, 0.05);
+    lastTime5 = ts;
+
+    const d   = +document.getElementById('r5a').value / 100;
+    const Hm  = +document.getElementById('r5b').value / 10;
+    const rho = +document.getElementById('r5c').value;
+    const r   = d/2;
+    const A   = Math.PI*r*r;
+
+    const h = waterLevel5 * Hm;
+    const v = Math.sqrt(2 * g * Math.max(h, 0.001));
+    const Q = A * v;
+    const G = rho * Q;
+
+    // tank geometry
+    const tankX = 100, tankW = 180, tankBot = H - 80, tankTop = 60;
+    const tankH = tankBot - tankTop;
+    const levelPx = waterLevel5 * tankH;
+
+    // drain: update water level
+    const Atank = (tankW/100)*(tankW/100); // m², proportional
+    const dVol = Q * dtReal;
+    const dH = dVol / Atank;
+    if (waterLevel5 > 0) {
+      waterLevel5 = Math.max(0, waterLevel5 - dH*0.25);
+    }
+
+    update5();
+    document.getElementById('i5h').textContent  = h.toFixed(2) + ' m';
+    document.getElementById('i5v').textContent  = v.toFixed(2) + ' m/s';
+    document.getElementById('i5a').textContent  = (A*1e4).toFixed(2) + ' cm²';
+    document.getElementById('i5q').textContent  = (Q*1000).toFixed(2) + ' L/s';
+    document.getElementById('i5g').textContent  = fmt(G,1) + ' kg/s';
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#f4f1eb';
+    ctx.fillRect(0,0,W,H);
+
+    // tank walls
+    ctx.strokeStyle = '#4a4640';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(tankX, tankTop);
+    ctx.lineTo(tankX, tankBot);
+    ctx.lineTo(tankX + tankW, tankBot);
+    ctx.lineTo(tankX + tankW, tankTop);
+    ctx.stroke();
+
+    // water in tank
+    const waterTop2 = tankBot - levelPx;
+    const waterGrad = ctx.createLinearGradient(0, waterTop2, 0, tankBot);
+    waterGrad.addColorStop(0, '#7ac8f0');
+    waterGrad.addColorStop(1, '#1a5a8a');
+    ctx.fillStyle = waterGrad;
+    ctx.fillRect(tankX+2, waterTop2, tankW-4, levelPx);
+
+    // height markers
+    for (let i=0; i<=5; i++) {
+      const my = tankBot - i*(tankH/5);
+      ctx.strokeStyle = '#8a8480';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3,3]);
+      ctx.beginPath();
+      ctx.moveTo(tankX-2, my); ctx.lineTo(tankX+tankW+2, my);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#4a4640';
+      ctx.font = '10px DM Mono';
+      ctx.textAlign = 'right';
+      ctx.fillText((i * Hm/5).toFixed(1)+'m', tankX-6, my+4);
+    }
+    ctx.textAlign = 'left';
+
+    // orifice
+    const oy = tankBot;
+    const ox = tankX + tankW;
+    ctx.fillStyle = '#1a1814';
+    ctx.fillRect(ox - 1, oy - d*600/2, 8, d*600);
+
+    // jet
+    if (waterLevel5 > 0.01) {
+      const jVx = v * 8;
+      const jBaseY = oy;
+      for (let i=0; i<3; i++) {
+        jetParticles.push({
+          x: ox + 8, y: jBaseY + (Math.random()-0.5)*d*300,
+          vx: jVx*(0.9+0.2*Math.random()), vy: (Math.random()-0.5)*v*1
+        });
+      }
+    }
+
+    jetParticles.forEach(p => {
+      p.x += p.vx * dtReal;
+      p.vy += g * dtReal * 30;
+      p.y  += p.vy * dtReal;
+    });
+    jetParticles = jetParticles.filter(p => p.x < W+20 && p.y < H+20);
+
+    ctx.fillStyle = '#4a9fd4';
+    jetParticles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    // graph: Q vs h on right
+    const gx = 360, gy = 60, gw = 260, gh = 200;
+    ctx.fillStyle = '#faf8f3';
+    ctx.strokeStyle = '#d4cfc4';
+    ctx.lineWidth = 1;
+    ctx.fillRect(gx, gy, gw, gh);
+    ctx.strokeRect(gx, gy, gw, gh);
+
+    ctx.fillStyle = '#4a4640';
+    ctx.font = '11px DM Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('Q = A√(2gh)', gx+gw/2, gy-8);
+    ctx.textAlign = 'left';
+
+    // axes
+    ctx.strokeStyle = '#4a4640'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(gx+30, gy+10); ctx.lineTo(gx+30, gy+gh-10);
+    ctx.lineTo(gx+gw-10, gy+gh-10);
+    ctx.stroke();
+
+    ctx.fillStyle = '#8a8480'; ctx.font = '10px DM Mono';
+    ctx.fillText('h →', gx+gw-30, gy+gh-2);
+    ctx.save(); ctx.translate(gx+12, gy+gh/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('Q →', 0, 0); ctx.restore();
+
+    // curve
+    const Qmax = A * Math.sqrt(2*g*Hm);
+    ctx.strokeStyle = '#1a5fa8'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let hi=0; hi<=Hm; hi+=Hm/100) {
+      const qi = A * Math.sqrt(2*g*hi);
+      const px2 = gx+30 + (hi/Hm)*(gw-40);
+      const py2 = gy+gh-10 - (qi/Qmax)*(gh-20);
+      if (hi===0) ctx.moveTo(px2, py2);
+      else ctx.lineTo(px2, py2);
+    }
+    ctx.stroke();
+
+    // current point
+    const hNorm = h/Hm, qNorm = Q/Qmax;
+    const px2 = gx+30 + hNorm*(gw-40);
+    const py2 = gy+gh-10 - qNorm*(gh-20);
+    ctx.fillStyle = '#e05050';
+    ctx.beginPath();
+    ctx.arc(px2, py2, 6, 0, Math.PI*2);
+    ctx.fill();
+
+    // empty message
+    if (waterLevel5 <= 0.005) {
+      ctx.fillStyle = 'rgba(244,241,235,0.8)';
+      ctx.fillRect(tankX, tankTop, tankW, tankH);
+      ctx.fillStyle = '#8a8480';
+      ctx.font = '13px DM Sans';
+      ctx.textAlign = 'center';
+      ctx.fillText('Serbatoio vuoto', tankX+tankW/2, (tankTop+tankBot)/2);
+      ctx.textAlign = 'left';
+    }
+  }
+  frame(0);
+}
+
+update5();
+
+// ============================================================
+// MODULE 6 — MAGNUS (animated)
+// ============================================================
+let anim6 = null;
+
+function update6() {
+  const vinf = +document.getElementById('r6a').value;
+  const omega = +document.getElementById('r6b').value;
+  const r = +document.getElementById('r6c').value / 100;
+  document.getElementById('v6a').textContent = vinf;
+  document.getElementById('v6b').textContent = omega;
+  document.getElementById('v6c').textContent = r.toFixed(2);
+
+  const Gamma = 2 * Math.PI * r * r * omega;
+  const FL = 1.225 * Gamma * vinf; // ρ_aria * Γ * v_inf (per metro lunghezza)
+  const dir = omega > 0 ? 'verso l\'alto' : omega < 0 ? 'verso il basso' : 'nulla';
+
+  document.getElementById('i6v').textContent = vinf + ' m/s';
+  document.getElementById('i6w').textContent = omega + ' rad/s';
+  document.getElementById('i6g').textContent = fmt(Gamma,2) + ' m²/s';
+  document.getElementById('i6f').textContent = fmt(Math.abs(FL),1) + ' N/m';
+  document.getElementById('i6d').textContent = dir;
+}
+
+function startAnim6() {
+  const cvs = document.getElementById('c6');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  const cx = W / 2, cy = H / 2;
+  let phase = 0;
+
+  // ψ(x,y) = U·y·(1 - R²/r²) - Γ/(2π)·ln(r/R)
+  // r² = x²+y², coord centrate sul cilindro.
+  // Una linea di flusso = isocurva di ψ.
+  // Lontano dal cilindro ψ → U·y → linee orizzontali. ✓
+  function psi(x, y, R, Gamma) {
+    const r2 = x*x + y*y;
+    if (r2 <= R*R) return null;
+    return y * (1 - R*R/r2) - (Gamma / (2*Math.PI)) * Math.log(Math.sqrt(r2) / R);
+  }
+
+  // Dato x e il valore bersaglio psi_t, trova y con Newton-Raphson
+  function findY(x, psiTarget, R, Gamma, yGuess) {
+    let y = yGuess;
+    for (let i = 0; i < 20; i++) {
+      const r2 = x*x + y*y;
+      if (r2 <= R*R*1.02) return null;
+      const p = psi(x, y, R, Gamma);
+      if (p === null) return null;
+      // dψ/dy numerica
+      const eps = 0.4;
+      const p2 = psi(x, y+eps, R, Gamma);
+      if (p2 === null) return null;
+      const dpdy = (p2 - p) / eps;
+      if (Math.abs(dpdy) < 1e-9) break;
+      const dy = (psiTarget - p) / dpdy;
+      y += dy * 0.75;
+      if (Math.abs(dy) < 0.05) return y;
+    }
+    return y;
+  }
+
+  function frame() {
+    anim6 = requestAnimationFrame(frame);
+    const vinf  = +document.getElementById('r6a').value;
+    const omega = +document.getElementById('r6b').value;
+    const rPx   = Math.max(24, Math.min(+document.getElementById('r6c').value * 5.2, 68));
+
+    phase += 0.018 * Math.max(vinf, 1);
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Sfondo
+    ctx.fillStyle = '#edf3f8';
+    ctx.fillRect(0, 0, W, H);
+
+    const R = rPx;
+    // Circolazione adimensionale: κ = ω·R/U, scalata per visibilità
+    const kappa = (vinf > 0.01) ? (omega * R) / (vinf * 2.0) : 0;
+    const Gamma = kappa * 2 * Math.PI * R;
+
+    // === STREAMLINES ===
+    // Numero di linee e spaziatura: le vogliamo ben distribuite su tutta l'altezza
+    const nLines = 26;
+    const margin = 18;
+    // Posizioni y "non perturbate" (lontano dal cilindro, a sinistra)
+    for (let i = 0; i < nLines; i++) {
+      const yFar = margin + i * (H - 2*margin) / (nLines - 1) - cy;
+      const psiTarget = yFar; // U=1, quindi ψ_far = y_far
+
+      ctx.beginPath();
+      let prevSx = -1, prevSy = -1;
+      let started = false;
+      let yc = yFar; // stima iniziale y
+
+      // Marcia da sinistra a destra
+      const xStart = -cx - R * 0.5;
+      const xEnd   =  cx + R * 0.5;
+      const step   = 3;
+
+      for (let xc = xStart; xc <= xEnd; xc += step) {
+        // Trova y su questa isocurva
+        const yn = findY(xc, psiTarget, R, Gamma, yc);
+        if (yn === null) { started = false; ctx.beginPath(); yc = yFar; continue; }
+
+        const r2 = xc*xc + yn*yn;
+        if (r2 < R*R*1.06) { started = false; ctx.beginPath(); yc = yn; continue; }
+
+        const sx = xc + cx;
+        const sy = yn + cy;
+        if (sy < 2 || sy > H-2) { started = false; ctx.beginPath(); yc = yFar; continue; }
+
+        // Velocità locale per colore
+        const r2v = xc*xc + yn*yn;
+        const R2  = R*R;
+        const vx  = 1 - R2*(yn*yn - xc*xc)/(r2v*r2v) + Gamma*yn/(2*Math.PI*r2v);
+        const vy  = -2*R2*xc*yn/(r2v*r2v)              - Gamma*xc/(2*Math.PI*r2v);
+        const spd = Math.sqrt(vx*vx + vy*vy);
+        const sn  = Math.min(spd / 3.0, 1.0);
+
+        const cr = Math.round(30  + sn*185);
+        const cg = Math.round(110 + sn*30);
+        const cb = Math.round(200 + sn*(-160));
+
+        // Spessore leggermente maggiore per linee vicine al cilindro
+        const dist = Math.sqrt(r2) / R;
+        ctx.lineWidth = dist < 1.8 ? 1.9 : 1.3;
+        ctx.strokeStyle = `rgba(${cr},${cg},${cb},0.78)`;
+
+        if (!started) {
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          started = true;
+        } else {
+          ctx.lineTo(sx, sy);
+          if (Math.floor(xc / 30) !== Math.floor((xc - step) / 30)) {
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+          }
+        }
+
+        prevSx = sx; prevSy = sy;
+        yc = yn;
+      }
+      if (started) ctx.stroke();
+
+      // Piccole frecce direzionali su ogni linea (a sinistra e a destra del cilindro)
+      for (const arrowX of [-cx*0.55, cx*0.55]) {
+        const ya = findY(arrowX, psiTarget, R, Gamma, yFar);
+        if (!ya) continue;
+        const r2a = arrowX*arrowX + ya*ya;
+        if (r2a < R*R*1.5) continue;
+        const sax = arrowX + cx, say = ya + cy;
+        if (say < 4 || say > H-4) continue;
+        // Velocità per direzione freccia
+        const R2a = R*R;
+        const vxa = 1 - R2a*(ya*ya-arrowX*arrowX)/(r2a*r2a) + Gamma*ya/(2*Math.PI*r2a);
+        const vya = -2*R2a*arrowX*ya/(r2a*r2a)               - Gamma*arrowX/(2*Math.PI*r2a);
+        const vm  = Math.sqrt(vxa*vxa + vya*vya) || 1;
+        const al  = 7;
+        const ex  = sax + vxa/vm*al, ey = say + vya/vm*al;
+        ctx.strokeStyle = 'rgba(26,80,160,0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(sax, say); ctx.lineTo(ex, ey); ctx.stroke();
+        // testa freccia
+        const ux = vxa/vm, uy = vya/vm;
+        ctx.fillStyle = 'rgba(26,80,160,0.55)';
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(ex - ux*5 - uy*3, ey - uy*5 + ux*3);
+        ctx.lineTo(ex - ux*5 + uy*3, ey - uy*5 - ux*3);
+        ctx.fill();
+      }
+    }
+
+    // === Punti animati che si muovono lungo le linee ===
+    for (let i = 0; i < nLines; i++) {
+      const yFar = margin + i * (H - 2*margin) / (nLines - 1) - cy;
+      const psiTarget = yFar;
+      // x del punto: avanza con la fase
+      const xDot = ((phase * 3.5 + i * 57) % (W + R*2)) - cx - R;
+      const yDot = findY(xDot, psiTarget, R, Gamma, yFar);
+      if (!yDot) continue;
+      const r2d = xDot*xDot + yDot*yDot;
+      if (r2d < R*R*1.1) continue;
+      const sdx = xDot+cx, sdy = yDot+cy;
+      if (sdx<2||sdx>W-2||sdy<2||sdy>H-2) continue;
+      ctx.fillStyle = 'rgba(26,90,180,0.75)';
+      ctx.beginPath(); ctx.arc(sdx, sdy, 2.8, 0, Math.PI*2); ctx.fill();
+    }
+
+    // === Aloni di pressione ===
+    if (Math.abs(omega) > 0.3) {
+      const hd = omega > 0 ? 1 : -1;
+      const lpG = ctx.createRadialGradient(cx, cy-hd*(R+14), 4, cx, cy-hd*(R+14), R*2.0);
+      lpG.addColorStop(0,'rgba(26,138,90,0.28)'); lpG.addColorStop(1,'rgba(26,138,90,0)');
+      ctx.fillStyle=lpG; ctx.beginPath(); ctx.arc(cx,cy-hd*(R+14),R*2.0,0,Math.PI*2); ctx.fill();
+
+      const hpG = ctx.createRadialGradient(cx, cy+hd*(R+14), 4, cx, cy+hd*(R+14), R*2.0);
+      hpG.addColorStop(0,'rgba(210,60,40,0.24)'); hpG.addColorStop(1,'rgba(210,60,40,0)');
+      ctx.fillStyle=hpG; ctx.beginPath(); ctx.arc(cx,cy+hd*(R+14),R*2.0,0,Math.PI*2); ctx.fill();
+    }
+
+    // === Cilindro ===
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(phase * omega * 0.033);
+    const sg = ctx.createRadialGradient(-R*0.3,-R*0.35,R*0.08,0,0,R);
+    sg.addColorStop(0,'#f5ece0'); sg.addColorStop(0.5,'#d0a060'); sg.addColorStop(1,'#502800');
+    ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(40,20,0,0.55)'; ctx.lineWidth=1.5; ctx.stroke();
+    for (let s=-3;s<=3;s++){
+      const sy2=s*R/3.2, hw=Math.sqrt(Math.max(0,R*R-sy2*sy2));
+      if(hw<3)continue;
+      ctx.strokeStyle='rgba(60,30,0,0.2)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(-hw,sy2); ctx.lineTo(hw,sy2); ctx.stroke();
+    }
+    ctx.restore();
+
+    // === Freccia vento principale ===
+    arrow(ctx, 20, H-36, 110, H-36, '#e05050', `v_∞ = ${vinf} m/s`);
+
+    // === Forza di Magnus ===
+    if (Math.abs(omega) > 0.3) {
+      const fDir = omega > 0 ? -1 : 1;
+      const fLen = Math.min(Math.abs(omega) * vinf * 0.5, 110);
+      arrow(ctx, cx+R+32, cy, cx+R+32, cy+fDir*fLen, '#1a8a5a', 'F_M');
+    }
+
+    // === Indicatore rotazione ===
+    if (omega !== 0) {
+      const arcR=R+15;
+      ctx.strokeStyle='#c84b1a'; ctx.lineWidth=2;
+      const sa=omega>0?0.3:Math.PI+0.3, ea=omega>0?Math.PI-0.3:2*Math.PI-0.3;
+      ctx.beginPath(); ctx.arc(cx,cy,arcR,sa,ea,omega<0); ctx.stroke();
+      const aEnd=omega>0?ea:sa, td=omega>0?1:-1;
+      const ax2=cx+arcR*Math.cos(aEnd), ay2=cy+arcR*Math.sin(aEnd);
+      const tx=-Math.sin(aEnd)*td, ty=Math.cos(aEnd)*td;
+      ctx.fillStyle='#c84b1a';
+      ctx.beginPath(); ctx.moveTo(ax2+tx*8-ty*5,ay2+ty*8+tx*5);
+      ctx.lineTo(ax2,ay2); ctx.lineTo(ax2+tx*8+ty*5,ay2+ty*8-tx*5); ctx.fill();
+    }
+
+    // === Etichette pressione ===
+    if (Math.abs(omega) > 1) {
+      const hd = omega > 0 ? 1 : -1;
+      ctx.font='bold 11px DM Mono'; ctx.textAlign='center';
+      ctx.fillStyle='#cc2020'; ctx.fillText('▲ alta P',  cx, cy+hd*(R+44));
+      ctx.fillStyle='#1a8a5a'; ctx.fillText('▼ bassa P', cx, cy-hd*(R+44));
+      ctx.textAlign='left';
+    }
+  }
+  frame();
+}
+update6();
+
+// Init draws
+</script>
+</body>
+</html>

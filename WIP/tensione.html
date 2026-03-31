@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Tensione di una fune",
+  "description": "Studio delle forze di tensione in una fune ideale e delle condizioni di equilibrio dinamico e statico in sistemi vincolati.",
+  "category": "Meccanica",
+  "icon": "🪢",
+  "order": 7,
+  "tags": ["tensione", "forze vincolari", "equilibrio", "dinamica"],
+  "level": "intermedio"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tensione nella Fune — Macchina di Atwood</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+  :root {
+    --bg: #f4f1eb;
+    --panel: #ffffff;
+    --border: #ddd8cc;
+    --border2: #c8c0b0;
+    --accent: #8b6914;
+    --accent3: #2a7a4a;
+    --text: #1a1814;
+    --muted: #7a7060;
+    --m1: #2a6090;
+    --m2: #902a2a;
+    --shadow: rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 16px 32px 13px;
+    border-bottom: 1px solid var(--border2);
+    background: var(--panel);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    box-shadow: 0 1px 4px var(--shadow);
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--accent);
+  }
+  header span {
+    font-size: 0.66rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 368px;
+    flex: 1;
+    min-height: 0;
+  }
+  .canvas-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edeae2;
+    padding: 18px;
+    border-right: 1px solid var(--border2);
+  }
+  canvas#sim { display: block; max-width: 100%; max-height: 82vh; }
+  .side {
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    overflow-y: auto;
+  }
+  .section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .section-title {
+    font-size: 0.57rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 11px;
+  }
+  .mode-row {
+    display: flex;
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 11px;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 8px 4px;
+    font-size: 0.66rem;
+    font-family: 'JetBrains Mono', monospace;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.13s, color 0.13s;
+    letter-spacing: 0.03em;
+  }
+  .mode-btn + .mode-btn { border-left: 1px solid var(--border2); }
+  .mode-btn.active { background: var(--accent); color: #fff; }
+  .mode-btn:hover:not(.active) { background: var(--bg); }
+  p.explain { font-size: 0.69rem; color: var(--muted); line-height: 1.62; }
+  .slider-row { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .slider-label { font-size: 0.74rem; color: var(--text); min-width: 26px; }
+  .slider-val { font-size: 0.74rem; color: var(--accent); min-width: 62px; text-align: right; font-weight: 600; }
+  input[type=range] {
+    -webkit-appearance: none; flex: 1; height: 3px;
+    background: var(--border2); border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 13px; height: 13px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+    border: 2px solid white; box-shadow: 0 1px 3px var(--shadow);
+  }
+  #slider-m1::-webkit-slider-thumb { background: var(--m1); }
+  #slider-m2::-webkit-slider-thumb { background: var(--m2); }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .data-cell { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+  .data-cell .dlabel { font-size: 0.54rem; color: var(--muted); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 2px; }
+  .data-cell .dvalue { font-size: 0.94rem; font-weight: 600; color: var(--text); }
+  .data-cell.accent .dvalue { color: var(--accent); }
+  .data-cell.blue .dvalue   { color: var(--m1); }
+  .data-cell.red .dvalue    { color: var(--m2); }
+  .data-cell.green .dvalue  { color: var(--accent3); }
+  .formula-box {
+    background: var(--bg); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 4px;
+    padding: 10px 12px; font-size: 0.74rem; line-height: 1.85; color: var(--text);
+  }
+  .formula-box .ftitle { font-size: 0.55rem; color: var(--accent); letter-spacing: 0.13em; text-transform: uppercase; margin-bottom: 5px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 5px; }
+  button.ctrl {
+    flex: 1; padding: 8px 9px;
+    border: 1px solid var(--border2); background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.71rem; letter-spacing: 0.05em;
+    cursor: pointer; border-radius: 4px; transition: border-color 0.13s, background 0.13s;
+  }
+  button.ctrl:hover { border-color: var(--accent); background: #fff9f0; }
+  button.ctrl.primary { border-color: var(--accent); color: var(--accent); background: #fff9f0; }
+  #graph-canvas { width: 100%; height: 95px; border: 1px solid var(--border); border-radius: 4px; display: block; }
+  .graph-labels { display: flex; justify-content: space-between; margin-top: 3px; font-size: 0.54rem; color: var(--muted); }
+  .graph-legend { display: flex; gap: 12px; margin-bottom: 4px; font-size: 0.56rem; }
+  .graph-legend span { display: flex; align-items: center; gap: 4px; color: var(--muted); }
+  .ll { display: inline-block; width: 16px; height: 2px; }
+  .status-bar {
+    padding: 5px 20px; font-size: 0.59rem; letter-spacing: 0.07em;
+    color: var(--muted); border-top: 1px solid var(--border);
+    display: flex; gap: 14px; background: var(--panel);
+  }
+  .side::-webkit-scrollbar { width: 4px; }
+  .side::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tensione nella Fune</h1>
+  <span>Macchina di Atwood — Simulazione Didattica</span>
+</header>
+
+<div class="main-layout">
+  <div class="canvas-wrap">
+    <canvas id="sim" width="520" height="580"></canvas>
+  </div>
+
+  <div class="side">
+
+    <div class="section">
+      <div class="section-title">Configurazione</div>
+      <div class="mode-row">
+        <button class="mode-btn active" id="btn-atwood"   onclick="setMode('atwood')">Atwood</button>
+        <button class="mode-btn"        id="btn-inclined" onclick="setMode('inclined')">Piano inclinato</button>
+        <button class="mode-btn"        id="btn-equil"    onclick="setMode('equil')">Esplora T e a</button>
+      </div>
+      <p class="explain" id="mode-explain">
+        Due masse collegate da una fune inestensibile su carrucola ideale. La massa maggiore scende, la minore sale.
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Parametri</div>
+      <div class="slider-row">
+        <span class="slider-label" style="color:var(--m1)">m₁</span>
+        <input type="range" id="slider-m1" min="0.1" max="5" step="0.1" value="1.0">
+        <span class="slider-val" id="val-m1">1.0 kg</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label" style="color:var(--m2)">m₂</span>
+        <input type="range" id="slider-m2" min="0.1" max="5" step="0.1" value="2.0">
+        <span class="slider-val" id="val-m2">2.0 kg</span>
+      </div>
+      <div class="slider-row" id="row-theta" style="display:none">
+        <span class="slider-label">θ</span>
+        <input type="range" id="slider-theta" min="0" max="85" step="1" value="30">
+        <span class="slider-val" id="val-theta">30°</span>
+      </div>
+      <div class="slider-row" id="row-mu" style="display:none">
+        <span class="slider-label">μ</span>
+        <input type="range" id="slider-mu" min="0" max="0.8" step="0.01" value="0">
+        <span class="slider-val" id="val-mu">0.00</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">g</span>
+        <input type="range" id="slider-g" min="1" max="20" step="0.1" value="9.81">
+        <span class="slider-val" id="val-g">9.81 m/s²</span>
+      </div>
+      <div class="btn-row" id="play-btns">
+        <button class="ctrl primary" id="btn-play" onclick="togglePlay()">▶ Avvia</button>
+        <button class="ctrl" onclick="resetSim()">↺ Reset</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Grandezze fisiche</div>
+      <div class="data-grid">
+        <div class="data-cell accent"><div class="dlabel">Tensione T</div><div class="dvalue" id="d-T">— N</div></div>
+        <div class="data-cell green"><div class="dlabel">Accelerazione a</div><div class="dvalue" id="d-a">— m/s²</div></div>
+        <div class="data-cell blue"><div class="dlabel">Peso m₁g</div><div class="dvalue" id="d-w1">— N</div></div>
+        <div class="data-cell red"><div class="dlabel">Peso m₂g</div><div class="dvalue" id="d-w2">— N</div></div>
+        <div class="data-cell blue"><div class="dlabel">Velocità |v|</div><div class="dvalue" id="d-v">0.000 m/s</div></div>
+        <div class="data-cell"><div class="dlabel">En. cinetica tot.</div><div class="dvalue" id="d-Ek">0.000 J</div></div>
+      </div>
+    </div>
+
+    <div class="section" id="graph-section">
+      <div class="section-title">Grafico nel tempo</div>
+      <div class="graph-legend">
+        <span><span class="ll" style="background:var(--accent)"></span>T (N)</span>
+        <span><span class="ll" style="border-top:2px dashed var(--accent3)"></span>|v| (m/s)</span>
+      </div>
+      <canvas id="graph-canvas"></canvas>
+      <div class="graph-labels"><span>t = 0 s</span><span id="graph-tmax">t = 6 s</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Derivazione analitica</div>
+      <div class="formula-box">
+        <div id="formula-content">
+          <div class="ftitle">Seconda legge di Newton (Atwood)</div>
+          Per m₁ (sale): $T - m_1 g = m_1 a$<br>
+          Per m₂ (scende): $m_2 g - T = m_2 a$<br><br>
+          $$a = \frac{(m_2 - m_1)\,g}{m_1 + m_2}$$
+          $$T = \frac{2\,m_1\,m_2\,g}{m_1 + m_2}$$
+          <span style="color:var(--muted);font-size:0.67rem">T è la media armonica dei due pesi; sempre minore di entrambi.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span id="s-time">t = 0.000 s</span>
+      <span id="s-state">in attesa</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   GEOMETRIA
+═══════════════════════════════════════ */
+const W=520, H=580;
+const PX=W/2, PY=82, PR=24;
+const BW=48, BH=36;
+const SCALE=70;
+
+/* ═══════════════════════════════════════
+   STATO
+═══════════════════════════════════════ */
+let mode='atwood', playing=false;
+let t=0, vel=0, pos=0, lastTime=null;
+let graphData={T:[],V:[],maxT:6};
+let m1=1.0, m2=2.0, g=9.81, theta=30, mu=0.0;
+
+/* ═══════════════════════════════════════
+   FISICA
+═══════════════════════════════════════ */
+function physics() {
+  if (mode==='atwood' || mode==='equil') {
+    // convenzione pos>0 → m2 scende, m1 sale
+    const a=(m2-m1)*g/(m1+m2);
+    const T=2*m1*m2*g/(m1+m2);
+    return {a, T, isStatic:Math.abs(a)<1e-9};
+  }
+  if (mode==='inclined') {
+    // convenzione pos>0 → m1 scende lungo il piano, m2 sale
+    const rad=theta*Math.PI/180;
+    const sinT=Math.sin(rad), cosT=Math.cos(rad);
+    // forza netta su m1 lungo il piano (positiva=verso il basso del piano)
+    const Fnet=m1*g*sinT - m2*g;
+    const Ffrmax=mu*m1*g*cosT;
+    if (Math.abs(Fnet)<=Ffrmax && Math.abs(vel)<1e-6) {
+      const T=m2*g;
+      return {a:0, T, isStatic:true};
+    }
+    const sign=Math.abs(vel)>1e-6 ? Math.sign(vel) : Math.sign(Fnet);
+    // attrito opposto al moto
+    const a=(m1*g*sinT - m2*g - sign*Ffrmax)/(m1+m2);
+    // su m2: T - m2*g = m2*a  (a>0 → m2 sale → netta verso l'alto)
+    const T=m2*(g+a);
+    return {a, T, isStatic:false};
+  }
+}
+
+/* ═══════════════════════════════════════
+   CANVAS
+═══════════════════════════════════════ */
+const C=document.getElementById('sim');
+const ctx=C.getContext('2d');
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  // griglia
+  ctx.strokeStyle='rgba(0,0,0,0.04)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  if(mode==='atwood'||mode==='equil') drawAtwood();
+  else drawInclined();
+}
+
+/* ── ATWOOD ── */
+function drawAtwood() {
+  const ph=physics();
+  // pos>0 → m2 scende (+dpx), m1 sale (−dpx)
+  const dpx=pos*SCALE;
+  const ropeTop=PY+PR;
+  const m1x=PX-72, m2x=PX+72;
+  const m1y=ropeTop+155 - dpx;
+  const m2y=ropeTop+155 + dpx;
+
+  drawCeiling(); drawSupport();
+  // funi
+  rope(m1x, m1y-BH/2, m1x, PY);
+  rope(m2x, m2y-BH/2, m2x, PY);
+  drawPulley();
+  drawBlock(m1x,m1y,'#2a6090','m₁',m1);
+  drawBlock(m2x,m2y,'#902a2a','m₂',m2);
+  forcesAtwood(m1x,m1y,m2x,m2y,ph);
+  drawFloor();
+}
+
+/* ── INCLINED ── */
+function drawInclined() {
+  const ph=physics();
+  const rad=theta*Math.PI/180;
+  const dpx=pos*SCALE; // pos>0 → m1 scende, m2 sale
+
+  // Piano: dalla base (basso-sx) fino al punto sotto la carrucola
+  const planeLen=210;
+  const baseX=PX-planeLen*Math.cos(rad);
+  const baseY=PY+PULLEY_R_h()+planeLen*Math.sin(rad);
+
+  // posizione di m1 lungo il piano
+  // frac=0 → alla carrucola (in cima), frac=1 → alla base
+  // inizialmente a metà piano (frac=0.45), pos>0 → si avvicina alla base
+  const frac0=0.45;
+  const frac=frac0 + pos/(planeLen/SCALE);
+  const cf=Math.max(0.04, Math.min(0.96, frac));
+  // posizione nel canvas: partendo dalla cima (PX,PY+PR) verso la base
+  const m1x=PX - cf*planeLen*Math.cos(rad);
+  const m1y=PY+PR + cf*planeLen*Math.sin(rad);
+
+  // m2 appesa a destra della carrucola
+  // pos>0 → m2 sale (y diminuisce)
+  const m2x=PX+62;
+  const m2y0=PY+PR+140;
+  const m2y=m2y0 - dpx;
+
+  drawCeiling(); drawSupport();
+
+  // Superficie del piano
+  ctx.strokeStyle='#c0b090'; ctx.lineWidth=7; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(PX,PY+PR); ctx.lineTo(baseX,baseY); ctx.stroke();
+  // base orizzontale
+  ctx.strokeStyle='#c0b090'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(baseX,baseY); ctx.lineTo(PX,baseY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PX,baseY); ctx.lineTo(PX,PY+PR); ctx.stroke();
+  // angolo θ — all'angolo in basso-sinistra tra base orizzontale e piano inclinato
+  if(theta>0){
+    ctx.strokeStyle='#9a8060'; ctx.lineWidth=1.5;
+    // l'arco parte dalla direzione orizzontale (0) e va verso il piano (angolo -rad rispetto all'asse x)
+    ctx.beginPath(); ctx.arc(baseX, baseY, 34, -rad, 0); ctx.stroke();
+    ctx.fillStyle='#5a4020'; ctx.font='12px JetBrains Mono'; ctx.textAlign='left';
+    ctx.fillText('θ', baseX+38, baseY-10); ctx.textAlign='left';
+  }
+
+  // Fune m1→carrucola (lungo il piano)
+  const cpx=PX-PR*Math.sin(rad), cpy=PY+PR*Math.cos(rad);
+  rope(m1x, m1y, cpx, cpy);
+  // Fune carrucola→m2 (verticale)
+  rope(PX, PY+PR, m2x, m2y-BH/2);
+
+  drawPulley();
+
+  // Blocco m1 ruotato sul piano
+  ctx.save();
+  ctx.translate(m1x,m1y);
+  ctx.rotate(-rad);
+  drawBlockLocal(0,0,'#2a6090','m₁',m1);
+  ctx.restore();
+
+  drawBlock(m2x,m2y,'#902a2a','m₂',m2);
+  forcesInclined(m1x,m1y,m2x,m2y,rad,ph);
+  drawFloor();
+}
+
+function PULLEY_R_h(){return PR;}
+
+/* ── ELEMENTI BASE ── */
+function drawCeiling(){
+  ctx.fillStyle='#d0c8b8'; ctx.fillRect(0,0,W,16);
+  ctx.strokeStyle='#b0a898'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=14){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-10,16);ctx.stroke();}
+}
+function drawFloor(){
+  ctx.fillStyle='#d0c8b8'; ctx.fillRect(0,H-14,W,14);
+  ctx.strokeStyle='#b0a898'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=14){ctx.beginPath();ctx.moveTo(x,H-14);ctx.lineTo(x+10,H);ctx.stroke();}
+}
+function drawSupport(){
+  ctx.fillStyle='#b0a890'; ctx.fillRect(PX-5,0,10,PY-PR+2);
+}
+function drawPulley(){
+  ctx.beginPath(); ctx.arc(PX,PY,PR,0,Math.PI*2);
+  ctx.fillStyle='#e8e2d5'; ctx.fill();
+  ctx.strokeStyle='#8b6914'; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(PX,PY,PR*0.52,0,Math.PI*2);
+  ctx.fillStyle='#d8d0c0'; ctx.fill();
+  ctx.strokeStyle='#a08040'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(PX,PY,5,0,Math.PI*2);
+  ctx.fillStyle='#8b6914'; ctx.fill();
+}
+function rope(x1,y1,x2,y2){
+  ctx.strokeStyle='#7a5a1a'; ctx.lineWidth=2.2; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+}
+function drawBlock(cx,cy,color,label,mass){
+  const x=cx-BW/2, y=cy-BH/2;
+  ctx.shadowColor=color; ctx.shadowBlur=7;
+  ctx.fillStyle=color; roundRect(ctx,x,y,BW,BH,5); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(255,255,255,0.28)'; ctx.lineWidth=1;
+  roundRect(ctx,x,y,BW,BH,5); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='bold 9px JetBrains Mono'; ctx.fillText(label,cx,cy-6);
+  ctx.font='8px JetBrains Mono'; ctx.fillText(mass.toFixed(1)+' kg',cx,cy+7);
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+}
+function drawBlockLocal(cx,cy,color,label,mass){
+  drawBlock(cx,cy,color,label,mass);
+}
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);
+  c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);
+  c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);
+  c.closePath();
+}
+function arrow(x1,y1,x2,y2,color,label,fs=11){
+  const dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+  if(len<5)return;
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const ang=Math.atan2(dy,dx);
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-8*Math.cos(ang-0.42),y2-8*Math.sin(ang-0.42));
+  ctx.lineTo(x2-8*Math.cos(ang+0.42),y2-8*Math.sin(ang+0.42));
+  ctx.closePath();ctx.fill();
+  if(label){
+    ctx.font=`${fs}px JetBrains Mono`;ctx.textAlign='center';
+    ctx.fillText(label,(x1+x2)/2+13,(y1+y2)/2);ctx.textAlign='left';
+  }
+}
+
+/* ── FORZE ATWOOD ── */
+function forcesAtwood(m1x,m1y,m2x,m2y,ph){
+  const sc=18, mx=95;
+  const T=Math.min(ph.T*sc,mx);
+  const w1=Math.min(m1*g*sc,mx), w2=Math.min(m2*g*sc,mx);
+  arrow(m1x,m1y-BH/2, m1x,m1y-BH/2-T, '#8b6914','T');
+  arrow(m2x,m2y-BH/2, m2x,m2y-BH/2-T, '#8b6914','');
+  arrow(m1x,m1y+BH/2, m1x,m1y+BH/2+w1,'#2a6090','m₁g');
+  arrow(m2x,m2y+BH/2, m2x,m2y+BH/2+w2,'#902a2a','m₂g');
+  if(Math.abs(ph.a)>0.02){
+    const aA=Math.min(Math.abs(ph.a)*28,52);
+    // ph.a>0 → m2 scende, m1 sale
+    const d2=ph.a>0?1:-1;
+    arrow(m1x-34,m1y, m1x-34,m1y-d2*aA,'#2a7a4a','a',10);
+    arrow(m2x+34,m2y, m2x+34,m2y+d2*aA,'#2a7a4a','',10);
+  }
+}
+
+/* ── FORZE INCLINED ── */
+function forcesInclined(m1x,m1y,m2x,m2y,rad,ph){
+  const sc=16, mx=85;
+  const T=Math.min(ph.T*sc,mx);
+  const w2=Math.min(m2*g*sc,mx);
+  // su m2 (verticale): T verso l'alto, peso verso il basso
+  arrow(m2x,m2y-BH/2, m2x,m2y-BH/2-T,'#8b6914','T');
+  arrow(m2x,m2y+BH/2, m2x,m2y+BH/2+w2,'#902a2a','m₂g');
+  // su m1 (nel piano): tensione verso la carrucola (su-destra lungo il piano)
+  const Tpx=-Math.cos(rad)*T, Tpy=-Math.sin(rad)*T;
+  arrow(m1x,m1y, m1x+Tpx,m1y+Tpy,'#8b6914','T');
+  // componente peso lungo il piano (giù-sx)
+  const w1s=Math.min(m1*g*Math.sin(rad)*sc,mx);
+  arrow(m1x,m1y, m1x+Math.cos(rad)*w1s,m1y+Math.sin(rad)*w1s,'#2a6090','m₁g sinθ');
+  // normale (perpendicolare al piano, verso l'esterno = verso sinistra-alto)
+  const w1n=Math.min(m1*g*Math.cos(rad)*sc*0.55,55);
+  arrow(m1x,m1y, m1x-Math.sin(rad)*w1n,m1y-Math.cos(rad)*w1n,'#5a8a5a','N');
+  // attrito (se presente e sistema in moto)
+  if(mu>0 && Math.abs(vel)>0.001){
+    const fr=Math.min(mu*m1*g*Math.cos(rad)*sc,55);
+    const fsign=-Math.sign(vel);
+    arrow(m1x,m1y, m1x+fsign*Math.cos(rad)*fr,m1y+fsign*Math.sin(rad)*fr,'#c06020','f_a');
+  }
+}
+
+/* ═══════════════════════════════════════
+   GRAFICO
+═══════════════════════════════════════ */
+const GC=document.getElementById('graph-canvas');
+const gctx=GC.getContext('2d');
+function resizeGraph(){
+  const dpr=window.devicePixelRatio||1;
+  GC.width=GC.offsetWidth*dpr; GC.height=GC.offsetHeight*dpr;
+  gctx.scale(dpr,dpr);
+}
+function drawGraph(){
+  const gw=GC.offsetWidth, gh=GC.offsetHeight;
+  gctx.clearRect(0,0,GC.width,GC.height);
+  gctx.fillStyle='#f0ede6'; gctx.fillRect(0,0,GC.width,GC.height);
+  if(graphData.T.length<2)return;
+  const mxT=Math.max(1,...graphData.T.map(d=>d.v))*1.15;
+  const mxV=Math.max(0.1,...graphData.V.map(d=>d.v))*1.15;
+  const tm=graphData.maxT;
+  const px=t=>( t/tm)*gw;
+  const pyT=v=>gh-4-(v/mxT)*(gh-10);
+  const pyV=v=>gh-4-(v/mxV)*(gh-10);
+  gctx.strokeStyle='rgba(0,0,0,0.06)'; gctx.lineWidth=1;
+  for(let i=0;i<=6;i++){const x=(i/6)*gw;gctx.beginPath();gctx.moveTo(x,0);gctx.lineTo(x,gh);gctx.stroke();}
+  gctx.strokeStyle='#8b6914'; gctx.lineWidth=2;
+  gctx.beginPath();
+  graphData.T.forEach((d,i)=>{i===0?gctx.moveTo(px(d.t),pyT(d.v)):gctx.lineTo(px(d.t),pyT(d.v));});
+  gctx.stroke();
+  gctx.strokeStyle='#2a7a4a'; gctx.lineWidth=1.5; gctx.setLineDash([5,4]);
+  gctx.beginPath();
+  graphData.V.forEach((d,i)=>{i===0?gctx.moveTo(px(d.t),pyV(d.v)):gctx.lineTo(px(d.t),pyV(d.v));});
+  gctx.stroke(); gctx.setLineDash([]);
+}
+
+/* ═══════════════════════════════════════
+   LOOP
+═══════════════════════════════════════ */
+function loop(ts){
+  if(!playing)return;
+  if(lastTime===null)lastTime=ts;
+  const dtR=Math.min((ts-lastTime)/1000,0.033); lastTime=ts;
+  const ph=physics();
+  if(!ph.isStatic){
+    vel+=ph.a*dtR;
+    pos+=vel*dtR;
+    const lim=1.25;
+    if(pos>lim){pos=lim;vel=-Math.abs(vel)*0.35;}
+    if(pos<-lim){pos=-lim;vel=Math.abs(vel)*0.35;}
+  }
+  t+=dtR;
+  if(graphData.T.length===0||t-graphData.T[graphData.T.length-1].t>0.04){
+    graphData.T.push({t,v:ph.T});
+    graphData.V.push({t,v:Math.abs(vel)});
+    if(t>graphData.maxT){graphData.maxT=t+2;document.getElementById('graph-tmax').textContent=`t = ${graphData.maxT.toFixed(0)} s`;}
+  }
+  updateReadout(ph); draw(); drawGraph();
+  requestAnimationFrame(loop);
+}
+
+function updateReadout(ph){
+  document.getElementById('d-T').textContent=ph.T.toFixed(3)+' N';
+  document.getElementById('d-a').textContent=ph.a.toFixed(4)+' m/s²';
+  document.getElementById('d-w1').textContent=(m1*g).toFixed(3)+' N';
+  document.getElementById('d-w2').textContent=(m2*g).toFixed(3)+' N';
+  document.getElementById('d-v').textContent=Math.abs(vel).toFixed(4)+' m/s';
+  document.getElementById('d-Ek').textContent=(0.5*(m1+m2)*vel*vel).toFixed(4)+' J';
+  document.getElementById('s-time').textContent=`t = ${t.toFixed(3)} s`;
+  const stato=ph.isStatic?'equilibrio statico':(ph.a>0?'m₂ scende':'m₁ scende')+`  a=${ph.a.toFixed(3)} m/s²`;
+  document.getElementById('s-state').textContent=stato;
+}
+
+/* ═══════════════════════════════════════
+   CONTROLLI
+═══════════════════════════════════════ */
+function togglePlay(){
+  playing=!playing;
+  document.getElementById('btn-play').textContent=playing?'⏸ Pausa':'▶ Avvia';
+  if(playing){lastTime=null;requestAnimationFrame(loop);}
+}
+function resetSim(){
+  playing=false;
+  document.getElementById('btn-play').textContent='▶ Avvia';
+  t=0;vel=0;pos=0;
+  graphData={T:[],V:[],maxT:6};
+  document.getElementById('graph-tmax').textContent='t = 6 s';
+  document.getElementById('s-state').textContent='in attesa';
+  const ph=physics(); updateReadout(ph); draw(); drawGraph();
+}
+function setMode(m){
+  mode=m; resetSim();
+  ['atwood','inclined','equil'].forEach(id=>{
+    document.getElementById(`btn-${id}`).classList.toggle('active',id===m);
+  });
+  document.getElementById('row-theta').style.display=m==='inclined'?'flex':'none';
+  document.getElementById('row-mu').style.display=m==='inclined'?'flex':'none';
+  document.getElementById('play-btns').style.display=m==='equil'?'none':'flex';
+  document.getElementById('graph-section').style.display=m==='equil'?'none':'block';
+  const ex={
+    atwood:'Due masse collegate da una fune inestensibile su carrucola ideale. La massa maggiore scende, la minore sale. Se m₁ = m₂ il sistema è in equilibrio (a = 0).',
+    inclined:'m₁ è sul piano inclinato (angolo θ, attrito μ). m₂ è appesa verticalmente. Quando m₁ scende lungo il piano, m₂ sale (fune inestensibile).',
+    equil:'Modalità interattiva senza animazione. Muovi i cursori e osserva come T e a variano istantaneamente al variare di m₁, m₂ e g.'
+  };
+  document.getElementById('mode-explain').textContent=ex[m];
+  const fm={
+    atwood:`<div class="ftitle">Seconda legge di Newton (Atwood)</div>
+      Per m₁ (sale): $T - m_1 g = m_1 a$<br>
+      Per m₂ (scende): $m_2 g - T = m_2 a$<br><br>
+      $$a = \\frac{(m_2 - m_1)\\,g}{m_1 + m_2}$$
+      $$T = \\frac{2\\,m_1\\,m_2\\,g}{m_1 + m_2}$$
+      <span style="color:var(--muted);font-size:0.67rem">T è la media armonica dei pesi; se m₁=m₂ allora a=0 e T=mg.</span>`,
+    inclined:`<div class="ftitle">Piano inclinato con carrucola</div>
+      Per m₂ (sale): $T - m_2 g = m_2 a$<br>
+      Per m₁ (lungo piano): $m_1 g\\sin\\theta - T - \\mu m_1 g\\cos\\theta = m_1 a$<br><br>
+      $$a = \\frac{m_1 g(\\sin\\theta - \\mu\\cos\\theta) - m_2 g}{m_1 + m_2}$$
+      $$T = m_2(g + a)$$
+      <span style="color:var(--muted);font-size:0.67rem">Equil. statico se |m₁g sinθ − m₂g| ≤ μ m₁g cosθ.</span>`,
+    equil:`<div class="ftitle">Relazione T e a al variare delle masse</div>
+      $$T = \\frac{2\\,m_1\\,m_2\\,g}{m_1 + m_2}$$
+      $$a = \\frac{m_2 - m_1}{m_2 + m_1}\\,g$$
+      <span style="color:var(--muted);font-size:0.67rem">
+        Muovi i cursori: quando m₁→0 allora T→0 e a→g.<br>
+        Quando m₁=m₂ allora a=0 e T=mg.
+      </span>`
+  };
+  document.getElementById('formula-content').innerHTML=fm[m];
+  if(window.MathJax)MathJax.typesetPromise([document.getElementById('formula-content')]);
+}
+function bind(id,setter,valId,fmt){
+  const el=document.getElementById(id);
+  el.addEventListener('input',()=>{
+    setter(parseFloat(el.value));
+    document.getElementById(valId).textContent=fmt(parseFloat(el.value));
+    if(mode==='equil'){const ph=physics();updateReadout(ph);draw();}
+    else resetSim();
+  });
+}
+bind('slider-m1',v=>m1=v,'val-m1',v=>`${v.toFixed(1)} kg`);
+bind('slider-m2',v=>m2=v,'val-m2',v=>`${v.toFixed(1)} kg`);
+bind('slider-theta',v=>theta=v,'val-theta',v=>`${v}°`);
+bind('slider-mu',v=>mu=v,'val-mu',v=>v.toFixed(2));
+bind('slider-g',v=>g=v,'val-g',v=>`${v.toFixed(2)} m/s²`);
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+graphData.V=[];
+resizeGraph();
+window.addEventListener('resize',()=>{resizeGraph();drawGraph();});
+const phI=physics();
+updateReadout(phI);
+draw();
+drawGraph();
+</script>
+</body>
+</html>

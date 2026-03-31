@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Urti",
+  "description": "Simulazione delle collisioni tra corpi con analisi della conservazione della quantità di moto e dell'energia (urti elastici e anelastici).",
+  "category": "Meccanica",
+  "icon": "💥",
+  "order": 6,
+  "tags": ["urti", "quantità di moto", "energia", "collisioni", "dinamica"],
+  "level": "intermedio"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulazione degli Urti</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$']] },
+  startup: { ready() { MathJax.startup.defaultReady(); } }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #f4f6f9;
+    --panel: #ffffff;
+    --border: #d0d7de;
+    --accent1: #0969da;
+    --accent2: #cf222e;
+    --accent3: #1a7f37;
+    --accent4: #9a6700;
+    --text: #1f2328;
+    --muted: #656d76;
+    --body1: #0969da;
+    --body2: #cf222e;
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent1);
+    letter-spacing: -0.5px;
+  }
+  header span {
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .canvas-area {
+    background: #f8fafc;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 0;
+    height: calc(100vh - 57px);
+  }
+
+  /* ===== LEFT PANEL ===== */
+  .left-panel {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+
+  /* Tipo urto tabs */
+  .type-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .type-tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 11px;
+    padding: 8px 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .type-tab:hover { border-color: var(--accent1); color: var(--accent1); }
+  .type-tab.active { background: var(--accent1); border-color: var(--accent1); color: #000; font-weight: 600; }
+
+  /* Slider */
+  .slider-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+  }
+  .slider-label span:first-child { color: var(--muted); }
+  .slider-label .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent1);
+    cursor: pointer;
+  }
+  .body1-color input[type=range]::-webkit-slider-thumb { background: var(--body1); }
+  .body2-color input[type=range]::-webkit-slider-thumb { background: var(--body2); }
+  .coeff-color input[type=range]::-webkit-slider-thumb { background: var(--accent3); }
+
+  /* Body indicators */
+  .body-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .body-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .body-dot.b1 { background: var(--body1); }
+  .body-dot.b2 { background: var(--body2); }
+  .body-label { font-size: 13px; font-weight: 600; }
+
+  /* Ref frame toggle */
+  .rf-toggle {
+    display: flex;
+    gap: 6px;
+  }
+  .rf-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 7px 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .rf-btn.active { background: #21262d; border-color: var(--accent3); color: var(--accent3); font-weight: 600; }
+
+  /* Buttons */
+  .btn {
+    background: var(--accent1);
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn.secondary:hover { border-color: var(--accent1); color: var(--accent1); }
+
+  .btn-row { display: flex; gap: 8px; }
+
+  /* ===== CANVAS AREA ===== */
+  .canvas-area {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .canvas-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* overlay info */
+  .overlay-info {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+  .overlay-info .hl { color: var(--text); }
+
+  .ref-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(26,127,55,0.1);
+    border: 1px solid var(--accent3);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    pointer-events: none;
+  }
+
+  /* collision flash overlay */
+  .collision-flash {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.04);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.05s;
+  }
+
+  /* 2D angle controls (only when oblique) */
+  .angle-row {
+    display: none;
+    gap: 8px;
+    flex-direction: column;
+  }
+  .angle-row.visible { display: flex; }
+
+  /* ===== RIGHT PANEL ===== */
+  .right-panel {
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Momentum bars */
+  .quantity-block { display: flex; flex-direction: column; gap: 8px; }
+  .q-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+  .q-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }
+  .bar-track {
+    background: var(--border);
+    border-radius: 3px;
+    height: 6px;
+    overflow: visible;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.05s;
+    min-width: 2px;
+  }
+
+  /* Before/After comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .compare-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .compare-table td {
+    padding: 5px 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .compare-table .change-pos { color: var(--accent3); }
+  .compare-table .change-neg { color: var(--accent2); }
+  .compare-table .change-zero { color: var(--muted); }
+
+  /* Formula box */
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  .formula-box .f-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* Impulso gauge */
+  .impulso-gauge {
+    text-align: center;
+    padding: 8px 0;
+  }
+  .impulso-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--accent4);
+  }
+  .impulso-unit { font-size: 11px; color: var(--muted); }
+
+  /* e indicator */
+  .e-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .e-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 3px solid var(--accent3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .e-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .e-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* Conservation row */
+  .conserv-row {
+    display: flex;
+    gap: 8px;
+  }
+  .conserv-chip {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .conserv-chip.ok { border-color: var(--accent3); background: rgba(63,185,80,0.08); }
+  .conserv-chip.no { border-color: var(--accent2); background: rgba(247,129,102,0.08); }
+  .conserv-chip .c-icon { font-size: 16px; }
+  .conserv-chip .c-name { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* Phase indicator */
+  .phase-bar {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .phase-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s;
+  }
+  .phase-dot.active { background: var(--accent1); box-shadow: 0 0 6px var(--accent1); }
+  .phase-label { font-size: 11px; color: var(--muted); margin-left: 4px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #c8d0da; border-radius: 3px; }
+
+  /* 2D canvas toggle */
+  .dim-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .tooltip {
+    position: absolute;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>// simulazione_urti</h1>
+  <span>conservazione della quantità di moto · coefficiente di restituzione · sistemi di riferimento</span>
+</header>
+
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <div>
+      <div class="section-title">Tipo di Urto</div>
+      <div class="card">
+        <div class="type-tabs">
+          <button class="type-tab active" data-type="elastico">Elastico<br><span style="font-size:9px;opacity:.7">e = 1</span></button>
+          <button class="type-tab" data-type="parziale">Anelastico<br><span style="font-size:9px;opacity:.7">0 &lt; e &lt; 1</span></button>
+          <button class="type-tab" data-type="totale">Completamente<br>anelastico<br><span style="font-size:9px;opacity:.7">e = 0</span></button>
+          <button class="type-tab" data-type="obliquo">Obliquo 2D<br><span style="font-size:9px;opacity:.7">angolo libero</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Sistema di Riferimento</div>
+      <div class="card">
+        <div class="rf-toggle">
+          <button class="rf-btn active" data-rf="lab">Lab Frame</button>
+          <button class="rf-btn" data-rf="cm">CM Frame</button>
+        </div>
+        <div style="margin-top:8px; font-size:11px; color:var(--muted); line-height:1.5;" id="rf-desc">
+          Sistema del laboratorio: l'osservatore è a riposo rispetto al pavimento.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Corpo 1</div>
+      <div class="card">
+        <div class="body-header"><div class="body-dot b1"></div><div class="body-label" style="color:var(--body1)">Corpo 1</div></div>
+        <div class="body1-color">
+          <div class="slider-row">
+            <div class="slider-label"><span>Massa m₁ (kg)</span><span class="val" id="m1-val">2.0</span></div>
+            <input type="range" id="m1" min="0.5" max="5" step="0.1" value="2">
+          </div>
+          <div class="slider-row">
+            <div class="slider-label"><span>Velocità v₁ (m/s)</span><span class="val" id="v1-val">+3.0</span></div>
+            <input type="range" id="v1" min="-8" max="8" step="0.5" value="3">
+          </div>
+          <!-- 2D angle -->
+          <div class="angle-row" id="angle1-row">
+            <div class="slider-label"><span>Angolo θ₁ (°)</span><span class="val" id="a1-val">0</span></div>
+            <input type="range" id="a1" min="-45" max="45" step="1" value="0">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Corpo 2</div>
+      <div class="card">
+        <div class="body-header"><div class="body-dot b2"></div><div class="body-label" style="color:var(--body2)">Corpo 2</div></div>
+        <div class="body2-color">
+          <div class="slider-row">
+            <div class="slider-label"><span>Massa m₂ (kg)</span><span class="val" id="m2-val">1.0</span></div>
+            <input type="range" id="m2" min="0.5" max="5" step="0.1" value="1">
+          </div>
+          <div class="slider-row">
+            <div class="slider-label"><span>Velocità v₂ (m/s)</span><span class="val" id="v2-val">-1.0</span></div>
+            <input type="range" id="v2" min="-8" max="8" step="0.5" value="-1">
+          </div>
+          <div class="angle-row" id="angle2-row">
+            <div class="slider-label"><span>Angolo θ₂ (°)</span><span class="val" id="a2-val">0</span></div>
+            <input type="range" id="a2" min="-45" max="45" step="1" value="0">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coeff only for parziale -->
+    <div id="coeff-card" style="display:none;">
+      <div class="section-title">Coefficiente di Restituzione</div>
+      <div class="card coeff-color">
+        <div class="slider-row">
+          <div class="slider-label"><span>e</span><span class="val" id="e-val">0.7</span></div>
+          <input type="range" id="e-slider" min="0.01" max="0.99" step="0.01" value="0.7">
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px;">
+          $e = -\dfrac{v_{1f}-v_{2f}}{v_{1i}-v_{2i}}$
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btn-avvia">▶ Avvia</button>
+      <button class="btn secondary" id="btn-reset">↺ Reset</button>
+    </div>
+
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div class="canvas-area">
+    <div class="canvas-wrap">
+      <canvas id="main-canvas"></canvas>
+      <div class="overlay-info" id="overlay-info">
+        <span class="hl" id="oi-phase">ATTESA</span> · t = <span class="hl" id="oi-time">0.00</span> s
+      </div>
+      <div class="ref-badge" id="ref-badge">LAB FRAME</div>
+      <div class="collision-flash" id="coll-flash"></div>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <div>
+      <div class="section-title">Fase</div>
+      <div class="card">
+        <div class="phase-bar">
+          <div class="phase-dot active" id="ph0"></div>
+          <div class="phase-dot" id="ph1"></div>
+          <div class="phase-dot" id="ph2"></div>
+          <div class="phase-label" id="ph-label">Pre-urto</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Conservazione</div>
+      <div class="card">
+        <div class="conserv-row">
+          <div class="conserv-chip ok" id="chip-p">
+            <div class="c-icon">⚡</div>
+            <div class="c-name">Quantità<br>di moto</div>
+          </div>
+          <div class="conserv-chip ok" id="chip-e">
+            <div class="c-icon">🔋</div>
+            <div class="c-name">Energia<br>cinetica</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Coefficiente di Restituzione</div>
+      <div class="card">
+        <div class="e-display">
+          <div class="e-circle" id="e-circle">
+            <div class="e-num" id="e-num">1.00</div>
+          </div>
+          <div class="e-desc" id="e-desc">Urto perfettamente elastico: nessuna perdita di energia cinetica.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Quantità di Moto (kg·m/s)</div>
+      <div class="card quantity-block">
+        <div>
+          <div class="q-label">p₁ = m₁·v₁</div>
+          <div class="q-value" id="p1-val" style="color:var(--body1)">—</div>
+          <div class="bar-track" style="margin-top:4px;">
+            <div class="bar-fill" id="p1-bar" style="background:var(--body1);width:50%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="q-label">p₂ = m₂·v₂</div>
+          <div class="q-value" id="p2-val" style="color:var(--body2)">—</div>
+          <div class="bar-track" style="margin-top:4px;">
+            <div class="bar-fill" id="p2-bar" style="background:var(--body2);width:30%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="q-label">p_tot = p₁ + p₂</div>
+          <div class="q-value" id="ptot-val" style="color:var(--accent3)">—</div>
+          <div class="bar-track" style="margin-top:4px;">
+            <div class="bar-fill" id="ptot-bar" style="background:var(--accent3);width:40%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Energia Cinetica (J)</div>
+      <div class="card quantity-block">
+        <div>
+          <div class="q-label">K₁ = ½m₁v₁²</div>
+          <div class="q-value" id="k1-val" style="color:var(--body1)">—</div>
+          <div class="bar-track" style="margin-top:4px;">
+            <div class="bar-fill" id="k1-bar" style="background:var(--body1);width:50%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="q-label">K₂ = ½m₂v₂²</div>
+          <div class="q-value" id="k2-val" style="color:var(--body2)">—</div>
+          <div class="bar-track" style="margin-top:4px;">
+            <div class="bar-fill" id="k2-bar" style="background:var(--body2);width:30%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="q-label">K_tot</div>
+          <div class="q-value" id="ktot-val" style="color:var(--accent4)">—</div>
+          <div class="bar-track" style="margin-top:4px;">
+            <div class="bar-fill" id="ktot-bar" style="background:var(--accent4);width:40%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="q-label">ΔK (energia dissipata)</div>
+          <div class="q-value" id="dk-val" style="color:var(--accent2)">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Impulso J = Δp (kg·m/s)</div>
+      <div class="card">
+        <div class="impulso-gauge">
+          <div class="impulso-val" id="imp-val">—</div>
+          <div class="impulso-unit">kg·m/s = N·s</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:6px;" id="imp-desc">
+          L'impulso $\vec{J} = \Delta\vec{p} = \vec{p}_f - \vec{p}_i$ quantifica la variazione di quantità di moto subita da ciascun corpo durante l'urto. Per il terzo principio di Newton, gli impulsi sui due corpi sono uguali e opposti: $\vec{J}_1 = -\vec{J}_2$.
+        </div>
+        <div style="margin-top:10px;">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--body1);flex-shrink:0;"></div>
+            <span style="font-size:11px;color:var(--muted);">J₁ su corpo 1</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--body1);margin-left:auto;" id="imp1-val">—</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" id="imp1-bar" style="background:var(--body1);width:0%;"></div></div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;margin-bottom:4px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--body2);flex-shrink:0;"></div>
+            <span style="font-size:11px;color:var(--muted);">J₂ su corpo 2</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--body2);margin-left:auto;" id="imp2-val">—</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" id="imp2-bar" style="background:var(--body2);width:0%;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Confronto Prima / Dopo</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="compare-table">
+          <thead>
+            <tr><th>Grandezza</th><th>Prima</th><th>Dopo</th><th>Δ%</th></tr>
+          </thead>
+          <tbody id="compare-tbody">
+            <tr><td colspan="4" style="color:var(--muted);text-align:center;padding:12px;">Avvia la simulazione</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ===================================================
+// STATO GLOBALE
+// ===================================================
+const state = {
+  type: 'elastico',
+  rf: 'lab',
+  m1: 2, v1: 3, m2: 1, v2: -1,
+  a1: 0, a2: 0, // angoli 2D in gradi
+  e_coeff: 0.7,
+  phase: 'idle', // idle, pre, collision, post
+  time: 0,
+  running: false,
+  raf: null,
+  lastTs: null,
+  // posizioni simulate
+  x1: 0, y1: 0, vx1: 0, vy1: 0,
+  x2: 0, y2: 0, vx2: 0, vy2: 0,
+  // valori salvati
+  pre: null, post: null,
+  // flash
+  flashTimer: 0,
+  // CM velocity
+  vcm: 0,
+};
+
+// ===================================================
+// CANVAS SETUP
+// ===================================================
+const canvas = document.getElementById('main-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resizeCanvas() {
+  const wrap = canvas.parentElement;
+  W = wrap.clientWidth;
+  H = wrap.clientHeight;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+}
+window.addEventListener('resize', () => { resizeCanvas(); if(!state.running) drawIdle(); });
+resizeCanvas();
+
+// ===================================================
+// FISICA
+// ===================================================
+function computePost() {
+  const {m1, v1, m2, v2, type, e_coeff, a1, a2} = state;
+
+  if (type === 'obliquo') {
+    // Urto obliquo: componenti
+    const rad1 = a1 * Math.PI / 180;
+    const rad2 = a2 * Math.PI / 180;
+    const vx1i = v1 * Math.cos(rad1);
+    const vy1i = v1 * Math.sin(rad1);
+    const vx2i = v2 * Math.cos(rad2);
+    const vy2i = v2 * Math.sin(rad2);
+    // Urto lungo x (1D), y conservato (ipotesi superfici lisce)
+    const e = 1; // in obliquo usiamo elastico
+    const vx1f = ((m1 - m2)*vx1i + 2*m2*vx2i) / (m1+m2);
+    const vx2f = ((m2 - m1)*vx2i + 2*m1*vx1i) / (m1+m2);
+    return {
+      vx1f, vy1f: vy1i, vx2f, vy2f: vy2i,
+      vx1i, vy1i, vx2i, vy2i
+    };
+  }
+
+  // 1D
+  let v1f, v2f;
+  switch(type) {
+    case 'elastico':
+      v1f = ((m1-m2)*v1 + 2*m2*v2) / (m1+m2);
+      v2f = ((m2-m1)*v2 + 2*m1*v1) / (m1+m2);
+      break;
+    case 'parziale': {
+      const e = e_coeff;
+      v1f = (m1*v1 + m2*v2 + m2*e*(v2-v1)) / (m1+m2);
+      v2f = (m1*v1 + m2*v2 + m1*e*(v1-v2)) / (m1+m2);
+      break;
+    }
+    case 'totale':
+      v1f = v2f = (m1*v1 + m2*v2) / (m1+m2);
+      break;
+  }
+  return { v1f, v2f };
+}
+
+function getCMVelocity() {
+  const {m1, v1, m2, v2} = state;
+  return (m1*v1 + m2*v2)/(m1+m2);
+}
+
+// ===================================================
+// SIMULAZIONE
+// ===================================================
+const SCALE = 50; // pixel per metro
+const BODY_R1 = () => 14 + state.m1 * 5;
+const BODY_R2 = () => 14 + state.m2 * 5;
+
+function initPositions() {
+  const vcm = getCMVelocity();
+  state.vcm = vcm;
+  const centerX = W / 2;
+  const centerY = H / 2;
+
+  // offset: corpo 1 a sinistra, corpo 2 a destra del centro
+  const gap = BODY_R1() + BODY_R2() + 80;
+  state.x1 = centerX - gap / 2;
+  state.y1 = centerY;
+  state.x2 = centerX + gap / 2;
+  state.y2 = centerY;
+
+  if (state.type === 'obliquo') {
+    const rad1 = state.a1 * Math.PI / 180;
+    const rad2 = state.a2 * Math.PI / 180;
+    state.vx1 = state.v1 * Math.cos(rad1);
+    state.vy1 = state.v1 * Math.sin(rad1);
+    state.vx2 = state.v2 * Math.cos(rad2);
+    state.vy2 = state.v2 * Math.sin(rad2);
+  } else {
+    state.vx1 = state.v1;
+    state.vy1 = 0;
+    state.vx2 = state.v2;
+    state.vy2 = 0;
+  }
+}
+
+function startSim() {
+  if (state.running) { stopSim(); return; }
+  initPositions();
+  state.phase = 'pre';
+  state.time = 0;
+  state.lastTs = null;
+  state.running = true;
+  state.pre = captureSnapshot();
+  state.post = null;
+  document.getElementById('btn-avvia').textContent = '⏹ Stop';
+  updatePhaseUI();
+  // Prima iterazione sempre tramite RAF così ts è sempre valido
+  state.raf = requestAnimationFrame(loop);
+}
+
+function stopSim() {
+  state.running = false;
+  state.phase = 'idle';
+  if (state.raf) cancelAnimationFrame(state.raf);
+  document.getElementById('btn-avvia').textContent = '▶ Avvia';
+  drawIdle();
+}
+
+function resetSim() {
+  stopSim();
+  state.pre = null; state.post = null;
+  state.time = 0;
+  updateRightPanel(false);
+  updatePhaseUI();
+  drawIdle();
+}
+
+function captureSnapshot() {
+  const is2D = state.type === 'obliquo';
+  if (is2D) {
+    const vmod1 = Math.hypot(state.vx1, state.vy1);
+    const vmod2 = Math.hypot(state.vx2, state.vy2);
+    return {
+      v1: vmod1, v2: vmod2,
+      p1: state.m1 * vmod1, p2: state.m2 * vmod2,
+      ptot: Math.hypot(state.m1*state.vx1 + state.m2*state.vx2, state.m1*state.vy1 + state.m2*state.vy2),
+      k1: 0.5*state.m1*vmod1**2, k2: 0.5*state.m2*vmod2**2,
+      ktot: 0.5*state.m1*vmod1**2 + 0.5*state.m2*vmod2**2,
+    };
+  }
+  return {
+    v1: state.vx1, v2: state.vx2,
+    p1: state.m1*state.vx1, p2: state.m2*state.vx2,
+    ptot: state.m1*state.vx1 + state.m2*state.vx2,
+    k1: 0.5*state.m1*state.vx1**2, k2: 0.5*state.m2*state.vx2**2,
+    ktot: 0.5*state.m1*state.vx1**2 + 0.5*state.m2*state.vx2**2,
+  };
+}
+
+let collisionDone = false;
+function loop(ts) {
+  if (!state.running) return;
+
+  // Protezione: se ts non è valido (non dovrebbe accadere con RAF) salta il frame
+  if (!ts || isNaN(ts)) {
+    state.raf = requestAnimationFrame(loop);
+    return;
+  }
+
+  if (!state.lastTs) state.lastTs = ts;
+  let dt = (ts - state.lastTs) / 1000;
+  state.lastTs = ts;
+  dt = Math.min(dt, 0.033); // max 33ms per frame
+
+  state.raf = requestAnimationFrame(loop);
+
+  // Speed up visualization
+  const simDt = dt * 1.5;
+
+  // CM correction
+  const cmShift = state.rf === 'cm' ? state.vcm * SCALE * simDt : 0;
+
+  state.x1 += state.vx1 * SCALE * simDt;
+  state.y1 += state.vy1 * SCALE * simDt;
+  state.x2 += state.vx2 * SCALE * simDt;
+  state.y2 += state.vy2 * SCALE * simDt;
+
+  if (state.rf === 'cm') {
+    state.x1 -= cmShift;
+    state.x2 -= cmShift;
+  }
+
+  state.time += simDt;
+
+  // Collision detection
+  const dx = state.x2 - state.x1;
+  const dy = state.y2 - state.y1;
+  const dist = Math.hypot(dx, dy);
+  const minDist = BODY_R1() + BODY_R2();
+
+  if (dist <= minDist && state.phase === 'pre') {
+    // Collisione!
+    state.phase = 'collision';
+    triggerCollision();
+  }
+
+  // Post-collision: check if bodies are far apart again
+  if (state.phase === 'post' && dist > minDist + 20) {
+    // all good
+  }
+
+  // stop if bodies exit screen
+  if ((state.x1 < -200 && state.x2 < -200) || (state.x1 > W+200 && state.x2 > W+200)) {
+    stopSim();
+    return;
+  }
+
+  // Flash timer
+  if (state.flashTimer > 0) {
+    state.flashTimer -= dt;
+    document.getElementById('coll-flash').style.opacity = Math.max(0, state.flashTimer / 0.15);
+  }
+
+  drawFrame();
+  updateRightPanelLive();
+  document.getElementById('oi-time').textContent = state.time.toFixed(2);
+  updatePhaseUI();
+}
+
+function triggerCollision() {
+  // Salva velocità pre-urto per calcolo impulso
+  if (state.pre) {
+    state.pre.vx1i = state.vx1; state.pre.vy1i = state.vy1;
+    state.pre.vx2i = state.vx2; state.pre.vy2i = state.vy2;
+    state.pre.v1signed = state.vx1;
+    state.pre.v2signed = state.vx2;
+  }
+
+  if (state.type === 'obliquo') {
+    const res = computePost();
+    state.vx1 = res.vx1f; state.vy1 = res.vy1f;
+    state.vx2 = res.vx2f; state.vy2 = res.vy2f;
+    // Separazione lungo la normale tra i centri
+    const dx = state.x2 - state.x1, dy = state.y2 - state.y1;
+    const d = Math.hypot(dx, dy) || 1;
+    const overlap = BODY_R1() + BODY_R2() - d;
+    if (overlap > 0) {
+      state.x1 -= (dx/d) * overlap * 0.51;
+      state.y1 -= (dy/d) * overlap * 0.51;
+      state.x2 += (dx/d) * overlap * 0.51;
+      state.y2 += (dy/d) * overlap * 0.51;
+    }
+  } else {
+    const res = computePost();
+    state.vx1 = res.v1f;
+    state.vx2 = res.v2f;
+    // Separazione: corpo 1 si allontana nella direzione della sua nuova velocità,
+    // corpo 2 nella propria. Se uno dei due ha velocità nulla (urto totale), si
+    // separa geometricamente lungo x in base a quale era a sinistra.
+    const overlap = BODY_R1() + BODY_R2() - Math.abs(state.x2 - state.x1);
+    if (overlap > 0) {
+      // Direzione di separazione: determinata da chi era a sinistra/destra
+      const sign = state.x1 < state.x2 ? -1 : 1; // sign per corpo 1
+      // Quota di spostamento proporzionale alle masse inverse (il più leggero cede di più)
+      const totalM = state.m1 + state.m2;
+      state.x1 += sign * overlap * (state.m2 / totalM) * 1.02;
+      state.x2 -= sign * overlap * (state.m1 / totalM) * 1.02;
+    }
+  }
+
+  state.phase = 'post';
+  state.post = captureSnapshot();
+  updateCompareTable();
+
+  state.flashTimer = 0.15;
+  document.getElementById('coll-flash').style.opacity = 1;
+  state.boomTimer = 0.4;
+  state.boomX = (state.x1+state.x2)/2;
+  state.boomY = (state.y1+state.y2)/2;
+}
+
+// ===================================================
+// RENDERING
+// ===================================================
+const COLORS = {
+  body1: '#0969da',
+  body2: '#cf222e',
+  grid: '#e2e8f0',
+  axis: '#c8d0da',
+  vel: '#7c3aed',
+  mom: '#6d28d9',
+  cm: '#1a7f37',
+};
+
+// ===================================================
+// TRAIETTORIE PREVISTE (solo urto obliquo)
+// ===================================================
+function computeCollisionPoint() {
+  // Calcola il tempo e il punto in cui le due sfere si toccano
+  // Risolve |P1(t) - P2(t)|² = (R1+R2)² per t
+  const r1 = BODY_R1(), r2 = BODY_R2();
+  const minD = r1 + r2;
+
+  const dx0 = state.x1 - state.x2;
+  const dy0 = state.y1 - state.y2;
+  const dvx = state.vx1 * SCALE - state.vx2 * SCALE;
+  const dvy = state.vy1 * SCALE - state.vy2 * SCALE;
+
+  // |dx0 + dvx*t|² + |dy0 + dvy*t|² = minD²
+  const a = dvx*dvx + dvy*dvy;
+  const b = 2*(dx0*dvx + dy0*dvy);
+  const c = dx0*dx0 + dy0*dy0 - minD*minD;
+
+  if (a < 1e-9) return null; // corpi fermi o stessa velocità
+
+  const disc = b*b - 4*a*c;
+  if (disc < 0) return null; // nessuna collisione
+
+  const t1 = (-b - Math.sqrt(disc)) / (2*a);
+  const t2 = (-b + Math.sqrt(disc)) / (2*a);
+  // Vogliamo il primo tempo positivo
+  const t = (t1 >= 0) ? t1 : (t2 >= 0 ? t2 : null);
+  if (t === null || t > 60) return null; // troppo lontano
+
+  return {
+    t,
+    cx1: state.x1 + state.vx1 * SCALE * t,
+    cy1: state.y1 + state.vy1 * SCALE * t,
+    cx2: state.x2 + state.vx2 * SCALE * t,
+    cy2: state.y2 + state.vy2 * SCALE * t,
+  };
+}
+
+function drawPredictedTrajectories() {
+  if (state.type !== 'obliquo') return;
+
+  const coll = computeCollisionPoint();
+  const r1 = BODY_R1(), r2 = BODY_R2();
+
+  ctx.save();
+  ctx.setLineDash([6, 5]);
+  ctx.lineWidth = 1.5;
+
+  // Traiettoria corpo 1
+  ctx.strokeStyle = COLORS.body1;
+  ctx.globalAlpha = 0.4;
+  ctx.beginPath();
+  ctx.moveTo(state.x1, state.y1);
+  if (coll) {
+    ctx.lineTo(coll.cx1, coll.cy1);
+  } else {
+    // Estendi fino al bordo del canvas
+    const tMax = 80;
+    ctx.lineTo(state.x1 + state.vx1 * SCALE * tMax, state.y1 + state.vy1 * SCALE * tMax);
+  }
+  ctx.stroke();
+
+  // Traiettoria corpo 2
+  ctx.strokeStyle = COLORS.body2;
+  ctx.beginPath();
+  ctx.moveTo(state.x2, state.y2);
+  if (coll) {
+    ctx.lineTo(coll.cx2, coll.cy2);
+  } else {
+    const tMax = 80;
+    ctx.lineTo(state.x2 + state.vx2 * SCALE * tMax, state.y2 + state.vy2 * SCALE * tMax);
+  }
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+
+  if (coll) {
+    // Cerchio fantasma corpo 1 nel punto di impatto
+    ctx.globalAlpha = 0.15;
+    ctx.fillStyle = COLORS.body1;
+    ctx.beginPath();
+    ctx.arc(coll.cx1, coll.cy1, r1, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = COLORS.body1;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(coll.cx1, coll.cy1, r1, 0, Math.PI*2);
+    ctx.stroke();
+
+    // Cerchio fantasma corpo 2 nel punto di impatto
+    ctx.globalAlpha = 0.15;
+    ctx.fillStyle = COLORS.body2;
+    ctx.beginPath();
+    ctx.arc(coll.cx2, coll.cy2, r2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = COLORS.body2;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(coll.cx2, coll.cy2, r2, 0, Math.PI*2);
+    ctx.stroke();
+
+    // Punto di contatto + etichetta
+    const midX = (coll.cx1 + coll.cx2) / 2;
+    const midY = (coll.cy1 + coll.cy2) / 2;
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = '#9a6700';
+    ctx.beginPath();
+    ctx.arc(midX, midY, 4, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = '#9a6700';
+    ctx.font = 'bold 11px IBM Plex Mono';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`t = ${coll.t.toFixed(2)} s`, midX + 8, midY - 8);
+    ctx.fillText('impatto previsto', midX + 8, midY + 6);
+
+    // Linea normale all'impatto
+    const nx = (coll.cx2 - coll.cx1) / (r1+r2);
+    const ny = (coll.cy2 - coll.cy1) / (r1+r2);
+    ctx.globalAlpha = 0.25;
+    ctx.strokeStyle = '#9a6700';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(midX - nx*40, midY - ny*40);
+    ctx.lineTo(midX + nx*40, midY + ny*40);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  } else {
+    // Nessuna collisione prevista: avviso
+    ctx.globalAlpha = 0.8;
+    ctx.fillStyle = '#cf222e';
+    ctx.font = 'bold 12px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⚠ Nessuna collisione con gli angoli attuali', W/2, H - 30);
+  }
+
+  ctx.restore();
+}
+
+function drawIdle() {
+  ctx.clearRect(0, 0, W, H);
+  drawGrid();
+  initPositions();
+  drawPredictedTrajectories();
+  drawBody(state.x1, state.y1, BODY_R1(), COLORS.body1, 'm₁='+state.m1.toFixed(1)+' kg', state.vx1, state.vy1, true);
+  drawBody(state.x2, state.y2, BODY_R2(), COLORS.body2, 'm₂='+state.m2.toFixed(1)+' kg', state.vx2, state.vy2, true);
+  drawCMMarker();
+  updateRightPanelLive();
+}
+
+function drawFrame() {
+  ctx.clearRect(0, 0, W, H);
+  drawGrid();
+
+  // Boom ring
+  if (state.boomTimer > 0) {
+    state.boomTimer -= 0.016;
+    const t = 1 - state.boomTimer / 0.4;
+    const r = t * 80;
+    ctx.save();
+    ctx.globalAlpha = (1-t) * 0.6;
+    ctx.strokeStyle = '#0969da';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(state.boomX, state.boomY, r, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Traiettorie previste (solo obliquo, solo pre-urto)
+  if (state.phase === 'pre') drawPredictedTrajectories();
+
+  // Trails
+  if (state.type === 'totale' && state.phase === 'post') {
+    // merged body
+    const mx = (state.x1+state.x2)/2, my = (state.y1+state.y2)/2;
+    drawBody(mx, my, (BODY_R1()+BODY_R2())*0.7, '#a78bfa', 'm₁+m₂', state.vx1, state.vy1, true);
+  } else {
+    drawBody(state.x1, state.y1, BODY_R1(), COLORS.body1, 'm₁', state.vx1, state.vy1, true);
+    drawBody(state.x2, state.y2, BODY_R2(), COLORS.body2, 'm₂', state.vx2, state.vy2, true);
+  }
+
+  drawCMMarker();
+  drawVelocityVectors();
+  drawMomentumVectors();
+}
+
+function drawGrid() {
+  ctx.strokeStyle = COLORS.grid;
+  ctx.lineWidth = 1;
+  const step = 50;
+  for (let x = 0; x < W; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += step) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  // Center axis
+  ctx.strokeStyle = COLORS.axis;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+}
+
+function drawBody(x, y, r, color, label, vx, vy, drawLabel) {
+  // Glow
+  const grd = ctx.createRadialGradient(x, y, 0, x, y, r*1.8);
+  grd.addColorStop(0, color+'33');
+  grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.arc(x, y, r*1.8, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.fill();
+
+  // Speed text inside
+  const spd = Math.hypot(vx, vy);
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${Math.max(9, r*0.5)}px IBM Plex Mono`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(spd.toFixed(1), x, y);
+
+  // Label below
+  if (drawLabel) {
+    ctx.fillStyle = color;
+    ctx.font = '11px IBM Plex Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x, y + r + 14);
+  }
+}
+
+function drawVelocityVectors() {
+  const bodies = state.type === 'totale' && state.phase === 'post'
+    ? [{ x: (state.x1+state.x2)/2, y: (state.y1+state.y2)/2, vx: state.vx1, vy: state.vy1, color: '#a78bfa' }]
+    : [
+        { x: state.x1, y: state.y1, vx: state.vx1, vy: state.vy1, color: COLORS.body1 },
+        { x: state.x2, y: state.y2, vx: state.vx2, vy: state.vy2, color: COLORS.body2 },
+      ];
+  for (const b of bodies) {
+    drawArrow(b.x, b.y, b.vx * 12, b.vy * 12, b.color, 'v='+Math.hypot(b.vx,b.vy).toFixed(1), true);
+  }
+}
+
+function drawMomentumVectors() {
+  const scale = 4;
+  const offset = 20; // draw below body
+  const bodies = state.type === 'totale' && state.phase === 'post'
+    ? [{ x: (state.x1+state.x2)/2, y: (state.y1+state.y2)/2+BODY_R1()+10, px: (state.m1+state.m2)*state.vx1, py: (state.m1+state.m2)*state.vy1 }]
+    : [
+        { x: state.x1, y: state.y1+BODY_R1()+10, px: state.m1*state.vx1, py: state.m1*state.vy1 },
+        { x: state.x2, y: state.y2+BODY_R2()+10, px: state.m2*state.vx2, py: state.m2*state.vy2 },
+      ];
+  for (const b of bodies) {
+    drawArrow(b.x, b.y + offset, b.px * scale, b.py * scale, COLORS.mom, 'p', false);
+  }
+}
+
+function drawArrow(x, y, dx, dy, color, label, showLabel) {
+  const len = Math.hypot(dx, dy);
+  if (len < 1) return;
+  const angle = Math.atan2(dy, dx);
+  const headLen = 10;
+
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.85;
+
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + dx, y + dy);
+  ctx.stroke();
+
+  // Arrowhead
+  ctx.beginPath();
+  ctx.moveTo(x+dx, y+dy);
+  ctx.lineTo(x+dx - headLen*Math.cos(angle-0.4), y+dy - headLen*Math.sin(angle-0.4));
+  ctx.lineTo(x+dx - headLen*Math.cos(angle+0.4), y+dy - headLen*Math.sin(angle+0.4));
+  ctx.closePath();
+  ctx.fill();
+
+  if (showLabel && len > 15) {
+    ctx.font = '10px IBM Plex Mono';
+    ctx.globalAlpha = 0.9;
+    ctx.fillText(label, x+dx/2, y+dy/2 - 6);
+  }
+  ctx.restore();
+}
+
+function drawCMMarker() {
+  const vcm = getCMVelocity();
+  // CM x position: weighted average (display only in idle or pre)
+  const cmX = (state.m1 * state.x1 + state.m2 * state.x2) / (state.m1 + state.m2);
+  const cmY = H / 2;
+
+  ctx.save();
+  ctx.strokeStyle = COLORS.cm;
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(cmX, 20);
+  ctx.lineTo(cmX, H - 20);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = COLORS.cm;
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('CM', cmX, 16);
+  ctx.fillText('v_cm='+vcm.toFixed(2), cmX, H-6);
+  ctx.restore();
+}
+
+// ===================================================
+// PANEL UPDATES
+// ===================================================
+function updateRightPanelLive() {
+  const is2D = state.type === 'obliquo';
+  const vmod1 = Math.hypot(state.vx1, state.vy1);
+  const vmod2 = Math.hypot(state.vx2, state.vy2);
+  const p1 = state.m1 * vmod1;
+  const p2 = state.m2 * vmod2;
+  const ptot_val = is2D
+    ? Math.hypot(state.m1*state.vx1+state.m2*state.vx2, state.m1*state.vy1+state.m2*state.vy2)
+    : Math.abs(state.m1*state.vx1 + state.m2*state.vx2);
+  const k1 = 0.5 * state.m1 * vmod1**2;
+  const k2 = 0.5 * state.m2 * vmod2**2;
+  const ktot = k1 + k2;
+
+  const MAXP = 40, MAXK = 200;
+
+  document.getElementById('p1-val').textContent = (state.m1*(is2D?vmod1:state.vx1)).toFixed(2) + ' kg·m/s';
+  document.getElementById('p2-val').textContent = (state.m2*(is2D?vmod2:state.vx2)).toFixed(2) + ' kg·m/s';
+  document.getElementById('ptot-val').textContent = (is2D ? ptot_val : (state.m1*state.vx1+state.m2*state.vx2)).toFixed(2) + ' kg·m/s';
+  document.getElementById('k1-val').textContent = k1.toFixed(2) + ' J';
+  document.getElementById('k2-val').textContent = k2.toFixed(2) + ' J';
+  document.getElementById('ktot-val').textContent = ktot.toFixed(2) + ' J';
+
+  const dk = state.pre ? state.pre.ktot - ktot : 0;
+  document.getElementById('dk-val').textContent = state.post ? dk.toFixed(2) + ' J' : '—';
+
+  // Bars
+  function barW(v, max) { return Math.min(100, Math.abs(v)/max*100) + '%'; }
+  document.getElementById('p1-bar').style.width = barW(p1, MAXP);
+  document.getElementById('p2-bar').style.width = barW(p2, MAXP);
+  document.getElementById('ptot-bar').style.width = barW(ptot_val, MAXP);
+  document.getElementById('k1-bar').style.width = barW(k1, MAXK);
+  document.getElementById('k2-bar').style.width = barW(k2, MAXK);
+  document.getElementById('ktot-bar').style.width = barW(ktot, MAXK);
+
+  // === IMPULSO ===
+  // Calcolato solo dopo la collisione (confronto con snapshot pre)
+  if (state.post && state.pre) {
+    const is2Dimp = state.type === 'obliquo';
+    // J1 = m1*(v1f - v1i)
+    let j1, j2;
+    if (is2Dimp) {
+      j1 = Math.hypot(
+        state.m1*(state.vx1 - state.pre.vx1i),
+        state.m1*(state.vy1 - state.pre.vy1i)
+      );
+      j2 = Math.hypot(
+        state.m2*(state.vx2 - state.pre.vx2i),
+        state.m2*(state.vy2 - state.pre.vy2i)
+      );
+    } else {
+      j1 = state.m1 * (state.vx1 - (state.pre.v1signed ?? state.pre.v1));
+      j2 = state.m2 * (state.vx2 - (state.pre.v2signed ?? state.pre.v2));
+    }
+    const jmod = Math.abs(j1);
+    document.getElementById('imp-val').textContent = jmod.toFixed(3) + ' N·s';
+    document.getElementById('imp1-val').textContent = j1.toFixed(3) + ' kg·m/s';
+    document.getElementById('imp2-val').textContent = j2.toFixed(3) + ' kg·m/s';
+    const MAXJ = 20;
+    document.getElementById('imp1-bar').style.width = Math.min(100, Math.abs(j1)/MAXJ*100) + '%';
+    document.getElementById('imp2-bar').style.width = Math.min(100, Math.abs(j2)/MAXJ*100) + '%';
+  } else {
+    document.getElementById('imp-val').textContent = '—';
+    document.getElementById('imp1-val').textContent = '—';
+    document.getElementById('imp2-val').textContent = '—';
+    document.getElementById('imp1-bar').style.width = '0%';
+    document.getElementById('imp2-bar').style.width = '0%';
+  }
+
+  let e_val, eColor, eDesc;
+  switch(state.type) {
+    case 'elastico': e_val='1.00'; eColor=COLORS.cm; eDesc='Urto perfettamente elastico: nessuna perdita di energia cinetica.'; break;
+    case 'totale': e_val='0.00'; eColor='#cf222e'; eDesc='Urto completamente anelastico: massima perdita di energia compatibile con la conservazione della quantità di moto.'; break;
+    case 'parziale': e_val=state.e_coeff.toFixed(2); eColor='#9a6700'; eDesc=`Urto parzialmente anelastico: ${((1-state.e_coeff**2)*100).toFixed(0)}% dell'energia cinetica relativa è dissipata.`; break;
+    case 'obliquo': e_val='1.00'; eColor=COLORS.cm; eDesc='Urto obliquo elastico in 2D: le componenti lungo la normale si scambiano come urto 1D elastico.'; break;
+  }
+  document.getElementById('e-num').textContent = e_val;
+  document.getElementById('e-circle').style.borderColor = eColor;
+  document.getElementById('e-num').style.color = eColor;
+  document.getElementById('e-desc').textContent = eDesc;
+
+  // Conservation chips
+  const pOk = true; // sempre
+  const eOk = state.type === 'elastico' || state.type === 'obliquo';
+  document.getElementById('chip-p').className = 'conserv-chip ok';
+  document.getElementById('chip-e').className = 'conserv-chip ' + (eOk ? 'ok' : 'no');
+}
+
+function updateRightPanel(withData) {
+  if (!withData) {
+    document.getElementById('compare-tbody').innerHTML =
+      '<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:12px;">Avvia la simulazione</td></tr>';
+  }
+}
+
+function updateCompareTable() {
+  const pre = state.pre, post = state.post;
+  if (!pre || !post) return;
+
+  const rows = [
+    ['v₁ (m/s)', pre.v1, post.v1, 'velocity'],
+    ['v₂ (m/s)', pre.v2, post.v2, 'velocity'],
+    ['p₁ (kg·m/s)', pre.p1, post.p1, 'momentum'],
+    ['p₂ (kg·m/s)', pre.p2, post.p2, 'momentum'],
+    ['p_tot', pre.ptot, post.ptot, 'momentum'],
+    ['K₁ (J)', pre.k1, post.k1, 'energy'],
+    ['K₂ (J)', pre.k2, post.k2, 'energy'],
+    ['K_tot (J)', pre.ktot, post.ktot, 'energy'],
+  ];
+
+  let html = '';
+  for (const [name, before, after, kind] of rows) {
+    const delta = before !== 0 ? ((after-before)/Math.abs(before)*100) : 0;
+    const dClass = Math.abs(delta) < 0.5 ? 'change-zero' : delta > 0 ? 'change-pos' : 'change-neg';
+    const sign = delta >= 0 ? '+' : '';
+    html += `<tr>
+      <td style="color:var(--muted)">${name}</td>
+      <td>${before.toFixed(2)}</td>
+      <td>${after.toFixed(2)}</td>
+      <td class="${dClass}">${sign}${delta.toFixed(1)}%</td>
+    </tr>`;
+  }
+  document.getElementById('compare-tbody').innerHTML = html;
+}
+
+function updatePhaseUI() {
+  const phases = { idle: 0, pre: 0, collision: 1, post: 2 };
+  const idx = phases[state.phase] ?? 0;
+  const labels = ['Pre-urto', 'Impatto', 'Post-urto'];
+  for (let i = 0; i < 3; i++) {
+    document.getElementById('ph'+i).className = 'phase-dot' + (i === idx ? ' active' : '');
+  }
+  document.getElementById('ph-label').textContent = labels[idx];
+  document.getElementById('oi-phase').textContent = ['ATTESA','PRE-URTO','IMPATTO','POST-URTO'][['idle','pre','collision','post'].indexOf(state.phase)];
+}
+
+// ===================================================
+// UI BINDINGS
+// ===================================================
+function bind(id, prop, display, factor=1) {
+  const el = document.getElementById(id);
+  el.value = state[prop];
+  el.addEventListener('input', () => {
+    state[prop] = parseFloat(el.value) * factor;
+    document.getElementById(display).textContent =
+      (prop === 'v1' || prop === 'v2')
+        ? (state[prop] >= 0 ? '+' : '') + state[prop].toFixed(1)
+        : state[prop].toFixed(prop === 'e_coeff' ? 2 : 1);
+    if (!state.running) drawIdle();
+    else updateRightPanelLive();
+    if (MathJax) MathJax.typesetPromise && MathJax.typesetPromise();
+  });
+}
+
+bind('m1','m1','m1-val');
+bind('v1','v1','v1-val');
+bind('m2','m2','m2-val');
+bind('v2','v2','v2-val');
+bind('e-slider','e_coeff','e-val');
+
+// Angle bindings
+['a1','a2'].forEach((id, i) => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    state[id] = parseFloat(el.value);
+    document.getElementById(id+'-val').textContent = state[id];
+    if (!state.running) drawIdle();
+  });
+});
+
+// Type tabs
+document.querySelectorAll('.type-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.type = btn.dataset.type;
+
+    // Show/hide coefficient slider
+    document.getElementById('coeff-card').style.display = state.type === 'parziale' ? 'block' : 'none';
+
+    // Show/hide angle controls
+    const show2D = state.type === 'obliquo';
+    document.getElementById('angle1-row').classList.toggle('visible', show2D);
+    document.getElementById('angle2-row').classList.toggle('visible', show2D);
+
+    if (!state.running) drawIdle();
+    updateRightPanelLive();
+    if (MathJax) MathJax.typesetPromise && MathJax.typesetPromise();
+  });
+});
+
+// RF buttons
+document.querySelectorAll('.rf-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rf-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.rf = btn.dataset.rf;
+    document.getElementById('ref-badge').textContent = state.rf === 'lab' ? 'LAB FRAME' : 'CM FRAME';
+    const descs = {
+      lab: 'Sistema del laboratorio: l\'osservatore è a riposo rispetto al pavimento.',
+      cm: 'Sistema del centro di massa (CM): il CM si trova sempre in x=cost. Le quantità di moto si annullano simmetricamente.',
+    };
+    document.getElementById('rf-desc').textContent = descs[state.rf];
+    if (state.running) {
+      // recalculate vcm
+      state.vcm = getCMVelocity();
+    }
+  });
+});
+
+document.getElementById('btn-avvia').addEventListener('click', startSim);
+document.getElementById('btn-reset').addEventListener('click', resetSim);
+
+// ===================================================
+// INIT
+// ===================================================
+drawIdle();
+updateRightPanelLive();
+if (window.MathJax) MathJax.typesetPromise && MathJax.typesetPromise();
+</script>
+</body>
+</html>

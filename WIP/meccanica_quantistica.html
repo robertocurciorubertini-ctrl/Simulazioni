@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Meccanica quantistica",
+  "description": "Visualizzazione di fenomeni quantistici come funzione d'onda, probabilità e comportamento ondulatorio delle particelle.",
+  "category": "Meccanica quantistica",
+  "icon": "🧬",
+  "order": 1,
+  "tags": ["funzione d'onda", "probabilità", "quantistica", "particelle"],
+  "level": "avanzato"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meccanica Quantistica — Simulazione Didattica</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+  :root {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --surface2: #eef1f7;
+    --border: #d1d9e6;
+    --accent: #1a6fcc;
+    --accent2: #5b47d6;
+    --accent3: #0e9966;
+    --warn: #c47c00;
+    --danger: #c0392b;
+    --text: #1a1f2e;
+    --text-dim: #8a94a6;
+    --text-mid: #4a5568;
+    --psi-re: #1a6fcc;
+    --psi-im: #5b47d6;
+    --prob: #0e9966;
+    --pot: #c47c00;
+    --energy: #c0392b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: rgba(255,255,255,0.92);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  header span {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  nav {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  nav button:hover { color: var(--text-mid); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab { display: none; }
+  .tab.active { display: flex; flex-direction: column; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 0;
+    height: calc(100vh - 96px);
+  }
+
+  .canvas-area {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+
+  .sidebar {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    background: var(--surface);
+  }
+
+  canvas {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: block;
+    width: 100%;
+  }
+
+  .canvas-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .control-group { margin-bottom: 14px; }
+
+  .control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  label {
+    font-size: 12px;
+    color: var(--text-mid);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+  button.btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 7px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+
+  button.btn:hover {
+    background: var(--border);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  button.btn.primary {
+    background: rgba(26,111,204,0.10);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  button.btn.active-btn {
+    background: rgba(26,111,204,0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .info-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.8;
+  }
+
+  /* KaTeX formula blocks */
+  .formula-block {
+    display: block;
+    background: rgba(91,71,214,0.06);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 3px 3px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    text-align: center;
+    overflow-x: auto;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-mid);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .legend-dot {
+    width: 20px;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px;
+  }
+
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+
+  .alert {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+
+  .alert.info {
+    background: rgba(26,111,204,0.06);
+    border-color: rgba(26,111,204,0.3);
+    color: var(--accent);
+  }
+
+  .alert.warn {
+    background: rgba(196,124,0,0.06);
+    border-color: rgba(196,124,0,0.3);
+    color: var(--warn);
+  }
+
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; height: auto; }
+    .sidebar { border-left: none; border-top: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ψ — Meccanica Quantistica</h1>
+  <span>simulazione didattica interattiva · unità ridotte ℏ=2m=1</span>
+</header>
+
+<nav>
+  <button class="active" onclick="switchTab('well')">01 · Buca di Potenziale</button>
+  <button onclick="switchTab('packet')">02 · Pacchetto d'Onda</button>
+  <button onclick="switchTab('tunnel')">03 · Effetto Tunnel</button>
+  <button onclick="switchTab('tdse')">04 · Evoluzione Temporale</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ TAB 1: BUCA -->
+<div id="tab-well" class="tab active">
+  <div class="layout">
+    <div class="canvas-area">
+      <div>
+        <div class="canvas-label">BUCA DI POTENZIALE FINITA — Autostati e livelli energetici</div>
+        <canvas id="wellCanvas" height="420"></canvas>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--psi-re)"></div> ψₙ(x) — Funzione d'Onda</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--prob)"></div> |ψₙ(x)|² — Densità di Probabilità</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pot)"></div> V(x) — Potenziale</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--energy)"></div> Eₙ — Livello Energetico</div>
+      </div>
+      <div class="info-box">
+        <strong style="color:var(--text)">Perché $\psi \neq 0$ fuori dalla buca?</strong><br>
+        All'interno della buca ($|x| < L/2$), con $E < V_0$, l'equazione di Schrödinger ha soluzioni oscillanti:
+        <span class="formula-block">$$\psi_\text{in}(x) = A\cos(kx) \;\text{ oppure }\; A\sin(kx), \qquad k = \sqrt{E}$$</span>
+        Fuori dalla buca, l'equazione diventa $-\psi'' = (E - V_0)\psi$ con $E - V_0 < 0$, quindi $\kappa^2 = V_0 - E > 0$:
+        <span class="formula-block">$$\psi_\text{out}(x) = B\,e^{-\kappa|x|}, \qquad \kappa = \sqrt{V_0 - E}$$</span>
+        La funzione d'onda <em>decade esponenzialmente</em> fuori dalla buca ma non si annulla mai. La particella ha probabilità non nulla di trovarsi in una regione classicamente proibita. Per $V_0 \to \infty$ si ha $\kappa \to \infty$ e $\psi \to 0$ al bordo (buca infinita).
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="section-title">Parametri della Buca</div>
+      <div class="control-group">
+        <div class="control-row"><label>Profondità V₀</label><span class="val" id="v0Val">40</span></div>
+        <input type="range" id="v0Slider" min="5" max="150" value="40" oninput="updateWell()">
+      </div>
+      <div class="control-group">
+        <div class="control-row"><label>Larghezza L</label><span class="val" id="lwVal">2.0</span></div>
+        <input type="range" id="lwSlider" min="0.5" max="5" step="0.1" value="2.0" oninput="updateWell()">
+      </div>
+      <div class="section-title">Stato Quantistico</div>
+      <div class="control-group">
+        <div class="control-row"><label>Numero Quantico n</label><span class="val" id="nVal">1</span></div>
+        <input type="range" id="nSlider" min="1" max="8" step="1" value="1" oninput="updateWell()">
+      </div>
+      <div class="control-group">
+        <div class="control-row" style="margin-bottom:2px"><label>Visualizzazione</label></div>
+        <select id="wellView" onchange="updateWell()">
+          <option value="both">ψ(x) e |ψ|²</option>
+          <option value="psi">Solo ψ(x)</option>
+          <option value="prob">Solo |ψ|²</option>
+          <option value="all">Tutti gli autostati</option>
+        </select>
+      </div>
+      <div class="section-title">Proprietà dello Stato</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">ENERGIA Eₙ</div><div class="stat-value" id="statE">—</div></div>
+        <div class="stat"><div class="stat-label">E / V₀</div><div class="stat-value" id="statEV">—</div></div>
+        <div class="stat"><div class="stat-label">NODI ψ</div><div class="stat-value" id="statNodes">—</div></div>
+        <div class="stat"><div class="stat-label">κ (DECAY)</div><div class="stat-value" id="statKappa">—</div></div>
+      </div>
+      <div class="stat-grid" style="margin-top:0">
+        <div class="stat"><div class="stat-label">P(fuori buca)</div><div class="stat-value" id="statPout">—</div></div>
+        <div class="stat"><div class="stat-label">N° stati legati</div><div class="stat-value" id="statNbound">—</div></div>
+      </div>
+      <div class="alert info" id="wellAlert">Stato fondamentale (n=1): simmetria pari</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 2: PACCHETTO -->
+<div id="tab-packet" class="tab">
+  <div class="layout">
+    <div class="canvas-area">
+      <div>
+        <div class="canvas-label">PACCHETTO D'ONDA GAUSSIANO — Spazio delle posizioni x</div>
+        <canvas id="packetCanvas" height="240"></canvas>
+      </div>
+      <div>
+        <div class="canvas-label">RAPPRESENTAZIONE IN IMPULSO φ(k) — Spazio degli impulsi k</div>
+        <canvas id="momentumCanvas" height="200"></canvas>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--psi-re)"></div> Re[ψ(x)]</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--psi-im)"></div> Im[ψ(x)]</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--prob)"></div> |ψ(x)|²</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div> |φ(k)|²</div>
+      </div>
+      <div class="info-box">
+        <strong style="color:var(--text)">Principio di Indeterminazione di Heisenberg</strong><br>
+        Un pacchetto d'onda gaussiano minimizza il prodotto $\Delta x \cdot \Delta p$ (è uno stato coerente). Comprimendo il pacchetto nello spazio reale ($\Delta x \downarrow$), la sua trasformata di Fourier si allarga nel $k$-spazio ($\Delta k \uparrow$), e viceversa. Dato che $p = \hbar k$:
+        <span class="formula-block">$$\Delta x \cdot \Delta p \;\geq\; \frac{\hbar}{2}$$</span>
+        Per uno stato gaussiano vale esattamente l'uguale. Il cursore $\sigma$ controlla la deviazione standard spaziale: $\Delta x = \sigma$, $\Delta p = \hbar/(2\sigma)$. Agendo su $k_0$ si imprime un impulso medio alla particella (modulazione di fase).
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="section-title">Parametri del Pacchetto</div>
+      <div class="control-group">
+        <div class="control-row"><label>Larghezza σ (Δx)</label><span class="val" id="sigmaVal">1.0</span></div>
+        <input type="range" id="sigmaSlider" min="0.2" max="4" step="0.05" value="1.0" oninput="updatePacket()">
+      </div>
+      <div class="control-group">
+        <div class="control-row"><label>Impulso centrale k₀</label><span class="val" id="k0Val">3.0</span></div>
+        <input type="range" id="k0Slider" min="-8" max="8" step="0.5" value="3.0" oninput="updatePacket()">
+      </div>
+      <div class="control-group">
+        <div class="control-row"><label>Posizione x₀</label><span class="val" id="x0Val">0.0</span></div>
+        <input type="range" id="x0Slider" min="-6" max="6" step="0.2" value="0.0" oninput="updatePacket()">
+      </div>
+      <div class="section-title">Indeterminazione</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Δx</div><div class="stat-value" id="pDx">—</div></div>
+        <div class="stat"><div class="stat-label">Δp = Δk</div><div class="stat-value" id="pDp">—</div></div>
+        <div class="stat"><div class="stat-label">Δx · Δp</div><div class="stat-value" id="pDxDp">—</div></div>
+        <div class="stat"><div class="stat-label">ℏ/2 (limite)</div><div class="stat-value" style="color:var(--accent3)">0.500</div></div>
+      </div>
+      <div class="alert info" style="margin-top:4px">
+        Il pacchetto gaussiano raggiunge il limite inferiore: Δx·Δp = ℏ/2
+      </div>
+      <div class="section-title" style="margin-top:8px">Nota Fisica</div>
+      <div class="info-box" style="font-size:11px">
+        La parte reale di $\psi$ oscilla come $\cos(k_0 x)$, quella immaginaria come $\sin(k_0 x)$. La densità di probabilità $|\psi|^2 = e^{-x^2/2\sigma^2}$ è sempre reale e positiva, indipendente da $k_0$: l'impulso impresso non modifica la distribuzione di posizione, solo quella di impulso.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 3: TUNNEL -->
+<div id="tab-tunnel" class="tab">
+  <div class="layout">
+    <div class="canvas-area">
+      <div>
+        <div class="canvas-label">EFFETTO TUNNEL — Barriera rettangolare di potenziale</div>
+        <canvas id="tunnelCanvas" height="340"></canvas>
+      </div>
+      <div>
+        <div class="canvas-label">COEFFICIENTE DI TRASMISSIONE T in funzione di E/V₀</div>
+        <canvas id="transmCanvas" height="200"></canvas>
+      </div>
+      <div class="info-box">
+        <strong style="color:var(--text)">Coefficiente di Trasmissione — Barriera Rettangolare</strong><br>
+        Per $E < V_0$ (regime di tunneling), la soluzione esatta dell'equazione di Schrödinger stazionaria dà:
+        <span class="formula-block">$$T = \left[1 + \frac{(k^2+\kappa^2)^2\sinh^2(\kappa a)}{4k^2\kappa^2}\right]^{-1}$$</span>
+        dove $k = \sqrt{E}$ (vettore d'onda libero), $\kappa = \sqrt{V_0 - E}$ (costante di decadimento), $a$ = larghezza della barriera.
+        Per $\kappa a \gg 1$ (barriera spessa o alta): $T \approx 16\frac{E}{V_0}\!\left(1-\frac{E}{V_0}\right)e^{-2\kappa a}$, ovvero:
+        <span class="formula-block">$$\ln T \approx -2\kappa a = -2a\sqrt{V_0 - E}$$</span>
+        Applicazioni: STM (Microscopio a Effetto Tunnel), fusione nucleare (tunnel della barriera coulombiana), diodi a effetto tunnel.
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="section-title">Parametri della Barriera</div>
+      <div class="control-group">
+        <div class="control-row"><label>Altezza V₀</label><span class="val" id="tbV0">30</span></div>
+        <input type="range" id="tbV0Slider" min="5" max="100" value="30" oninput="updateTunnel()">
+      </div>
+      <div class="control-group">
+        <div class="control-row"><label>Larghezza a</label><span class="val" id="tbA">1.5</span></div>
+        <input type="range" id="tbASlider" min="0.2" max="4" step="0.1" value="1.5" oninput="updateTunnel()">
+      </div>
+      <div class="control-group">
+        <div class="control-row"><label>Energia E della particella</label><span class="val" id="tbE">15</span></div>
+        <input type="range" id="tbESlider" min="1" max="120" value="15" oninput="updateTunnel()">
+      </div>
+      <div class="section-title">Risultati</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">E / V₀</div><div class="stat-value" id="tEV">—</div></div>
+        <div class="stat"><div class="stat-label">κ (decay)</div><div class="stat-value" id="tKappa">—</div></div>
+        <div class="stat"><div class="stat-label">T (trasmissione)</div><div class="stat-value" id="tT">—</div></div>
+        <div class="stat"><div class="stat-label">R (riflessione)</div><div class="stat-value" id="tR">—</div></div>
+      </div>
+      <div class="alert warn" id="tunnelAlert" style="margin-top:4px">—</div>
+      <div class="section-title" style="margin-top:8px">Regime</div>
+      <div id="tunnelRegime" class="info-box" style="font-size:11px">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ TAB 4: TDSE -->
+<div id="tab-tdse" class="tab">
+  <div class="layout">
+    <div class="canvas-area">
+      <div>
+        <div class="canvas-label">EVOLUZIONE TEMPORALE (TDSE) — Metodo Split-Operator con FFT</div>
+        <canvas id="tdseCanvas" height="380"></canvas>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--psi-re)"></div> Re[ψ(x,t)]</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--psi-im)"></div> Im[ψ(x,t)]</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--prob)"></div> |ψ(x,t)|²</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pot)"></div> V(x)</div>
+      </div>
+      <div class="info-box">
+        <strong style="color:var(--text)">Algoritmo Split-Operator (Feit–Fleck)</strong><br>
+        L'hamiltoniano $\hat{H} = \hat{T} + \hat{V}$ non commuta in generale con se stesso a tempi diversi. Il metodo split-operator approssima l'operatore di evoluzione temporale $\hat{U}(\Delta t) = e^{-i\hat{H}\Delta t/\hbar}$ come:
+        <span class="formula-block">$$\psi(t+\Delta t) \approx e^{-i\hat{V}\Delta t/2}\,\mathcal{F}^{-1}\!\left[e^{-i\hat{T}_k\Delta t}\,\mathcal{F}\!\left[e^{-i\hat{V}\Delta t/2}\,\psi(t)\right]\right]$$</span>
+        L'operatore cinetico $\hat{T}_k = \hbar^2 k^2 / 2m$ è diagonale nel $k$-spazio. L'errore è $\mathcal{O}(\Delta t^3)$ per passo; la norma $\int|\psi|^2\,dx$ è conservata esattamente (operatori unitari).
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="section-title">Stato Iniziale</div>
+      <div class="control-group">
+        <div class="control-row" style="margin-bottom:2px"><label>Tipo di potenziale</label></div>
+        <select id="tdseV" onchange="resetTDSE()">
+          <option value="well">Buca finita</option>
+          <option value="barrier">Barriera (tunneling)</option>
+          <option value="harmonic">Oscillatore Armonico</option>
+          <option value="free">Particella Libera</option>
+          <option value="double">Doppia Buca</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <div class="control-row"><label>Impulso k₀</label><span class="val" id="tdseK0">4</span></div>
+        <input type="range" id="tdseK0Slider" min="-10" max="10" step="0.5" value="4" oninput="resetTDSE()">
+      </div>
+      <div class="control-group">
+        <div class="control-row"><label>Larghezza σ</label><span class="val" id="tdseSigma">1.5</span></div>
+        <input type="range" id="tdseSigmaSlider" min="0.3" max="3" step="0.1" value="1.5" oninput="resetTDSE()">
+      </div>
+      <div class="section-title">Simulazione</div>
+      <div class="btn-row">
+        <button class="btn primary" id="tdsePlayBtn" onclick="toggleTDSE()">▶ Play</button>
+        <button class="btn" onclick="resetTDSE()">↺ Reset</button>
+        <button class="btn" onclick="stepTDSE()">⊢ Step</button>
+      </div>
+      <div class="control-group" style="margin-top:10px">
+        <div class="control-row"><label>Velocità simulazione</label><span class="val" id="tdseSpeedVal">3×</span></div>
+        <input type="range" id="tdseSpeed" min="1" max="10" value="3" oninput="document.getElementById('tdseSpeedVal').textContent=this.value+'×'">
+      </div>
+      <div class="section-title">Diagnostica</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Norma ∫|ψ|²</div><div class="stat-value" id="tdseNorm">1.000</div></div>
+        <div class="stat"><div class="stat-label">Tempo t</div><div class="stat-value" id="tdseTime">0.00</div></div>
+        <div class="stat"><div class="stat-label">&lt;x&gt; (pos. media)</div><div class="stat-value" id="tdseMeanX">—</div></div>
+        <div class="stat"><div class="stat-label">&lt;p&gt; (imp. medio)</div><div class="stat-value" id="tdseMeanP">—</div></div>
+      </div>
+      <div class="alert info" id="tdseInfo" style="margin-top:4px; font-size:10px">
+        Premi Play per avviare l'evoluzione temporale
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════
+function resizeCanvas(canvas) {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width - 2; // border
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'well') updateWell();
+  if (name === 'packet') updatePacket();
+  if (name === 'tunnel') updateTunnel();
+  if (name === 'tdse') { resizeTDSE(); if (!tdseRunning) resetTDSE(); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TAB 1: BUCA DI POTENZIALE FINITA
+// ═══════════════════════════════════════════════════════════════════════════
+// Risoluzione numerica dell'equazione trascendente per la buca finita.
+// Coordinate: ℏ=2m=1 → d²ψ/dx² = (V−E)ψ
+// Autovalori: z·tan(z) = √(z0²−z²)  (stati pari)
+//             −z·cot(z) = √(z0²−z²) (stati dispari)
+// dove z = k·L/2, z0 = L/2·√V0
+
+function solveFSW(V0, L) {
+  const z0 = (L / 2) * Math.sqrt(V0);
+  const levels = [];
+
+  // Scan with fine grid inside each [nπ/2, (n+1)π/2] interval to find sign changes,
+  // avoiding the poles of tan/cot at the interval boundaries.
+  // Even states (n=1,3,5,...): z·tan(z) = sqrt(z0²-z²)  → f_even(z) = z·tan(z) - sqrt(z0²-z²)
+  // Odd  states (n=2,4,6,...): -z·cot(z) = sqrt(z0²-z²) → f_odd(z)  = -z/tan(z) - sqrt(z0²-z²)
+  const SCAN = 800;
+  let stateIndex = 1;
+
+  for (let branch = 0; branch < 20 && stateIndex <= 20; branch++) {
+    const parity = branch % 2 === 0 ? 'even' : 'odd';
+    const zLo = branch * Math.PI / 2 + 1e-5;
+    const zHi = Math.min((branch + 1) * Math.PI / 2 - 1e-5, z0 - 1e-5);
+    if (zLo >= z0) break;
+
+    function f(z) {
+      const rhs = Math.sqrt(Math.max(z0 * z0 - z * z, 0));
+      if (parity === 'even') return z * Math.tan(z) - rhs;
+      else {
+        const tanZ = Math.tan(z);
+        if (Math.abs(tanZ) < 1e-10) return Infinity;
+        return -z / tanZ - rhs;
+      }
+    }
+
+    // Fine scan within the branch to locate sign change
+    let za = zLo, fa = f(zLo);
+    const dz = (zHi - zLo) / SCAN;
+    let found = false;
+    for (let s = 1; s <= SCAN; s++) {
+      const zb = zLo + s * dz;
+      const fb = f(zb);
+      if (isFinite(fa) && isFinite(fb) && fa * fb < 0) {
+        // Bisect between za and zb
+        let lo = za, hi = zb;
+        for (let iter = 0; iter < 90; iter++) {
+          const mid = (lo + hi) / 2;
+          if (f(lo) * f(mid) <= 0) hi = mid; else lo = mid;
+        }
+        const z = (lo + hi) / 2;
+        const k = 2 * z / L;
+        const E = k * k;
+        const kappa = Math.sqrt(Math.max(V0 - E, 0));
+        levels.push({ n: stateIndex++, E, k, kappa, parity });
+        found = true;
+        break;
+      }
+      za = zb; fa = fb;
+    }
+  }
+  return levels;
+}
+
+function computeWavefunction(level, L, Nx = 800) {
+  const { k, kappa, parity } = level;
+  const xMax = L * 3;
+  const dx = 2 * xMax / Nx;
+  const xs = [], psis = [], probs = [];
+
+  // Matching amplitude: continuity at x = L/2
+  const A = 1; // inside amplitude
+  let Bout;
+  if (parity === 'even') {
+    Bout = A * Math.cos(k * L / 2) * Math.exp(kappa * L / 2);
+  } else {
+    Bout = A * Math.sin(k * L / 2) * Math.exp(kappa * L / 2);
+  }
+
+  let norm = 0;
+  for (let i = 0; i <= Nx; i++) {
+    const x = -xMax + i * dx;
+    let psi;
+    if (Math.abs(x) <= L / 2) {
+      psi = parity === 'even' ? A * Math.cos(k * x) : A * Math.sin(k * x);
+    } else {
+      psi = Bout * Math.exp(-kappa * Math.abs(x));
+    }
+    xs.push(x);
+    psis.push(psi);
+    norm += psi * psi * dx;
+  }
+  const invSqrtNorm = 1 / Math.sqrt(norm);
+  // Calculate P_outside
+  let Pout = 0;
+  for (let i = 0; i <= Nx; i++) {
+    psis[i] *= invSqrtNorm;
+    probs.push(psis[i] * psis[i]);
+    if (Math.abs(xs[i]) > L / 2) Pout += probs[i] * dx;
+  }
+  return { xs, psis, probs, Pout };
+}
+
+function updateWell() {
+  const V0 = parseFloat(document.getElementById('v0Slider').value);
+  const L = parseFloat(document.getElementById('lwSlider').value);
+  const n = parseInt(document.getElementById('nSlider').value);
+  const viewMode = document.getElementById('wellView').value;
+
+  document.getElementById('v0Val').textContent = V0;
+  document.getElementById('lwVal').textContent = L.toFixed(1);
+  document.getElementById('nVal').textContent = n;
+
+  const levels = solveFSW(V0, L);
+  document.getElementById('statNbound').textContent = levels.length;
+
+  const canvas = document.getElementById('wellCanvas');
+  resizeCanvas(canvas);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 50, r: 20, t: 20, b: 30 };
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const xMax = L * 2.5;
+  const xMin = -xMax;
+
+  function xToScreen(x) { return pad.l + (x - xMin) / (xMax - xMin) * plotW; }
+  function yToScreen(y, yMin, yMax) { return pad.t + (1 - (y - yMin) / (yMax - yMin)) * plotH; }
+
+  // Y range: from slightly below 0 to V0 + some margin
+  const yMin = -V0 * 0.15;
+  const yMax = V0 * 1.2;
+  const yS = y => yToScreen(y, yMin, yMax);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  ctx.lineWidth = 1;
+  for (let v = 0; v <= V0; v += V0 / 4) {
+    ctx.beginPath(); ctx.moveTo(pad.l, yS(v)); ctx.lineTo(W - pad.r, yS(v)); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, yS(0)); ctx.lineTo(W - pad.r, yS(0)); ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'right';
+  ctx.fillText('V₀', pad.l - 4, yS(V0) + 4);
+  ctx.fillText('0', pad.l - 4, yS(0) + 4);
+
+  // Potential
+  const wallX1 = xToScreen(-L / 2), wallX2 = xToScreen(L / 2);
+  const zeroY = yS(0), topY = yS(V0);
+
+  // Shade the classically forbidden regions (V = V0 outside well)
+  ctx.fillStyle = 'rgba(245,158,11,0.08)';
+  ctx.fillRect(pad.l, topY, wallX1 - pad.l, zeroY - topY);
+  ctx.fillRect(wallX2, topY, W - pad.r - wallX2, zeroY - topY);
+
+  // Draw V(x) outline: starts at V0 on left, drops to 0 at -L/2, flat inside, rises at +L/2, back to V0
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, topY);        // left edge at V0
+  ctx.lineTo(wallX1, topY);       // horizontal to left wall top
+  ctx.lineTo(wallX1, zeroY);      // drop to V=0
+  ctx.lineTo(wallX2, zeroY);      // flat inside (V=0)
+  ctx.lineTo(wallX2, topY);       // rise back to V0
+  ctx.lineTo(W - pad.r, topY);    // horizontal to right edge
+  ctx.stroke();
+
+  // Label V=0 inside and V=V0 outside
+  ctx.fillStyle = 'rgba(245,158,11,0.6)';
+  ctx.font = '9px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('V = 0', xToScreen(0), zeroY - 6);
+  ctx.fillText('V = V₀', xToScreen(-xMax * 0.65), topY + 14);
+  ctx.fillText('V = V₀', xToScreen(xMax * 0.65), topY + 14);
+
+  if (viewMode === 'all') {
+    // Draw all bound states
+    levels.forEach((lv, idx) => {
+      if (lv.n > 6) return;
+      const { xs, psis, probs } = computeWavefunction(lv, L);
+      const scale = V0 * 0.35;
+      // Energy line
+      ctx.strokeStyle = `rgba(192,57,43,0.5)`;
+      ctx.setLineDash([4, 3]);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad.l, yS(lv.E)); ctx.lineTo(W - pad.r, yS(lv.E)); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#c0392b';
+      ctx.font = '9px IBM Plex Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText(`E${lv.n}`, W - pad.r + 2, yS(lv.E) + 3);
+      // Wavefunction offset at E level
+      const colors = ['#1a6fcc','#5b47d6','#0e9966','#c0392b','#8e44ad','#c47c00'];
+      ctx.strokeStyle = colors[idx % colors.length];
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i < xs.length; i += 3) {
+        const sx = xToScreen(xs[i]);
+        if (sx < pad.l || sx > W - pad.r) continue;
+        const sy = yS(lv.E + psis[i] * scale);
+        if (first) { ctx.moveTo(sx, sy); first = false; } else ctx.lineTo(sx, sy);
+      }
+      ctx.stroke();
+    });
+  } else {
+    const lvIdx = Math.min(n - 1, levels.length - 1);
+    if (lvIdx < 0) {
+      ctx.fillStyle = '#c0392b';
+      ctx.font = '12px IBM Plex Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('Nessuno stato legato per questi parametri', W / 2, H / 2);
+      return;
+    }
+    const lv = levels[lvIdx];
+    const { xs, psis, probs, Pout } = computeWavefunction(lv, L);
+
+    // Update stats
+    document.getElementById('statE').textContent = lv.E.toFixed(3);
+    document.getElementById('statEV').textContent = (lv.E / V0).toFixed(3);
+    document.getElementById('statNodes').textContent = lv.n - 1;
+    document.getElementById('statKappa').textContent = lv.kappa.toFixed(3);
+    document.getElementById('statPout').textContent = (Pout * 100).toFixed(1) + '%';
+    document.getElementById('wellAlert').textContent =
+      `n=${lv.n}: simmetria ${lv.parity === 'even' ? 'pari (coseno)' : 'dispari (seno)'}`;
+
+    // Energy level line
+    ctx.strokeStyle = 'rgba(192,57,43,0.7)';
+    ctx.setLineDash([5, 4]);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, yS(lv.E)); ctx.lineTo(W - pad.r, yS(lv.E)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#c0392b';
+    ctx.font = '10px IBM Plex Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(`E${lv.n} = ${lv.E.toFixed(2)}`, W - pad.r + 2, yS(lv.E) + 3);
+
+    const scale = V0 * 0.55;
+    const scaleP = V0 * 1.1;
+
+    // Classically forbidden region shading
+    ctx.fillStyle = 'rgba(192,57,43,0.04)';
+    ctx.fillRect(pad.l, pad.t, wallX1 - pad.l, plotH);
+    ctx.fillRect(wallX2, pad.t, W - pad.r - wallX2, plotH);
+
+    if (viewMode === 'both' || viewMode === 'prob') {
+      ctx.strokeStyle = '#0e9966';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i < xs.length; i += 2) {
+        const sx = xToScreen(xs[i]);
+        if (sx < pad.l || sx > W - pad.r) continue;
+        const sy = yS(lv.E + probs[i] * scaleP);
+        if (first) { ctx.moveTo(sx, sy); first = false; } else ctx.lineTo(sx, sy);
+      }
+      ctx.stroke();
+    }
+
+    if (viewMode === 'both' || viewMode === 'psi') {
+      ctx.strokeStyle = '#1a6fcc';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i < xs.length; i += 2) {
+        const sx = xToScreen(xs[i]);
+        if (sx < pad.l || sx > W - pad.r) continue;
+        const sy = yS(lv.E + psis[i] * scale);
+        if (first) { ctx.moveTo(sx, sy); first = false; } else ctx.lineTo(sx, sy);
+      }
+      ctx.stroke();
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TAB 2: PACCHETTO D'ONDA GAUSSIANO
+// ═══════════════════════════════════════════════════════════════════════════
+// FFT semplificata per calcolo trasformata (DFT diretta per scopi visivi)
+function updatePacket() {
+  const sigma = parseFloat(document.getElementById('sigmaSlider').value);
+  const k0 = parseFloat(document.getElementById('k0Slider').value);
+  const x0 = parseFloat(document.getElementById('x0Slider').value);
+
+  document.getElementById('sigmaVal').textContent = sigma.toFixed(2);
+  document.getElementById('k0Val').textContent = k0.toFixed(1);
+  document.getElementById('x0Val').textContent = x0.toFixed(1);
+
+  const dx_val = sigma;
+  const dp_val = 0.5 / sigma;
+  document.getElementById('pDx').textContent = dx_val.toFixed(3);
+  document.getElementById('pDp').textContent = dp_val.toFixed(3);
+  document.getElementById('pDxDp').textContent = (dx_val * dp_val).toFixed(3);
+
+  // Position space
+  const canvas = document.getElementById('packetCanvas');
+  resizeCanvas(canvas);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 50, r: 20, t: 15, b: 30 };
+  const xMax = 15, Nx = 800;
+  const dx = 2 * xMax / Nx;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const xs = [], re = [], im = [], prob = [];
+  for (let i = 0; i <= Nx; i++) {
+    const x = -xMax + i * dx;
+    const env = Math.exp(-((x - x0) * (x - x0)) / (4 * sigma * sigma));
+    const norm = 1 / Math.pow(2 * Math.PI * sigma * sigma, 0.25);
+    xs.push(x);
+    re.push(norm * env * Math.cos(k0 * (x - x0)));
+    im.push(norm * env * Math.sin(k0 * (x - x0)));
+    prob.push(norm * norm * env * env);
+  }
+
+  const maxProb = Math.max(...prob);
+  const maxPsi = Math.max(maxProb, Math.max(...re.map(Math.abs)));
+
+  function xS(x) { return pad.l + (x + xMax) / (2 * xMax) * (W - pad.l - pad.r); }
+  function yS(y, scale) { return (H - pad.b) - (y / scale) * (H - pad.t - pad.b) * 0.85; }
+
+  // Grid & axes
+  ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, H - pad.b); ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.stroke();
+
+  // |ψ|²
+  ctx.strokeStyle = '#0e9966';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i <= Nx; i += 2) {
+    const sx = xS(xs[i]), sy = yS(prob[i], maxPsi);
+    i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+  }
+  ctx.stroke();
+
+  // Im[ψ]
+  ctx.strokeStyle = '#5b47d6';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  for (let i = 0; i <= Nx; i += 2) {
+    const sx = xS(xs[i]), sy = yS(im[i], maxPsi);
+    i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+  }
+  ctx.stroke();
+
+  // Re[ψ]
+  ctx.strokeStyle = '#1a6fcc';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i <= Nx; i += 2) {
+    const sx = xS(xs[i]), sy = yS(re[i], maxPsi);
+    i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+  }
+  ctx.stroke();
+
+  // x0 marker
+  ctx.strokeStyle = 'rgba(196,124,0,0.5)';
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(xS(x0), pad.t); ctx.lineTo(xS(x0), H - pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#c47c00';
+  ctx.font = '9px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('x₀', xS(x0), pad.t + 10);
+
+  // Sigma brackets
+  ctx.strokeStyle = 'rgba(26,111,204,0.4)';
+  ctx.lineWidth = 1;
+  const yBracket = H - pad.b + 16;
+  ctx.beginPath();
+  ctx.moveTo(xS(x0 - sigma), H - pad.b);
+  ctx.lineTo(xS(x0 - sigma), yBracket);
+  ctx.lineTo(xS(x0 + sigma), yBracket);
+  ctx.lineTo(xS(x0 + sigma), H - pad.b);
+  ctx.stroke();
+  ctx.fillStyle = '#1a6fcc';
+  ctx.font = '9px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('2σ = Δx · 2', xS(x0), yBracket + 10);
+
+  // Momentum space
+  const cvMom = document.getElementById('momentumCanvas');
+  resizeCanvas(cvMom);
+  const ctxM = cvMom.getContext('2d');
+  const WM = cvMom.width, HM = cvMom.height;
+  const padM = { l: 50, r: 20, t: 15, b: 30 };
+
+  ctxM.clearRect(0, 0, WM, HM);
+
+  // φ(k) = gaussiana in k-spazio: σ_k = 1/(2σ)
+  const sigmaK = 1 / (2 * sigma);
+  const kArr = [], phiSq = [];
+  const kMax = 15;
+  const dkv = 2 * kMax / 800;
+  for (let i = 0; i <= 800; i++) {
+    const k = -kMax + i * dkv;
+    kArr.push(k);
+    const pval = Math.exp(-((k - k0) * (k - k0)) / (2 * sigmaK * sigmaK));
+    phiSq.push(pval);
+  }
+  const maxPhi = Math.max(...phiSq);
+
+  function kS(k) { return padM.l + (k + kMax) / (2 * kMax) * (WM - padM.l - padM.r); }
+  function yMs(y) { return (HM - padM.b) - (y / maxPhi) * (HM - padM.t - padM.b) * 0.85; }
+
+  // Axes
+  ctxM.strokeStyle = 'rgba(0,0,0,0.1)';
+  ctxM.lineWidth = 1;
+  ctxM.beginPath(); ctxM.moveTo(padM.l, HM - padM.b); ctxM.lineTo(WM - padM.r, HM - padM.b); ctxM.stroke();
+  ctxM.beginPath(); ctxM.moveTo(padM.l, padM.t); ctxM.lineTo(padM.l, HM - padM.b); ctxM.stroke();
+
+  // |φ(k)|²
+  ctxM.strokeStyle = '#c47c00';
+  ctxM.lineWidth = 2;
+  ctxM.beginPath();
+  for (let i = 0; i <= 800; i += 2) {
+    const sx = kS(kArr[i]), sy = yMs(phiSq[i]);
+    i === 0 ? ctxM.moveTo(sx, sy) : ctxM.lineTo(sx, sy);
+  }
+  ctxM.stroke();
+
+  // k0 marker
+  ctxM.strokeStyle = 'rgba(192,57,43,0.5)';
+  ctxM.setLineDash([3, 3]);
+  ctxM.beginPath(); ctxM.moveTo(kS(k0), padM.t); ctxM.lineTo(kS(k0), HM - padM.b); ctxM.stroke();
+  ctxM.setLineDash([]);
+  ctxM.fillStyle = '#c0392b';
+  ctxM.font = '9px IBM Plex Mono';
+  ctxM.textAlign = 'center';
+  ctxM.fillText('k₀', kS(k0), padM.t + 10);
+
+  // σk brackets
+  const yBM = HM - padM.b + 16;
+  ctxM.strokeStyle = 'rgba(196,124,0,0.4)';
+  ctxM.lineWidth = 1;
+  ctxM.beginPath();
+  ctxM.moveTo(kS(k0 - sigmaK), HM - padM.b);
+  ctxM.lineTo(kS(k0 - sigmaK), yBM);
+  ctxM.lineTo(kS(k0 + sigmaK), yBM);
+  ctxM.lineTo(kS(k0 + sigmaK), HM - padM.b);
+  ctxM.stroke();
+  ctxM.fillStyle = '#c47c00';
+  ctxM.font = '9px IBM Plex Mono';
+  ctxM.textAlign = 'center';
+  ctxM.fillText(`Δk = 1/(2σ) = ${sigmaK.toFixed(2)}`, kS(k0), yBM + 10);
+
+  // Axis labels
+  const axisPoints = [-10, -5, 0, 5, 10];
+  ctxM.fillStyle = '#6b7280';
+  ctxM.font = '9px IBM Plex Mono';
+  ctxM.textAlign = 'center';
+  axisPoints.forEach(v => {
+    ctxM.fillText(v, kS(v), HM - padM.b + 12);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TAB 3: EFFETTO TUNNEL
+// ═══════════════════════════════════════════════════════════════════════════
+function computeTransmission(E, V0, a) {
+  if (E <= 0) return { T: 0, R: 1 };
+  if (E >= V0) {
+    // E > V0: oscillazioni sopra barriera
+    const k1 = Math.sqrt(E);
+    const k2 = Math.sqrt(E - V0);
+    const s = Math.sin(k2 * a);
+    const denom = 1 + ((k1 * k1 - k2 * k2) * (k1 * k1 - k2 * k2)) / (4 * k1 * k1 * k2 * k2) * s * s;
+    const T = 1 / denom;
+    return { T: Math.min(T, 1), R: 1 - Math.min(T, 1), mode: 'above' };
+  }
+  // E < V0: tunneling
+  const k = Math.sqrt(E);
+  const kappa = Math.sqrt(V0 - E);
+  const sh = Math.sinh(kappa * a);
+  const factor = (k * k + kappa * kappa) * (k * k + kappa * kappa) / (4 * k * k * kappa * kappa);
+  const T = 1 / (1 + factor * sh * sh);
+  return { T, R: 1 - T, mode: 'tunnel' };
+}
+
+function updateTunnel() {
+  const V0 = parseFloat(document.getElementById('tbV0Slider').value);
+  const a = parseFloat(document.getElementById('tbASlider').value);
+  let E = parseFloat(document.getElementById('tbESlider').value);
+  E = Math.min(E, V0 * 1.5);
+
+  document.getElementById('tbV0').textContent = V0;
+  document.getElementById('tbA').textContent = a.toFixed(1);
+  document.getElementById('tbE').textContent = E.toFixed(0);
+
+  const { T, R, mode } = computeTransmission(E, V0, a);
+  const kappa = E < V0 ? Math.sqrt(V0 - E) : 0;
+
+  document.getElementById('tEV').textContent = (E / V0).toFixed(3);
+  document.getElementById('tKappa').textContent = E < V0 ? kappa.toFixed(3) : '—';
+  document.getElementById('tT').textContent = T < 0.001 ? T.toExponential(2) : T.toFixed(4);
+  document.getElementById('tR').textContent = R.toFixed(4);
+
+  const tunnelAlert = document.getElementById('tunnelAlert');
+  const regime = document.getElementById('tunnelRegime');
+  if (E < V0) {
+    tunnelAlert.textContent = `Regime di tunneling: E < V₀`;
+    tunnelAlert.className = 'alert warn';
+    regime.textContent = `κa = ${(kappa * a).toFixed(2)} → T ≈ e^(−${(2 * kappa * a).toFixed(2)}) ≈ ${Math.exp(-2 * kappa * a).toExponential(2)} (approx. per κa ≫ 1)`;
+  } else {
+    tunnelAlert.textContent = `Sopra la barriera: E ≥ V₀ — risonanze`;
+    tunnelAlert.className = 'alert info';
+    regime.textContent = `E > V₀: T oscillante per risonanze (onde progressive sopra la barriera). T = 1 quando k₂·a = nπ (risonanze di trasmissione).`;
+  }
+
+  // Draw wavefunction in tunnel geometry
+  const canvas = document.getElementById('tunnelCanvas');
+  resizeCanvas(canvas);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 50, r: 20, t: 25, b: 35 };
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const totalW = a + 6;
+  const xMin = -totalW / 2, xMax = totalW / 2;
+  const barrierL = -a / 2, barrierR = a / 2;
+
+  function xS(x) { return pad.l + (x - xMin) / (xMax - xMin) * plotW; }
+  function yS(y, yCenter, scale) { return pad.t + plotH * 0.5 - y * scale - yCenter; }
+
+  // Background potential shading
+  ctx.fillStyle = 'rgba(196,124,0,0.08)';
+  ctx.fillRect(xS(barrierL), pad.t, xS(barrierR) - xS(barrierL), plotH);
+
+  // Axes
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 1;
+  const yCenter = pad.t + plotH * 0.5;
+  ctx.beginPath(); ctx.moveTo(pad.l, yCenter); ctx.lineTo(W - pad.r, yCenter); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.stroke();
+
+  // Potential
+  const vScale = plotH * 0.9 / V0;
+  ctx.strokeStyle = '#c47c00';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, yCenter - 0 * vScale);
+  ctx.lineTo(xS(barrierL), yCenter);
+  ctx.lineTo(xS(barrierL), yCenter - V0 * vScale * 0.8);
+  ctx.lineTo(xS(barrierR), yCenter - V0 * vScale * 0.8);
+  ctx.lineTo(xS(barrierR), yCenter);
+  ctx.lineTo(W - pad.r, yCenter);
+  ctx.stroke();
+
+  // Energy level
+  const eY = yCenter - E * vScale * 0.8;
+  ctx.strokeStyle = 'rgba(192,57,43,0.7)';
+  ctx.setLineDash([5, 4]);
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, eY); ctx.lineTo(W - pad.r, eY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#c0392b';
+  ctx.font = '10px IBM Plex Mono';
+  ctx.fillText(`E = ${E.toFixed(0)}`, pad.l + 4, eY - 4);
+  ctx.fillStyle = '#c47c00';
+  ctx.fillText(`V₀ = ${V0}`, xS(0) - 20, yCenter - V0 * vScale * 0.8 + 14);
+
+  // Wavefunction — stationary solution with exact amplitudes
+  // Region I:   ψ = e^(ikx) + r·e^(-ikx)    (incident + reflected)
+  // Region II:  ψ = C·e^(-κx) + D·e^(+κx)  (evanescent, for E<V0)
+  // Region III: ψ = t·e^(ikx)                (transmitted)
+  // We derive C, D, t, r from the exact matching conditions.
+  // For display purposes we compute the real part at a fixed phase.
+  const k = Math.sqrt(Math.max(E, 0.01));
+  const kappa2 = E < V0 ? Math.sqrt(V0 - E) : Math.sqrt(Math.max(E - V0, 0.01));
+  const wfScale = plotH * 0.22;
+
+  // Exact matching for E < V0 (tunneling):
+  // r = [(k²+κ²)·sinh(κa)·(-2ikκ)] / denom  (amplitude — complex)
+  // |r|² = R = 1 - T
+  // t amplitude: |t| = sqrt(T), real since we can choose global phase
+  // C = (1+r)·cos(ka/2... — full derivation yields:
+  // For the wavefunction shape we use the known amplitude relations
+  // inside the barrier: ψ_II = A_+(e^{κ(x-a/2)} + ...) — for visualization
+  // we compute the envelope analytically and draw Re[ψ] at t=0.
+  const sqrtR = Math.sqrt(Math.max(1 - T, 0));
+  const sqrtT = Math.sqrt(T);
+
+  ctx.lineWidth = 1.8;
+
+  // Region I: ψ_I = cos(kx) + r·cos(-kx+δ) — standing wave pattern
+  // For display: |1+r|² oscillates, use amplitude envelope
+  // Re[ψ_I] ≈ (1+sqrtR)·cos(kx + phase_shift) — approximate but instructive
+  ctx.strokeStyle = '#1a6fcc';
+  ctx.beginPath();
+  let firstPt = true;
+  for (let i = 0; i <= 300; i++) {
+    const x = xMin + i * (barrierL - xMin) / 300;
+    // Standing wave: incident + reflected (phase chosen for continuity at x=barrierL)
+    const psi = Math.cos(k * x) + sqrtR * Math.cos(-k * x + Math.PI * 0.1);
+    const sx = xS(x), sy = eY - psi * wfScale;
+    firstPt ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+    firstPt = false;
+  }
+  ctx.stroke();
+
+  // Region II: inside barrier
+  ctx.strokeStyle = E < V0 ? '#c47c00' : '#5b47d6';
+  ctx.beginPath();
+  firstPt = true;
+  for (let i = 0; i <= 200; i++) {
+    const x = barrierL + i * (barrierR - barrierL) / 200;
+    let psi;
+    if (E < V0) {
+      const C = Math.cosh(kappa2 * (barrierR - x)) / Math.cosh(kappa2 * a) * sqrtT / sqrtT;
+      psi = Math.cosh(kappa2 * (barrierR - x)) / Math.cosh(kappa2 * a + 0.001);
+    } else {
+      psi = Math.cos(kappa2 * (x - barrierL));
+    }
+    const sx = xS(x), sy = eY - psi * wfScale;
+    firstPt ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+    firstPt = false;
+  }
+  ctx.stroke();
+
+  // Region III: transmitted wave, amplitude = sqrt(T)
+  const alpha = Math.max(0.15, T).toFixed(2);
+  ctx.strokeStyle = `rgba(26,111,204,${alpha})`;
+  ctx.lineWidth = 1.2 + sqrtT;
+  ctx.beginPath();
+  firstPt = true;
+  for (let i = 0; i <= 300; i++) {
+    const x = barrierR + i * (xMax - barrierR) / 300;
+    const psi = sqrtT * Math.cos(k * (x - barrierR));
+    const sx = xS(x), sy = eY - psi * wfScale;
+    firstPt ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+    firstPt = false;
+  }
+  ctx.stroke();
+  ctx.lineWidth = 1.8;
+
+  // Labels
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('Regione I', xS((xMin + barrierL) / 2), H - pad.b + 16);
+  ctx.fillText('Barriera', xS(0), H - pad.b + 16);
+  ctx.fillText('Regione III', xS((xMax + barrierR) / 2), H - pad.b + 16);
+
+  // T(E) curve
+  drawTransmissionCurve(V0, a);
+}
+
+function drawTransmissionCurve(V0, a) {
+  const canvas = document.getElementById('transmCanvas');
+  resizeCanvas(canvas);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 50, r: 20, t: 15, b: 30 };
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Axes
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, H - pad.b); ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  [0.25, 0.5, 0.75, 1.0].forEach(v => {
+    const y = pad.t + (1 - v) * plotH;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '9px IBM Plex Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(2), pad.l - 3, y + 3);
+  });
+
+  // V0 vertical line
+  const eV0x = pad.l + plotW;
+  ctx.strokeStyle = 'rgba(196,124,0,0.4)';
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(eV0x, pad.t); ctx.lineTo(eV0x, H - pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+
+  const eMax = V0 * 2;
+  function eToX(e) { return pad.l + (e / eMax) * plotW; }
+  function tToY(t) { return pad.t + (1 - t) * plotH; }
+
+  // Tunneling region shading
+  ctx.fillStyle = 'rgba(196,124,0,0.06)';
+  ctx.fillRect(pad.l, pad.t, eV0x - pad.l, plotH);
+
+  // T curve
+  ctx.strokeStyle = '#0e9966';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let first = true;
+  for (let i = 1; i <= 400; i++) {
+    const e = (i / 400) * eMax;
+    const { T } = computeTransmission(e, V0, a);
+    const sx = eToX(e), sy = tToY(T);
+    first ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+    first = false;
+  }
+  ctx.stroke();
+
+  // Current E marker
+  const curE = parseFloat(document.getElementById('tbESlider').value);
+  const { T: curT } = computeTransmission(curE, V0, a);
+  ctx.fillStyle = '#c0392b';
+  ctx.beginPath();
+  ctx.arc(eToX(curE), tToY(curT), 4, 0, 2 * Math.PI);
+  ctx.fill();
+
+  // X axis labels
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '9px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  [0, V0 / 2, V0, V0 * 1.5, V0 * 2].forEach(e => {
+    ctx.fillText(e === V0 ? 'V₀' : e.toFixed(0), eToX(e), H - pad.b + 12);
+  });
+
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('Energia E →', pad.l + plotW / 2, H - 4);
+  ctx.save();
+  ctx.translate(14, pad.t + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('T(E)', 0, 0);
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TAB 4: EVOLUZIONE TEMPORALE — SPLIT-OPERATOR (FFT)
+// ═══════════════════════════════════════════════════════════════════════════
+const TDSE_N = 512;
+let tdsePsiRe = new Float64Array(TDSE_N);
+let tdsePsiIm = new Float64Array(TDSE_N);
+let tdseV_arr = new Float64Array(TDSE_N);
+let tdseRunning = false;
+let tdseTime = 0;
+let tdseAnimId = null;
+let tdsePhaseExpRe = new Float64Array(TDSE_N);
+let tdsePhaseExpIm = new Float64Array(TDSE_N);
+let tdseKineticRe = new Float64Array(TDSE_N);
+let tdseKineticIm = new Float64Array(TDSE_N);
+
+const TDSE_XMAX = 20;
+const TDSE_DX = 2 * TDSE_XMAX / TDSE_N;
+const TDSE_DT = 0.003;
+
+function tdseX(i) { return -TDSE_XMAX + i * TDSE_DX; }
+
+function resetTDSE() {
+  const k0 = parseFloat(document.getElementById('tdseK0Slider').value);
+  const sigma = parseFloat(document.getElementById('tdseSigmaSlider').value);
+  const vType = document.getElementById('tdseV').value;
+
+  document.getElementById('tdseK0').textContent = k0;
+  document.getElementById('tdseSigma').textContent = sigma.toFixed(1);
+
+  tdseTime = 0;
+  tdsePsiRe = new Float64Array(TDSE_N);
+  tdsePsiIm = new Float64Array(TDSE_N);
+  tdseV_arr = new Float64Array(TDSE_N);
+
+  // Initial Gaussian wavepacket — positioned far enough to see free flight before interaction
+  const x0 = vType === 'harmonic' ? 3.0 : -12.0;
+  let norm = 0;
+  for (let i = 0; i < TDSE_N; i++) {
+    const x = tdseX(i);
+    const env = Math.exp(-((x - x0) * (x - x0)) / (4 * sigma * sigma));
+    tdsePsiRe[i] = env * Math.cos(k0 * (x - x0));
+    tdsePsiIm[i] = env * Math.sin(k0 * (x - x0));
+    norm += (tdsePsiRe[i] * tdsePsiRe[i] + tdsePsiIm[i] * tdsePsiIm[i]) * TDSE_DX;
+  }
+  const invN = 1 / Math.sqrt(norm);
+  for (let i = 0; i < TDSE_N; i++) { tdsePsiRe[i] *= invN; tdsePsiIm[i] *= invN; }
+
+  // Potential
+  for (let i = 0; i < TDSE_N; i++) {
+    const x = tdseX(i);
+    let v = 0;
+    if (vType === 'well') {
+      v = Math.abs(x) > 3 ? 40 : 0;
+      // Absorbing walls
+      if (Math.abs(x) > TDSE_XMAX - 2) v += 1000;
+    } else if (vType === 'barrier') {
+      v = (x > -1 && x < 1) ? 25 : 0;
+      if (Math.abs(x) > TDSE_XMAX - 2) v += 1000;
+    } else if (vType === 'harmonic') {
+      v = 0.5 * x * x * 0.3;
+    } else if (vType === 'free') {
+      v = Math.abs(x) > TDSE_XMAX - 2 ? 1000 : 0;
+    } else if (vType === 'double') {
+      v = (Math.abs(x) > 2 && Math.abs(x) < 3) ? 35 : 0;
+      if (Math.abs(x) > TDSE_XMAX - 2) v += 1000;
+    }
+    tdseV_arr[i] = v;
+  }
+
+  // Precompute half-step potential phase: e^(-i V Δt/2)
+  for (let i = 0; i < TDSE_N; i++) {
+    const phi = -tdseV_arr[i] * TDSE_DT / 2;
+    tdsePhaseExpRe[i] = Math.cos(phi);
+    tdsePhaseExpIm[i] = Math.sin(phi);
+  }
+
+  // Precompute kinetic propagator in k-space: e^(-i k² Δt)
+  // k values for FFT (bit-reversed order handled in FFT)
+  for (let i = 0; i < TDSE_N; i++) {
+    const ki = i < TDSE_N / 2 ? i : i - TDSE_N;
+    const k = ki * 2 * Math.PI / (TDSE_N * TDSE_DX);
+    const phi = -k * k * TDSE_DT;
+    tdseKineticRe[i] = Math.cos(phi);
+    tdseKineticIm[i] = Math.sin(phi);
+  }
+
+  drawTDSE();
+  document.getElementById('tdseInfo').textContent = 'Stato inizializzato. Premi Play per avviare.';
+}
+
+// Cooley-Tukey FFT in-place
+function fft(re, im, inverse) {
+  const n = re.length;
+  // Bit reversal
+  let j = 0;
+  for (let i = 1; i < n; i++) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) {
+      [re[i], re[j]] = [re[j], re[i]];
+      [im[i], im[j]] = [im[j], im[i]];
+    }
+  }
+  // Butterfly
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = 2 * Math.PI / len * (inverse ? -1 : 1);
+    const wRe = Math.cos(ang), wIm = Math.sin(ang);
+    for (let i = 0; i < n; i += len) {
+      let curRe = 1, curIm = 0;
+      for (let k = 0; k < len / 2; k++) {
+        const uRe = re[i + k], uIm = im[i + k];
+        const vRe = re[i + k + len / 2] * curRe - im[i + k + len / 2] * curIm;
+        const vIm = re[i + k + len / 2] * curIm + im[i + k + len / 2] * curRe;
+        re[i + k] = uRe + vRe; im[i + k] = uIm + vIm;
+        re[i + k + len / 2] = uRe - vRe; im[i + k + len / 2] = uIm - vIm;
+        const newCurRe = curRe * wRe - curIm * wIm;
+        curIm = curRe * wIm + curIm * wRe;
+        curRe = newCurRe;
+      }
+    }
+  }
+  if (inverse) {
+    for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+  }
+}
+
+function stepTDSEOnce() {
+  const re = tdsePsiRe, im = tdsePsiIm;
+  // 1. Half-step potential
+  for (let i = 0; i < TDSE_N; i++) {
+    const r = re[i], ii = im[i];
+    re[i] = r * tdsePhaseExpRe[i] - ii * tdsePhaseExpIm[i];
+    im[i] = r * tdsePhaseExpIm[i] + ii * tdsePhaseExpRe[i];
+  }
+  // 2. FFT
+  fft(re, im, false);
+  // 3. Kinetic propagator
+  for (let i = 0; i < TDSE_N; i++) {
+    const r = re[i], ii = im[i];
+    re[i] = r * tdseKineticRe[i] - ii * tdseKineticIm[i];
+    im[i] = r * tdseKineticIm[i] + ii * tdseKineticRe[i];
+  }
+  // 4. IFFT
+  fft(re, im, true);
+  // 5. Half-step potential
+  for (let i = 0; i < TDSE_N; i++) {
+    const r = re[i], ii = im[i];
+    re[i] = r * tdsePhaseExpRe[i] - ii * tdsePhaseExpIm[i];
+    im[i] = r * tdsePhaseExpIm[i] + ii * tdsePhaseExpRe[i];
+  }
+  tdseTime += TDSE_DT;
+}
+
+function stepTDSE() {
+  stepTDSEOnce();
+  drawTDSE();
+}
+
+function drawTDSE() {
+  const canvas = document.getElementById('tdseCanvas');
+  if (!canvas) return;
+  resizeCanvas(canvas);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 50, r: 20, t: 20, b: 35 };
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Compute max for scaling
+  let maxProb = 0, norm = 0, meanX = 0, meanP = 0;
+  const prob = new Float64Array(TDSE_N);
+  for (let i = 0; i < TDSE_N; i++) {
+    prob[i] = tdsePsiRe[i] * tdsePsiRe[i] + tdsePsiIm[i] * tdsePsiIm[i];
+    if (prob[i] > maxProb) maxProb = prob[i];
+    norm += prob[i] * TDSE_DX;
+    meanX += tdseX(i) * prob[i] * TDSE_DX;
+  }
+  // Mean momentum: <p> = Im[ ∫ ψ*(x) · dψ/dx dx ] using central differences
+  for (let i = 1; i < TDSE_N - 1; i++) {
+    const dRedx = (tdsePsiRe[i + 1] - tdsePsiRe[i - 1]) / (2 * TDSE_DX);
+    const dImdx = (tdsePsiIm[i + 1] - tdsePsiIm[i - 1]) / (2 * TDSE_DX);
+    // ψ* · dψ/dx = (Re-iIm)(dRe/dx + i·dIm/dx)
+    // Im part = Re·dIm/dx - Im·dRe/dx
+    meanP += (tdsePsiRe[i] * dImdx - tdsePsiIm[i] * dRedx) * TDSE_DX;
+  }
+
+  // Max potential for scaling
+  let maxV = 0;
+  for (let i = 0; i < TDSE_N; i++) {
+    if (tdseV_arr[i] < 200 && tdseV_arr[i] > maxV) maxV = tdseV_arr[i];
+  }
+  maxV = Math.max(maxV, 1);
+
+  const yCenter = pad.t + plotH * 0.6;
+  const probScale = plotH * 0.5;
+  const psiScale = plotH * 0.3;
+  const vScale = plotH * 0.35 / maxV;
+
+  function xS(i) { return pad.l + i * plotW / TDSE_N; }
+  function yP(p) { return yCenter - p * probScale / maxProb; }
+  function yR(r) { return yCenter - r * psiScale / Math.sqrt(maxProb + 1e-10); }
+  function yV(v) { return v > 200 ? pad.t : yCenter - Math.min(v * vScale, plotH * 0.9); }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, yCenter); ctx.lineTo(W - pad.r, yCenter); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.stroke();
+
+  // Potential (filled)
+  ctx.fillStyle = 'rgba(196,124,0,0.10)';
+  ctx.beginPath();
+  ctx.moveTo(pad.l, yCenter);
+  for (let i = 0; i < TDSE_N; i++) {
+    if (tdseV_arr[i] < 200) ctx.lineTo(xS(i), yV(tdseV_arr[i]));
+    else ctx.lineTo(xS(i), yCenter);
+  }
+  ctx.lineTo(W - pad.r, yCenter);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#c47c00';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  let first = true;
+  for (let i = 0; i < TDSE_N; i++) {
+    const y = tdseV_arr[i] < 200 ? yV(tdseV_arr[i]) : yCenter;
+    first ? ctx.moveTo(xS(i), y) : ctx.lineTo(xS(i), y);
+    first = false;
+  }
+  ctx.stroke();
+
+  // Im[ψ]
+  ctx.strokeStyle = '#5b47d6';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  first = true;
+  for (let i = 0; i < TDSE_N; i++) {
+    const y = yR(tdsePsiIm[i]);
+    first ? ctx.moveTo(xS(i), y) : ctx.lineTo(xS(i), y);
+    first = false;
+  }
+  ctx.stroke();
+
+  // Re[ψ]
+  ctx.strokeStyle = '#1a6fcc';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  first = true;
+  for (let i = 0; i < TDSE_N; i++) {
+    const y = yR(tdsePsiRe[i]);
+    first ? ctx.moveTo(xS(i), y) : ctx.lineTo(xS(i), y);
+    first = false;
+  }
+  ctx.stroke();
+
+  // |ψ|² filled
+  ctx.fillStyle = 'rgba(14,153,102,0.12)';
+  ctx.beginPath();
+  ctx.moveTo(pad.l, yCenter);
+  for (let i = 0; i < TDSE_N; i++) ctx.lineTo(xS(i), yP(prob[i]));
+  ctx.lineTo(W - pad.r, yCenter);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#0e9966';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  first = true;
+  for (let i = 0; i < TDSE_N; i++) {
+    const y = yP(prob[i]);
+    first ? ctx.moveTo(xS(i), y) : ctx.lineTo(xS(i), y);
+    first = false;
+  }
+  ctx.stroke();
+
+  // <x> marker
+  const meanI = (meanX + TDSE_XMAX) / (2 * TDSE_XMAX) * TDSE_N;
+  ctx.strokeStyle = 'rgba(192,57,43,0.5)';
+  ctx.setLineDash([2, 3]);
+  ctx.beginPath(); ctx.moveTo(xS(meanI), pad.t); ctx.lineTo(xS(meanI), H - pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // X axis tick labels
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '9px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  [-15, -10, -5, 0, 5, 10, 15].forEach(v => {
+    const i = (v + TDSE_XMAX) / (2 * TDSE_XMAX) * TDSE_N;
+    ctx.fillText(v, xS(i), H - pad.b + 14);
+  });
+
+  // Stats
+  document.getElementById('tdseNorm').textContent = norm.toFixed(4);
+  document.getElementById('tdseTime').textContent = tdseTime.toFixed(2);
+  document.getElementById('tdseMeanX').textContent = meanX.toFixed(3);
+  document.getElementById('tdseMeanP').textContent = meanP.toFixed(3);
+}
+
+function toggleTDSE() {
+  tdseRunning = !tdseRunning;
+  const btn = document.getElementById('tdsePlayBtn');
+  if (tdseRunning) {
+    btn.textContent = '⏸ Pausa';
+    btn.classList.add('active-btn');
+    document.getElementById('tdseInfo').textContent = 'Simulazione in corso...';
+    animateTDSE();
+  } else {
+    btn.textContent = '▶ Play';
+    btn.classList.remove('active-btn');
+    if (tdseAnimId) cancelAnimationFrame(tdseAnimId);
+    document.getElementById('tdseInfo').textContent = 'Simulazione in pausa.';
+  }
+}
+
+function animateTDSE() {
+  if (!tdseRunning) return;
+  const speed = parseInt(document.getElementById('tdseSpeed').value);
+  for (let s = 0; s < speed * 3; s++) stepTDSEOnce();
+  drawTDSE();
+  tdseAnimId = requestAnimationFrame(animateTDSE);
+}
+
+function resizeTDSE() {
+  const canvas = document.getElementById('tdseCanvas');
+  if (canvas) resizeCanvas(canvas);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  updateWell();
+});
+
+window.addEventListener('resize', () => {
+  const active = document.querySelector('.tab.active');
+  if (!active) return;
+  const id = active.id;
+  if (id === 'tab-well') updateWell();
+  else if (id === 'tab-packet') updatePacket();
+  else if (id === 'tab-tunnel') updateTunnel();
+  else if (id === 'tab-tdse') { resizeTDSE(); drawTDSE(); }
+});
+</script>
+</body>
+</html>

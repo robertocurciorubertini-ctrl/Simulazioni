@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Relatività ristretta",
+  "description": "Studio degli effetti relativistici a velocità prossime a quella della luce, come dilatazione dei tempi e contrazione delle lunghezze.",
+  "category": "Relatività",
+  "icon": "⏱️",
+  "order": 1,
+  "tags": ["relatività ristretta", "dilatazione dei tempi", "contrazione delle lunghezze", "trasformazioni di Lorentz"],
+  "level": "avanzato"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatività Ristretta</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+
+<style>
+:root {
+  --bg:        #f5f0e8;
+  --surface:   #faf7f2;
+  --surface2:  #eee9df;
+  --border:    #d4cbbf;
+  --text:      #1a1610;
+  --muted:     #7a6e60;
+  --accent:    #b85c2a;
+  --accent2:   #2a6bb8;
+  --accent3:   #2a8f5a;
+  --mono:      'IBM Plex Mono', monospace;
+  --sans:      'IBM Plex Sans', sans-serif;
+  --serif:     'EB Garamond', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ─── HEADER ─────────────────────────────────────────────── */
+header {
+  background: var(--text);
+  color: var(--bg);
+  padding: 28px 40px 24px;
+  border-bottom: 3px solid var(--accent);
+}
+header h1 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+header p {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: #b8a89a;
+  margin-top: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ─── TABS ────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  background: var(--surface2);
+  border-bottom: 2px solid var(--border);
+  padding: 0 40px;
+  gap: 0;
+  overflow-x: auto;
+}
+.tab-btn {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 14px 22px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ─── PANELS ──────────────────────────────────────────────── */
+.panel { display: none; padding: 36px 40px 50px; max-width: 960px; margin: 0 auto; }
+.panel.active { display: block; }
+
+.panel h2 {
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.panel .subtitle {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.panel p { margin-bottom: 14px; color: #2e2820; }
+
+/* formula box */
+.formula-box {
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  border-radius: 2px;
+  padding: 16px 22px;
+  margin: 20px 0;
+  font-size: 1.1rem;
+}
+
+/* slider controls */
+.controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin: 22px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.ctrl-row label {
+  font-family: var(--sans);
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-width: 120px;
+}
+.ctrl-row input[type=range] {
+  flex: 1;
+  min-width: 200px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.ctrl-row .val {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  min-width: 90px;
+  text-align: right;
+  color: var(--accent);
+}
+
+/* canvas wrapper */
+.canvas-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+canvas { display: block; width: 100%; }
+
+/* readout grid */
+.readout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+.readout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 18px;
+}
+.readout .label {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.readout .value {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* note box */
+.note {
+  background: #eef4ff;
+  border-left: 4px solid var(--accent2);
+  border-radius: 2px;
+  padding: 13px 18px;
+  margin: 16px 0;
+  font-family: var(--sans);
+  font-size: 0.87rem;
+  color: #1a2a4a;
+}
+
+/* playback btn */
+.btn {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 9px 22px;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.btn:hover { background: var(--accent); color: #fff; }
+.btn.playing { background: var(--accent); color: #fff; }
+
+/* Minkowski legend */
+.legend {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin: 10px 0 18px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Relatività Ristretta</h1>
+  <p>Simulazione interattiva — Liceo Scientifico · Quinta classe</p>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">① Dilatazione del Tempo</button>
+  <button class="tab-btn" onclick="switchTab(1)">② Contrazione delle Lunghezze</button>
+  <button class="tab-btn" onclick="switchTab(2)">③ Simultaneità Relativa</button>
+  <button class="tab-btn" onclick="switchTab(3)">④ Diagramma di Minkowski</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 1 — DILATAZIONE DEL TEMPO
+══════════════════════════════════════════════════════════ -->
+<div class="panel active" id="tab0">
+  <p class="subtitle">Fenomeno I</p>
+  <h2>Dilatazione del Tempo</h2>
+
+  <p>Secondo la relatività ristretta di Einstein, il tempo non scorre in modo assoluto: dipende dallo stato di moto dell'osservatore. Un orologio in moto rispetto a un osservatore a riposo <em>segna meno tempo</em> di quanto l'orologio fermo dello stesso osservatore indica. Questo effetto prende il nome di <strong>dilatazione del tempo</strong> (<em>time dilation</em>).</p>
+
+  <p>Il ragionamento si basa sull'<em>orologio a luce</em>: un fotone rimbalza verticalmente tra due specchi. Per l'osservatore sul razzo il percorso è puramente verticale; per l'osservatore a terra il fotone percorre una traiettoria a zigzag, quindi copre una distanza maggiore — ma la velocità della luce è sempre la stessa $c$. Dunque il periodo dell'orologio in moto risulta più lungo.</p>
+
+  <div class="formula-box">
+    $$\Delta t' = \gamma \, \Delta t_0 \qquad \text{con} \qquad \gamma = \frac{1}{\sqrt{1 - \beta^2}}, \quad \beta = \frac{v}{c}$$
+  </div>
+
+  <p>$\Delta t_0$ è il <strong>tempo proprio</strong> (misurato sull'orologio in moto), $\Delta t'$ è il tempo misurato dall'osservatore a riposo, e $\gamma \geq 1$ è il <strong>fattore di Lorentz</strong>.</p>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <label>Velocità $v/c$</label>
+      <input type="range" id="s1-beta" min="0" max="0.999" step="0.001" value="0.6"
+        oninput="updateTab1()">
+      <span class="val" id="s1-beta-val">0.600 c</span>
+    </div>
+    <div class="ctrl-row" style="gap:10px">
+      <button class="btn" id="s1-playbtn" onclick="togglePlay1()">▶ Avvia animazione</button>
+    </div>
+  </div>
+
+  <div class="readout-grid">
+    <div class="readout"><div class="label">$\beta = v/c$</div><div class="value" id="r1-beta">0.600</div></div>
+    <div class="readout"><div class="label">Fattore di Lorentz $\gamma$</div><div class="value" id="r1-gamma">1.250</div></div>
+    <div class="readout"><div class="label">Tempo proprio $\Delta t_0$</div><div class="value" id="r1-t0">— s</div></div>
+    <div class="readout"><div class="label">Tempo dilatato $\Delta t'$</div><div class="value" id="r1-tp">— s</div></div>
+  </div>
+
+  <div class="canvas-wrap"><canvas id="c1" height="260"></canvas></div>
+
+  <div class="note">
+    <strong>Esempio reale:</strong> I muoni ($\mu^-$) prodotti dai raggi cosmici nell'alta atmosfera (~15 km) hanno vita media a riposo di circa 2.2 µs: classicamente percorrerebbero solo ~660 m prima di decadere. Invece li osserviamo in abbondanza a livello del suolo — perché nel loro riferimento vivono 2.2 µs, ma nel riferimento della Terra la loro vita dura molto di più grazie alla dilatazione del tempo. Questo è uno dei test sperimentali più netti della relatività ristretta.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 2 — CONTRAZIONE DELLE LUNGHEZZE
+══════════════════════════════════════════════════════════ -->
+<div class="panel" id="tab1">
+  <p class="subtitle">Fenomeno II</p>
+  <h2>Contrazione delle Lunghezze</h2>
+
+  <p>Complementare alla dilatazione del tempo è la <strong>contrazione di Lorentz</strong>: un oggetto in moto risulta più corto — nella sola direzione del moto — rispetto alle sue dimensioni misurate a riposo. Le dimensioni trasversali non subiscono alcuna variazione.</p>
+
+  <p>La contrazione nasce dal fatto che misurare la lunghezza di un oggetto in moto richiede di rilevare simultaneamente le posizioni dei suoi estremi — ma la simultaneità è relativa al sistema di riferimento. I due osservatori non concordano su quali eventi siano "contemporanei", e quindi ottengono lunghezze diverse.</p>
+
+  <div class="formula-box">
+    $$L = \frac{L_0}{\gamma} = L_0 \sqrt{1 - \beta^2}$$
+  </div>
+
+  <p>$L_0$ è la <strong>lunghezza propria</strong> (misurata nel riferimento in cui l'oggetto è a riposo), $L$ è la lunghezza misurata dall'osservatore rispetto al quale l'oggetto si muove. Poiché $\gamma \geq 1$, si ha sempre $L \leq L_0$.</p>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <label>Velocità $v/c$</label>
+      <input type="range" id="s2-beta" min="0" max="0.999" step="0.001" value="0.5"
+        oninput="updateTab2()">
+      <span class="val" id="s2-beta-val">0.500 c</span>
+    </div>
+    <div class="ctrl-row">
+      <label>Lunghezza propria $L_0$</label>
+      <input type="range" id="s2-L0" min="50" max="300" step="10" value="200"
+        oninput="updateTab2()">
+      <span class="val" id="s2-L0-val">200 m</span>
+    </div>
+    <div class="ctrl-row">
+      <button class="btn" id="s2-playbtn" onclick="togglePlay2()">▶ Avvia animazione</button>
+    </div>
+  </div>
+
+  <div class="readout-grid">
+    <div class="readout"><div class="label">$\gamma$</div><div class="value" id="r2-gamma">1.155</div></div>
+    <div class="readout"><div class="label">Lunghezza propria $L_0$</div><div class="value" id="r2-L0">200 m</div></div>
+    <div class="readout"><div class="label">Lunghezza contratta $L$</div><div class="value" id="r2-L">173 m</div></div>
+    <div class="readout"><div class="label">Contrazione $L/L_0$</div><div class="value" id="r2-ratio">0.866</div></div>
+  </div>
+
+  <div class="canvas-wrap"><canvas id="c2" height="260"></canvas></div>
+
+  <div class="note">
+    <strong>Attenzione:</strong> la contrazione di Lorentz non è un'illusione ottica né un effetto di compressione meccanica — è una proprietà geometrica dello spaziotempo. L'oggetto non "sente" nulla: è il confronto tra misure in riferimenti diversi che produce lunghezze diverse.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 3 — SIMULTANEITÀ RELATIVA
+══════════════════════════════════════════════════════════ -->
+<div class="panel" id="tab2">
+  <p class="subtitle">Fenomeno III</p>
+  <h2>Simultaneità Relativa</h2>
+
+  <p>Nella fisica classica la simultaneità è assoluta: se due eventi accadono nello stesso istante per un osservatore, lo sono per tutti. La relatività ristretta rompe questa intuizione: <strong>due eventi simultanei in un sistema di riferimento non sono simultanei in un altro in moto relativo</strong>.</p>
+
+  <p>Il classico esperimento mentale è quello del <em>treno di Einstein</em>: due fulmini colpiscono simultaneamente le estremità di un treno in moto, secondo un osservatore sul binario. Un passeggero al centro del treno si muove verso il fronte — quindi incontra prima la luce proveniente dal fulmine anteriore e conclude che quel fulmine è caduto <em>prima</em>.</p>
+
+  <div class="formula-box">
+    $$\Delta t' = \gamma \!\left(\Delta t - \frac{v \,\Delta x}{c^2}\right)$$
+  </div>
+
+  <p>Questa è la trasformazione di Lorentz per gli intervalli di tempo. Se i due eventi sono simultanei nel riferimento a terra ($\Delta t = 0$) ma separati spazialmente ($\Delta x \neq 0$), allora $\Delta t' \neq 0$: nel riferimento del treno non sono simultanei. Lo sfasamento temporale vale $\Delta t' = -\gamma v \Delta x / c^2$.</p>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <label>Velocità $v/c$</label>
+      <input type="range" id="s3-beta" min="0.01" max="0.98" step="0.01" value="0.6"
+        oninput="updateTab3()">
+      <span class="val" id="s3-beta-val">0.60 c</span>
+    </div>
+    <div class="ctrl-row">
+      <button class="btn" id="s3-playbtn" onclick="togglePlay3()">▶ Avvia animazione</button>
+      <button class="btn" style="margin-left:8px" onclick="resetAnim3()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="readout-grid">
+    <div class="readout"><div class="label">$\gamma$</div><div class="value" id="r3-gamma">1.25</div></div>
+    <div class="readout"><div class="label">Sfasamento $\Delta t'$</div><div class="value" id="r3-dt">— s</div></div>
+    <div class="readout"><div class="label">Evento A (terra)</div><div class="value" id="r3-evA">t=0</div></div>
+    <div class="readout"><div class="label">Evento B (terra)</div><div class="value" id="r3-evB">t=0</div></div>
+  </div>
+
+  <div class="canvas-wrap"><canvas id="c3" height="300"></canvas></div>
+
+  <div class="note">
+    <strong>Nota fondamentale:</strong> la simultaneità relativa non viola la causalità. Due eventi possono avere ordine temporale invertito in riferimenti diversi <em>solo se</em> sono separati da un intervallo di tipo spazio (cioè nessun segnale fisico può connetterli). Per eventi causalmente connessi (tipo tempo), l'ordine è assoluto.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 4 — DIAGRAMMA DI MINKOWSKI
+══════════════════════════════════════════════════════════ -->
+<div class="panel" id="tab3">
+  <p class="subtitle">Fenomeno IV</p>
+  <h2>Diagramma di Minkowski</h2>
+
+  <p>Il <strong>diagramma spaziotemporale di Minkowski</strong> rappresenta gli eventi come punti in uno spazio bidimensionale con assi $x$ (posizione) e $ct$ (tempo moltiplicato per $c$, così da avere dimensioni omogenee). In questo piano ogni oggetto descrive una <em>linea d'universo</em> (worldline): una retta verticale se è a riposo, una retta inclinata se si muove a velocità costante.</p>
+
+  <p>La luce percorre sempre rette a 45° (poiché $x = ct \Rightarrow x/ct = 1$). Il <strong>cono luce</strong> divide lo spaziotempo in tre regioni: il futuro causale ($ct > |x|$), il passato causale ($ct < -|x|$) e la regione di tipo spazio (fuori dal cono), raggiungibile solo a velocità superluminale — quindi inaccessibile.</p>
+
+  <div class="formula-box">
+    $$s^2 = (c\,\Delta t)^2 - (\Delta x)^2$$
+  </div>
+
+  <p>$s^2$ è l'<strong>intervallo spaziotemporale</strong>, invariante per tutte le trasformazioni di Lorentz. Se $s^2 > 0$: tipo tempo (causalmente connesso); se $s^2 = 0$: tipo luce; se $s^2 < 0$: tipo spazio (non causalmente connesso).</p>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <label>Velocità osservatore $v/c$</label>
+      <input type="range" id="s4-beta" min="-0.9" max="0.9" step="0.01" value="0.5"
+        oninput="updateTab4()">
+      <span class="val" id="s4-beta-val">0.50 c</span>
+    </div>
+    <div class="ctrl-row">
+      <label>Mostra assi S'</label>
+      <input type="checkbox" id="s4-showprime" checked onchange="updateTab4()">
+      &nbsp;<span style="font-family:var(--sans);font-size:0.85rem">Sistema di riferimento in moto $S'$</span>
+    </div>
+    <div class="ctrl-row">
+      <label>Mostra cono luce</label>
+      <input type="checkbox" id="s4-showcone" checked onchange="updateTab4()">
+      &nbsp;<span style="font-family:var(--sans);font-size:0.85rem">Cono luce (45°)</span>
+    </div>
+    <div class="ctrl-row">
+      <label>Mostra evento P</label>
+      <input type="checkbox" id="s4-showevent" checked onchange="updateTab4()">
+      &nbsp;<span style="font-family:var(--sans);font-size:0.85rem">Evento P e sue coordinate in S e S'</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#1a1610;width:24px"></div> Assi S (a riposo)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent);width:24px"></div> Assi S' (in moto)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent2);width:24px"></div> Cono luce</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent3);width:24px;height:14px;border-radius:50%"></div> Evento P</div>
+  </div>
+
+  <div class="canvas-wrap"><canvas id="c4" height="500"></canvas></div>
+
+  <div class="readout-grid">
+    <div class="readout"><div class="label">$\gamma$</div><div class="value" id="r4-gamma">1.155</div></div>
+    <div class="readout"><div class="label">Angolo assi S' con S</div><div class="value" id="r4-angle">26.6°</div></div>
+    <div class="readout"><div class="label">$x_P$ in S</div><div class="value" id="r4-xp">—</div></div>
+    <div class="readout"><div class="label">$ct_P$ in S</div><div class="value" id="r4-tp">—</div></div>
+    <div class="readout"><div class="label">$x'_P$ in S'</div><div class="value" id="r4-xpp">—</div></div>
+    <div class="readout"><div class="label">$ct'_P$ in S'</div><div class="value" id="r4-tpp">—</div></div>
+  </div>
+
+  <div class="note">
+    <strong>Come leggere il diagramma:</strong> trascinando lo slider cambia la velocità del sistema $S'$ rispetto a $S$. Gli assi di $S'$ si "chiudono" verso la bisettrice a 45° (la luce) al crescere di $v$. La chiave è che le scale sugli assi di $S'$ cambiano (si allungano per $\gamma$), in modo che la luce abbia sempre la stessa velocità in entrambi i sistemi.
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   UTILITÀ GENERALI
+═══════════════════════════════════════════════════════════ */
+function gamma(b){ return 1/Math.sqrt(1-b*b); }
+
+function switchTab(i){
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  if(i===3) updateTab4();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 1 — DILATAZIONE DEL TEMPO
+═══════════════════════════════════════════════════════════ */
+const c1 = document.getElementById('c1');
+const ctx1 = c1.getContext('2d');
+let anim1 = null, t1 = 0, playing1 = false;
+
+function updateTab1(){
+  const beta = parseFloat(document.getElementById('s1-beta').value);
+  const g = gamma(beta);
+  document.getElementById('s1-beta-val').textContent = beta.toFixed(3)+' c';
+  document.getElementById('r1-beta').textContent = beta.toFixed(3);
+  document.getElementById('r1-gamma').textContent = g.toFixed(4);
+  const t0_ex = 1.00;
+  document.getElementById('r1-t0').textContent = t0_ex.toFixed(3)+' s';
+  document.getElementById('r1-tp').textContent = (g*t0_ex).toFixed(4)+' s';
+  drawTab1(beta, g, t1);
+}
+
+function drawTab1(beta, g, t){
+  const W = c1.offsetWidth; c1.width = W; c1.height = 260;
+  const H = 260;
+  ctx1.clearRect(0,0,W,H);
+
+  // sfondo
+  ctx1.fillStyle = '#faf7f2'; ctx1.fillRect(0,0,W,H);
+
+  // --- Orologio a riposo (sinistra) ---
+  const cx0 = W*0.22, cy0 = H*0.5, R = 54;
+  drawClock(ctx1, cx0, cy0, R, t, 1, '#1a1610', 'A riposo (S)');
+
+  // --- Orologio in moto (destra) ---
+  const cx1_ = W*0.7, cy1_ = H*0.5;
+  drawClock(ctx1, cx1_, cy1_, R, t, g, '#b85c2a', `In moto (v=${beta.toFixed(2)}c)`);
+
+  // freccia moto
+  ctx1.save();
+  ctx1.strokeStyle = '#b85c2a';
+  ctx1.lineWidth = 2;
+  ctx1.setLineDash([5,4]);
+  const ax = cx1_-70, bx = cx1_+70, ay = H*0.88;
+  ctx1.beginPath(); ctx1.moveTo(ax,ay); ctx1.lineTo(bx,ay); ctx1.stroke();
+  ctx1.setLineDash([]);
+  ctx1.fillStyle = '#b85c2a';
+  ctx1.beginPath(); ctx1.moveTo(bx,ay); ctx1.lineTo(bx-10,ay-5); ctx1.lineTo(bx-10,ay+5); ctx1.closePath(); ctx1.fill();
+  ctx1.font = '13px IBM Plex Sans'; ctx1.fillStyle='#b85c2a'; ctx1.textAlign='center';
+  ctx1.fillText('→ v', cx1_, ay+18);
+  ctx1.restore();
+
+  // confronto testuale
+  const t0_shown = (t % (2*Math.PI)) / (2*Math.PI);
+  const tp_shown = t0_shown / g;
+  ctx1.font = '13px IBM Plex Mono'; ctx1.fillStyle='#7a6e60'; ctx1.textAlign='center';
+  ctx1.fillText(`Δt₀ = ${(t0_shown).toFixed(3)} (u.a.)`, cx0, H-14);
+  ctx1.fillText(`Δt' = ${(t0_shown/g).toFixed(3)} (u.a.)`, cx1_, H-14);
+}
+
+function drawClock(ctx, cx, cy, R, t, g_factor, color, label){
+  // disco
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI);
+  ctx.fillStyle='#fff'; ctx.fill();
+  ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke();
+
+  // tacche
+  for(let i=0;i<12;i++){
+    const a=i*Math.PI/6;
+    const r0=R-7, r1=R-2;
+    ctx.beginPath();
+    ctx.moveTo(cx+r0*Math.cos(a), cy+r0*Math.sin(a));
+    ctx.lineTo(cx+r1*Math.cos(a), cy+r1*Math.sin(a));
+    ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke();
+  }
+
+  // lancetta — angolo dipende da t/gamma
+  const angle = (t / g_factor) - Math.PI/2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + (R-14)*Math.cos(angle), cy + (R-14)*Math.sin(angle));
+  ctx.strokeStyle=color; ctx.lineWidth=3; ctx.lineCap='round'; ctx.stroke();
+
+  // label
+  ctx.font = '500 13px IBM Plex Sans';
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.fillText(label, cx, cy - R - 10);
+
+  ctx.restore();
+}
+
+function togglePlay1(){
+  playing1 = !playing1;
+  const btn = document.getElementById('s1-playbtn');
+  btn.textContent = playing1 ? '⏸ Pausa' : '▶ Avvia animazione';
+  btn.classList.toggle('playing', playing1);
+  if(playing1) loopTab1();
+}
+
+function loopTab1(){
+  if(!playing1) return;
+  const beta = parseFloat(document.getElementById('s1-beta').value);
+  const g = gamma(beta);
+  t1 += 0.018;
+  drawTab1(beta, g, t1);
+  requestAnimationFrame(loopTab1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 2 — CONTRAZIONE DELLE LUNGHEZZE
+═══════════════════════════════════════════════════════════ */
+const c2 = document.getElementById('c2');
+const ctx2 = c2.getContext('2d');
+let playing2 = false, tx2 = 0;
+
+function updateTab2(){
+  const beta = parseFloat(document.getElementById('s2-beta').value);
+  const L0 = parseFloat(document.getElementById('s2-L0').value);
+  const g = gamma(beta);
+  const L = L0/g;
+  document.getElementById('s2-beta-val').textContent = beta.toFixed(3)+' c';
+  document.getElementById('s2-L0-val').textContent = L0.toFixed(0)+' m';
+  document.getElementById('r2-gamma').textContent = g.toFixed(4);
+  document.getElementById('r2-L0').textContent = L0.toFixed(0)+' m';
+  document.getElementById('r2-L').textContent = L.toFixed(2)+' m';
+  document.getElementById('r2-ratio').textContent = (L/L0).toFixed(4);
+  drawTab2(beta, L0, g, tx2);
+}
+
+function drawTab2(beta, L0px_input, g, tx){
+  const W = c2.offsetWidth; c2.width = W; c2.height = 260;
+  const H = 260;
+  ctx2.clearRect(0,0,W,H);
+  ctx2.fillStyle='#faf7f2'; ctx2.fillRect(0,0,W,H);
+
+  const maxBarW = W * 0.55;
+  const L0bar = maxBarW * (L0px_input/300);
+  const Lbar = L0bar / g;
+  const barH = 36;
+  const trackH = 40;
+
+  // ---- RIGA SUPERIORE: sistema a riposo ---
+  const y1 = H*0.3;
+  ctx2.font = '500 13px IBM Plex Sans';
+  ctx2.fillStyle = '#7a6e60'; ctx2.textAlign='left';
+  ctx2.fillText('Sistema S (a riposo con l\'oggetto): lunghezza propria L₀', 20, y1-14);
+
+  // barra L0
+  const x1 = (W - L0bar)/2;
+  ctx2.fillStyle = '#dde8ff';
+  ctx2.fillRect(x1, y1, L0bar, barH);
+  ctx2.strokeStyle = var2str('--accent2'); ctx2.lineWidth=2;
+  ctx2.strokeRect(x1, y1, L0bar, barH);
+  // frecce estremità
+  drawBrace(ctx2, x1, y1+barH+8, L0bar, '#2a6bb8');
+  ctx2.font='13px IBM Plex Mono'; ctx2.fillStyle='#2a6bb8'; ctx2.textAlign='center';
+  ctx2.fillText(`L₀ = ${document.getElementById('s2-L0').value} m`, x1+L0bar/2, y1+barH+30);
+
+  // ---- RIGA INFERIORE: sistema in moto ---
+  const y2 = H*0.67;
+  ctx2.font = '500 13px IBM Plex Sans';
+  ctx2.fillStyle = '#7a6e60'; ctx2.textAlign='left';
+  ctx2.fillText(`Sistema S' (osservatore a terra): lunghezza contratta L`, 20, y2-14);
+
+  // barra L contratta — con animazione posizione se in moto
+  const xOffset = tx % (W + Lbar + 40) - Lbar - 20;
+  const x2 = (W - Lbar)/2;
+  ctx2.fillStyle = '#fde8dd';
+  ctx2.fillRect(x2, y2, Lbar, barH);
+  ctx2.strokeStyle = '#b85c2a'; ctx2.lineWidth=2;
+  ctx2.strokeRect(x2, y2, Lbar, barH);
+  drawBrace(ctx2, x2, y2+barH+8, Lbar, '#b85c2a');
+  ctx2.font='13px IBM Plex Mono'; ctx2.fillStyle='#b85c2a'; ctx2.textAlign='center';
+  ctx2.fillText(`L = ${(L0px_input/g).toFixed(1)} m`, x2+Lbar/2, y2+barH+30);
+
+  // freccia velocità
+  ctx2.fillStyle='#b85c2a'; ctx2.font='13px IBM Plex Sans'; ctx2.textAlign='center';
+  ctx2.fillText(`→ v = ${beta.toFixed(2)}c`, W/2, y2+barH+52);
+}
+
+function var2str(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function drawBrace(ctx, x, y, w, color){
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w,y); ctx.lineTo(x+w,y+8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y+4); ctx.lineTo(x+w,y+4); ctx.stroke();
+  ctx.restore();
+}
+
+function togglePlay2(){
+  playing2=!playing2;
+  const btn=document.getElementById('s2-playbtn');
+  btn.textContent=playing2?'⏸ Pausa':'▶ Avvia animazione';
+  btn.classList.toggle('playing',playing2);
+  if(playing2) loopTab2();
+}
+function loopTab2(){
+  if(!playing2) return;
+  const beta=parseFloat(document.getElementById('s2-beta').value);
+  const L0=parseFloat(document.getElementById('s2-L0').value);
+  const g=gamma(beta);
+  tx2+=beta*2.5+0.5;
+  drawTab2(beta,L0,g,tx2);
+  requestAnimationFrame(loopTab2);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 3 — SIMULTANEITÀ RELATIVA
+═══════════════════════════════════════════════════════════ */
+const c3=document.getElementById('c3');
+const ctx3=c3.getContext('2d');
+let playing3=false, t3=0, resetNeeded3=false;
+
+function updateTab3(){
+  const beta=parseFloat(document.getElementById('s3-beta').value);
+  const g=gamma(beta);
+  document.getElementById('s3-beta-val').textContent=beta.toFixed(2)+' c';
+  document.getElementById('r3-gamma').textContent=g.toFixed(3);
+  // dx = lunghezza treno (in unità relative)
+  const dx=300; // m
+  const dt_prime = g*beta*dx/(3e8);
+  document.getElementById('r3-dt').textContent=(dt_prime*1e6).toFixed(2)+' µs';
+  drawTab3(beta,g,t3);
+}
+
+function drawTab3(beta,g,phase){
+  const W=c3.offsetWidth; c3.width=W; c3.height=300;
+  const H=300;
+  ctx3.clearRect(0,0,W,H);
+  ctx3.fillStyle='#faf7f2'; ctx3.fillRect(0,0,W,H);
+
+  // Treno
+  const trainW=W*0.55, trainH=52;
+  const trainX=(W-trainW)/2 + (phase % (W*0.3)) - W*0.15;
+  const trainY=H*0.22;
+
+  // corpo treno
+  ctx3.save();
+  ctx3.fillStyle='#e8ddd0';
+  ctx3.strokeStyle='#7a6e60'; ctx3.lineWidth=2;
+  roundRect(ctx3, trainX, trainY, trainW, trainH, 8);
+  ctx3.fill(); ctx3.stroke();
+
+  // finestrini
+  for(let i=0;i<4;i++){
+    const fx=trainX+20+i*(trainW-60)/3;
+    ctx3.fillStyle='#c8e0ff';
+    ctx3.fillRect(fx, trainY+10, 28, 20);
+    ctx3.strokeStyle='#7a9abf'; ctx3.lineWidth=1;
+    ctx3.strokeRect(fx, trainY+10, 28, 20);
+  }
+
+  // passeggero al centro
+  const px=trainX+trainW/2;
+  drawPerson(ctx3, px, trainY+trainH, '#b85c2a', 'Passeggero');
+
+  // binario
+  const railY=trainY+trainH+34;
+  ctx3.strokeStyle='#7a6e60'; ctx3.lineWidth=3;
+  ctx3.beginPath(); ctx3.moveTo(0,railY); ctx3.lineTo(W,railY); ctx3.stroke();
+
+  // osservatore a terra
+  drawPerson(ctx3, W/2, railY, '#2a6bb8', 'Osservatore\na terra');
+
+  // ─── FULMINI e onde luce ───
+  const evtA_x=trainX;      // estremo sinistro treno
+  const evtB_x=trainX+trainW; // estremo destro treno
+  const evtY=trainY-10;
+
+  // Solo se la fase è avanzata mostriamo i flash
+  const showFlash = phase > 10;
+  const lightPhase = Math.max(0, phase-10);
+
+  if(showFlash){
+    // Lampo A (sinistra) – luce si espande verso destra
+    const rA=lightPhase*3.5;
+    drawLightRing(ctx3, evtA_x, evtY, rA, '#f5a623');
+    // Lampo B (destra) – luce si espande verso sinistra
+    const rB=lightPhase*3.5;
+    drawLightRing(ctx3, evtB_x, evtY, rB, '#e55');
+
+    // fulmine grafico
+    drawBolt(ctx3, evtA_x, evtY-30, '#f5a623');
+    drawBolt(ctx3, evtB_x, evtY-30, '#e55');
+
+    // Testo eventi
+    ctx3.font='12px IBM Plex Mono'; ctx3.textAlign='center';
+    ctx3.fillStyle='#f5a623';
+    ctx3.fillText('Evento A', evtA_x, evtY-46);
+    ctx3.fillStyle='#e55';
+    ctx3.fillText('Evento B', evtB_x, evtY-46);
+
+    // Distanza della luce A dal passeggero e dalla luce B
+    const distA=Math.abs(px-evtA_x);
+    const distB=Math.abs(px-evtB_x);
+    const reached_A = rA >= distA;
+    const reached_B = rB >= distB;
+
+    ctx3.font='500 12px IBM Plex Sans'; ctx3.textAlign='center';
+    if(!reached_A && !reached_B){
+      ctx3.fillStyle='#888';
+      ctx3.fillText('La luce viaggia verso il passeggero...', W/2, H-10);
+    } else if(reached_B && !reached_A){
+      ctx3.fillStyle='#b85c2a';
+      ctx3.fillText('Il passeggero vede prima la luce da B → B è avvenuto prima (per lui)', W/2, H-10);
+    } else if(reached_A && !reached_B){
+      ctx3.fillStyle='#b85c2a';
+      ctx3.fillText('Il passeggero vede prima la luce da A → A è avvenuto prima (per lui)', W/2, H-10);
+    } else {
+      ctx3.fillStyle='#2a8f5a';
+      ctx3.fillText('Per l\'osservatore a terra: A e B simultanei. Per il passeggero: B prima!', W/2, H-10);
+    }
+  } else {
+    ctx3.font='13px IBM Plex Sans'; ctx3.fillStyle='#7a6e60'; ctx3.textAlign='center';
+    ctx3.fillText('Premi ▶ per avviare. Il treno si muove → v. I fulmini colpiscono le estremità simultaneamente (per S).', W/2, H-10);
+  }
+
+  // velocità label
+  ctx3.font='12px IBM Plex Mono'; ctx3.fillStyle='#b85c2a'; ctx3.textAlign='left';
+  ctx3.fillText(`v = ${beta.toFixed(2)}c  →`, trainX+8, trainY+trainH/2+5);
+}
+
+function drawLightRing(ctx,x,y,r,col){
+  if(r<=0) return;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI);
+  ctx.strokeStyle=col; ctx.lineWidth=2; ctx.globalAlpha=Math.max(0,1-r/200);
+  ctx.stroke(); ctx.restore();
+}
+
+function drawBolt(ctx,x,y,col){
+  ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.moveTo(x,y); ctx.lineTo(x-6,y+14); ctx.lineTo(x+3,y+14); ctx.lineTo(x-4,y+28);
+  ctx.stroke(); ctx.restore();
+}
+
+function drawPerson(ctx,x,y,col,label){
+  ctx.save();
+  // testa
+  ctx.beginPath(); ctx.arc(x,y-22,7,0,2*Math.PI);
+  ctx.fillStyle=col; ctx.fill();
+  // corpo
+  ctx.strokeStyle=col; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(x,y-15); ctx.lineTo(x,y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x-8,y-8); ctx.lineTo(x+8,y-8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-6,y+14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+6,y+14); ctx.stroke();
+  // label
+  ctx.font='11px IBM Plex Sans'; ctx.fillStyle=col; ctx.textAlign='center';
+  const lines=label.split('\n');
+  lines.forEach((l,i)=>ctx.fillText(l,x,y+28+i*14));
+  ctx.restore();
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+function togglePlay3(){
+  playing3=!playing3;
+  const btn=document.getElementById('s3-playbtn');
+  btn.textContent=playing3?'⏸ Pausa':'▶ Avvia animazione';
+  btn.classList.toggle('playing',playing3);
+  if(playing3) loopTab3();
+}
+function resetAnim3(){ t3=0; playing3=false; document.getElementById('s3-playbtn').textContent='▶ Avvia animazione'; document.getElementById('s3-playbtn').classList.remove('playing'); updateTab3(); }
+function loopTab3(){
+  if(!playing3) return;
+  const beta=parseFloat(document.getElementById('s3-beta').value);
+  const g=gamma(beta);
+  t3+=beta*1.2+0.4;
+  // reset ciclico dopo completamento
+  if(t3 > 200) { t3=0; }
+  drawTab3(beta,g,t3);
+  requestAnimationFrame(loopTab3);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 4 — DIAGRAMMA DI MINKOWSKI
+═══════════════════════════════════════════════════════════ */
+const c4=document.getElementById('c4');
+const ctx4=c4.getContext('2d');
+
+// Evento P trascinabile
+let eventP={x:1.5,ct:2.5}; // in unità del diagramma
+let dragging4=false;
+
+c4.addEventListener('mousedown',e=>{ dragging4=true; moveEventP(e); });
+c4.addEventListener('mousemove',e=>{ if(dragging4){moveEventP(e);} });
+c4.addEventListener('mouseup',()=>dragging4=false);
+c4.addEventListener('mouseleave',()=>dragging4=false);
+c4.addEventListener('touchstart',e=>{dragging4=true;moveEventP(e.touches[0]);},{passive:true});
+c4.addEventListener('touchmove',e=>{if(dragging4)moveEventP(e.touches[0]);},{passive:true});
+c4.addEventListener('touchend',()=>dragging4=false);
+
+function moveEventP(e){
+  const show=document.getElementById('s4-showevent').checked; if(!show) return;
+  const rect=c4.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const scaleF=c4.width/c4.offsetWidth;
+  const {ox,oy,scale}=minkCoords();
+  eventP.x=(mx*scaleF-ox)/scale;
+  eventP.ct=-(my*scaleF-oy)/scale;
+  updateTab4();
+}
+
+function minkCoords(){
+  const W=c4.width, H=c4.height;
+  return {ox:W/2, oy:H*0.85, scale:Math.min(W,H)*0.14};
+}
+
+function updateTab4(){
+  const W=c4.offsetWidth; c4.width=W; c4.height=500;
+  const beta=parseFloat(document.getElementById('s4-beta').value);
+  const g=gamma(beta);
+  document.getElementById('s4-beta-val').textContent=(beta>=0?'+':'')+beta.toFixed(2)+' c';
+  document.getElementById('r4-gamma').textContent=g.toFixed(3);
+  const angleDeg=Math.atan(Math.abs(beta))*180/Math.PI;
+  document.getElementById('r4-angle').textContent=angleDeg.toFixed(1)+'°';
+
+  const showPrime=document.getElementById('s4-showprime').checked;
+  const showCone=document.getElementById('s4-showcone').checked;
+  const showEvent=document.getElementById('s4-showevent').checked;
+
+  const {ox,oy,scale}=minkCoords();
+
+  // Trasformazioni di Lorentz per l'evento P
+  const xP=eventP.x, ctP=eventP.ct;
+  const xPp=g*(xP-beta*ctP);
+  const ctPp=g*(ctP-beta*xP);
+  document.getElementById('r4-xp').textContent=xP.toFixed(2)+' u';
+  document.getElementById('r4-tp').textContent=ctP.toFixed(2)+' u';
+  document.getElementById('r4-xpp').textContent=xPp.toFixed(2)+' u';
+  document.getElementById('r4-tpp').textContent=ctPp.toFixed(2)+' u';
+
+  // Riempimento regioni cono luce
+  const H=c4.height;
+  ctx4.clearRect(0,0,W,H);
+  ctx4.fillStyle='#faf7f2'; ctx4.fillRect(0,0,W,H);
+
+  if(showCone){
+    // futuro (sopra)
+    ctx4.save();
+    ctx4.beginPath();
+    ctx4.moveTo(ox,oy);
+    ctx4.lineTo(0,oy-ox); ctx4.lineTo(0,0); ctx4.lineTo(W,0); ctx4.lineTo(W,oy-ox); // appross
+    // vero cono futuro
+    ctx4.moveTo(ox,oy); ctx4.lineTo(ox-oy,0); ctx4.lineTo(ox+oy+W,0);
+    ctx4.closePath();
+    ctx4.fillStyle='rgba(42,107,184,0.07)'; ctx4.fill();
+    // passato (sotto)
+    const remainH=H-oy;
+    ctx4.beginPath();
+    ctx4.moveTo(ox,oy);
+    ctx4.lineTo(ox-remainH,H); ctx4.lineTo(ox+remainH,H);
+    ctx4.closePath();
+    ctx4.fillStyle='rgba(42,107,184,0.05)'; ctx4.fill();
+    ctx4.restore();
+  }
+
+  // Griglia leggera
+  ctx4.save();
+  ctx4.strokeStyle='#e0d9ce'; ctx4.lineWidth=1;
+  for(let i=-8;i<=8;i++){
+    const gx=ox+i*scale, gy=oy-i*scale;
+    ctx4.beginPath(); ctx4.moveTo(gx,0); ctx4.lineTo(gx,H); ctx4.stroke();
+    ctx4.beginPath(); ctx4.moveTo(0,gy); ctx4.lineTo(W,gy); ctx4.stroke();
+  }
+  ctx4.restore();
+
+  // ─── CONO LUCE ───
+  if(showCone){
+    ctx4.save();
+    ctx4.strokeStyle='#2a6bb8'; ctx4.lineWidth=1.8; ctx4.setLineDash([6,4]);
+    // luce verso dx/alto
+    ctx4.beginPath(); ctx4.moveTo(ox,oy); ctx4.lineTo(ox+Math.min(W-ox,oy),oy-Math.min(W-ox,oy)); ctx4.stroke();
+    // luce verso sx/alto
+    ctx4.beginPath(); ctx4.moveTo(ox,oy); ctx4.lineTo(ox-Math.min(ox,oy),oy-Math.min(ox,oy)); ctx4.stroke();
+    // luce verso dx/basso
+    ctx4.beginPath(); ctx4.moveTo(ox,oy); ctx4.lineTo(ox+Math.min(W-ox,H-oy),oy+Math.min(W-ox,H-oy)); ctx4.stroke();
+    // luce verso sx/basso
+    ctx4.beginPath(); ctx4.moveTo(ox,oy); ctx4.lineTo(ox-Math.min(ox,H-oy),oy+Math.min(ox,H-oy)); ctx4.stroke();
+    ctx4.setLineDash([]);
+    // etichette luce
+    ctx4.font='12px IBM Plex Mono'; ctx4.fillStyle='#2a6bb8'; ctx4.textAlign='left';
+    ctx4.fillText('luce (x=ct)',ox+30,oy-38);
+    ctx4.restore();
+  }
+
+  // ─── ASSI S' (sistema in moto) ───
+  if(showPrime){
+    ctx4.save();
+    // asse x' : inclinazione beta rispetto all'asse x → pendenza beta in ct
+    // In Minkowski: t'=0 → ct = beta·x → slope in (x,ct): Δct/Δx = beta
+    const slopeXp=beta; // Δct/Δx per asse x'
+    // asse ct': inclinazione = 1/beta rispetto a x → Δct/Δx = 1/beta
+    // ct'=0 → x=beta·ct → Δct/Δx = 1/beta ... in realtà asse t': x=beta·ct → Δct/Δx = 1/beta
+    // Ma lo disegnamo come: worldline di x'=0 cioè x=v·t, cioè Δct/Δx=1/beta (se beta!=0)
+    const ext=Math.max(W,H)*1.5;
+
+    // asse x' (in rosso/accent)
+    const dx_xp=ext, dct_xp=slopeXp*ext;
+    ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=2;
+    ctx4.beginPath();
+    ctx4.moveTo(ox-dx_xp, oy+dct_xp); ctx4.lineTo(ox+dx_xp, oy-dct_xp);
+    ctx4.stroke();
+    // freccia e label
+    arrowHead(ctx4, ox+dx_xp*0.45, oy-dct_xp*0.45, Math.atan2(-dct_xp,dx_xp), '#b85c2a');
+    ctx4.font='600 13px IBM Plex Mono'; ctx4.fillStyle='#b85c2a'; ctx4.textAlign='center';
+    const lx=ox+scale*4.5, lct=-scale*4.5*slopeXp;
+    ctx4.fillText("x'", lx, oy+lct+16);
+
+    // asse ct' (worldline x'=0)
+    if(Math.abs(beta)>0.001){
+      const dct_ctp=ext, dx_ctp=beta*ext; // worldline: x=beta·ct → dx=beta·dct
+      ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=2;
+      ctx4.beginPath();
+      ctx4.moveTo(ox-dx_ctp, oy+dct_ctp); ctx4.lineTo(ox+dx_ctp, oy-dct_ctp);
+      ctx4.stroke();
+      arrowHead(ctx4, ox+dx_ctp*0.45, oy-dct_ctp*0.45, Math.atan2(-dct_ctp,dx_ctp), '#b85c2a');
+      ctx4.fillText("ct'", ox+dx_ctp*0.45+20, oy-dct_ctp*0.45-8);
+    } else {
+      // beta~0: ct' = ct (verticale)
+      ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=2;
+      ctx4.beginPath(); ctx4.moveTo(ox,0); ctx4.lineTo(ox,H); ctx4.stroke();
+      ctx4.fillText("ct'=ct", ox+14, oy-scale*4);
+    }
+    ctx4.restore();
+  }
+
+  // ─── ASSI S (sistema a riposo) ───
+  ctx4.save();
+  ctx4.strokeStyle='#1a1610'; ctx4.lineWidth=2.5;
+  // asse x
+  ctx4.beginPath(); ctx4.moveTo(0,oy); ctx4.lineTo(W,oy); ctx4.stroke();
+  arrowHead(ctx4, W-14, oy, 0, '#1a1610');
+  // asse ct
+  ctx4.beginPath(); ctx4.moveTo(ox,H); ctx4.lineTo(ox,0); ctx4.stroke();
+  arrowHead(ctx4, ox, 14, -Math.PI/2, '#1a1610');
+  // labels
+  ctx4.font='600 14px IBM Plex Mono'; ctx4.fillStyle='#1a1610'; ctx4.textAlign='center';
+  ctx4.fillText('x', W-24, oy-12);
+  ctx4.fillText('ct', ox+20, 20);
+  // tacche e numeri
+  ctx4.font='11px IBM Plex Mono'; ctx4.fillStyle='#7a6e60';
+  for(let i=-7;i<=7;i++){
+    if(i===0) continue;
+    const gx=ox+i*scale, gy=oy-i*scale;
+    ctx4.beginPath(); ctx4.moveTo(gx,oy-4); ctx4.lineTo(gx,oy+4); ctx4.strokeStyle='#1a1610'; ctx4.lineWidth=1.5; ctx4.stroke();
+    ctx4.beginPath(); ctx4.moveTo(ox-4,gy); ctx4.lineTo(ox+4,gy); ctx4.stroke();
+    if(i>0){
+      ctx4.textAlign='center'; ctx4.fillText(i,gx,oy+16);
+      ctx4.textAlign='right'; ctx4.fillText(i,ox-8,gy+4);
+    }
+  }
+  ctx4.restore();
+
+  // ─── WORLDLINE dell'osservatore S' (x=v·t) ───
+  if(showPrime){
+    ctx4.save();
+    ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=1.5; ctx4.setLineDash([4,4]);
+    // già disegnata sopra come asse ct'
+    ctx4.setLineDash([]); ctx4.restore();
+  }
+
+  // ─── EVENTO P ───
+  if(showEvent){
+    const pxCanvas=ox+eventP.x*scale;
+    const pyCanvas=oy-eventP.ct*scale;
+
+    // proiezioni su S
+    ctx4.save();
+    ctx4.strokeStyle='#2a8f5a'; ctx4.lineWidth=1.2; ctx4.setLineDash([4,3]);
+    ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(pxCanvas,oy); ctx4.stroke();
+    ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(ox,pyCanvas); ctx4.stroke();
+    ctx4.setLineDash([]); ctx4.restore();
+
+    // proiezioni su S' (se visibili)
+    if(showPrime && Math.abs(beta)>0.001){
+      // Coord di P in S': xPp, ctPp
+      // punto (xPp, 0) in S → canvas
+      const x_onXp_canvas=ox+xPp*scale;
+      const ct_onXp_canvas=oy-xPp*scale*beta; // asse x': ct=beta*x
+      // punto (0, ctPp) in S → canvas: world line x'=0 → x=beta*ct
+      const ct_onCtp=ctPp;
+      const x_onCtp_canvas=ox+ct_onCtp*scale*beta;
+      const y_onCtp_canvas=oy-ct_onCtp*scale;
+
+      ctx4.save();
+      ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=1.2; ctx4.setLineDash([3,3]); ctx4.globalAlpha=0.65;
+      ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(x_onXp_canvas,ct_onXp_canvas); ctx4.stroke();
+      ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(x_onCtp_canvas,y_onCtp_canvas); ctx4.stroke();
+      ctx4.setLineDash([]); ctx4.globalAlpha=1; ctx4.restore();
+    }
+
+    // pallino evento P
+    ctx4.save();
+    ctx4.beginPath(); ctx4.arc(pxCanvas,pyCanvas,9,0,2*Math.PI);
+    ctx4.fillStyle='#2a8f5a'; ctx4.fill();
+    ctx4.strokeStyle='#fff'; ctx4.lineWidth=2; ctx4.stroke();
+    ctx4.font='600 12px IBM Plex Mono'; ctx4.fillStyle='#2a8f5a'; ctx4.textAlign='left';
+    ctx4.fillText('P',pxCanvas+13,pyCanvas-5);
+    ctx4.restore();
+
+    // classificazione intervallo
+    const s2=eventP.ct*eventP.ct - eventP.x*eventP.x;
+    let tipo, colT;
+    if(Math.abs(s2)<0.05){tipo='Tipo luce (s²≈0)'; colT='#2a6bb8';}
+    else if(s2>0){tipo='Tipo tempo (s²>0)'; colT='#2a8f5a';}
+    else {tipo='Tipo spazio (s²<0)'; colT='#b85c2a';}
+    ctx4.font='500 12px IBM Plex Sans'; ctx4.fillStyle=colT; ctx4.textAlign='left';
+    ctx4.fillText(`P: s² = ${s2.toFixed(2)} → ${tipo}`, 14, H-14);
+
+    ctx4.font='11px IBM Plex Mono'; ctx4.fillStyle='#7a6e60'; ctx4.textAlign='right';
+    ctx4.fillText('↖ trascina P', W-10, H-14);
+  }
+}
+
+function arrowHead(ctx,x,y,angle,col){
+  ctx.save();
+  ctx.translate(x,y); ctx.rotate(angle);
+  ctx.fillStyle=col;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-10,-5); ctx.lineTo(-10,5); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+/* ─── INIT ─── */
+window.addEventListener('load', ()=>{
+  updateTab1();
+  updateTab2();
+  updateTab3();
+  updateTab4();
+});
+window.addEventListener('resize', ()=>{
+  updateTab1();
+  updateTab2();
+  updateTab3();
+  updateTab4();
+});
+</script>
+</body>
+</html>

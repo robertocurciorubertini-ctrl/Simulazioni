@@ -43,6 +43,22 @@
       "file": "elettro-magnetismo/elettrostatica.html"
     },
     {
+      "title": "Fluidodinamica",
+      "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
+      "category": "Fluidodinamica",
+      "icon": "🌊",
+      "order": 1,
+      "tags": [
+        "fluidi",
+        "Bernoulli",
+        "continuità",
+        "flusso",
+        "pressione"
+      ],
+      "level": "intermedio",
+      "file": "WIP/fluidodinamica.html"
+    },
+    {
       "title": "Gravità",
       "description": "Simulazione dell'interazione gravitazionale tra masse con visualizzazione delle forze e del moto risultante secondo la legge di gravitazione universale.",
       "category": "Gravitazione",
@@ -76,13 +92,44 @@
     },
     {
       "title": "Moto uniformemente accelerato",
-      "description": "Simulazione interattiva del moto uniformemente accelerato in una dimensione, con visualizzazione sincronizzata del moto dell’oggetto e dei grafici posizione-tempo e velocità-tempo. Include sia il caso lungo l’asse x sia il moto verticale sotto l’azione della gravità.",
+      "description": "Simulazione interattiva del moto uniformemente accelerato in una dimensione, con visualizzazione sincronizzata del moto dell’oggetto e dei grafici posizione-tempo e velocità-tempo.",
       "icon": "📈",
       "order": 5,
       "category": "Meccanica",
       "file": "meccanica/moto-uniformemente-accelerato.html",
       "tags": [],
       "level": ""
+    },
+    {
+      "title": "Urti",
+      "description": "Simulazione delle collisioni tra corpi con analisi della conservazione della quantità di moto e dell'energia (urti elastici e anelastici).",
+      "category": "Meccanica",
+      "icon": "💥",
+      "order": 6,
+      "tags": [
+        "urti",
+        "quantità di moto",
+        "energia",
+        "collisioni",
+        "dinamica"
+      ],
+      "level": "intermedio",
+      "file": "WIP/urti.html"
+    },
+    {
+      "title": "Tensione di una fune",
+      "description": "Studio delle forze di tensione in una fune ideale e delle condizioni di equilibrio dinamico e statico in sistemi vincolati.",
+      "category": "Meccanica",
+      "icon": "🪢",
+      "order": 7,
+      "tags": [
+        "tensione",
+        "forze vincolari",
+        "equilibrio",
+        "dinamica"
+      ],
+      "level": "intermedio",
+      "file": "WIP/tensione.html"
     },
     {
       "title": "Indipendenza dei moti",
@@ -166,7 +213,7 @@
     },
     {
       "title": "Piano inclinato",
-      "description": "Esplora il moto di un corpo su un piano inclinato variando angolo, massa, attrito e forza applicata. Osserva come cambiano accelerazione, velocità, forze lungo il piano e condizioni di equilibrio o di scorrimento.",
+      "description": "Esplora il moto di un corpo su un piano inclinato variando angolo, massa, attrito e forza applicata",
       "category": "Meccanica",
       "icon": "📐",
       "order": 60,
@@ -208,6 +255,21 @@
       ],
       "level": "base",
       "file": "meccanica/conservazione-energia.html"
+    },
+    {
+      "title": "Meccanica quantistica",
+      "description": "Visualizzazione di fenomeni quantistici come funzione d'onda, probabilità e comportamento ondulatorio delle particelle.",
+      "category": "Meccanica quantistica",
+      "icon": "🧬",
+      "order": 1,
+      "tags": [
+        "funzione d'onda",
+        "probabilità",
+        "quantistica",
+        "particelle"
+      ],
+      "level": "avanzato",
+      "file": "WIP/meccanica_quantistica.html"
     },
     {
       "title": "Suono",
@@ -292,6 +354,36 @@
       ],
       "level": "base",
       "file": "ottica/specchi-e-lenti.html"
+    },
+    {
+      "title": "Relatività ristretta",
+      "description": "Studio degli effetti relativistici a velocità prossime a quella della luce, come dilatazione dei tempi e contrazione delle lunghezze.",
+      "category": "Relatività",
+      "icon": "⏱️",
+      "order": 1,
+      "tags": [
+        "relatività ristretta",
+        "dilatazione dei tempi",
+        "contrazione delle lunghezze",
+        "trasformazioni di Lorentz"
+      ],
+      "level": "avanzato",
+      "file": "WIP/relativita_ristretta.html"
+    },
+    {
+      "title": "Relatività generale",
+      "description": "Introduzione alla gravità come curvatura dello spazio-tempo e visualizzazione degli effetti gravitazionali su traiettorie e tempo.",
+      "category": "Relatività",
+      "icon": "🌀",
+      "order": 2,
+      "tags": [
+        "spazio-tempo",
+        "gravità",
+        "curvatura",
+        "geodetiche"
+      ],
+      "level": "avanzato",
+      "file": "WIP/relativita_generale.html"
     }
   ]
 }

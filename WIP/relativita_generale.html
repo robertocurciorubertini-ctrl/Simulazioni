@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Relatività generale",
+  "description": "Introduzione alla gravità come curvatura dello spazio-tempo e visualizzazione degli effetti gravitazionali su traiettorie e tempo.",
+  "category": "Relatività",
+  "icon": "🌀",
+  "order": 2,
+  "tags": ["spazio-tempo", "gravità", "curvatura", "geodetiche"],
+  "level": "avanzato"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curvatura dello Spaziotempo — Schwarzschild</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f4f1eb; --bg2:#ede9e0; --surface:#fff; --border:#d4cfc4; --border2:#b8b2a6;
+  --text:#1a1714; --text-mid:#4a4540; --text-dim:#8a8278;
+  --accent:#1a3a5c; --accent2:#7c3a10; --red:#8b1a1a; --green:#1a5c3a;
+  --shadow:rgba(0,0,0,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'EB Garamond',serif;min-height:100vh;display:flex;flex-direction:column;}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px var(--shadow);}
+header h1{font-size:1.5rem;font-weight:500;color:var(--accent);}
+header p{font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-top:2px;}
+.badge{padding:3px 10px;border:1px solid;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:.1em;text-transform:uppercase;}
+.badge-bh{border-color:var(--red);color:var(--red);}
+.badge-star{border-color:var(--accent2);color:var(--accent2);}
+
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:260px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.sec{padding:13px 16px 11px;border-bottom:1px solid var(--border);}
+.sec-title{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin-bottom:11px;}
+.ctrl{margin-bottom:11px;}
+.ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;font-size:.87rem;color:var(--text-mid);}
+.cv{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--accent);font-weight:500;}
+.cv.red{color:var(--red);}.cv.gold{color:var(--accent2);}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 0 0 1px var(--accent);cursor:pointer;transition:transform .15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.3);}
+.chk{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:.85rem;color:var(--text-mid);cursor:pointer;}
+.chk input[type=checkbox]{accent-color:var(--accent);}
+.inf-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg2);font-size:.82rem;}
+.inf-row:last-child{border-bottom:none;}
+.ik{color:var(--text-dim);font-style:italic;}
+.iv{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--accent);}
+.iv.red{color:var(--red);}.iv.gold{color:var(--accent2);}
+.formula{background:var(--bg2);border-left:3px solid var(--accent);padding:9px 11px;font-family:'DM Mono',monospace;font-size:.62rem;line-height:1.85;color:var(--text-mid);margin-top:3px;}
+.btn{display:block;width:100%;padding:8px;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .18s;margin-bottom:6px;}
+.btn:hover{background:var(--accent);color:#fff;}
+.btn.g{border-color:var(--green);color:var(--green);}
+.btn.g:hover{background:var(--green);color:#fff;}
+.btn.o{border-color:var(--accent2);color:var(--accent2);}
+.btn.o:hover{background:var(--accent2);color:#fff;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 20px;gap:10px;overflow:hidden;}
+.canvas-frame{background:#07101c;border:1px solid #1a2a3a;box-shadow:0 4px 24px rgba(0,0,0,.28);position:relative;}
+canvas#cv{display:block;}
+.legend{display:flex;gap:18px;font-family:'DM Mono',monospace;font-size:.61rem;color:var(--text-dim);flex-wrap:wrap;justify-content:center;}
+.li{display:flex;align-items:center;gap:5px;}
+.ll{width:18px;height:2px;border-radius:1px;}
+.ld{width:18px;height:0;border-top:2px dashed;}
+
+/* MODAL FLAMM */
+#modal3d{display:none;position:fixed;inset:0;background:rgba(20,18,14,.6);backdrop-filter:blur(5px);z-index:100;align-items:center;justify-content:center;}
+#modal3d.open{display:flex;}
+.mbox{background:var(--surface);border:1px solid var(--border);width:min(860px,96vw);height:min(640px,90vh);display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.22);}
+.mhdr{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.mhdr h2{font-size:1.1rem;font-weight:500;color:var(--accent);}
+.mhdr p{font-family:'DM Mono',monospace;font-size:.57rem;color:var(--text-dim);margin-top:2px;}
+.mclose{background:transparent;border:1px solid var(--border2);color:var(--text-dim);font-size:.9rem;width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.mclose:hover{border-color:var(--accent);color:var(--accent);}
+.mctrl{display:flex;align-items:center;gap:14px;padding:7px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap;}
+.mctrl label{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text-dim);white-space:nowrap;}
+.mctrl input[type=range]{width:90px;}
+.mctrl span{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent);min-width:32px;}
+#canvas3d{flex:1;width:100%;display:block;background:var(--bg);}
+.mftr{padding:7px 20px;border-top:1px solid var(--border);background:var(--bg2);font-family:'DM Mono',monospace;font-size:.57rem;color:var(--text-dim);display:flex;gap:20px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Curvatura dello Spaziotempo</h1>
+    <p>Metrica di Schwarzschild — geodesiche nulle &amp; corpo orbitante</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <div id="hdr-badge" class="badge badge-star">★ Stella</div>
+  </div>
+</header>
+
+<div class="layout">
+<div class="sidebar">
+
+  <div class="sec">
+    <div class="sec-title">Corpo Centrale</div>
+    <div class="ctrl">
+      <div class="ctrl-label">Massa <em>M</em> <span class="cv" id="lM">10.0 M☉</span></div>
+      <input type="range" id="slM" min="0.5" max="50" step="0.1" value="10">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-label">Raggio <em>R / r<sub>s</sub></em> <span class="cv" id="lR">1.00 r<sub>s</sub></span></div>
+      <input type="range" id="slR" min="0.3" max="5" step="0.05" value="1.0">
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Corpo Orbitante</div>
+    <div class="ctrl">
+      <div class="ctrl-label">Massa <em>m</em> <span class="cv gold" id="lm">0.5 M☉</span></div>
+      <input type="range" id="slm" min="0.01" max="5" step="0.01" value="0.5">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-label">Raggio orbitale <em>r</em> <span class="cv gold" id="lrorb">5.0 r<sub>s</sub></span></div>
+      <input type="range" id="slrorb" min="2" max="14" step="0.1" value="5">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-label">Eccentricità <em>e</em> <span class="cv gold" id="lecc">0.0</span></div>
+      <input type="range" id="slecc" min="0" max="0.7" step="0.01" value="0">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-label">Velocità simulazione <span class="cv" id="lspeed">1×</span></div>
+      <input type="range" id="slspeed" min="0.1" max="5" step="0.05" value="1">
+    </div>
+    <div class="chk"><input type="checkbox" id="chkOrbit" checked><label for="chkOrbit">Mostra traccia orbitale</label></div>
+    <div class="chk"><input type="checkbox" id="chkOrbGrid" checked><label for="chkOrbGrid">Deformazione locale corpo m</label></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Raggi di Luce</div>
+    <div class="ctrl">
+      <div class="ctrl-label">N° raggi <span class="cv" id="lN">14</span></div>
+      <input type="range" id="slN" min="2" max="30" step="1" value="14">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-label"><em>b</em><sub>min</sub> <span class="cv" id="lbmin">1.5 r<sub>s</sub></span></div>
+      <input type="range" id="slbmin" min="1.2" max="8" step="0.1" value="1.5">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-label"><em>b</em><sub>max</sub> <span class="cv" id="lbmax">9.0 r<sub>s</sub></span></div>
+      <input type="range" id="slbmax" min="3" max="20" step="0.2" value="9">
+    </div>
+    <div class="chk"><input type="checkbox" id="chkSym" checked><label for="chkSym">Fascio simmetrico</label></div>
+    <div class="chk"><input type="checkbox" id="chkCap" checked><label for="chkCap">Raggi catturati</label></div>
+    <div class="chk"><input type="checkbox" id="chkOrb2" checked><label for="chkOrb2">Orbita fotonica</label></div>
+    <div class="chk"><input type="checkbox" id="chkGrid" checked><label for="chkGrid">Griglia spaziotemporale</label></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Valori Fisici</div>
+    <div class="inf-row"><span class="ik">r<sub>s</sub></span><span class="iv red" id="inf-rs">—</span></div>
+    <div class="inf-row"><span class="ik">r<sub>ISCO</sub> (6M)</span><span class="iv" id="inf-isco">—</span></div>
+    <div class="inf-row"><span class="ik">r<sub>orb</sub></span><span class="iv gold" id="inf-rorb">—</span></div>
+    <div class="inf-row"><span class="ik">T<sub>orb</sub> (coord.)</span><span class="iv gold" id="inf-T">—</span></div>
+    <div class="inf-row"><span class="ik">Tipo</span><span class="iv" id="inf-tipo">—</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="formula">
+ds² = -(1-rₛ/r)c²dt²<br>
+    + dr²/(1-rₛ/r)<br>
+    + r²dΩ²<br><br>
+d²u/dφ²+u = 3u²/2<br>
+r_ISCO = 6M  (G=c=1)<br>
+T = 2π√(r³/M)
+    </div>
+  </div>
+
+  <div class="sec">
+    <button class="btn" onclick="resetAll()">↺ Reset tutto</button>
+    <button class="btn o" id="btnAnim" onclick="toggleAnim()">⏸ Pausa orbita</button>
+    <button class="btn g" onclick="open3D()">⬡ Embedding di Flamm 3D</button>
+  </div>
+
+</div><!-- /sidebar -->
+
+<div class="main">
+  <div class="canvas-frame">
+    <canvas id="cv" width="900" height="650"></canvas>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ll" style="background:#ffe080;"></div><span>raggio deflesso</span></div>
+    <div class="li"><div class="ll" style="background:#ff6040;"></div><span>catturato</span></div>
+    <div class="li"><div class="ld" style="border-color:#f05040;"></div><span>rₛ</span></div>
+    <div class="li"><div class="ld" style="border-color:#4af0c8;"></div><span>r_foto</span></div>
+    <div class="li"><div class="ll" style="background:#c8a060;"></div><span>corpo m</span></div>
+    <div class="li"><div class="ll" style="background:#60a0c8;opacity:.5;"></div><span>deform. locale</span></div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL FLAMM -->
+<div id="modal3d">
+  <div class="mbox">
+    <div class="mhdr">
+      <div>
+        <h2>Diagramma di Embedding di Flamm</h2>
+        <p>z(r) = 2√(r − rₛ) &nbsp;|&nbsp; sezione spaziale t = cost &nbsp;|&nbsp; griglia cartesiana deformata</p>
+      </div>
+      <button class="mclose" onclick="close3D()">✕</button>
+    </div>
+    <div class="mctrl">
+      <label>Tilt</label>
+      <input type="range" id="sl-tilt" min="5" max="72" step="1" value="34"
+        oninput="tilt3d=+this.value;draw3D();document.getElementById('lbl-tilt').textContent=this.value+'°'">
+      <span id="lbl-tilt">34°</span>
+      <label>Rotazione</label>
+      <input type="range" id="sl-rot3d" min="0" max="360" step="1" value="30"
+        oninput="rot3d=+this.value*Math.PI/180;draw3D();document.getElementById('lbl-rot3d').textContent=this.value+'°'">
+      <span id="lbl-rot3d">30°</span>
+      <label>Profondità</label>
+      <input type="range" id="sl-depth" min="0.2" max="3.5" step="0.05" value="1.0"
+        oninput="depth3d=+this.value;draw3D();document.getElementById('lbl-depth').textContent=(+this.value).toFixed(1)+'×'">
+      <span id="lbl-depth">1.0×</span>
+    </div>
+    <canvas id="canvas3d"></canvas>
+    <div class="mftr">
+      <span>Le linee si addensano per r→rₛ⁺: il fattore metrico √g_rr = (1−rₛ/r)^−½ diverge</span>
+      <span>Il corpo orbitante appare come seconda depressione sulla superficie</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// COSTANTI E STATO GLOBALE
+// ═══════════════════════════════════════════════════════════════
+const cv  = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height, CX = W/2, CY = H/2;
+const SCALE = 46; // px per rs
+const RS_KM = 2.953; // km per M_solare
+const B_CRIT = 3*Math.sqrt(3)/2; // ≈ 2.598 rs
+
+// Parametri simulazione
+let M   = 10;    // massa centrale [M_solare] — anche unità geometriche rs
+let Rph = 1.0;   // raggio fisico [rs]
+let m_orb = 0.5; // massa corpo orbitante [M_solare]
+let r_orb_init = 5.0; // raggio orbitale iniziale [rs]
+let ecc   = 0.0; // eccentricità
+let simSpeed = 1.0;
+let N_rays = 14, b_min = 1.5, b_max = 9.0;
+let showSym=true, showCap=true, showOrb2=true, showGrid=true;
+let showTrace=true, showOrbGrid=true;
+
+// Stato orbita — integrazione RK4 in metrica Schwarzschild
+// Variabili: r (distanza da M in rs), phi, pr (momento radiale ~ dr/dt coor.)
+// Usiamo le equazioni del moto dalla geodesica massiva di Schwarzschild:
+//   d²r/dτ² = -M/r² + L²/r³*(1 - 3M/r)   [unità rs=1, G=c=1]
+//   dphi/dτ = L/r²
+//   E,L conservati
+let orb = { r:5, phi:0, rdot:0, phi_dot:0, L:0, E:0 };
+let orbitTrace = []; // storia posizioni schermo per traccia
+const TRACE_MAX = 800;
+let animRunning = true;
+let lastTime = null;
+let animFrame = null;
+
+// Precompute geodesiche (statiche — ricalcolate solo quando cambiano)
+let rays = [];
+let gridLines = [];
+
+// ═══════════════════════════════════════════════════════════════
+// COORDINATE SCHERMO
+// ═══════════════════════════════════════════════════════════════
+function S(x,y){ return [CX+x*SCALE, CY-y*SCALE]; }
+
+// ═══════════════════════════════════════════════════════════════
+// GEODESICHE NULLE — RK4 su d²u/dφ²+u = (3/2)u²
+// ═══════════════════════════════════════════════════════════════
+function integrateGeodesic(b_rs){
+  const sign = b_rs>=0?1:-1;
+  const ab   = Math.abs(b_rs);
+  if(ab<0.01) return {points:[],captured:false};
+  const r0=220;
+  const phi0 = sign>0 ? Math.PI-Math.atan2(ab,r0) : -(Math.PI-Math.atan2(ab,r0));
+  let u=1/r0, du=sign/ab, phi=phi0;
+  const pts=[], ds=0.0015, dphi=sign>0?-ds:ds;
+  const N=Math.ceil(Math.PI*10/ds);
+  let captured=false;
+  for(let i=0;i<N;i++){
+    const r=u>1e-7?1/u:1e9;
+    if(r<1.0){captured=true;break;}
+    if(r>260) break;
+    pts.push({x:r*Math.cos(phi), y:r*Math.sin(phi)});
+    const d=(u_,du_)=>[du_, -u_+1.5*u_*u_];
+    const [k1u,k1d]=d(u,du);
+    const [k2u,k2d]=d(u+ds/2*k1u,du+ds/2*k1d);
+    const [k3u,k3d]=d(u+ds/2*k2u,du+ds/2*k2d);
+    const [k4u,k4d]=d(u+ds*k3u,du+ds*k3d);
+    u+=ds/6*(k1u+2*k2u+2*k3u+k4u);
+    du+=ds/6*(k1d+2*k2d+2*k3d+k4d);
+    phi+=dphi;
+  }
+  return {points:pts,captured};
+}
+
+function computeRays(){
+  rays=[];
+  for(let i=0;i<N_rays;i++){
+    const t=N_rays>1?i/(N_rays-1):0;
+    const b=b_min+t*(b_max-b_min);
+    rays.push({b,...integrateGeodesic(b)});
+    if(showSym) rays.push({b:-b,...integrateGeodesic(-b)});
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GRIGLIA SPAZIOTEMPORALE (deformata radialmente da Schwarzschild)
+// ═══════════════════════════════════════════════════════════════
+function computeGrid(){
+  gridLines=[];
+  const rmax=(W/2)/SCALE+1, Nphi=22, Nr=18;
+  for(let i=0;i<Nphi;i++){
+    const phi=(i/Nphi)*Math.PI*2, pts=[];
+    for(let j=2;j<=200;j++){
+      const r=1.05+j*(rmax-1.05)/200;
+      const s=0.3/Math.sqrt(r-1.0);
+      pts.push({x:(r+s*0.5)*Math.cos(phi),y:(r+s*0.5)*Math.sin(phi)});
+    }
+    gridLines.push(pts);
+  }
+  for(let i=1;i<=Nr;i++){
+    const r=1.1+i*(rmax-1.1)/Nr;
+    const s=0.3/Math.sqrt(r-1.0), rv=r+s*0.5, pts=[];
+    for(let j=0;j<=120;j++){
+      const phi=(j/120)*Math.PI*2;
+      pts.push({x:rv*Math.cos(phi),y:rv*Math.sin(phi)});
+    }
+    gridLines.push(pts);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ORBITA — Equazioni del moto Schwarzschild (unità rs=1, G=c=1)
+//
+// La metrica in coordinate (t,r,φ) sul piano equatoriale ha le
+// costanti del moto:
+//   E = (1-1/r)*dt/dτ          (energia specifica)
+//   L = r²*dφ/dτ               (momento angolare specifico)
+//
+// L'equazione radiale si ottiene da g_μν u^μ u^ν = -1:
+//   (dr/dτ)² = E² - (1-1/r)(1+L²/r²)    ≡ V_eff(r)
+//   d²r/dτ² = dV_eff/dr / 2
+//            = -1/(2r²) + L²*(1/r³-3/(2r⁴))... semplificato:
+//   d²r/dτ² = -M/r² + L²/r³ - 3ML²/r⁴
+// con M=1 (in rs), ovvero tutto in unità rs.
+//
+// Per orbita circolare a r0: d²r=0, dr=0
+//   L² = r0²/(2r0-3)   (circolare stabile per r0>6M=6rs)
+//   E² = (1-1/r0)²/(1-3/(2r0))
+//
+// Per eccentricità e>0 partiamo dalla distanza afelio r_a = r0*(1+e)
+// e calcoliamo rdot dal potenziale efficace.
+// ═══════════════════════════════════════════════════════════════
+function initOrbit(){
+  orbitTrace=[];
+  // rs come unità geometrica: M_geom = M * rs / rs = 1 (in unità rs)
+  // Quindi nelle equazioni G=c=rs=1, M_geom=1
+  const r0 = Math.max(r_orb_init, 3.1); // non sotto r_foto
+
+  // Momento angolare per orbita circolare a r0
+  // L_circ² = r0² M / (r0 - 3M/2)  con M=1 (rs units)
+  // Versione esatta: L² = r0/(2 - 3/r0)
+  const L2 = r0*r0/(2*r0-3);
+  if(L2<0){ console.warn('r_orb troppo piccolo'); return; }
+  const L_circ = Math.sqrt(L2);
+
+  // Per orbita con eccentricità e, partiamo dall'afelio r_a:
+  // r_a = r0*(1+e) => per conservazione L usiamo L_circ ma modifichiamo rdot
+  // L'energia all'afelio: E²=(1-1/r_a)(1+L²/r_a²)+(dr/dτ)²
+  // all'afelio rdot=0, quindi E²=(1-1/r_a)(1+L²/r_a²)
+  const r_a = r0*(1+ecc);
+  const L   = L_circ; // manteniamo L della circolare di riferimento
+  const E2  = (1-1/r_a)*(1+L*L/(r_a*r_a));
+  const E   = Math.sqrt(Math.max(E2,0));
+
+  orb.r    = r_a;
+  orb.phi  = 0;
+  orb.rdot = 0;   // all'afelio
+  orb.L    = L;
+  orb.E    = E;
+
+  // Periodo kepleriano coordinato approssimato: T ≈ 2π√(r0³) (post-newt.)
+  const T_approx = 2*Math.PI*Math.sqrt(r0*r0*r0);
+  document.getElementById('inf-T').textContent = T_approx.toFixed(1)+' tᵤ';
+}
+
+// RK4 sull'orbita — passo dτ (tempo proprio)
+// Stato: [r, phi, rdot]
+function orbitDerivs(r, phi, rdot, L){
+  const r2=r*r, r3=r2*r, r4=r3*r;
+  // d²r/dτ² = -1/r² + L²/r³ - 3L²/r⁴  (con M=1 in rs units)
+  const rddot = -1/r2 + L*L/r3 - 3*L*L/r4;
+  const phidot = L/r2;
+  return [rdot, phidot, rddot];
+}
+
+function stepOrbit(dtau){
+  const {r,phi,rdot,L}=orb;
+  const [k1r,k1p,k1rd] = orbitDerivs(r,phi,rdot,L);
+  const r2=r+dtau/2*k1r, p2=phi+dtau/2*k1p, rd2=rdot+dtau/2*k1rd;
+  const [k2r,k2p,k2rd] = orbitDerivs(r2,p2,rd2,L);
+  const r3=r+dtau/2*k2r, p3=phi+dtau/2*k2p, rd3=rdot+dtau/2*k2rd;
+  const [k3r,k3p,k3rd] = orbitDerivs(r3,p3,rd3,L);
+  const r4=r+dtau*k3r, p4=phi+dtau*k3p, rd4=rdot+dtau*k3rd;
+  const [k4r,k4p,k4rd] = orbitDerivs(r4,p4,rd4,L);
+
+  orb.r    = r   +dtau/6*(k1r +2*k2r +2*k3r +k4r);
+  orb.phi  = phi +dtau/6*(k1p +2*k2p +2*k3p +k4p);
+  orb.rdot = rdot+dtau/6*(k1rd+2*k2rd+2*k3rd+k4rd);
+
+  // Safety: rimbalzo se troppo vicino o troppo lontano
+  if(orb.r<1.05) orb.r=1.05, orb.rdot=Math.abs(orb.rdot)*0.5;
+  if(orb.r>200)  orb.r=200,  orb.rdot=0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STELLE DI SFONDO
+// ═══════════════════════════════════════════════════════════════
+const _stars=(()=>{
+  const rng=mb32(42), a=[];
+  for(let i=0;i<220;i++) a.push({x:rng()*W,y:rng()*H,r:rng()*1.1+0.3,op:rng()*.55+.1});
+  return a;
+})();
+function mb32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER PRINCIPALE
+// ═══════════════════════════════════════════════════════════════
+function render(){
+  ctx.clearRect(0,0,W,H);
+
+  // Sfondo
+  const bg=ctx.createRadialGradient(CX,CY,0,CX,CY,W*.65);
+  bg.addColorStop(0,'#081422'); bg.addColorStop(.6,'#050e18'); bg.addColorStop(1,'#030810');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  for(const s of _stars){ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(210,225,255,${s.op})`;ctx.fill();}
+
+  // Assi
+  ctx.save(); ctx.strokeStyle='rgba(60,100,140,.15)'; ctx.lineWidth=1; ctx.setLineDash([4,10]);
+  ctx.beginPath();ctx.moveTo(0,CY);ctx.lineTo(W,CY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(CX,0);ctx.lineTo(CX,H);ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+
+  // Posizione corpo orbitante in coordinate schermo
+  const ox_rs = orb.r*Math.cos(orb.phi);
+  const oy_rs = orb.r*Math.sin(orb.phi);
+  const [osx,osy] = S(ox_rs, oy_rs);
+
+  // ── Griglia principale (deformata da M)
+  if(showGrid){
+    ctx.save();
+    for(const pts of gridLines){
+      if(pts.length<2) continue;
+      ctx.beginPath(); let first=true;
+      for(const p of pts){
+        const [sx,sy]=S(p.x,p.y);
+        if(sx<-80||sx>W+80||sy<-80||sy>H+80){first=true;continue;}
+        first?(ctx.moveTo(sx,sy),first=false):ctx.lineTo(sx,sy);
+      }
+      ctx.strokeStyle='rgba(18,58,100,.30)'; ctx.lineWidth=.75; ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ── Deformazione locale del corpo orbitante (mini-griglia attorno a m)
+  if(showOrbGrid){
+    drawLocalDistortion(ox_rs, oy_rs, m_orb/M, orb.r);
+  }
+
+  // ── Traccia orbitale
+  if(showTrace && orbitTrace.length>1){
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(orbitTrace[0][0], orbitTrace[0][1]);
+    for(let i=1;i<orbitTrace.length;i++){
+      ctx.lineTo(orbitTrace[i][0], orbitTrace[i][1]);
+    }
+    ctx.strokeStyle='rgba(200,160,80,.35)'; ctx.lineWidth=1.2;
+    ctx.setLineDash([3,4]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // ── Raggi di luce
+  ctx.save();
+  for(const ray of rays){
+    if(ray.captured&&!showCap) continue;
+    const pts=ray.points; if(!pts||pts.length<2) continue;
+    ctx.beginPath(); let first=true;
+    for(const p of pts){
+      const [sx,sy]=S(p.x,p.y);
+      if(sx<-100||sx>W+100||sy<-100||sy>H+100){first=true;continue;}
+      first?(ctx.moveTo(sx,sy),first=false):ctx.lineTo(sx,sy);
+    }
+    if(ray.captured){
+      ctx.strokeStyle='rgba(255,90,50,.75)'; ctx.shadowColor='rgba(255,80,40,.5)'; ctx.shadowBlur=5; ctx.lineWidth=1.4;
+    } else {
+      const ab=Math.abs(ray.b), prox=Math.max(0,1-(ab-B_CRIT)/(B_CRIT*.8));
+      const g=Math.floor(200+55*(1-prox*.5)), bl=Math.floor(40+120*(1-prox));
+      ctx.strokeStyle=`rgba(255,${g},${bl},.82)`; ctx.shadowColor=`rgba(255,${g},${bl},.4)`;
+      ctx.shadowBlur=7; ctx.lineWidth=1.5;
+    }
+    ctx.stroke(); ctx.shadowBlur=0;
+  }
+  ctx.restore();
+
+  // ── Corpo centrale
+  drawCentralBody();
+
+  // ── Corpo orbitante
+  drawOrbitingBody(osx, osy);
+}
+
+function drawCentralBody(){
+  const rs_px=SCALE, R_px=Rph*SCALE, isBH=Rph<=1.0;
+  if(isBH){
+    const halo=ctx.createRadialGradient(CX,CY,rs_px*.95,CX,CY,rs_px*4);
+    halo.addColorStop(0,'rgba(255,140,20,.2)'); halo.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.arc(CX,CY,rs_px*4,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
+    ctx.beginPath();ctx.arc(CX,CY,rs_px*.96,0,Math.PI*2);ctx.fillStyle='#000';ctx.fill();
+  } else {
+    const g=ctx.createRadialGradient(CX,CY,0,CX,CY,R_px);
+    g.addColorStop(0,'rgba(255,255,200,.97)');g.addColorStop(.55,'rgba(255,190,90,.9)');g.addColorStop(1,'rgba(255,110,15,.75)');
+    ctx.beginPath();ctx.arc(CX,CY,R_px,0,Math.PI*2);ctx.fillStyle=g;
+    ctx.shadowColor='rgba(255,160,60,.5)';ctx.shadowBlur=28;ctx.fill();ctx.shadowBlur=0;
+  }
+  ctx.beginPath();ctx.arc(CX,CY,rs_px,0,Math.PI*2);
+  ctx.strokeStyle=isBH?'rgba(240,80,60,.65)':'rgba(240,80,60,.3)';
+  ctx.setLineDash([5,5]);ctx.lineWidth=1.4;ctx.stroke();ctx.setLineDash([]);
+  ctx.font="11px 'DM Mono'";ctx.fillStyle='rgba(240,80,60,.75)';ctx.fillText('rₛ',CX+rs_px+4,CY-5);
+  if(showOrb2){
+    ctx.beginPath();ctx.arc(CX,CY,rs_px*1.5,0,Math.PI*2);
+    ctx.strokeStyle='rgba(74,240,200,.38)';ctx.setLineDash([3,6]);ctx.lineWidth=1.1;ctx.stroke();ctx.setLineDash([]);
+  }
+}
+
+function drawOrbitingBody(osx, osy){
+  // Raggio visivo del corpo orbitante (proporzionale a m^(1/3) per sembrare realistico)
+  const r_vis = Math.max(5, 4 + 4*(m_orb/5));
+  const g=ctx.createRadialGradient(osx-r_vis*.3,osy-r_vis*.3,0,osx,osy,r_vis);
+  g.addColorStop(0,'rgba(255,240,180,1)');
+  g.addColorStop(.5,'rgba(220,170,80,.95)');
+  g.addColorStop(1,'rgba(180,120,30,.8)');
+  ctx.beginPath();ctx.arc(osx,osy,r_vis,0,Math.PI*2);
+  ctx.fillStyle=g;ctx.shadowColor='rgba(220,160,60,.6)';ctx.shadowBlur=18;
+  ctx.fill();ctx.shadowBlur=0;
+  // label massa
+  ctx.font="10px 'DM Mono'";ctx.fillStyle='rgba(200,160,80,.8)';
+  ctx.fillText('m='+m_orb.toFixed(2)+'M☉',osx+r_vis+3,osy-3);
+}
+
+// Deformazione locale: mini-cerchi concentrici che mostrano la curvatura locale di m
+// La deformazione scala come m/r²_orb rispetto al campo principale M
+function drawLocalDistortion(ox, oy, mu, r_orb){
+  ctx.save();
+  // Raggio di influenza visiva in rs: ~sqrt(mu)*3
+  const inf_rs = Math.sqrt(mu)*3.5;
+  const Nr=5;
+  for(let i=1;i<=Nr;i++){
+    const ri = inf_rs*i/Nr; // in rs
+    // Applica un'ellisse leggermente schiacciata verso il centro di M
+    // (tidally distorted) — asse maggiore verso M
+    const dir_x = -ox/r_orb, dir_y = -oy/r_orb; // dir verso M
+    const r_px  = ri*SCALE;
+    // Ellisse con semi-assi: perpendicolare=r_px, radiale=r_px*(1+0.2*mu)
+    const angle = Math.atan2(-oy, -ox); // angolo verso M
+    const a_r = r_px*(1+.25*mu); // asse radiale (verso M) leggermente maggiore
+    const a_t = r_px;             // asse tangenziale
+    ctx.beginPath();
+    ctx.ellipse(CX+ox*SCALE, CY-oy*SCALE, a_r, a_t, angle, 0, Math.PI*2);
+    const alpha = 0.22*(1-i/Nr)+0.06;
+    ctx.strokeStyle=`rgba(96,160,200,${alpha})`;
+    ctx.lineWidth=.8; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOOP DI ANIMAZIONE
+// ═══════════════════════════════════════════════════════════════
+function animLoop(ts){
+  animFrame=requestAnimationFrame(animLoop);
+  if(!animRunning){render();return;}
+
+  // Delta tempo: limitato per evitare salti grandi
+  if(!lastTime) lastTime=ts;
+  const dtMs = Math.min(ts-lastTime, 50);
+  lastTime=ts;
+
+  // Passo di integrazione in unità geometriche (rs/c)
+  // La velocità reale è modulata da simSpeed
+  // dtau_per_frame: ~ 0.005 * simSpeed per ogni ms reale
+  const dtau_step = 0.003*simSpeed;
+  const n_steps   = Math.ceil(dtMs*0.8);
+  for(let i=0;i<n_steps;i++) stepOrbit(dtau_step);
+
+  // Aggiorna traccia
+  const [osx,osy]=S(orb.r*Math.cos(orb.phi), orb.r*Math.sin(orb.phi));
+  if(orbitTrace.length===0 || distSq(orbitTrace[orbitTrace.length-1],[osx,osy])>4){
+    orbitTrace.push([osx,osy]);
+    if(orbitTrace.length>TRACE_MAX) orbitTrace.shift();
+  }
+
+  // Aggiorna infos dinamiche
+  document.getElementById('inf-rorb').textContent=(orb.r).toFixed(2)+' rₛ';
+
+  render();
+}
+function distSq(a,b){return (a[0]-b[0])**2+(a[1]-b[1])**2;}
+
+// ═══════════════════════════════════════════════════════════════
+// UI — lettura slider e aggiornamenti
+// ═══════════════════════════════════════════════════════════════
+function readParams(){
+  M        = +document.getElementById('slM').value;
+  Rph      = +document.getElementById('slR').value;
+  m_orb    = +document.getElementById('slm').value;
+  r_orb_init=+document.getElementById('slrorb').value;
+  ecc      = +document.getElementById('slecc').value;
+  simSpeed = +document.getElementById('slspeed').value;
+  N_rays   = +document.getElementById('slN').value;
+  b_min    = +document.getElementById('slbmin').value;
+  b_max    = +document.getElementById('slbmax').value;
+  showSym  = document.getElementById('chkSym').checked;
+  showCap  = document.getElementById('chkCap').checked;
+  showOrb2 = document.getElementById('chkOrb2').checked;
+  showGrid = document.getElementById('chkGrid').checked;
+  showTrace= document.getElementById('chkOrbit').checked;
+  showOrbGrid=document.getElementById('chkOrbGrid').checked;
+
+  document.getElementById('lM').textContent=M.toFixed(1)+' M☉';
+  document.getElementById('lR').textContent=Rph.toFixed(2)+' rₛ';
+  document.getElementById('lm').textContent=m_orb.toFixed(2)+' M☉';
+  document.getElementById('lrorb').textContent=r_orb_init.toFixed(1)+' rₛ';
+  document.getElementById('lecc').textContent=ecc.toFixed(2);
+  document.getElementById('lspeed').textContent=simSpeed.toFixed(1)+'×';
+  document.getElementById('lN').textContent=N_rays;
+  document.getElementById('lbmin').textContent=b_min.toFixed(1)+' rₛ';
+  document.getElementById('lbmax').textContent=b_max.toFixed(1)+' rₛ';
+
+  const rs=M*RS_KM, isBH=Rph<=1.0;
+  document.getElementById('inf-rs').textContent=rs.toFixed(2)+' km';
+  document.getElementById('inf-isco').textContent=(6*rs).toFixed(1)+' km';
+  document.getElementById('inf-tipo').textContent=isBH?'Buco Nero ●':'Stella ★';
+  document.getElementById('inf-tipo').className='iv '+(isBH?'red':'gold');
+  document.getElementById('hdr-badge').textContent=isBH?'● Buco Nero':'★ Stella';
+  document.getElementById('hdr-badge').className='badge '+(isBH?'badge-bh':'badge-star');
+}
+
+// Slider che richiedono il ricalcolo completo (geodesiche + orbita)
+['slM','slR','slN','slbmin','slbmax'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    readParams(); computeGrid(); computeRays(); initOrbit();
+    orbitTrace=[];
+  });
+});
+// Slider che richiedono solo il reset dell'orbita
+['slm','slrorb','slecc'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    readParams(); initOrbit(); orbitTrace=[];
+  });
+});
+// Slider senza ricalcolo
+['slspeed'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',readParams);
+});
+['chkSym','chkCap','chkOrb2','chkGrid','chkOrbit','chkOrbGrid'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',()=>{readParams();computeRays();});
+});
+
+function resetAll(){
+  readParams();
+  computeGrid();
+  computeRays();
+  initOrbit();
+  orbitTrace=[];
+}
+
+function toggleAnim(){
+  animRunning=!animRunning;
+  lastTime=null;
+  document.getElementById('btnAnim').textContent=animRunning?'⏸ Pausa orbita':'▶ Riprendi orbita';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL EMBEDDING DI FLAMM — Canvas 2D obliquo
+// ═══════════════════════════════════════════════════════════════
+let tilt3d=34, rot3d=30*Math.PI/180, depth3d=1.0;
+let cv3=null, ctx3=null, W3, H3;
+
+function open3D(){
+  document.getElementById('modal3d').classList.add('open');
+  setTimeout(()=>{init3DCanvas();draw3D();},30);
+}
+function close3D(){ document.getElementById('modal3d').classList.remove('open'); }
+
+function init3DCanvas(){
+  cv3=document.getElementById('canvas3d');
+  W3=cv3.parentElement.clientWidth||840;
+  H3=cv3.parentElement.clientHeight||440;
+  cv3.width=W3; cv3.height=H3;
+  ctx3=cv3.getContext('2d');
+}
+
+function proj3(wx,wy,wz){
+  const tR=tilt3d*Math.PI/180, cosT=Math.cos(tR), sinT=Math.sin(tR);
+  const rx= wx*Math.cos(rot3d)+wy*Math.sin(rot3d);
+  const ry=-wx*Math.sin(rot3d)+wy*Math.cos(rot3d);
+  const SC=Math.min(W3,H3)/22;
+  return [W3/2+rx*SC, H3/2-ry*cosT*SC+wz*sinT*SC, ry*cosT];
+}
+
+function flamm(r){ return r>1.001?-depth3d*2*Math.sqrt(r-1.0):-depth3d*2*Math.sqrt(0.001); }
+
+function draw3D(){
+  if(!ctx3) return;
+  ctx3.clearRect(0,0,W3,H3);
+  const bg=ctx3.createLinearGradient(0,0,0,H3);
+  bg.addColorStop(0,'#f7f4ee'); bg.addColorStop(1,'#ede8df');
+  ctx3.fillStyle=bg; ctx3.fillRect(0,0,W3,H3);
+
+  const HALF=9.5, STEP=0.75, r_min=1.02, isBH=Rph<=1.0;
+
+  function colorDepth(z,al){
+    const t=Math.min(1,Math.max(0,-z/(depth3d*2*Math.sqrt(HALF-1)+.001)));
+    return `rgba(${Math.round(140+80*t)},${Math.round(155-55*t)},${Math.round(175-95*t)},${al})`;
+  }
+  function lw(z){ const t=Math.min(1,Math.max(0,-z/(depth3d*2*Math.sqrt(HALF-1)+.001))); return .5+t*1.1; }
+
+  const segs=[];
+  function addLine(pts){
+    for(let i=0;i<pts.length-1;i++){
+      const a=pts[i],b=pts[i+1];
+      if(a&&b) segs.push({depth:(a[2]+b[2])*.5,wz:(a[3]+b[3])*.5,x1:a[0],y1:a[1],x2:b[0],y2:b[1]});
+    }
+  }
+
+  const Nsamp=280;
+  // Il corpo orbitante introduce una seconda depressione locale
+  // La depressione è proporzionale a m_orb/M e centrata su (ox,oy)
+  const mu = m_orb/M;
+  const ox_rs=orb.r*Math.cos(orb.phi), oy_rs=orb.r*Math.sin(orb.phi);
+
+  function localDip(wx,wy){
+    // Flamm locale del corpo orbitante: aggiunge una depressione
+    const dx=wx-ox_rs, dy=wy-oy_rs;
+    const d2=dx*dx+dy*dy+0.05;
+    const d=Math.sqrt(d2);
+    // Profilo: depressione gaussiana-ish ∝ mu/d
+    const r_eff = d/Math.sqrt(mu+.001)*2;
+    if(r_eff<1.01) return -depth3d*2*Math.sqrt(mu)*0.8;
+    const dip = d<=2.5*Math.sqrt(mu+.001) ? -depth3d*2*Math.sqrt(mu)*Math.sqrt(Math.max(0,1-(d/(2.5*Math.sqrt(mu+.001)))**2)) : 0;
+    return dip;
+  }
+
+  // Linee parallele X
+  for(let yi=-HALF;yi<=HALF+.01;yi+=STEP){
+    const pts=[];
+    for(let k=0;k<=Nsamp;k++){
+      const xi=-HALF+k*(2*HALF/Nsamp);
+      const r=Math.sqrt(xi*xi+yi*yi);
+      const wz=(r>r_min?flamm(r):flamm(r_min))+localDip(xi,yi);
+      const [sx,sy,dep]=proj3(xi,yi,wz);
+      pts.push([sx,sy,dep,wz]);
+    }
+    addLine(pts);
+  }
+  // Linee parallele Y
+  for(let xi=-HALF;xi<=HALF+.01;xi+=STEP){
+    const pts=[];
+    for(let k=0;k<=Nsamp;k++){
+      const yi=-HALF+k*(2*HALF/Nsamp);
+      const r=Math.sqrt(xi*xi+yi*yi);
+      const wz=(r>r_min?flamm(r):flamm(r_min))+localDip(xi,yi);
+      const [sx,sy,dep]=proj3(xi,yi,wz);
+      pts.push([sx,sy,dep,wz]);
+    }
+    addLine(pts);
+  }
+
+  segs.sort((a,b)=>b.depth-a.depth);
+  for(const seg of segs){
+    ctx3.beginPath(); ctx3.moveTo(seg.x1,seg.y1); ctx3.lineTo(seg.x2,seg.y2);
+    ctx3.strokeStyle=colorDepth(seg.wz,.72); ctx3.lineWidth=lw(seg.wz); ctx3.stroke();
+  }
+
+  // Cerchi di riferimento
+  const refs=[
+    {r:1.0,label:'rₛ',col:'rgba(190,60,40,.85)',lw:2,dash:[]},
+    {r:1.5,label:'r_foto',col:'rgba(30,110,70,.7)',lw:1.3,dash:[4,4]},
+    {r:6.0,label:'r_ISCO',col:'rgba(50,90,150,.45)',lw:.9,dash:[3,7]},
+  ];
+  for(const c of refs){
+    ctx3.beginPath(); let first=true;
+    for(let k=0;k<=200;k++){
+      const phi=(k/200)*Math.PI*2;
+      const wx=c.r*Math.cos(phi),wy=c.r*Math.sin(phi);
+      const wz=c.r>=r_min?flamm(c.r):flamm(r_min);
+      const [sx,sy]=proj3(wx,wy,wz);
+      first?(ctx3.moveTo(sx,sy),first=false):ctx3.lineTo(sx,sy);
+    }
+    ctx3.closePath(); ctx3.strokeStyle=c.col; ctx3.lineWidth=c.lw; ctx3.setLineDash(c.dash); ctx3.stroke(); ctx3.setLineDash([]);
+    const [lx,ly]=proj3(c.r,0,c.r>=r_min?flamm(c.r):flamm(r_min));
+    ctx3.font="11px 'DM Mono'"; ctx3.fillStyle=c.col; ctx3.fillText(c.label,lx+5,ly-3);
+  }
+
+  // Corpo centrale
+  const [cx3,cy3]=proj3(0,0,flamm(r_min));
+  const SC=Math.min(W3,H3)/22, tR=tilt3d*Math.PI/180;
+  const er=Math.min(Rph,.95)*SC, et=er*Math.cos(tR*.7);
+  if(isBH){
+    const hal=ctx3.createRadialGradient(cx3,cy3,er*.7,cx3,cy3,er*3.5);
+    hal.addColorStop(0,'rgba(255,130,20,.18)'); hal.addColorStop(1,'rgba(0,0,0,0)');
+    ctx3.beginPath();ctx3.ellipse(cx3,cy3,er*3.5,et*3.5,0,0,Math.PI*2);ctx3.fillStyle=hal;ctx3.fill();
+    ctx3.beginPath();ctx3.ellipse(cx3,cy3,er,et,0,0,Math.PI*2);ctx3.fillStyle='#111';ctx3.fill();
+    ctx3.strokeStyle='rgba(190,55,40,.8)';ctx3.lineWidth=1.5;ctx3.stroke();
+  } else {
+    const gs=ctx3.createRadialGradient(cx3-er*.2,cy3-et*.2,0,cx3,cy3,er);
+    gs.addColorStop(0,'rgba(255,255,210,1)');gs.addColorStop(.5,'rgba(255,185,75,.95)');gs.addColorStop(1,'rgba(255,110,20,.8)');
+    ctx3.beginPath();ctx3.ellipse(cx3,cy3,er,et,0,0,Math.PI*2);ctx3.fillStyle=gs;
+    ctx3.shadowColor='rgba(255,155,45,.4)';ctx3.shadowBlur=18;ctx3.fill();ctx3.shadowBlur=0;
+  }
+
+  // Corpo orbitante sulla superficie di Flamm
+  const wz_orb=flamm(orb.r)+localDip(ox_rs,oy_rs);
+  const [osx3,osy3]=proj3(ox_rs,oy_rs,wz_orb);
+  const or3=Math.max(4,3+3*(m_orb/5));
+  const g2=ctx3.createRadialGradient(osx3-or3*.3,osy3-or3*.3,0,osx3,osy3,or3);
+  g2.addColorStop(0,'rgba(255,240,175,1)');g2.addColorStop(.5,'rgba(220,165,75,.95)');g2.addColorStop(1,'rgba(180,115,25,.8)');
+  ctx3.beginPath();ctx3.arc(osx3,osy3,or3,0,Math.PI*2);ctx3.fillStyle=g2;
+  ctx3.shadowColor='rgba(220,155,55,.5)';ctx3.shadowBlur=14;ctx3.fill();ctx3.shadowBlur=0;
+
+  ctx3.font="500 12px 'EB Garamond'";ctx3.fillStyle='rgba(40,50,70,.5)';
+  ctx3.fillText('Superficie di Flamm — M='+M.toFixed(1)+'M☉, m='+m_orb.toFixed(2)+'M☉',14,18);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+readParams();
+computeGrid();
+computeRays();
+initOrbit();
+requestAnimationFrame(animLoop);
+</script>
+</body>
+</html>

@@ -419,7 +419,6 @@
     <section class="panel">
       <div class="panel-header">
         <div class="panel-title">Simulazioni disponibili</div>
-        <div class="counter" id="counter">Caricamento...</div>
       </div>
 
       <div class="filters">
@@ -452,7 +451,6 @@
   <script>
     const CATALOG_PATH = "simulations.json";
 
-    const counter = document.getElementById("counter");
     const results = document.getElementById("results");
     const searchInput = document.getElementById("searchInput");
     const categoryFilter = document.getElementById("categoryFilter");
@@ -631,7 +629,7 @@
       const simulations = (catalog.simulations || []).map(normalizeSimulation).filter(matchesFilters);
       const orderedCategories = sortCategories(catalog.categories || [], simulations);
 
-      counter.textContent = `${simulations.length} simulazione${simulations.length === 1 ? "" : "i"}`;
+      counter.textContent = `${simulations.length}
 
       if (simulations.length === 0) {
         results.innerHTML = `
@@ -660,7 +658,7 @@
                   <h2 class="category-title">${escapeHtml(category.name)}</h2>
                   ${category.description ? `<p class="category-desc">${escapeHtml(category.description)}</p>` : ""}
                 </div>
-                <div class="category-pill">${sims.length} simulazion${sims.length === 1 ? "e" : "i"}</div>
+             
               </div>
               <div class="grid">
                 ${sims.map(renderCard).join("")}
@@ -697,7 +695,7 @@
         buildCategoryOptions(normalizedSimulations, catalog.categories || []);
         render();
       } catch (error) {
-        counter.textContent = "Errore";
+        
         results.innerHTML = `
           <div class="error-state">
             Non è stato possibile caricare il catalogo delle simulazioni.<br>

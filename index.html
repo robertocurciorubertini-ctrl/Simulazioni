@@ -613,7 +613,7 @@
       const simulations = (catalog.simulations || []).map(normalizeSimulation).filter(matchesFilters);
       const orderedCategories = sortCategories(catalog.categories || [], simulations);
 
-      counter.textContent = `${simulations.length}
+ 
 
       if (simulations.length === 0) {
         results.innerHTML = `

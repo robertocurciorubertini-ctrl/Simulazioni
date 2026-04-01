@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build_catalog.py
+generate_sim.py
 
 Scansiona ricorsivamente una cartella di file HTML, cerca un blocco statico del tipo:
 
@@ -25,12 +25,8 @@ Caratteristiche principali:
 - deduce la categoria dalla prima cartella del percorso, se il campo "category"
   non è presente nei metadati oppure se si usa --category-source folder;
 - evita duplicati sia per "file" sia per "title";
-- conserva chiavi extra già presenti nel JSON quando possibile.
-
-Uso tipico:
-    py build_catalog.py
-    py build_catalog.py --category-source auto
-    py build_catalog.py --category-source folder
+- conserva chiavi extra già presenti nel JSON quando possibile;
+- include i file nella cartella WIP come simulazioni marcate con isWip=true.
 """
 
 from __future__ import annotations
@@ -84,7 +80,7 @@ def parse_args() -> argparse.Namespace:
 
 def find_html_files(root: Path) -> list[Path]:
     html_files = []
-    excluded_dirs = {"theory", "WIP"}
+    excluded_dirs = {"theory"}
 
     for p in root.rglob("*"):
         if not p.is_file():
@@ -119,11 +115,6 @@ def js_object_to_json(js_text: str) -> str:
         js_text,
     )
 
-    # Non convertire automaticamente stringhe tra apici singoli.
-    # Questa trasformazione rompe casi perfettamente validi come:
-    # "forme d'onda"
-    # quando l'apostrofo compare dentro una stringa già delimitata da doppi apici.
-
     js_text = re.sub(r",(\s*[}\]])", r"\1", js_text)
     return js_text
 
@@ -156,7 +147,15 @@ def infer_category_from_path(relative_path: Path) -> str:
     return title_case_from_slug(parts[0])
 
 
+def is_wip_path(relative_path: Path) -> bool:
+    parts = [part.casefold() for part in relative_path.parts]
+    return len(parts) > 1 and parts[0] == "wip"
+
+
 def choose_category(raw: dict[str, Any], relative_path: Path, mode: str) -> str:
+    if is_wip_path(relative_path):
+        return "WIP"
+
     from_folder = infer_category_from_path(relative_path)
     from_metadata = str(raw.get("category", "")).strip()
 
@@ -191,6 +190,8 @@ def load_metadata_from_html(path: Path, root: Path, category_source: str) -> dic
         )
 
     relative_path = path.relative_to(root)
+    wip_flag = is_wip_path(relative_path)
+
     result = dict(raw)
     result["file"] = relative_path.as_posix()
     result["title"] = str(raw["title"]).strip()
@@ -200,6 +201,7 @@ def load_metadata_from_html(path: Path, root: Path, category_source: str) -> dic
     result["category"] = choose_category(raw, relative_path, category_source)
     result["tags"] = [str(tag).strip() for tag in raw.get("tags", []) if str(tag).strip()]
     result["level"] = str(raw.get("level", "")).strip()
+    result["isWip"] = wip_flag
     return result
 
 
@@ -292,6 +294,25 @@ def merge_simulations(existing: list[dict[str, Any]], extracted: list[dict[str, 
     return sorted(dedup_by_title.values(), key=sort_key)
 
 
+def ensure_wip_category(data: dict[str, Any]) -> None:
+    categories = data.get("categories", [])
+    if not isinstance(categories, list):
+        data["categories"] = []
+        categories = data["categories"]
+
+    has_wip = any(
+        isinstance(cat, dict) and str(cat.get("name", "")).strip().casefold() == "wip"
+        for cat in categories
+    )
+
+    if not has_wip:
+      categories.append({
+          "name": "WIP",
+          "description": "Simulazioni in sviluppo o in fase di test.",
+          "order": 999999
+      })
+
+
 def write_json(data: dict[str, Any], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="\n") as f:
@@ -340,6 +361,7 @@ def main() -> int:
         return 1
 
     data["simulations"] = merge_simulations(existing_simulations, extracted)
+    ensure_wip_category(data)
 
     try:
         write_json(data, json_path)

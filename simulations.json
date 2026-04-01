@@ -39,9 +39,13 @@
       "name": "Meccanica Quantistica",
       "order": 8,
       "description": "Studio del moto dei fluidi e delle leggi che governano flusso, pressione ed energia nei mezzi continui."
+    },
+    {
+      "name": "WIP",
+      "description": "Simulazioni in sviluppo o in fase di test.",
+      "order": 999999
     }
   ],
-
   "simulations": [
     {
       "title": "Elettrostatica",
@@ -56,7 +60,8 @@
         "legge di Coulomb"
       ],
       "level": "intermedio",
-      "file": "elettro-magnetismo/elettrostatica.html"
+      "file": "elettro-magnetismo/elettrostatica.html",
+      "isWip": false
     },
     {
       "title": "Gravità",
@@ -72,7 +77,8 @@
         "legge di gravitazione universale"
       ],
       "level": "intermedio",
-      "file": "gravitazione/gravità.html"
+      "file": "gravitazione/gravità.html",
+      "isWip": false
     },
     {
       "title": "Moto rettilineo uniforme",
@@ -88,7 +94,8 @@
         "cinematica"
       ],
       "level": "base",
-      "file": "meccanica/moto-rettilineo-uniforme.html"
+      "file": "meccanica/moto-rettilineo-uniforme.html",
+      "isWip": false
     },
     {
       "title": "Moto uniformemente accelerato",
@@ -98,7 +105,8 @@
       "category": "Meccanica",
       "file": "meccanica/moto-uniformemente-accelerato.html",
       "tags": [],
-      "level": ""
+      "level": "",
+      "isWip": false
     },
     {
       "title": "Indipendenza dei moti",
@@ -114,7 +122,8 @@
         "cinematica"
       ],
       "level": "base",
-      "file": "meccanica/indipendenza-moti.html"
+      "file": "meccanica/indipendenza-moti.html",
+      "isWip": false
     },
     {
       "title": "Moto Parabolico",
@@ -130,7 +139,8 @@
         "composizione dei moti"
       ],
       "level": "base",
-      "file": "meccanica/moto-parabolico.html"
+      "file": "meccanica/moto-parabolico.html",
+      "isWip": false
     },
     {
       "title": "Moto Circolare",
@@ -146,7 +156,8 @@
         "traiettoria"
       ],
       "level": "base",
-      "file": "meccanica/moto-circolare.html"
+      "file": "meccanica/moto-circolare.html",
+      "isWip": false
     },
     {
       "title": "Moto Armonico",
@@ -162,7 +173,8 @@
         "ampiezza"
       ],
       "level": "intermedio",
-      "file": "meccanica/moto-armonico.html"
+      "file": "meccanica/moto-armonico.html",
+      "isWip": false
     },
     {
       "title": "Principi della Dinamica",
@@ -178,7 +190,8 @@
         "leggi di Newton"
       ],
       "level": "base",
-      "file": "meccanica/dinamica.html"
+      "file": "meccanica/dinamica.html",
+      "isWip": false
     },
     {
       "title": "Piano inclinato",
@@ -194,7 +207,8 @@
         "seconda legge di Newton"
       ],
       "level": "base",
-      "file": "meccanica/piano-inclinato.html"
+      "file": "meccanica/piano-inclinato.html",
+      "isWip": false
     },
     {
       "title": "Momento di una forza",
@@ -210,7 +224,8 @@
         "braccio della forza"
       ],
       "level": "base",
-      "file": "meccanica/momento-di-una-forza.html"
+      "file": "meccanica/momento-di-una-forza.html",
+      "isWip": false
     },
     {
       "title": "Conservazione dell'energia",
@@ -223,7 +238,8 @@
         "energia cinetica"
       ],
       "level": "base",
-      "file": "meccanica/conservazione-energia.html"
+      "file": "meccanica/conservazione-energia.html",
+      "isWip": false
     },
     {
       "title": "Suono",
@@ -242,7 +258,8 @@
         "armoniche"
       ],
       "level": "intermedio",
-      "file": "onde/suono.html"
+      "file": "onde/suono.html",
+      "isWip": false
     },
     {
       "title": "Interferenza",
@@ -259,7 +276,8 @@
         "interferenza distruttiva"
       ],
       "level": "intermedio",
-      "file": "onde/Interferenza-onde.html"
+      "file": "onde/Interferenza-onde.html",
+      "isWip": false
     },
     {
       "title": "Effetto Doppler",
@@ -275,7 +293,8 @@
         "suono"
       ],
       "level": "intermedio",
-      "file": "onde/effetto-doppler.html"
+      "file": "onde/effetto-doppler.html",
+      "isWip": false
     },
     {
       "title": "Rifrazione",
@@ -291,7 +310,8 @@
         "ottica geometrica"
       ],
       "level": "base",
-      "file": "ottica/rifrazione.html"
+      "file": "ottica/rifrazione.html",
+      "isWip": false
     },
     {
       "title": "Specchi e Lenti",
@@ -307,7 +327,106 @@
         "ottica geometrica"
       ],
       "level": "base",
-      "file": "ottica/specchi-e-lenti.html"
+      "file": "ottica/specchi-e-lenti.html",
+      "isWip": false
+    },
+    {
+      "title": "Fluidodinamica",
+      "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
+      "category": "WIP",
+      "icon": "🌊",
+      "order": 1,
+      "tags": [
+        "fluidi",
+        "Bernoulli",
+        "continuità",
+        "flusso",
+        "pressione"
+      ],
+      "level": "intermedio",
+      "file": "WIP/fluidodinamica.html",
+      "isWip": true
+    },
+    {
+      "title": "Meccanica quantistica",
+      "description": "Visualizzazione di fenomeni quantistici come funzione d'onda, probabilità e comportamento ondulatorio delle particelle.",
+      "category": "WIP",
+      "icon": "🧬",
+      "order": 1,
+      "tags": [
+        "funzione d'onda",
+        "probabilità",
+        "quantistica",
+        "particelle"
+      ],
+      "level": "avanzato",
+      "file": "WIP/meccanica_quantistica.html",
+      "isWip": true
+    },
+    {
+      "title": "Relatività ristretta",
+      "description": "Studio degli effetti relativistici a velocità prossime a quella della luce, come dilatazione dei tempi e contrazione delle lunghezze.",
+      "category": "WIP",
+      "icon": "⏱️",
+      "order": 1,
+      "tags": [
+        "relatività ristretta",
+        "dilatazione dei tempi",
+        "contrazione delle lunghezze",
+        "trasformazioni di Lorentz"
+      ],
+      "level": "avanzato",
+      "file": "WIP/relativita_ristretta.html",
+      "isWip": true
+    },
+    {
+      "title": "Relatività generale",
+      "description": "Introduzione alla gravità come curvatura dello spazio-tempo e visualizzazione degli effetti gravitazionali su traiettorie e tempo.",
+      "category": "WIP",
+      "icon": "🌀",
+      "order": 2,
+      "tags": [
+        "spazio-tempo",
+        "gravità",
+        "curvatura",
+        "geodetiche"
+      ],
+      "level": "avanzato",
+      "file": "WIP/relativita_generale.html",
+      "isWip": true
+    },
+    {
+      "title": "Urti",
+      "description": "Simulazione delle collisioni tra corpi con analisi della conservazione della quantità di moto e dell'energia (urti elastici e anelastici).",
+      "category": "WIP",
+      "icon": "💥",
+      "order": 6,
+      "tags": [
+        "urti",
+        "quantità di moto",
+        "energia",
+        "collisioni",
+        "dinamica"
+      ],
+      "level": "intermedio",
+      "file": "WIP/urti.html",
+      "isWip": true
+    },
+    {
+      "title": "Tensione di una fune",
+      "description": "Studio delle forze di tensione in una fune ideale e delle condizioni di equilibrio dinamico e statico in sistemi vincolati.",
+      "category": "WIP",
+      "icon": "🪢",
+      "order": 7,
+      "tags": [
+        "tensione",
+        "forze vincolari",
+        "equilibrio",
+        "dinamica"
+      ],
+      "level": "intermedio",
+      "file": "WIP/tensione.html",
+      "isWip": true
     }
   ]
 }

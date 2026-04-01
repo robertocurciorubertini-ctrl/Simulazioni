@@ -274,6 +274,9 @@
     .nav-link.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
     .nav-link:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
 
+    details > summary:hover { color: var(--accent); }
+    details[open] > summary { margin-bottom: 0; }
+
     @media (max-width: 800px) {
       .grid-intro { grid-template-columns: 1fr; }
       .grid-2 { grid-template-columns: 1fr; }
@@ -292,7 +295,7 @@
         <!-- =========================================================
              PULSANTE SIMULAZIONE — modifica solo l'href qui sotto
              ========================================================= -->
-        <a id="sim-btn" href="PERCORSO/SIMULAZIONE/moto-parabolico-sim.html">
+        <a id="sim-btn" href="../../meccanica/moto-parabolico.html">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polygon points="3,2 13,8 3,14" fill="white"/>
           </svg>
@@ -384,7 +387,7 @@
 
           <!--
             Traiettoria parabolica:
-            Parametri usati: v0=1 (u.a.), θ=45°, g proporzionale
+            Parametri usati: v0=1 (u.a.), α=45°, g proporzionale
             x(t) = cos45·t = t/√2
             y(t) = sin45·t − 0.5·g·t²
             In pixel: lancio da (30,260), apice a (182,115), atterraggio a (334,260)
@@ -405,7 +408,7 @@
 
           <!-- gittata R -->
           <line x1="30" y1="276" x2="334" y2="276" stroke="#475569" stroke-width="1.2" marker-end="url(#arr-gray)" marker-start="url(#arr-gray-rev)"/>
-          <text x="182" y="292" fill="#475569" font-size="12" text-anchor="middle" font-style="italic">R (gittata)</text>
+          <text x="182" y="292" fill="#475569" font-size="12" text-anchor="middle" font-style="italic">L (gittata)</text>
 
           <!-- definizione marker frecce -->
           <defs>
@@ -430,22 +433,22 @@
           <!-- componente vx (orizzontale) -->
           <line x1="30" y1="260" x2="80" y2="260"
                 stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
-          <text x="46" y="253" fill="#16a34a" font-size="11.5" font-style="italic">v₀ₓ</text>
+          <text x="46" y="253" fill="#16a34a" font-size="11.5" font-style="italic">v₀,ₓ</text>
 
           <!-- componente vy (verticale) -->
           <line x1="30" y1="260" x2="30" y2="210"
                 stroke="#dc2626" stroke-width="2" marker-end="url(#arr-red)"/>
-          <text x="4" y="238" fill="#dc2626" font-size="11.5" font-style="italic">v₀ᵧ</text>
+          <text x="4" y="238" fill="#dc2626" font-size="11.5" font-style="italic">v₀,ᵧ</text>
 
           <!-- vettore v0 diagonale (composizione) -->
           <line x1="30" y1="260" x2="78" y2="212"
                 stroke="#1d4ed8" stroke-width="2.2" marker-end="url(#arr-blue)"/>
           <text x="62" y="232" fill="#1d4ed8" font-size="12" font-style="italic" font-weight="600">v⃗₀</text>
 
-          <!-- arco angolo θ -->
+          <!-- arco angolo α -->
           <path d="M 55 260 A 25 25 0 0 0 47.3 239.4"
                 fill="none" stroke="#334155" stroke-width="1.2"/>
-          <text x="58" y="252" fill="#334155" font-size="11" font-style="italic">θ</text>
+          <text x="58" y="252" fill="#334155" font-size="11" font-style="italic">α</text>
 
           <!-- vettore velocità all'apice (solo orizzontale) -->
           <line x1="182" y1="120" x2="222" y2="120"
@@ -457,7 +460,7 @@
                 stroke="#1d4ed8" stroke-width="2" marker-end="url(#arr-blue)"/>
           <text x="322" y="215" fill="#1d4ed8" font-size="11" font-style="italic">v⃗</text>
 
-          <!-- etichetta θ lancio -->
+          <!-- etichetta α lancio -->
           <text x="26" y="207" fill="#dc2626" font-size="11" font-style="italic" text-anchor="middle">↑ vᵧ</text>
 
         </svg>
@@ -468,19 +471,19 @@
     <section class="card section" id="velocita-iniziale">
       <h2>Scomporre la velocità iniziale</h2>
       <p>
-        Tutto parte dal momento del lancio. Immagina di lanciare un oggetto con una certa velocità $v_0$ (chiamata <em>velocità iniziale</em>), formando un angolo $\theta$ (theta) rispetto al suolo. Questa velocità non è né puramente orizzontale né puramente verticale: è una via di mezzo, una direzione obliqua.
+        Tutto parte dal momento del lancio. Immagina di lanciare un oggetto con una certa velocità $v_0$ (chiamata <em>velocità iniziale</em>), formando un angolo $\alpha$ (alpha) rispetto al suolo. Questa velocità non è né puramente orizzontale né puramente verticale: è una via di mezzo, una direzione obliqua.
       </p>
       <p>
         Per applicare il ragionamento dell'indipendenza dei moti, dobbiamo <strong>scomporre</strong> questa velocità nelle sue due componenti, esattamente come si scompone una forza lungo due assi. Usando la trigonometria di base, le due componenti della velocità iniziale risultano:
       </p>
       <div class="formula-box">
-        $$v_{0x} = v_0 \cos\theta \qquad\qquad v_{0y} = v_0 \sin\theta$$
+        $$v_{0,x} = v_0 \cos\alpha \qquad\qquad v_{0,y} = v_0 \sin\alpha$$
       </div>
       <p>
-        La componente orizzontale $v_{0x}$ è quella che "spinge" l'oggetto in avanti. La componente verticale $v_{0y}$ è quella che lo "spinge" verso l'alto all'inizio. Puoi verificare che queste due componenti, sommate vettorialmente (come i lati di un triangolo rettangolo), restituiscono esattamente la velocità $v_0$ con la direzione originale: $v_0 = \sqrt{v_{0x}^2 + v_{0y}^2}$.
+        La componente orizzontale $v_{0,x}$ è quella che "spinge" l'oggetto in avanti. La componente verticale $v_{0,y}$ è quella che lo "spinge" verso l'alto all'inizio. Puoi verificare che queste due componenti, sommate vettorialmente (come i lati di un triangolo rettangolo), restituiscono esattamente la velocità $v_0$ con la direzione originale: $v_0 = \sqrt{v_{0,x}^2 + v_{0,y}^2}$.
       </p>
       <div class="callout">
-        Pensa a un lancio con $\theta = 45°$: il coseno e il seno di 45° sono entrambi uguali a $\frac{\sqrt{2}}{2} \approx 0{,}71$, quindi la velocità si distribuisce in modo uguale tra le due direzioni. Se invece $\theta$ è piccolo (lancio quasi orizzontale), $\cos\theta$ è grande e $\sin\theta$ è piccolo: si va lontano ma non si sale molto.
+        Pensa a un lancio con $\alpha = 45°$: il coseno e il seno di 45° sono entrambi uguali a $\frac{\sqrt{2}}{2} \approx 0{,}71$, quindi la velocità si distribuisce in modo uguale tra le due direzioni. Se invece $\alpha$ è piccolo (lancio quasi orizzontale), $\cos\alpha$ è grande e $\sin\alpha$ è piccolo: si va lontano ma non si sale molto.
       </div>
     </section>
 
@@ -494,28 +497,37 @@
       <h3>Posizione in funzione del tempo</h3>
       <p>
         Orizzontalmente si ha un moto rettilineo uniforme (MRU): la distanza percorsa è semplicemente velocità per tempo, perché non c'è accelerazione.
-        Verticalmente si ha un moto uniformemente accelerato (MUA): la quota cresce inizialmente grazie a $v_{0y}$, ma viene progressivamente frenata dalla gravità che agisce sempre verso il basso.
+        Verticalmente si ha un moto uniformemente accelerato (MUA): la quota cresce inizialmente grazie a $v_{0,y}$, ma viene progressivamente frenata dalla gravità che agisce sempre verso il basso.
+      </p>
+      <p>
+        Nella forma più generale, che include una posizione iniziale arbitraria $(x_0, y_0)$, le leggi orarie si scrivono usando direttamente le componenti della velocità iniziale $v_{0,x} = v_0\cos\alpha$ e $v_{0,y} = v_0\sin\alpha$:
       </p>
       <div class="formula-box">
-        $$x(t) = v_0 \cos\theta \cdot t$$
-        $$y(t) = v_0 \sin\theta \cdot t - \frac{1}{2}g t^2$$
+        $$x(t) = v_{0,x}\,t + x_0$$
+        $$y(t) = \tfrac{1}{2}a\,t^2 + v_{0,y}\,t + y_0$$
       </div>
+      <p>
+        Nella seconda equazione $a = -g$ (l'accelerazione è diretta verso il basso, quindi negativa con la convenzione dell'asse $y$ verso l'alto). Nel caso più comune del lancio dal suolo si pone $x_0 = y_0 = 0$, e le formule si riducono alla forma più compatta. La scrittura con $v_{0,x}$ e $v_{0,y}$ è però più generale e vale anche per lanci da quote diverse o con condizioni iniziali arbitrarie.
+      </p>
 
       <h3>Velocità in funzione del tempo</h3>
       <p>
-        La componente orizzontale della velocità <strong>non cambia mai</strong>: è costante dall'inizio alla fine del volo. La componente verticale, invece, diminuisce durante la salita (la gravità la frena), si annulla all'apice, e poi aumenta nuovamente in modulo durante la discesa (la gravità la accelera verso il basso).
+        La componente orizzontale della velocità <strong>non cambia mai</strong>: è costante dall'inizio alla fine del volo, perché in assenza di attrito nessuna forza agisce orizzontalmente. La componente verticale, invece, diminuisce durante la salita (la gravità la frena), si annulla all'apice, e poi aumenta nuovamente in modulo durante la discesa.
       </p>
       <div class="formula-box">
-        $$v_x(t) = v_0 \cos\theta = \text{costante}$$
-        $$v_y(t) = v_0 \sin\theta - g\,t$$
+        $$v_x(t) = v_{0,x} = v_0\cos\alpha = \text{costante}$$
+        $$v_y(t) = a\,t + v_{0,y}$$
       </div>
+      <p>
+        Esplicitando $a = -g$, la seconda diventa $v_y(t) = v_{0,y} - g\,t$, che si annulla all'apice per $t_{\text{apice}} = v_{0,y}/g$. Scrivere la velocità verticale nella forma $at + v_{0,y}$ rende evidente l'analogia con la legge oraria $y(t)$: entrambe sono polinomi di primo grado in $t$, con gli stessi coefficienti.
+      </p>
       <p>
         Il modulo della velocità complessiva in un qualsiasi istante si ricava sempre con il teorema di Pitagora applicato alle due componenti:
       </p>
       <div class="formula-box">
-        $$v(t) = \sqrt{v_x^2 + v_y(t)^2}$$
+        $$v(t) = \sqrt{v_{0,x}^2 + v_y(t)^2}$$
       </div>
-      <p class="muted">Unità: $v_0$ in m/s, $\theta$ in gradi o radianti, $t$ in s, $g \approx 9{,}81$ m/s², $x$ e $y$ in m.</p>
+      <p class="muted">Unità: $v_0$ in m/s, $\alpha$ in gradi o radianti, $t$ in s, $a = -g \approx -9{,}81$ m/s², $x$ e $y$ in m.</p>
     </section>
 
     <!-- ── SEZIONE 4: grandezze notevoli ── -->
@@ -527,45 +539,56 @@
 
       <h3>Tempo all'apice e altezza massima</h3>
       <p>
-        L'oggetto raggiunge il punto più alto quando la sua velocità verticale diventa zero: in quel momento ha finito di salire e sta per iniziare a scendere. Ponendo $v_y(t) = 0$ si trova il tempo necessario per arrivare all'apice:
+        L'oggetto raggiunge il punto più alto quando la sua componente verticale di velocità si annulla: fino a quell'istante stava ancora salendo, subito dopo inizia a scendere. Poiché $v_y$ parte da $v_{0,y}$ e diminuisce linearmente con tasso $g$, il momento in cui si azzera è semplicemente il rapporto tra la velocità verticale iniziale e l'accelerazione di gravità. Se lo sostituiamo nell'equazione $y(t)$, otteniamo la quota massima raggiunta. Per indicare entrambe le quantità ricaviamo, in modo opzionale, le espressioni esplicite:
       </p>
-      <div class="formula-box">
-        $$t_{\text{apice}} = \frac{v_0 \sin\theta}{g}$$
-      </div>
-      <p>
-        Sostituendo questo valore in $y(t)$ si ottiene l'altezza massima $H$:
-      </p>
-      <div class="formula-box">
-        $$H = \frac{v_0^2 \sin^2\theta}{2g}$$
-      </div>
+      <details style="margin: 18px 0;">
+        <summary style="cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-size:0.92rem; font-weight:600; color:var(--blue); user-select:none;">
+          ▸ Mostra le formule per $t_{\text{apice}}$ e $H$
+        </summary>
+        <div class="formula-box" style="margin-top:12px;">
+          $$t_{\text{apice}} = \frac{v_{0,y}}{g} = \frac{v_0\sin\alpha}{g}$$
+          $$H = \frac{v_{0,y}^2}{2g} = \frac{v_0^2\sin^2\alpha}{2g}$$
+        </div>
+        <p style="font-size:0.93rem; color:var(--muted); margin-top:8px;">
+          La seconda si ottiene sostituendo $t_{\text{apice}}$ in $y(t) = \tfrac{1}{2}at^2 + v_{0,y}t$ con $a=-g$ e $y_0=0$.
+        </p>
+      </details>
 
-      <h3>Tempo di volo e gittata</h3>
+      <h3>Gittata</h3>
       <p>
-        Per la simmetria del moto (la traiettoria è speculare rispetto all'apice, quando partenza e arrivo sono alla stessa quota), il tempo totale di volo è esattamente il doppio del tempo all'apice:
+        La <strong>gittata</strong> $L$ è la distanza orizzontale percorsa dall'oggetto dal momento del lancio fino al ritorno alla quota di partenza. Poiché la velocità orizzontale è costante e pari a $v_{0,x}$, basta moltiplicarla per il tempo totale di volo. Per la simmetria della traiettoria parabolica (la fase di salita e quella di discesa sono speculari quando la quota di arrivo coincide con quella di partenza), il tempo totale è il doppio di $t_{\text{apice}}$, e la gittata risulta:
       </p>
       <div class="formula-box">
-        $$T_{\text{volo}} = \frac{2\,v_0 \sin\theta}{g}$$
+        $$L = \frac{2\,v_{0,x}\,v_{0,y}}{g}$$
       </div>
       <p>
-        La gittata $R$ si ottiene moltiplicando la velocità orizzontale (costante) per il tempo totale di volo. Usando l'identità trigonometrica $2\sin\theta\cos\theta = \sin(2\theta)$, l'espressione si semplifica elegantemente in:
+        Questa forma è particolarmente trasparente: la gittata cresce se aumenta la componente orizzontale (si va più veloci in avanti) oppure quella verticale (si rimane più a lungo in volo). Le due componenti contribuiscono simmetricamente. Sostituendo $v_{0,x} = v_0\cos\alpha$ e $v_{0,y} = v_0\sin\alpha$ e usando l'identità $2\sin\alpha\cos\alpha = \sin(2\alpha)$, si può riscrivere la formula nella forma tradizionale:
       </p>
-      <div class="formula-box">
-        $$R = v_0\cos\theta \cdot T_{\text{volo}} = \frac{v_0^2\,\sin(2\theta)}{g}$$
-      </div>
+      <details style="margin: 18px 0;">
+        <summary style="cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-size:0.92rem; font-weight:600; color:var(--blue); user-select:none;">
+          ▸ Mostra la forma con $\sin(2\alpha)$
+        </summary>
+        <div class="formula-box" style="margin-top:12px;">
+          $$L = \frac{v_0^2\,\sin(2\alpha)}{g}$$
+        </div>
+        <p style="font-size:0.93rem; color:var(--muted); margin-top:8px;">
+          Le due scritture sono equivalenti. La forma con $v_{0,x}$ e $v_{0,y}$ è più diretta e non richiede identità trigonometriche; quella con $\sin(2\alpha)$ evidenzia il ruolo dell'angolo di lancio.
+        </p>
+      </details>
       <div class="callout">
-        La gittata è massima quando $\sin(2\theta) = 1$, cioè per $\theta = 45°$. Vale anche una curiosità: angoli complementari come 30° e 60° producono la stessa gittata, perché $\sin(60°) = \sin(120°)$. Puoi verificarlo con la simulazione!
+        La gittata è massima quando $v_{0,x} = v_{0,y}$, cioè per $\alpha = 45°$. Vale anche una curiosità: angoli complementari come 30° e 60° producono la stessa gittata, perché $\sin(60°) = \sin(120°)$. Puoi verificarlo con la simulazione!
       </div>
 
       <h3>Casi particolari</h3>
       <div class="grid-2">
         <div class="info-box">
-          <h3>Lancio orizzontale ($\theta = 0°$)</h3>
+          <h3>Lancio orizzontale ($\alpha = 0°$)</h3>
           <p>
             La velocità iniziale è tutta orizzontale: $v_{0y} = 0$. L'oggetto non sale affatto, cade subito sotto l'effetto della gravità. Il tempo di volo dipende dall'altezza iniziale $h$: $T = \sqrt{2h/g}$, e la gittata è $R = v_0\sqrt{2h/g}$.
           </p>
         </div>
         <div class="info-box">
-          <h3>Lancio verticale ($\theta = 90°$)</h3>
+          <h3>Lancio verticale ($\alpha = 90°$)</h3>
           <p>
             La velocità è tutta verticale: $v_{0x} = 0$. L'oggetto sale e ridiscende lungo la stessa retta verticale, senza spostarsi orizzontalmente. L'altezza massima è $H = v_0^2/(2g)$. È il caso del sasso lanciato dritto verso l'alto.
           </p>
@@ -580,7 +603,7 @@
                LINK SIMULAZIONE nel corpo della pagina — stesso percorso
                del pulsante in alto a destra: modifica href qui sotto
                ========================================================= -->
-          <a class="nav-link primary" href="PERCORSO/SIMULAZIONE/moto-parabolico-sim.html">
+          <a class="nav-link primary" href="../../meccanica/moto-parabolico.html.html">
             Apri simulazione
           </a>
         </div>

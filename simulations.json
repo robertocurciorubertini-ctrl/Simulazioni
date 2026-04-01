@@ -331,23 +331,6 @@
       "isWip": false
     },
     {
-      "title": "Fluidodinamica",
-      "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
-      "category": "WIP",
-      "icon": "🌊",
-      "order": 1,
-      "tags": [
-        "fluidi",
-        "Bernoulli",
-        "continuità",
-        "flusso",
-        "pressione"
-      ],
-      "level": "intermedio",
-      "file": "WIP/fluidodinamica.html",
-      "isWip": true
-    },
-    {
       "title": "Meccanica quantistica",
       "description": "Visualizzazione di fenomeni quantistici come funzione d'onda, probabilità e comportamento ondulatorio delle particelle.",
       "category": "WIP",
@@ -426,6 +409,23 @@
       ],
       "level": "intermedio",
       "file": "WIP/tensione.html",
+      "isWip": true
+    },
+    {
+      "title": "Fluidodinamica",
+      "description": "Simulatore interattivo di circuiti RC, RL, RLC con corrente continua e alternata.",
+      "category": "WIP",
+      "icon": "💡",
+      "order": 20,
+      "tags": [
+        "circuiti",
+        "corrente",
+        "condensatore",
+        "resistenza",
+        "equivalente"
+      ],
+      "level": "intermedio",
+      "file": "WIP/circuiti.html",
       "isWip": true
     }
   ]

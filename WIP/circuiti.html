@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulatore di Circuiti Elettrici</title>
+<script>
+window.SIM_METADATA = {
+  "title": "Fluidodinamica",
+  "description": "Simulatore interattivo di circuiti RC, RL, RLC con corrente continua e alternata.",
+  "category": "Elettromagnetismo",
+  "icon": "💡",
+  "order": 20,
+  "tags": ["circuiti", "corrente", "condensatore", "resistenza", "equivalente"],
+  "level": "intermedio"
+};
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f2eb;--bg2:#eceae0;--bg3:#e2dfd4;--panel:#faf9f5;
+  --border:#c8c4b5;--text:#1a1a16;--text2:#5a5a50;--text3:#8a8a7a;
+  --acc:#c04a1a;--acc2:#e06030;--blue:#1a4a8a;--blue2:#2a6abf;
+  --green:#1a6a2a;--green2:#3a9a4a;--yel:#c08010;--yel2:#e0a020;--r:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+header{background:var(--text);color:var(--bg);padding:10px 20px;display:flex;align-items:center;gap:10px;border-bottom:3px solid var(--acc);flex-shrink:0;}
+header h1{font-family:'Space Mono',monospace;font-size:.9rem;letter-spacing:-.02em;}
+.tag{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--acc2);background:rgba(192,74,26,.15);padding:2px 6px;border-radius:3px;}
+.app{display:grid;grid-template-columns:252px 1fr 240px;flex:1;min-height:0;overflow:hidden;}
+/* LEFT */
+.lp{background:var(--panel);border-right:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;}
+.ps{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px;}
+.ps h3{font-family:'Space Mono',monospace;font-size:.57rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:7px;}
+.sr{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;}
+.sr label{font-size:.73rem;color:var(--text2);display:flex;justify-content:space-between;}
+.sr label span{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--acc);font-weight:700;}
+input[type=range]{width:100%;accent-color:var(--acc);}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;border-radius:4px;font-size:.73rem;padding:5px 9px;transition:all .15s;}
+.br{display:flex;gap:5px;flex-wrap:wrap;}
+.bp{background:var(--acc);color:#fff;font-weight:600;}.bp:hover{background:var(--acc2);}
+.bs{background:var(--bg3);color:var(--text);border:1px solid var(--border);}.bs:hover{background:var(--border);}
+.bd{background:#8a1a1a;color:#fff;}.bd:hover{background:#aa2a2a;}
+.cpg{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.cpb{background:var(--bg);border:1.5px solid var(--border);border-radius:4px;padding:6px 3px;text-align:center;font-size:.68rem;color:var(--text);cursor:pointer;transition:all .15s;}
+.cpb:hover{border-color:var(--acc);color:var(--acc);}
+.cpb.active{border-color:var(--acc);background:rgba(192,74,26,.09);color:var(--acc);}
+.cpb .sym{font-size:.88rem;display:block;margin-bottom:1px;}
+.mt{display:flex;gap:3px;margin-bottom:7px;}
+.mb{flex:1;padding:4px;font-size:.68rem;background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.mb.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+/* CENTER */
+.cw{position:relative;background:var(--bg);overflow:hidden;display:flex;flex-direction:column;}
+.sb{background:var(--bg2);border-bottom:1px solid var(--border);padding:3px 12px;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text3);flex-shrink:0;}
+.sb span{color:var(--acc);}
+#cc{display:block;flex:1;width:100%;}
+#hint{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(192,74,26,.9);color:#fff;font-family:'Space Mono',monospace;font-size:.62rem;padding:3px 12px;border-radius:20px;pointer-events:none;display:none;}
+.ga{display:none;position:absolute;bottom:0;left:0;right:0;background:rgba(20,20,14,.93);border-top:1px solid #555;padding:7px 12px;gap:12px;}
+.ga.vis{display:flex;}
+/* RIGHT */
+.rp{background:var(--panel);border-left:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
+.meter{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 9px;}
+.ml{font-family:'Space Mono',monospace;font-size:.52rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:1px;}
+.mv{font-family:'Space Mono',monospace;font-size:.92rem;font-weight:700;color:var(--acc);}
+.mv.bl{color:var(--blue2);}.mv.gr{color:var(--green2);}.mv.ye{color:var(--yel2);}.mv.rd{color:#dd2222;}
+.cl{display:flex;flex-direction:column;gap:3px;}
+.ci{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:.68rem;display:flex;align-items:center;gap:6px;}
+.ci:hover{border-color:var(--acc);}
+.ci .csym{font-size:.95rem;flex-shrink:0;}
+.ci .cname{flex:1;font-weight:600;}
+.ci .cv{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text2);}
+.ci .cd{color:#aa2a2a;cursor:pointer;padding:0 2px;margin-left:2px;}
+/* Resistor mini-symbol */
+.rsym{display:inline-flex;align-items:center;gap:0;}
+.rsym span{display:inline-block;}
+/* FORMULARIO */
+details.form{background:var(--text);color:var(--bg);flex-shrink:0;border-top:3px solid var(--acc);}
+details.form summary{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--acc2);cursor:pointer;padding:8px 16px;user-select:none;}
+details.form summary:hover{color:var(--acc);}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px;padding:9px 16px 13px;}
+.fc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:9px;}
+.fc h4{font-family:'Space Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.09em;color:var(--acc2);margin-bottom:6px;}
+.fc p{font-family:'Space Mono',monospace;font-size:.67rem;color:rgba(245,242,235,.85);line-height:1.6;}
+.fc p em{color:var(--yel2);font-style:normal;}
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.mo.vis{display:flex;}
+.mod{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;width:280px;box-shadow:0 8px 40px rgba(0,0,0,.3);}
+.mod h3{font-family:'Space Mono',monospace;font-size:.75rem;margin-bottom:11px;color:var(--acc);}
+.mf{margin-bottom:8px;}
+.mf label{display:block;font-size:.72rem;color:var(--text2);margin-bottom:2px;}
+.mf input{width:100%;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--text);}
+.mf input:focus{outline:none;border-color:var(--acc);}
+</style>
+</head>
+<body>
+<header>
+  <h1>⚡ Simulatore di Circuiti Elettrici</h1>
+  <span class="tag">FISICA II — LICEO</span>
+  <span class="tag" id="hdr-mode">CC</span>
+</header>
+<div class="app">
+  <!-- LEFT -->
+  <div class="lp">
+    <div class="ps">
+      <h3>Segnale</h3>
+      <div class="mt">
+        <button class="mb active" id="btn-dc" onclick="setMode('DC')">CC (DC)</button>
+        <button class="mb" id="btn-ac" onclick="setMode('AC')">CA (AC)</button>
+      </div>
+      <div class="sr">
+        <label>f.e.m. (forza elettromotrice) <span id="fem-val">12 V</span></label>
+        <input type="range" id="fem-sl" min="1" max="50" step="1" value="12" oninput="updateFEM(this.value)">
+      </div>
+      <div id="ac-ctrl" style="display:none">
+        <div class="sr">
+          <label>Frequenza reale <span id="freq-val">50 Hz</span></label>
+          <input type="range" id="freq-sl" min="1" max="1000" step="1" value="50" oninput="updateFreq(this.value)">
+        </div>
+        <div class="sr">
+          <label>Velocità visiva CA <span id="vfreq-val">0.4 Hz</span></label>
+          <input type="range" id="vfreq-sl" min="0.05" max="2" step="0.05" value="0.4" oninput="updateVisFreq(this.value)">
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <h3>Topologia</h3>
+      <div class="sr">
+        <label>Maglie <span id="mesh-val">1</span></label>
+        <input type="range" id="mesh-sl" min="1" max="4" step="1" value="1" oninput="updateMesh(this.value)">
+      </div>
+    </div>
+    <div class="ps">
+      <h3>Aggiungi componente</h3>
+      <div class="cpg">
+        <div class="cpb" id="cpbtn-R" onclick="selComp('R')"><span class="sym">⊓⊔</span>Resistenza</div>
+        <div class="cpb" id="cpbtn-C" onclick="selComp('C')"><span class="sym">⊣⊢</span>Condensatore</div>
+        <div class="cpb" id="cpbtn-L" onclick="selComp('L')"><span class="sym">⌇⌇</span>Induttanza</div>
+        <div class="cpb" id="cpbtn-W" onclick="selComp('W')"><span class="sym">✕</span>Rimuovi</div>
+      </div>
+      <p style="font-size:.65rem;color:var(--text3);margin-top:5px;line-height:1.4">Scegli tipo → clicca su un lato. "Rimuovi" elimina il componente su quel lato.</p>
+    </div>
+    <div class="ps">
+      <h3>Simulazione</h3>
+      <div class="br">
+        <button class="bp" onclick="startSim()">▶ Avvia</button>
+        <button class="bs" onclick="pauseSim()">⏸ Pausa</button>
+        <button class="bd" onclick="resetSim()">↺ Reset</button>
+      </div>
+      <div class="sr" style="margin-top:8px">
+        <label>Velocità particelle <span id="spd-val">3</span></label>
+        <input type="range" id="spd-sl" min="1" max="10" step="1" value="3" oninput="updateSpeed(this.value)">
+      </div>
+      <div class="sr">
+        <label>N. particelle <span id="np-val">20</span></label>
+        <input type="range" id="np-sl" min="5" max="60" step="5" value="20" oninput="updateNP(this.value)">
+      </div>
+      <label style="font-size:.71rem;display:flex;align-items:center;gap:5px;cursor:pointer;margin-top:4px">
+        <input type="checkbox" id="show-g" onchange="toggleGraphs(this.checked)"> Grafici V(t)/I(t)
+      </label>
+    </div>
+  </div>
+  <!-- CENTER -->
+  <div class="cw">
+    <div class="sb">Stato: <span id="st">Pronto — aggiungi componenti e avvia</span></div>
+    <canvas id="cc"></canvas>
+    <div id="hint">Clicca su un lato del circuito</div>
+    <div class="ga" id="ga">
+      <div><div style="font-family:'Space Mono',monospace;font-size:.55rem;color:#aaa;margin-bottom:2px">V(t) generatore</div><canvas id="gv" width="310" height="90" style="background:rgba(255,255,255,.04);border-radius:3px"></canvas></div>
+      <div><div style="font-family:'Space Mono',monospace;font-size:.55rem;color:#aaa;margin-bottom:2px">I(t) maglia 1</div><canvas id="gi" width="310" height="90" style="background:rgba(255,255,255,.04);border-radius:3px"></canvas></div>
+    </div>
+  </div>
+  <!-- RIGHT -->
+  <div class="rp">
+    <div class="ps">
+      <h3>Grandezze equivalenti</h3>
+      <div class="meter"><div class="ml">R_eq (resistenza)</div><div class="mv" id="mr-req">— Ω</div></div>
+      <div class="meter" style="margin-top:4px"><div class="ml">C_eq (capacità)</div><div class="mv bl" id="mr-ceq">— F</div></div>
+      <div class="meter" style="margin-top:4px"><div class="ml">L_eq (induttanza)</div><div class="mv gr" id="mr-leq">— H</div></div>
+      <div class="meter" style="margin-top:4px"><div class="ml">|Z| impedenza (CA)</div><div class="mv ye" id="mr-zeq">— Ω</div></div>
+      <div class="meter" style="margin-top:4px"><div class="ml">ω₀ risonanza</div><div class="mv" id="mr-om">— rad/s</div></div>
+    </div>
+    <div class="ps"><h3>Grandezze dinamiche</h3><div id="live"></div></div>
+    <div class="ps"><h3>Componenti</h3><div class="cl" id="clist"><p style="font-size:.68rem;color:var(--text3)">Nessun componente.</p></div></div>
+  </div>
+</div>
+<details class="form">
+  <summary>📐 Formulario — Leggi dei Circuiti</summary>
+  <div class="fg">
+    <div class="fc"><h4>Legge di Ohm</h4><p><em>V = R · I</em><br>V: tensione [V]<br>R: resistenza [Ω]<br>I: corrente [A]<br><em>P = V·I = R·I² = V²/R</em></p></div>
+    <div class="fc"><h4>Kirchhoff</h4><p><em>KCL (nodi):</em> Σ Iₖ = 0<br><br><em>KVL (maglie):</em> Σ Vₖ = 0<br>Somma d.d.p. in maglia chiusa = 0</p></div>
+    <div class="fc"><h4>Condensatore</h4><p><em>Q = C·V, I = C·dV/dt</em><br>Energia: <em>U = ½CV²</em><br>Carica CC: <em>V(t)=ε(1−e^−t/τ)</em><br><em>τ = RC</em><br>Serie: <em>1/C_eq=Σ1/Cₖ</em></p></div>
+    <div class="fc"><h4>Induttore</h4><p><em>V = L·dI/dt</em><br>Energia: <em>U = ½LI²</em><br>Carica CC: <em>I(t)=(ε/R)(1−e^−t/τ)</em><br><em>τ = L/R</em><br>Serie: <em>L_eq=ΣLₖ</em></p></div>
+    <div class="fc"><h4>Impedenza (CA)</h4><p><em>Z_R = R</em><br><em>Z_C = 1/(jωC) → X_C=1/(ωC)</em><br><em>Z_L = jωL → X_L=ωL</em><br><em>|Z|=√(R²+(X_L−X_C)²)</em><br><em>φ=arctan((X_L−X_C)/R)</em></p></div>
+    <div class="fc"><h4>Risonanza RLC</h4><p><em>ω₀ = 1/√(LC)</em><br><em>f₀ = ω₀/(2π)</em><br>Q: <em>(1/R)√(L/C)</em><br>A risonanza: <em>Z=R</em> (minimo)<br><em>I = ε/R</em> (massimo)</p></div>
+    <div class="fc"><h4>f.e.m. e potenza</h4><p><em>ε = V_t + r·I</em><br>r: resistenza interna<br><em>P_tot = ε·I</em><br><em>P_Joule = R·I²</em><br>Rendimento: <em>η=P_u/P_tot</em></p></div>
+    <div class="fc"><h4>Serie / Parallelo</h4><p>R serie: <em>R_eq=ΣRₖ</em><br>R parall.: <em>1/R_eq=Σ1/Rₖ</em><br>C serie: <em>1/C_eq=Σ1/Cₖ</em><br>C parall.: <em>C_eq=ΣCₖ</em><br>L serie: <em>L_eq=ΣLₖ</em></p></div>
+  </div>
+</details>
+<div class="mo" id="modal">
+  <div class="mod">
+    <h3 id="mod-title">Aggiungi Resistenza</h3>
+    <div class="mf"><label id="mod-lbl">Valore (Ω):</label><input type="number" id="mod-val" min="1e-12" step="1" value="100"></div>
+    <div class="mf"><label>Etichetta:</label><input type="text" id="mod-name" placeholder="es. R₁"></div>
+    <div class="br" style="margin-top:11px">
+      <button class="bp" onclick="confirmAdd()">Aggiungi</button>
+      <button class="bs" onclick="closeModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+<script>
+// ══════ COMPLESSI ══════
+const C=(re,im=0)=>({re,im});
+const Cadd=(a,b)=>({re:a.re+b.re,im:a.im+b.im});
+const Csub=(a,b)=>({re:a.re-b.re,im:a.im-b.im});
+const Cmul=(a,b)=>({re:a.re*b.re-a.im*b.im,im:a.re*b.im+a.im*b.re});
+const Cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;if(d<1e-60)return C(0);return{re:(a.re*b.re+a.im*b.im)/d,im:(a.im*b.re-a.re*b.im)/d};};
+const Cabs=a=>Math.sqrt(a.re*a.re+a.im*a.im);
+const Carg=a=>Math.atan2(a.im,a.re);
+function Zimp(comp,omega){
+  if(!comp)return C(0);
+  if(comp.type==='R')return C(comp.value);
+  if(comp.type==='C')return C(0,omega>1e-9?-1/(omega*comp.value):-1e12);
+  if(comp.type==='L')return C(0,omega*comp.value);
+  return C(0);
+}
+
+// ══════ STATE ══════
+const S={
+  mode:'DC',fem:12,freq:50,meshCount:1,
+  selType:null,pendSeg:null,
+  components:[],running:false,paused:false,
+  simTime:0,visPhase:0,visFreq:0.4,simSpeed:3,numParticles:20,
+  particles:[],graphV:[],graphI:[],showGraphs:false,
+  vc:{},il:{},ilN:{},heat:{},lastSol:null,compId:0,
+};
+
+// ══════ GEOMETRY ══════
+const MW=210,MH=170;
+let canvas,ctx,segs=[];
+
+function buildGeo(){
+  canvas=document.getElementById('cc');
+  if(!canvas)return;
+  ctx=canvas.getContext('2d');
+  sizeCv();
+  const N=S.meshCount;
+  const old={};
+  for(const s of segs)if(s.compId!==null)old[s.id]={type:s.type,cid:s.compId};
+  segs=[];
+  const sx=Math.max(20,(canvas.width-N*MW)/2);
+  const sy=Math.max(20,(canvas.height-MH)/2);
+  for(let m=0;m<N;m++){
+    const x=sx+m*MW,y=sy;
+    segs.push({id:`${m}-0`,x1:x,y1:y,x2:x+MW,y2:y,mi:m,si:0,type:'wire',compId:null});
+    if(m===N-1)segs.push({id:`${m}-1`,x1:x+MW,y1:y,x2:x+MW,y2:y+MH,mi:m,si:1,type:'wire',compId:null});
+    segs.push({id:`${m}-2`,x1:x,y1:y+MH,x2:x+MW,y2:y+MH,mi:m,si:2,type:'wire',compId:null});
+    if(m===0)segs.push({id:'0-3',x1:x,y1:y,x2:x,y2:y+MH,mi:0,si:3,type:'gen',compId:null});
+    else segs.push({id:`${m}-3`,x1:x,y1:y,x2:x,y2:y+MH,mi:m,si:3,type:'wire',compId:null,shared:true,nb:m-1});
+  }
+  for(const s of segs)if(old[s.id]){s.type=old[s.id].type;s.compId=old[s.id].cid;}
+  S.components=S.components.filter(c=>segs.find(s=>s.id===c.segId));
+  updEqMeters();
+}
+
+function sizeCv(){
+  const wrap=document.querySelector('.cw');
+  const sb=document.querySelector('.sb');
+  if(!wrap||!sb)return;
+  const w=wrap.clientWidth,h=wrap.clientHeight;
+  if(w<10||h<10)return;
+  const gh=S.showGraphs?110:0;
+  canvas.width=w;
+  canvas.height=Math.max(150,h-sb.offsetHeight-gh);
+}
+
+const slen=s=>Math.hypot(s.x2-s.x1,s.y2-s.y1);
+function dps(px,py,s){
+  const dx=s.x2-s.x1,dy=s.y2-s.y1,l2=dx*dx+dy*dy;
+  if(l2<1)return Math.hypot(px-s.x1,py-s.y1);
+  const t=Math.max(0,Math.min(1,((px-s.x1)*dx+(py-s.y1)*dy)/l2));
+  return Math.hypot(px-s.x1-t*dx,py-s.y1-t*dy);
+}
+
+// Segment contains point (px,py)? — for generator hide check
+function isOnGen(px,py){
+  const gen=segs.find(s=>s.id==='0-3');
+  if(!gen)return false;
+  // is point within bounding box of gen segment (with margin 18px = circle radius)
+  const margin=26;
+  const minX=Math.min(gen.x1,gen.x2)-margin,maxX=Math.max(gen.x1,gen.x2)+margin;
+  const minY=Math.min(gen.y1,gen.y2)-margin,maxY=Math.max(gen.y1,gen.y2)+margin;
+  return px>=minX&&px<=maxX&&py>=minY&&py<=maxY;
+}
+
+// ══════ DRAW ══════
+let hovSeg=null,blinkT=0;
+
+function draw(dt){
+  if(!ctx||!canvas.width)return;
+  blinkT+=(dt||.016);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // grid
+  ctx.save();ctx.strokeStyle='rgba(175,170,155,.16)';ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<canvas.height;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+  ctx.restore();
+  for(const s of segs)drawSeg(s);
+  drawParticles();
+  drawLabels();
+}
+
+function wcolor(s){
+  if(s.type==='R'){const h=Math.min(S.heat[s.compId]||0,1);return`rgb(${Math.round(80+h*172)},${Math.round(38-h*30)},20)`;}
+  if(s.type==='C')return'#1a4a8a';
+  if(s.type==='L')return'#1a6a2a';
+  if(s.type==='gen')return'#1a1a16';
+  return'#2a2a22';
+}
+
+function drawSeg(s){
+  const mx=(s.x1+s.x2)/2,my=(s.y1+s.y2)/2;
+  const isV=Math.abs(s.x1-s.x2)<1;
+  const len=slen(s);
+  const ang=Math.atan2(s.y2-s.y1,s.x2-s.x1);
+  // placement highlight
+  if(S.selType&&s.type!=='gen'){
+    if(s===hovSeg){
+      ctx.save();ctx.strokeStyle=`rgba(192,74,26,${.45+.4*Math.sin(blinkT*9)})`;
+      ctx.lineWidth=12;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(s.x1,s.y1);ctx.lineTo(s.x2,s.y2);ctx.stroke();ctx.restore();
+    } else {
+      ctx.save();ctx.strokeStyle='rgba(192,74,26,.09)';ctx.lineWidth=5;ctx.lineCap='round';ctx.setLineDash([4,6]);
+      ctx.beginPath();ctx.moveTo(s.x1,s.y1);ctx.lineTo(s.x2,s.y2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    }
+  }
+  ctx.save();ctx.strokeStyle=wcolor(s);ctx.lineWidth=2.5;ctx.lineCap='round';
+  if(s.type==='gen')drawGen(s,mx,my,isV);
+  else if(s.type==='R'){drawR(s,mx,my,ang,len);drawHeat(s,mx,my,ang);}
+  else if(s.type==='C'){drawC(s,mx,my,ang,len);drawEfield(s,mx,my,ang);}
+  else if(s.type==='L'){drawL(s,mx,my,ang,len);drawBfield(s,mx,my,ang);}
+  else{ctx.beginPath();ctx.moveTo(s.x1,s.y1);ctx.lineTo(s.x2,s.y2);ctx.stroke();}
+  ctx.restore();
+}
+
+function drawGen(s,mx,my,isV){
+  ctx.strokeStyle='#1a1a16';ctx.lineWidth=2.5;const r=22;
+  if(isV){ctx.beginPath();ctx.moveTo(mx,s.y1);ctx.lineTo(mx,my-r);ctx.stroke();ctx.beginPath();ctx.moveTo(mx,my+r);ctx.lineTo(mx,s.y2);ctx.stroke();}
+  else{ctx.beginPath();ctx.moveTo(s.x1,my);ctx.lineTo(mx-r,my);ctx.stroke();ctx.beginPath();ctx.moveTo(mx+r,my);ctx.lineTo(s.x2,my);ctx.stroke();}
+  if(S.running&&!S.paused){ctx.beginPath();ctx.arc(mx,my,r+5,0,Math.PI*2);ctx.strokeStyle='rgba(192,74,26,.28)';ctx.lineWidth=5;ctx.stroke();}
+  ctx.beginPath();ctx.arc(mx,my,r,0,Math.PI*2);ctx.fillStyle='#faf9f5';ctx.fill();ctx.strokeStyle='#1a1a16';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#c04a1a';ctx.font='bold 12px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  if(isV){ctx.fillText('+',mx,my-11);ctx.fillText('−',mx,my+12);}else{ctx.fillText('+',mx-11,my);ctx.fillText('−',mx+12,my);}
+  ctx.fillStyle='#333';ctx.font='10px DM Sans,sans-serif';
+  ctx.fillText(`ε=${S.fem}V`,mx+(isV?28:0),my+(isV?0:-18));
+  if(S.mode==='AC')ctx.fillText(`${S.freq}Hz`,mx+(isV?28:0),my+(isV?13:-31));
+}
+
+// Resistor: zigzag
+function drawR(s,mx,my,ang,len){
+  ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+  const hcl=40;
+  ctx.beginPath();ctx.moveTo(-len/2,0);ctx.lineTo(-hcl,0);ctx.moveTo(hcl,0);ctx.lineTo(len/2,0);ctx.stroke();
+  // Zigzag
+  const steps=8,bh=7;ctx.beginPath();ctx.moveTo(-hcl,0);
+  for(let i=0;i<=steps;i++){const x=-hcl+(i/steps)*hcl*2,y=i%2===0?0:(i%4===1?-bh:bh);ctx.lineTo(x,y);}
+  ctx.stroke();ctx.restore();
+}
+
+function drawHeat(s,mx,my,ang){
+  const h=Math.min(S.heat[s.compId]||0,1);if(h<0.03)return;
+  ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+  const g=ctx.createRadialGradient(0,0,5,0,0,30+h*35);
+  g.addColorStop(0,`rgba(255,${Math.round(100-h*85)},0,${h*.65})`);g.addColorStop(1,'rgba(255,60,0,0)');
+  ctx.fillStyle=g;ctx.fillRect(-52,-36,104,72);
+  const nL=Math.round(h*8);ctx.strokeStyle=`rgba(255,175,55,${h*.6})`;ctx.lineWidth=1.2;ctx.setLineDash([2,4]);
+  for(let i=0;i<nL;i++){const xo=-36+(i/(Math.max(nL-1,1)))*72,a=4+h*12;ctx.beginPath();ctx.moveTo(xo,-a-9);ctx.bezierCurveTo(xo+a*.6,-a,xo-a*.6,a,xo,a+9);ctx.stroke();}
+  ctx.setLineDash([]);ctx.restore();
+  const comp=getComp(s.compId);
+  if(comp&&Math.abs(comp._I||0)>1e-9){
+    const P=comp._I*comp._I*comp.value;
+    ctx.save();ctx.fillStyle=`rgba(210,50,10,${.5+h*.5})`;
+    ctx.font=`bold ${9+Math.round(h*4)}px Space Mono,monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+    const isV=Math.abs(s.x1-s.x2)<1;
+    ctx.fillText(`P=${fmtN(P)}W`,mx+(isV?24:0),my+(isV?0:-20));ctx.restore();
+  }
+}
+
+function drawC(s,mx,my,ang,len){
+  ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+  ctx.strokeStyle='#1a4a8a';const gap=10,pl=26;
+  ctx.beginPath();ctx.moveTo(-len/2,0);ctx.lineTo(-gap/2,0);ctx.moveTo(gap/2,0);ctx.lineTo(len/2,0);ctx.stroke();
+  ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(-gap/2,-pl/2);ctx.lineTo(-gap/2,pl/2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(gap/2,-pl/2);ctx.lineTo(gap/2,pl/2);ctx.stroke();ctx.restore();
+}
+
+function drawEfield(s,mx,my,ang){
+  const comp=getComp(s.compId);if(!comp)return;
+  const charge=Math.min(Math.abs(comp._chargeNorm||0),1);if(charge<0.02)return;
+  ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+  const gap=10,pl=26;
+  const nDots=Math.round(2+charge*7);
+  for(let i=0;i<nDots;i++){
+    const yy=-pl*.44+pl*.88*i/(Math.max(nDots-1,1));
+    ctx.fillStyle=`rgba(192,74,26,${.35+charge*.65})`;ctx.beginPath();ctx.arc(-gap/2-5,yy,2.8,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='bold 6px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('+',-(gap/2)-5,yy);
+    ctx.fillStyle=`rgba(26,74,138,${.35+charge*.65})`;ctx.beginPath();ctx.arc(gap/2+5,yy,2.8,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.92)';ctx.fillText('−',gap/2+5,yy);
+  }
+  const nA=Math.round(1+charge*4);
+  for(let i=0;i<nA;i++){const yy=-pl*.36+pl*.72*i/(Math.max(nA-1,1));arrowCtx(ctx,-gap/2+1,yy,gap/2-1,yy,`rgba(255,190,35,${.38+charge*.58})`,1.3);}
+  const grd=ctx.createLinearGradient(-gap/2,0,gap/2,0);
+  grd.addColorStop(0,`rgba(192,74,26,${charge*.22})`);grd.addColorStop(.5,`rgba(255,215,65,${charge*.18})`);grd.addColorStop(1,`rgba(26,74,138,${charge*.22})`);
+  ctx.fillStyle=grd;ctx.fillRect(-gap/2,-pl/2,gap,pl);
+  if(Math.abs(comp._V||0)>0.001){ctx.fillStyle=`rgba(26,74,138,${.6+charge*.4})`;ctx.font='bold 9px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`V=${fmtN(Math.abs(comp._V))}V`,0,pl/2+13);}
+  ctx.restore();
+}
+
+function arrowCtx(ctx,x1,y1,x2,y2,color,lw){
+  const a=Math.atan2(y2-y1,x2-x1),len=Math.hypot(x2-x1,y2-y1);if(len<2)return;
+  ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-4*Math.cos(a),y2-4*Math.sin(a));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-7*Math.cos(a-.4),y2-7*Math.sin(a-.4));ctx.lineTo(x2-7*Math.cos(a+.4),y2-7*Math.sin(a+.4));ctx.closePath();ctx.fill();ctx.restore();
+}
+
+function drawL(s,mx,my,ang,len){
+  ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+  ctx.strokeStyle='#1a6a2a';const hcl=40;
+  ctx.beginPath();ctx.moveTo(-len/2,0);ctx.lineTo(-hcl,0);ctx.moveTo(hcl,0);ctx.lineTo(len/2,0);ctx.stroke();
+  const loops=5,lw=hcl*2/loops;
+  for(let i=0;i<loops;i++){const cx=-hcl+(i+.5)*lw;ctx.beginPath();ctx.arc(cx,0,lw/2,Math.PI,0,false);ctx.stroke();}
+  ctx.restore();
+}
+
+function drawBfield(s,mx,my,ang){
+  const comp=getComp(s.compId);if(!comp)return;
+  // In DC: campo cresce con la corrente (S.ilN). In CA: campo oscilla con la corrente istantanea
+  const flux=Math.min(Math.abs(S.ilN[comp.id]||0),1);if(flux<0.02)return;
+  ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+  const g=ctx.createRadialGradient(0,-20,3,0,-20,34+flux*28);
+  g.addColorStop(0,`rgba(30,140,55,${flux*.42})`);g.addColorStop(1,'rgba(30,140,55,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,-20,34+flux*28,0,Math.PI*2);ctx.fill();
+  const nD=Math.round(2+flux*5),spread=34;
+  for(let i=0;i<nD;i++){
+    const xo=-spread+i*spread*2/(Math.max(nD-1,1)),yo=-22-flux*7,al=.42+flux*.58;
+    ctx.strokeStyle=`rgba(30,120,50,${al})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(xo,yo,6,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle=`rgba(30,200,70,${al})`;ctx.beginPath();ctx.arc(xo,yo,2.2,0,Math.PI*2);ctx.fill();
+  }
+  if(Math.abs(comp._I||0)>1e-9){ctx.fillStyle=`rgba(20,100,35,${.6+flux*.4})`;ctx.font='bold 9px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`I=${fmtN(Math.abs(comp._I))}A`,0,14);}
+  ctx.restore();
+}
+
+// ══════ PARTICLES ══════
+// Build ALL paths through the circuit (outer loop + internal branches for multi-mesh)
+function buildAllPaths(){
+  const N=S.meshCount;
+  const paths=[];
+  // Outer path: gen(rev) → tops → right → bottoms(rev)
+  const outer=[];
+  const gen=segs.find(s=>s.id==='0-3');
+  // gen: corrente interna dal polo− (y2,basso) al polo+ (y1,alto) → rev:true
+  if(gen)outer.push({s:gen,rev:true});
+  for(let m=0;m<N;m++){const seg=segs.find(s=>s.id===`${m}-0`);if(seg)outer.push({s:seg,rev:false});}
+  const rt=segs.find(s=>s.id===`${N-1}-1`);if(rt)outer.push({s:rt,rev:false});
+  for(let m=N-1;m>=0;m--){const seg=segs.find(s=>s.id===`${m}-2`);if(seg)outer.push({s:seg,rev:true});}
+  if(outer.length)paths.push(outer);
+  // Internal branches: for each shared divider, add small loop through it
+  // These carry branch current I_mesh[m] - I_mesh[m-1]
+  for(let m=1;m<N;m++){
+    const sh=segs.find(s=>s.id===`${m}-3`&&s.shared);
+    if(!sh)continue;
+    // Small loop: top-m (left half) → shared vert → bottom-m (left half reversed)
+    // Represented as path going down and back up through adjacent mesh tops
+    // Simplified: just show particles on the shared segment going in/out
+    // We add it as a short bidirectional segment path
+    const topL=segs.find(s=>s.id===`${m-1}-0`);
+    const topR=segs.find(s=>s.id===`${m}-0`);
+    const botL=segs.find(s=>s.id===`${m-1}-2`);
+    const botR=segs.find(s=>s.id===`${m}-2`);
+    if(topL&&topR&&botL&&botR&&sh){
+      // Inner loop: right half of mesh m-1 top → shared divider ↓ → left half of mesh m-1 bottom ←
+      paths.push([
+        {s:topL,rev:false,partial:[0.5,1.0]},
+        {s:sh,rev:false},
+        {s:botL,rev:true,partial:[0,0.5]},
+      ]);
+    }
+  }
+  return paths;
+}
+
+function initParticles(){
+  S.particles=[];
+  const n=S.numParticles;
+  for(let i=0;i<n;i++)S.particles.push({t:i/n,pathIdx:0});
+}
+
+function pathTotalLen(path){
+  return path.reduce((a,{s,partial})=>{
+    const sl=slen(s);
+    if(partial)return a+sl*(partial[1]-partial[0]);
+    return a+sl;
+  },0);
+}
+
+function ptPos(t,path){
+  const tot=pathTotalLen(path);
+  let d=t*tot;
+  for(const{s,rev,partial}of path){
+    const sl=slen(s);
+    const pStart=partial?partial[0]:0,pEnd=partial?partial[1]:1;
+    const segContrib=sl*(pEnd-pStart);
+    if(d<=segContrib){
+      const f=pStart+(d/segContrib)*(pEnd-pStart);
+      return rev
+        ?{x:s.x2+(s.x1-s.x2)*(1-f+pStart),y:s.y2+(s.y1-s.y2)*(1-f+pStart)}
+        :{x:s.x1+(s.x2-s.x1)*f,y:s.y1+(s.y2-s.y1)*f};
+    }
+    d-=segContrib;
+  }
+  return null;
+}
+
+function drawParticles(){
+  if(!S.running||S.paused)return;
+  const paths=buildAllPaths();
+  if(!paths.length)return;
+  // Capacitor blocking factor (DC only)
+  let capBlock=0;
+  if(S.mode==='DC'){for(const c of S.components){if(c.type==='C')capBlock=Math.max(capBlock,Math.min(1,Math.abs(c._chargeNorm||0)));}}
+  const flowFactor=1-capBlock;
+  if(flowFactor<0.01)return;
+  // In CA: particles oscillate — direction determined by sign of current
+  // We use a signed speed: positive = forward, negative = backward
+  let signedFlow=1;
+  if(S.mode==='AC'){
+    const I0r=S.lastSol&&S.lastSol.Im?S.lastSol.Im[0]:null;
+    if(I0r!==null){const Ival=typeof I0r==='object'?Cabs(I0r)*Math.cos(S.visPhase+Carg(I0r)):I0r;signedFlow=Ival>=0?1:-1;}
+  }
+  for(const p of S.particles){
+    const path=paths[p.pathIdx%paths.length];
+    const tot=pathTotalLen(path);if(tot<1)continue;
+    // Hide particles that are on the generator segment
+    const pos=ptPos(p.t,path);if(!pos)continue;
+    if(isOnGen(pos.x,pos.y))continue; // nasconde particelle sul generatore
+    const t2=(p.t-0.007+1)%1,tail=ptPos(t2,path);
+    const alpha=flowFactor*0.9;
+    if(tail&&!isOnGen(tail.x,tail.y)){ctx.save();ctx.strokeStyle=`rgba(210,90,25,${flowFactor*.26})`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tail.x,tail.y);ctx.lineTo(pos.x,pos.y);ctx.stroke();ctx.restore();}
+    ctx.save();ctx.beginPath();ctx.arc(pos.x,pos.y,4.5,0,Math.PI*2);ctx.fillStyle=`rgba(228,92,42,${alpha})`;ctx.fill();ctx.strokeStyle=`rgba(255,210,175,${flowFactor*.68})`;ctx.lineWidth=1;ctx.stroke();ctx.restore();
+  }
+}
+
+function drawLabels(){
+  for(const s of segs){
+    if(!s.compId)continue;const comp=getComp(s.compId);if(!comp)continue;
+    const mx=(s.x1+s.x2)/2,my=(s.y1+s.y2)/2;const isV=Math.abs(s.x1-s.x2)<1;
+    const ox=isV?25:0,oy=isV?0:-21;
+    ctx.save();ctx.font='bold 10px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=wcolor(s);ctx.fillText(comp.name,mx+ox,my+oy);ctx.restore();
+  }
+}
+
+// ══════ SOLVER KVL ══════
+function getMeshSegs(m){
+  const N=S.meshCount,res=[];
+  const top=segs.find(s=>s.id===`${m}-0`);if(top)res.push({id:top.id,shared:false});
+  if(m===N-1){const r=segs.find(s=>s.id===`${m}-1`);if(r)res.push({id:r.id,shared:false});}
+  const bot=segs.find(s=>s.id===`${m}-2`);if(bot)res.push({id:bot.id,shared:false});
+  if(m===0){const g=segs.find(s=>s.id==='0-3');if(g)res.push({id:g.id,shared:false});}
+  if(m>0){const sh=segs.find(s=>s.id===`${m}-3`&&s.shared);if(sh)res.push({id:sh.id,shared:true,nb:m-1});}
+  if(m<N-1){const sh=segs.find(s=>s.id===`${m+1}-3`&&s.shared);if(sh)res.push({id:sh.id,shared:true,nb:m+1});}
+  return res;
+}
+
+function getZ(segId,omega){
+  const s=segs.find(x=>x.id===segId);if(!s||s.type==='gen')return C(1e-6);
+  if(!s.compId)return C(0);const c=getComp(s.compId);return c?Zimp(c,omega):C(0);
+}
+
+function gaussR(M,b,N){
+  const A=M.map((r,i)=>[...r,b[i]]);
+  for(let c=0;c<N;c++){
+    let pr=c;for(let r=c+1;r<N;r++)if(Math.abs(A[r][c])>Math.abs(A[pr][c]))pr=r;
+    if(pr!==c)[A[c],A[pr]]=[A[pr],A[c]];
+    const pv=A[c][c];if(Math.abs(pv)<1e-30)continue;
+    for(let r=0;r<N;r++){if(r===c)continue;const f=A[r][c]/pv;for(let j=c;j<=N;j++)A[r][j]-=f*A[c][j];}
+  }
+  return A.map((r,k)=>Math.abs(r[k])<1e-30?0:r[N]/r[k]);
+}
+
+function gaussC(M,b,N){
+  const A=M.map((r,i)=>[...r,b[i]]);
+  for(let c=0;c<N;c++){
+    let pr=c;for(let r=c+1;r<N;r++)if(Cabs(A[r][c])>Cabs(A[pr][c]))pr=r;
+    if(pr!==c)[A[c],A[pr]]=[A[pr],A[c]];
+    const pv=A[c][c];if(Cabs(pv)<1e-30)continue;
+    for(let r=0;r<N;r++){if(r===c)continue;const f=Cdiv(A[r][c],pv);for(let j=c;j<=N;j++)A[r][j]=Csub(A[r][j],Cmul(f,A[c][j]));}
+  }
+  return A.map((r,k)=>Cabs(r[k])<1e-30?C(0):Cdiv(r[N],r[k]));
+}
+
+function buildZmat(efR, efVaux, N){
+  const Zm=Array.from({length:N},()=>Array(N).fill(0));
+  const Vv=Array(N).fill(0);Vv[0]+=S.fem;
+  for(let m=0;m<N;m++){
+    for(const{id,shared,nb}of getMeshSegs(m)){
+      const r=efR(id),va=efVaux(id);
+      Zm[m][m]+=r;Vv[m]+=va;
+      if(shared&&nb>=0&&nb<N){Zm[m][nb]-=r;Vv[nb]-=va;}
+    }
+    if(Zm[m][m]<1e-9)Zm[m][m]=1e-9;
+  }
+  return{Zm,Vv};
+}
+
+function computeBranchI(Im,N){
+  const bI={};
+  for(const s of segs){
+    const m=s.mi;
+    bI[s.id]=s.shared?(m<N?Im[m]:0)-(m-1>=0?Im[m-1]:0):(m<N?Im[m]:0);
+  }
+  return bI;
+}
+
+function stepDC(dt){
+  const N=S.meshCount;
+  function efR(sid){const s=segs.find(x=>x.id===sid);if(!s||s.type==='gen')return 1e-6;if(!s.compId)return 0;const c=getComp(s.compId);if(!c)return 0;if(c.type==='R')return c.value;if(c.type==='C')return dt/c.value;if(c.type==='L')return c.value/dt;return 0;}
+  function efV(sid){const s=segs.find(x=>x.id===sid);if(!s||!s.compId)return 0;const c=getComp(s.compId);if(!c)return 0;if(c.type==='C')return-(S.vc[c.id]||0);if(c.type==='L')return(c.value/dt)*(S.il[c.id]||0);return 0;}
+  const{Zm,Vv}=buildZmat(efR,efV,N);
+  const Im=gaussR(Zm,Vv,N);
+  const bI=computeBranchI(Im,N);
+  const Rmax=Math.max(...S.components.filter(c=>c.type==='R').map(c=>c.value),.01);
+  for(const s of segs){
+    if(!s.compId)continue;const c=getComp(s.compId);if(!c)continue;
+    const Ib=bI[s.id]||0;c._I=Ib;
+    if(c.type==='R'){
+      c._V=Ib*c.value;
+      const p=Ib*Ib*c.value,mp=(S.fem*S.fem)/Math.max(Zm[0][0],.01);
+      S.heat[c.id]=Math.min(1,(S.heat[c.id]||0)*.993+(p/Math.max(mp,1e-6))*.007);
+    }
+    if(c.type==='C'){
+      // Aggiorna V_C con Eulero: V_C += I*dt/C
+      // Ma clampare a fem per evitare overflow
+      const oldV=S.vc[c.id]||0;
+      const newV=oldV+Ib*(dt/c.value);
+      S.vc[c.id]=Math.sign(newV)*Math.min(Math.abs(newV),Math.abs(S.fem)*1.05);
+      c._V=S.vc[c.id];
+      c._chargeNorm=Math.max(0,Math.min(1,Math.abs(S.vc[c.id])/Math.max(Math.abs(S.fem),.001)));
+    }
+    if(c.type==='L'){
+      // In DC: corrente nell'induttore cresce esponenzialmente verso ε/R
+      S.il[c.id]=Ib;
+      const Imax=S.fem/Math.max(Rmax,.001);
+      // ilN normalizzato 0..1 per display campo magnetico
+      S.ilN[c.id]=Math.min(1,Math.abs(Ib)/Math.max(Imax,.001));
+    }
+  }
+  return{Im,bI};
+}
+
+function stepAC(visPhase){
+  const N=S.meshCount,omega=2*Math.PI*S.freq;
+  const Zmat=Array.from({length:N},()=>Array.from({length:N},()=>C(0)));
+  const Vvec=Array.from({length:N},()=>C(0));Vvec[0]=C(S.fem*Math.sqrt(2));
+  for(let m=0;m<N;m++){
+    for(const{id,shared,nb}of getMeshSegs(m)){const z=getZ(id,omega);Zmat[m][m]=Cadd(Zmat[m][m],z);if(shared&&nb>=0&&nb<N)Zmat[m][nb]=Csub(Zmat[m][nb],z);}
+    if(Cabs(Zmat[m][m])<1e-9)Zmat[m][m]=C(1e-9);
+  }
+  const If=gaussC(Zmat,Vvec,N);
+  const bI={};
+  const Rmax=Math.max(...S.components.filter(c=>c.type==='R').map(c=>c.value),.01);
+  for(const s of segs){
+    const m=s.mi;let Iph;
+    if(s.shared){const Im=m<N?If[m]:C(0),Il=m-1>=0?If[m-1]:C(0);Iph=Csub(Im,Il);}
+    else Iph=m<N?If[m]:C(0);
+    const Ib=Cabs(Iph)*Math.cos(visPhase+Carg(Iph));bI[s.id]=Ib;
+    if(s.compId){
+      const c=getComp(s.compId);if(!c)continue;c._I=Ib;
+      if(c.type==='R'){
+        c._V=Ib*c.value;
+        S.heat[c.id]=Math.min(1,(S.heat[c.id]||0)*.992+(Ib*Ib*c.value/(S.fem*S.fem/Math.max(c.value,.001)))*.008);
+      }
+      if(c.type==='C'){
+        // Tensione sul C in CA: V_C = I_C * X_C, sfasata di 90°
+        const xc=1/(omega*c.value);
+        c._V=Cabs(Iph)*xc*Math.cos(visPhase+Carg(Iph)-Math.PI/2);
+        c._chargeNorm=Math.min(1,Math.abs(c._V)/Math.max(Math.abs(S.fem),.001));
+        S.vc[c.id]=c._chargeNorm;
+      }
+      if(c.type==='L'){
+        // In CA: il campo magnetico è proporzionale alla corrente istantanea
+        S.il[c.id]=Ib;
+        const Imax=S.fem/Math.max(Rmax,.001);
+        // ilN oscilla: positivo quando I>0, negativo quando I<0 (campo si inverte)
+        S.ilN[c.id]=Ib/Math.max(Imax,.001); // può essere negativo
+      }
+    }
+  }
+  return{Im:If,bI};
+}
+
+// ══════ PHYSICS STEP ══════
+function stepPhysics(dt){
+  if(!S.running||S.paused)return;
+  const simDt=dt*S.simSpeed*0.25;
+  S.simTime+=simDt;
+  // visPhase avanza a velocità didattica (visFreq Hz) indipendente dalla freq reale
+  S.visPhase+=dt*S.simSpeed*S.visFreq*2*Math.PI;
+  const sol=S.mode==='DC'?stepDC(simDt):stepAC(S.visPhase);
+  S.lastSol=sol;
+  // Muovi particelle — in CA oscillano avanti/indietro con il segno della corrente
+  const spd=0.00022*S.simSpeed;
+  if(S.mode==='DC'){
+    // DC: tutti in avanti, rallentano con cap carico
+    let capBlock=0;for(const c of S.components){if(c.type==='C')capBlock=Math.max(capBlock,Math.min(1,Math.abs(c._chargeNorm||0)));}
+    const ff=1-capBlock;
+    for(const p of S.particles){p.t=(p.t+spd*ff+1)%1;}
+  } else {
+    // CA: velocità proporzionale al seno della visPhase → oscilla avanti e indietro
+    const oscillation=Math.sin(S.visPhase);
+    for(const p of S.particles){p.t=(p.t+spd*oscillation+1)%1;}
+  }
+  // Graphs
+  if(S.showGraphs){
+    const vg=S.mode==='AC'?S.fem*Math.sqrt(2)*Math.cos(S.visPhase):S.fem;
+    const I0r=sol.Im[0];const I0=I0r&&typeof I0r==='object'?Cabs(I0r)*Math.cos(S.visPhase+Carg(I0r)):Math.abs(I0r||0);
+    S.graphV.push({t:S.simTime,v:vg});S.graphI.push({t:S.simTime,v:I0});
+    if(S.graphV.length>500){S.graphV.shift();S.graphI.shift();}
+  }
+  updateMeters(sol);
+}
+
+// ══════ METERS & EQUIV ══════
+// Calcola R_eq usando il solver KVL con tutte le R, e C_eq e L_eq analiticamente
+function computeEquiv(){
+  const N=S.meshCount;
+  // R_eq: usa il solver con solo resistenze (C→aperto in DC, L→cortocircuito in DC)
+  const Zm=Array.from({length:N},()=>Array(N).fill(0));
+  for(let m=0;m<N;m++){
+    for(const{id,shared,nb}of getMeshSegs(m)){
+      const s=segs.find(x=>x.id===id);if(!s||s.type==='gen')continue;
+      let r=0;
+      if(s.compId){const c=getComp(s.compId);if(c&&c.type==='R')r=c.value;}
+      Zm[m][m]+=r;if(shared&&nb>=0&&nb<N)Zm[m][nb]-=r;
+    }
+    if(Zm[m][m]<1e-9)Zm[m][m]=1e-9;
+  }
+  const bR=Array(N).fill(0);bR[0]=S.fem;
+  const IR=gaussR(Zm,bR,N);
+  const Req=Math.abs(IR[0])>1e-12?S.fem/IR[0]:Infinity;
+  // C_eq e L_eq: per ogni maglia in serie, poi maglie in parallelo (semplificato)
+  // Per una topologia a maglie adiacenti: componenti sulla stessa maglia sono in serie
+  // maglie diverse: le R equivalenti ci dicono la struttura
+  let Cinv=0,Cn=0,Ltot=0;
+  for(const s of segs){
+    if(!s.compId||s.mi!==0)continue; // solo maglia 0 per ora
+    const c=getComp(s.compId);if(!c)continue;
+    if(c.type==='L')Ltot+=c.value;
+    if(c.type==='C'){Cinv+=1/c.value;Cn++;}
+  }
+  return{Req:isFinite(Req)?Req:0,Ceq:Cn>0?1/Cinv:0,Leq:Ltot};
+}
+
+function updEqMeters(){
+  const{Req,Ceq,Leq}=computeEquiv();const omega=2*Math.PI*S.freq;
+  document.getElementById('mr-req').textContent=fmtN(Req)+' Ω';
+  document.getElementById('mr-ceq').textContent=Ceq>0?fmtN(Ceq)+' F':'— F';
+  document.getElementById('mr-leq').textContent=Leq>0?fmtN(Leq)+' H':'— H';
+  if(S.mode==='AC'){const XL=Leq>0?omega*Leq:0,XC=Ceq>0?1/(omega*Ceq):0;document.getElementById('mr-zeq').textContent=fmtN(Math.sqrt(Req*Req+(XL-XC)*(XL-XC)))+' Ω';}
+  else document.getElementById('mr-zeq').textContent='— Ω';
+  if(Leq>0&&Ceq>0)document.getElementById('mr-om').textContent=fmtN(1/Math.sqrt(Leq*Ceq))+' rad/s';
+  else document.getElementById('mr-om').textContent='— rad/s';
+}
+
+function updateMeters(sol){
+  updEqMeters();
+  const N=S.meshCount;const I0r=sol.Im[0];
+  const I0=I0r&&typeof I0r==='object'?Cabs(I0r):Math.abs(I0r||0);
+  let html=`<div class="meter"><div class="ml">Corrente maglia 1 (I₁)</div><div class="mv">${fmtN(I0)} A</div></div>`;
+  if(N>1)for(let k=1;k<N;k++){const Ir=sol.Im[k];const Ik=Ir&&typeof Ir==='object'?Cabs(Ir):Math.abs(Ir||0);html+=`<div class="meter" style="margin-top:4px"><div class="ml">Corrente maglia ${k+1}</div><div class="mv bl">${fmtN(Ik)} A</div></div>`;}
+  if(N>1)for(let k=1;k<N;k++){const sh=segs.find(s=>s.id===`${k}-3`&&s.shared);if(sh&&sol.bI){const Ib=sol.bI[sh.id]||0;html+=`<div class="meter" style="margin-top:4px"><div class="ml">I ramo condiviso ${k}|${k+1}</div><div class="mv gr">${fmtN(Math.abs(Ib))} A</div></div>`;}}
+  let Ptot=0;
+  for(const c of S.components){
+    if(c._V===undefined)continue;const V=Math.abs(c._V);
+    let lbl=c.type==='R'?'ΔV su':c.type==='C'?'V_C su':'V_L su';
+    if(V>1e-9)html+=`<div class="meter" style="margin-top:4px"><div class="ml">${lbl} ${c.name}</div><div class="mv ye">${fmtN(V)} V</div></div>`;
+    if(c.type==='R'&&c._I!==undefined){const P=c._I*c._I*c.value;Ptot+=P;if(P>1e-9)html+=`<div class="meter" style="margin-top:2px"><div class="ml">P Joule su ${c.name}</div><div class="mv rd">${fmtN(P)} W</div></div>`;}
+  }
+  html+=`<div class="meter" style="margin-top:6px;border-color:#bb2222"><div class="ml">Potenza totale dissipata</div><div class="mv rd">${fmtN(Ptot)} W</div></div>`;
+  document.getElementById('live').innerHTML=html;
+}
+
+// ══════ GRAPHS ══════
+function drawGraphs(){gDraw('gv',S.graphV,'#e06030','V');gDraw('gi',S.graphI,'#40aaff','A');}
+function gDraw(id,data,col,unit){
+  const gc=document.getElementById(id);if(!gc||data.length<2)return;
+  const gx=gc.getContext('2d');gx.clearRect(0,0,gc.width,gc.height);
+  const p=8,W=gc.width-p*2,H=gc.height-p*2;
+  const vals=data.map(d=>d.v),mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn||1;
+  const zy=p+(1-(0-mn)/rng)*H;gx.strokeStyle='rgba(255,255,255,.14)';gx.lineWidth=1;gx.beginPath();gx.moveTo(p,zy);gx.lineTo(p+W,zy);gx.stroke();
+  gx.strokeStyle=col;gx.lineWidth=1.5;gx.beginPath();data.forEach((d,i)=>{const x=p+(i/data.length)*W,y=p+(1-(d.v-mn)/rng)*H;i===0?gx.moveTo(x,y):gx.lineTo(x,y);});gx.stroke();
+  gx.fillStyle=col;gx.font='9px Space Mono';gx.fillText(`${fmtN(mx)} ${unit}`,p+2,p+10);gx.fillText(`${fmtN(mn)} ${unit}`,p+2,p+H);
+}
+
+// ══════ INTERACTION ══════
+function initEvents(){
+  const cv=document.getElementById('cc');
+  cv.addEventListener('mousemove',e=>{
+    canvas=cv;if(!S.selType){hovSeg=null;return;}
+    const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    hovSeg=null;for(const s of segs){if(s.type==='gen')continue;if(dps(mx,my,s)<15){hovSeg=s;break;}}
+    cv.style.cursor=hovSeg?'pointer':S.selType?'crosshair':'default';
+  });
+  cv.addEventListener('click',e=>{
+    if(!S.selType)return;
+    canvas=cv;const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    for(const s of segs){
+      if(s.type==='gen')continue;
+      if(dps(mx,my,s)<15){
+        if(S.selType==='W'){
+          // Rimuovi componente su questo segmento
+          if(s.compId){removeComp(s.compId);}
+        } else {
+          S.pendSeg=s;openModal(S.selType);
+        }
+        return;
+      }
+    }
+  });
+}
+
+// ══════ MODAL ══════
+const DEFS={R:{lbl:'Resistenza',u:'Ω',v:100,st:1},C:{lbl:'Condensatore',u:'F (es. 0.0001)',v:0.0001,st:0.0001},L:{lbl:'Induttore',u:'H',v:0.01,st:0.001}};
+function openModal(t){const d=DEFS[t];document.getElementById('mod-title').textContent='Aggiungi '+d.lbl;document.getElementById('mod-lbl').textContent=`Valore (${d.u}):`;const i=document.getElementById('mod-val');i.value=d.v;i.step=d.st;i.min=1e-12;document.getElementById('mod-name').value='';document.getElementById('modal').classList.add('vis');}
+function closeModal(){document.getElementById('modal').classList.remove('vis');S.pendSeg=null;}
+function confirmAdd(){
+  const seg=S.pendSeg;if(!seg)return closeModal();
+  const val=parseFloat(document.getElementById('mod-val').value);if(isNaN(val)||val<=0){alert('Valore non valido.');return;}
+  const name=document.getElementById('mod-name').value.trim();const type=S.selType;const id=++S.compId;
+  const comp={id,type,value:val,name:name||(type+id),segId:seg.id,_V:0,_I:0,_chargeNorm:0};
+  S.components.push(comp);seg.type=type;seg.compId=id;
+  S.vc[id]=0;S.il[id]=0;S.ilN[id]=0;S.heat[id]=0;
+  closeModal();selComp(null);renderList();updEqMeters();
+}
+function removeComp(id){
+  const idx=S.components.findIndex(c=>c.id===id);if(idx<0)return;
+  const seg=segs.find(s=>s.id===S.components[idx].segId);if(seg){seg.type='wire';seg.compId=null;}
+  S.components.splice(idx,1);delete S.vc[id];delete S.il[id];delete S.ilN[id];delete S.heat[id];
+  renderList();updEqMeters();
+}
+
+// Component symbol as SVG-in-HTML for the list
+function compSymbol(type){
+  if(type==='R'){
+    // Zigzag ASCII art
+    return '<span style="font-family:monospace;font-size:.75rem;color:#c04a1a">⊓⊔⊓</span>';
+  }
+  if(type==='C')return '<span style="font-size:.9rem">⊣⊢</span>';
+  if(type==='L')return '<span style="font-size:.9rem">⌇⌇</span>';
+  return '<span>—</span>';
+}
+
+function renderList(){
+  const el=document.getElementById('clist');
+  if(!S.components.length){el.innerHTML='<p style="font-size:.68rem;color:var(--text3)">Nessun componente.</p>';return;}
+  el.innerHTML=S.components.map(c=>`
+    <div class="ci">
+      <span class="csym">${compSymbol(c.type)}</span>
+      <span class="cname">${c.name}</span>
+      <span class="cv">${fmtVal(c.value,c.type)}</span>
+      <span class="cd" onclick="removeComp(${c.id})" title="Rimuovi">✕</span>
+    </div>`).join('');
+}
+function getComp(id){return S.components.find(c=>c.id===id)||null;}
+
+// ══════ FORMAT ══════
+function fmtN(v){if(!isFinite(v)||isNaN(v))return'—';const a=Math.abs(v);if(a===0)return'0';if(a>=1e6)return(v/1e6).toFixed(2)+'M';if(a>=1e3)return(v/1e3).toFixed(2)+'k';if(a>=1)return v.toFixed(3);if(a>=1e-3)return(v*1e3).toFixed(2)+'m';if(a>=1e-6)return(v*1e6).toFixed(2)+'μ';if(a>=1e-9)return(v*1e9).toFixed(2)+'n';return v.toExponential(2);}
+function fmtVal(v,t){if(t==='R')return v>=1000?`${(v/1000).toFixed(1)}kΩ`:`${v}Ω`;if(t==='C')return v<1e-6?`${(v*1e9).toFixed(0)}nF`:v<1e-3?`${(v*1e6).toFixed(1)}μF`:`${(v*1e3).toFixed(1)}mF`;if(t==='L')return v<1e-3?`${(v*1e6).toFixed(0)}μH`:v<1?`${(v*1e3).toFixed(1)}mH`:`${v.toFixed(2)}H`;return`${v}`;}
+
+// ══════ CONTROLS ══════
+function setMode(m){S.mode=m;document.getElementById('btn-dc').classList.toggle('active',m==='DC');document.getElementById('btn-ac').classList.toggle('active',m==='AC');document.getElementById('ac-ctrl').style.display=m==='AC'?'block':'none';document.getElementById('hdr-mode').textContent=m;resetSim();}
+function updateFEM(v){S.fem=parseInt(v);document.getElementById('fem-val').textContent=v+' V';}
+function updateFreq(v){S.freq=parseInt(v);document.getElementById('freq-val').textContent=v+' Hz';}
+function updateVisFreq(v){S.visFreq=parseFloat(v);document.getElementById('vfreq-val').textContent=parseFloat(v).toFixed(2)+' Hz';}
+function updateMesh(v){S.meshCount=parseInt(v);document.getElementById('mesh-val').textContent=v;if(S.running)resetSim();buildGeo();initParticles();}
+function updateSpeed(v){S.simSpeed=parseInt(v);document.getElementById('spd-val').textContent=v;}
+function updateNP(v){S.numParticles=parseInt(v);document.getElementById('np-val').textContent=v;initParticles();}
+function selComp(t){
+  S.selType=S.selType===t?null:t;
+  ['R','C','L','W'].forEach(x=>document.getElementById('cpbtn-'+x).classList.toggle('active',S.selType===x));
+  document.getElementById('hint').style.display=S.selType?'block':'none';
+  if(!S.selType){if(canvas)canvas.style.cursor='default';hovSeg=null;}
+}
+function startSim(){if(S.running&&!S.paused)return;if(!S.running){S.simTime=0;S.visPhase=0;S.graphV=[];S.graphI=[];S.components.forEach(c=>{S.vc[c.id]=0;S.il[c.id]=0;S.ilN[c.id]=0;S.heat[c.id]=0;c._V=0;c._I=0;c._chargeNorm=0;});initParticles();}S.running=true;S.paused=false;document.getElementById('st').textContent=`In corso — ${S.mode} — ε=${S.fem}V`;}
+function pauseSim(){if(!S.running)return;S.paused=!S.paused;document.getElementById('st').textContent=S.paused?'In pausa':`In corso — ${S.mode}`;}
+function resetSim(){S.running=false;S.paused=false;S.simTime=0;S.visPhase=0;S.particles=[];S.graphV=[];S.graphI=[];S.components.forEach(c=>{S.vc[c.id]=0;S.il[c.id]=0;S.ilN[c.id]=0;S.heat[c.id]=0;c._V=0;c._I=0;c._chargeNorm=0;});document.getElementById('st').textContent='Resettato';document.getElementById('live').innerHTML='';updEqMeters();}
+function toggleGraphs(v){S.showGraphs=v;document.getElementById('ga').classList.toggle('vis',v);sizeCv();buildGeo();}
+
+// ══════ LOOP ══════
+let last=null;
+function loop(ts){
+  if(!last)last=ts;const dt=Math.min((ts-last)/1000,.05);last=ts;
+  if(ctx){stepPhysics(dt);draw(dt);if(S.showGraphs)drawGraphs();}
+  requestAnimationFrame(loop);
+}
+
+// ══════ INIT ══════
+window.addEventListener('load',()=>{
+  initEvents();initParticles();requestAnimationFrame(loop);
+  const ro=new ResizeObserver(()=>{canvas=document.getElementById('cc');if(canvas)ctx=canvas.getContext('2d');sizeCv();buildGeo();});
+  ro.observe(document.querySelector('.cw'));
+});
+</script>
+</body>
+</html>

@@ -429,6 +429,23 @@
       "isWip": true
     },
     {
+      "title": "Collasso stellare",
+      "description": "Simulazione numerica del collasso gravitazionale di una nube stellare con evoluzione verso proto-stella, stella stabile, supernova e stella di neutroni.",
+      "category": "WIP",
+      "icon": "✦",
+      "order": 10,
+      "tags": [
+        "collasso gravitazionale",
+        "SPH",
+        "supernova",
+        "stella di neutroni",
+        "astrofisica"
+      ],
+      "level": "avanzato",
+      "file": "WIP/Collasso stellare/collasso-stellare.html",
+      "isWip": true
+    },
+    {
       "title": "Circuiti",
       "description": "Simulatore interattivo di circuiti RC, RL, RLC con corrente continua e alternata.",
       "category": "WIP",

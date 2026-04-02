@@ -464,11 +464,13 @@ function waitForSimModule() {
   SimModule().then(module => {
     simModuleInstance = module;
 
-    sim_init = module.cwrap('sim_init', null, ['number']);
-    sim_step = module.cwrap('sim_step', null, ['number']);
-    sim_get_state = module.cwrap('sim_get_state', 'number', []);
-    sim_get_phase = module.cwrap('sim_get_phase', 'number', []);
-    sim_get_diagnostics = module.cwrap('sim_get_diagnostics', 'number', []);
+    // Chiamiamo direttamente le funzioni esportate dal WASM
+    // (senza usare cwrap che a volte non viene incluso da Emscripten)
+    sim_init = module._sim_init;
+    sim_step = module._sim_step;
+    sim_get_state = module._sim_get_state;
+    sim_get_phase = module._sim_get_phase;
+    sim_get_diagnostics = module._sim_get_diagnostics;
 
     sim_init(N_PARTICLES);
     wasmReady = true;
@@ -481,9 +483,6 @@ function waitForSimModule() {
     console.log("sim_get_state =", typeof sim_get_state);
     console.log("sim_get_diagnostics =", typeof sim_get_diagnostics);
     console.log("sim_get_phase =", typeof sim_get_phase);
-    console.log("statePtr iniziale =", sim_get_state());
-    console.log("diagPtr iniziale =", sim_get_diagnostics());
-    console.log("phase iniziale =", sim_get_phase());
 
     document.getElementById("loading-screen").classList.add("hidden");
     requestAnimationFrame(loop);

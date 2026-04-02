@@ -400,28 +400,23 @@ let HEAPF32 = null;
 let wasmReady = false;
 
 function refreshHeapViews() {
-  const memBuffer =
-    simModuleInstance?.wasmMemory?.buffer ||
-    simModuleInstance?.HEAPF32?.buffer ||
-    simModuleInstance?.HEAPU8?.buffer ||
-    simModuleInstance?.HEAP8?.buffer ||
-    simModuleInstance?.asm?.memory?.buffer ||
-    simModuleInstance?.instance?.exports?.memory?.buffer ||
-    simModuleInstance?.exports?.memory?.buffer ||
-    null;
+  // Cerchiamo il buffer di memoria ovunque Emscripten possa averlo nascosto
+  const memBuffer = 
+    simModuleInstance.HEAPF32?.buffer || 
+    simModuleInstance.wasmMemory?.buffer || 
+    simModuleInstance.instance?.exports?.memory?.buffer;
 
   if (!memBuffer) {
-    HEAPF32 = null;
     return false;
   }
 
-  if (!(HEAPF32 instanceof Float32Array) || HEAPF32.buffer !== memBuffer) {
+  // Se il buffer è cambiato o la vista non esiste, ricreiamola
+  if (!HEAPF32 || HEAPF32.buffer !== memBuffer) {
     HEAPF32 = new Float32Array(memBuffer);
   }
 
   return true;
-}
-let paused = false;
+}let paused = false;
 let speed  = 1;
 let currentPhase = 0;
 let overlayTimer = 0;

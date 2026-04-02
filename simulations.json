@@ -41,6 +41,11 @@
       "description": "Branca della fisica che studia il comportamento della materia e della radiazione su scala microscopica."
     },
     {
+      "name": "Astrofisica",
+      "order": 9,
+      "description": "Branca della fisica che studia i fenomeni e le leggi che governano l’Universo, dalle stelle e galassie fino agli oggetti più compatti e agli eventi più energetici."
+    },
+    {
       "name": "WIP",
       "description": "Simulazioni in sviluppo o in fase di test.",
       "order": 999999
@@ -442,7 +447,7 @@
         "astrofisica"
       ],
       "level": "avanzato",
-      "file": "WIP/Collasso stellare/collasso-stellare.html",
+      "file": "WIP/collasso_stellare/collasso-stellare.html",
       "isWip": true
     },
     {

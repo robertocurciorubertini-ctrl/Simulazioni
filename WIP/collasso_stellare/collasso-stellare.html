@@ -393,6 +393,19 @@ let sim_init, sim_step, sim_get_state, sim_get_phase, sim_get_diagnostics;
 let simModuleInstance = null;
 let HEAPF32 = null;
 let wasmReady = false;
+
+let sim_init, sim_step, sim_get_state, sim_get_phase, sim_get_diagnostics;
+let simModuleInstance = null;
+let HEAPF32 = null;
+let wasmReady = false;
+
+
+let paused = false;
+let speed  = 1;
+let currentPhase = 0;
+let overlayTimer = 0;
+let flashAlpha   = 0;
+let frameCount   = 0;
 let paused = false;
 let speed  = 1;
 let currentPhase = 0;
@@ -426,6 +439,7 @@ const CAM_LERP = 0.04;
 
 // ── Caricamento modulo WASM ──
 // sim.js è caricato con defer: aspettiamo che SimModule sia disponibile
+
 function waitForSimModule() {
   if (typeof SimModule === 'undefined') {
     setTimeout(waitForSimModule, 50);
@@ -434,9 +448,6 @@ function waitForSimModule() {
 
   SimModule().then(module => {
     simModuleInstance = module;
-
-    // prova a leggere la heap, ma senza assumere che esista già
-    HEAPF32 = module.HEAPF32 || null;
 
     sim_init = module.cwrap('sim_init', null, ['number']);
     sim_step = module.cwrap('sim_step', null, ['number']);
@@ -447,8 +458,10 @@ function waitForSimModule() {
     sim_init(N_PARTICLES);
     wasmReady = true;
 
+    const heapOk = refreshHeapViews();
+
     console.log("WASM inizializzato");
-    console.log("HEAPF32 disponibile =", !!HEAPF32);
+    console.log("heap disponibile =", heapOk);
     console.log("HEAPF32 length =", HEAPF32 ? HEAPF32.length : "non disponibile");
     console.log("sim_get_state =", typeof sim_get_state);
     console.log("sim_get_diagnostics =", typeof sim_get_diagnostics);
@@ -464,7 +477,9 @@ function waitForSimModule() {
     document.querySelector("#loading-screen p").textContent =
       "Errore caricamento WASM: " + err.message;
   });
-}waitForSimModule();
+}
+
+waitForSimModule();
 
 // ── Colore particella da temperatura e densità ──
 function tempColor(u, rho, phase) {
@@ -619,8 +634,10 @@ function loop() {
   if (!wasmReady || !simModuleInstance) return;
 
   try {
-    HEAPF32 = simModuleInstance.HEAPF32;
-    if (!HEAPF32) return;
+    if (!refreshHeapViews()) {
+  console.warn("Memoria WASM non accessibile");
+  return;
+}
 
     if (!paused) sim_step(speed);
 

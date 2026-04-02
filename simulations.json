@@ -33,12 +33,12 @@
     {
       "name": "Relatività",
       "order": 7,
-      "description": "Studio del moto dei fluidi e delle leggi che governano flusso, pressione ed energia nei mezzi continui."
+      "description": "“Branca della fisica che studia la struttura dello spazio-tempo e il moto dei corpi in condizioni di alte velocità o in presenza di campi gravitazionali intensi."
     },
     {
       "name": "Meccanica Quantistica",
       "order": 8,
-      "description": "Studio del moto dei fluidi e delle leggi che governano flusso, pressione ed energia nei mezzi continui."
+      "description": "Branca della fisica che studia il comportamento della materia e della radiazione su scala microscopica."
     },
     {
       "name": "WIP",
@@ -331,6 +331,23 @@
       "isWip": false
     },
     {
+      "title": "Fluidodinamica",
+      "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
+      "category": "WIP",
+      "icon": "🌊",
+      "order": 1,
+      "tags": [
+        "fluidi",
+        "Bernoulli",
+        "continuità",
+        "flusso",
+        "pressione"
+      ],
+      "level": "intermedio",
+      "file": "WIP/fluidodinamica.html",
+      "isWip": true
+    },
+    {
       "title": "Meccanica quantistica",
       "description": "Visualizzazione di fenomeni quantistici come funzione d'onda, probabilità e comportamento ondulatorio delle particelle.",
       "category": "WIP",
@@ -412,7 +429,7 @@
       "isWip": true
     },
     {
-      "title": "Fluidodinamica",
+      "title": "Circuiti",
       "description": "Simulatore interattivo di circuiti RC, RL, RLC con corrente continua e alternata.",
       "category": "WIP",
       "icon": "💡",

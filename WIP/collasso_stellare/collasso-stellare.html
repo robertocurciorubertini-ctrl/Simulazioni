@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
+<link rel="icon" href="data:,">
 <!-- sim.js deve essere caricato prima del codice applicativo -->
 <script src="sim.js" defer></script>
 <script>
@@ -393,6 +394,29 @@ let sim_init, sim_step, sim_get_state, sim_get_phase, sim_get_diagnostics;
 let simModuleInstance = null;
 let HEAPF32 = null;
 let wasmReady = false;
+
+function refreshHeapViews() {
+  const memBuffer =
+    simModuleInstance?.wasmMemory?.buffer ||
+    simModuleInstance?.HEAPF32?.buffer ||
+    simModuleInstance?.HEAPU8?.buffer ||
+    simModuleInstance?.HEAP8?.buffer ||
+    simModuleInstance?.asm?.memory?.buffer ||
+    simModuleInstance?.instance?.exports?.memory?.buffer ||
+    simModuleInstance?.exports?.memory?.buffer ||
+    null;
+
+  if (!memBuffer) {
+    HEAPF32 = null;
+    return false;
+  }
+
+  if (!(HEAPF32 instanceof Float32Array) || HEAPF32.buffer !== memBuffer) {
+    HEAPF32 = new Float32Array(memBuffer);
+  }
+
+  return true;
+}
 let paused = false;
 let speed  = 1;
 let currentPhase = 0;

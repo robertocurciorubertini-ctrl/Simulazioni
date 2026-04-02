@@ -1,0 +1,9 @@
+Comandi per entrare nell'ambiente Emscripten:
+
+cd C:\Users\rober\emsdk
+emsdk_env.bat
+
+
+comando per generare file collasso stellare:
+
+emcc sim.c -o sim.js -O2 -s WASM=1 -s EXPORTED_FUNCTIONS="['_sim_init','_sim_step','_sim_get_state','_sim_get_phase','_sim_get_diagnostics']" -s EXPORTED_RUNTIME_METHODS="['ccall','cwrap']" -s ALLOW_MEMORY_GROWTH=1 -s MODULARIZE=1 -s EXPORT_NAME="SimModule"

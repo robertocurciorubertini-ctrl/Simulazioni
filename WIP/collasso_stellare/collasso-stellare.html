@@ -434,7 +434,9 @@ function waitForSimModule() {
 
   SimModule().then(module => {
     simModuleInstance = module;
-    HEAPF32 = module.HEAPF32;
+
+    // prova a leggere la heap, ma senza assumere che esista già
+    HEAPF32 = module.HEAPF32 || null;
 
     sim_init = module.cwrap('sim_init', null, ['number']);
     sim_step = module.cwrap('sim_step', null, ['number']);
@@ -445,23 +447,24 @@ function waitForSimModule() {
     sim_init(N_PARTICLES);
     wasmReady = true;
 
- console.log("WASM inizializzato");
-  console.log("HEAPF32 length =", simModuleInstance.HEAPF32.length);
-  console.log("sim_get_state =", typeof sim_get_state);
-  console.log("sim_get_diagnostics =", typeof sim_get_diagnostics);
-  console.log("sim_get_phase =", typeof sim_get_phase);
-  console.log("statePtr iniziale =", sim_get_state());
-  console.log("diagPtr iniziale =", sim_get_diagnostics());
-  console.log("phase iniziale =", sim_get_phase());
+    console.log("WASM inizializzato");
+    console.log("HEAPF32 disponibile =", !!HEAPF32);
+    console.log("HEAPF32 length =", HEAPF32 ? HEAPF32.length : "non disponibile");
+    console.log("sim_get_state =", typeof sim_get_state);
+    console.log("sim_get_diagnostics =", typeof sim_get_diagnostics);
+    console.log("sim_get_phase =", typeof sim_get_phase);
+    console.log("statePtr iniziale =", sim_get_state());
+    console.log("diagPtr iniziale =", sim_get_diagnostics());
+    console.log("phase iniziale =", sim_get_phase());
 
     document.getElementById("loading-screen").classList.add("hidden");
     requestAnimationFrame(loop);
   }).catch(err => {
+    console.error("Errore durante init WASM:", err);
     document.querySelector("#loading-screen p").textContent =
       "Errore caricamento WASM: " + err.message;
   });
-}
-waitForSimModule();
+}waitForSimModule();
 
 // ── Colore particella da temperatura e densità ──
 function tempColor(u, rho, phase) {

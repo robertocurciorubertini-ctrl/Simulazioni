@@ -445,6 +445,15 @@ function waitForSimModule() {
     sim_init(N_PARTICLES);
     wasmReady = true;
 
+ console.log("WASM inizializzato");
+  console.log("HEAPF32 length =", simModuleInstance.HEAPF32.length);
+  console.log("sim_get_state =", typeof sim_get_state);
+  console.log("sim_get_diagnostics =", typeof sim_get_diagnostics);
+  console.log("sim_get_phase =", typeof sim_get_phase);
+  console.log("statePtr iniziale =", sim_get_state());
+  console.log("diagPtr iniziale =", sim_get_diagnostics());
+  console.log("phase iniziale =", sim_get_phase());
+
     document.getElementById("loading-screen").classList.add("hidden");
     requestAnimationFrame(loop);
   }).catch(err => {

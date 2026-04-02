@@ -431,21 +431,23 @@ function waitForSimModule() {
     setTimeout(waitForSimModule, 50);
     return;
   }
+
   SimModule().then(module => {
-  HEAPF32 = module.HEAPF32;
+    simModuleInstance = module;
+    HEAPF32 = module.HEAPF32;
 
-  sim_init         = module.cwrap('sim_init',         null,    ['number']);
-  sim_step         = module.cwrap('sim_step',         null,    ['number']);
-  sim_get_state    = module.cwrap('sim_get_state',    'number', []);
-  sim_get_phase    = module.cwrap('sim_get_phase',    'number', []);
-  sim_get_diagnostics = module.cwrap('sim_get_diagnostics', 'number', []);
+    sim_init = module.cwrap('sim_init', null, ['number']);
+    sim_step = module.cwrap('sim_step', null, ['number']);
+    sim_get_state = module.cwrap('sim_get_state', 'number', []);
+    sim_get_phase = module.cwrap('sim_get_phase', 'number', []);
+    sim_get_diagnostics = module.cwrap('sim_get_diagnostics', 'number', []);
 
-  sim_init(N_PARTICLES);
-  wasmReady = true;
+    sim_init(N_PARTICLES);
+    wasmReady = true;
 
-  document.getElementById("loading-screen").classList.add("hidden");
-  requestAnimationFrame(loop);
-}).catch(err => {
+    document.getElementById("loading-screen").classList.add("hidden");
+    requestAnimationFrame(loop);
+  }).catch(err => {
     document.querySelector("#loading-screen p").textContent =
       "Errore caricamento WASM: " + err.message;
   });
@@ -602,115 +604,146 @@ function drawChart(el, hist, color, maxEl) {
 // ── Loop principale ──
 function loop() {
   requestAnimationFrame(loop);
-  if (!wasmReady) return;
+  if (!wasmReady || !simModuleInstance) return;
 
-  // step fisici
-  if (!paused) sim_step(speed);
+  try {
+    HEAPF32 = simModuleInstance.HEAPF32;
+    if (!HEAPF32) return;
 
-  // leggi stato dal modulo WASM
-  const statePtr = sim_get_state();
-  const diagPtr  = sim_get_diagnostics();
-  const phase    = sim_get_phase();
+    if (!paused) sim_step(speed);
 
-  // header: [n_alive, ns_active, ns_x, ns_y, ns_pulse, cam_x, cam_y, 0]
-  const hOff    = statePtr / 4;
-  const nAlive  = HEAPF32[hOff + 0] | 0;
-  const nsActive= HEAPF32[hOff + 1] | 0;
-  const nsX     = HEAPF32[hOff + 2];
-  const nsY     = HEAPF32[hOff + 3];
-  const nsPulse = HEAPF32[hOff + 4];
-  const targetCamX = HEAPF32[hOff + 5];
-  const targetCamY = HEAPF32[hOff + 6];
+    const statePtr = sim_get_state();
+    const diagPtr  = sim_get_diagnostics();
+    const phase    = sim_get_phase();
 
-  // camera lerp verso centro di massa
-  camX += (targetCamX - camX) * CAM_LERP;
-  camY += (targetCamY - camY) * CAM_LERP;
-  const offX = W/2 - camX;
-  const offY = H/2 - camY;
+    if (!statePtr || !diagPtr) return;
+    if ((statePtr & 3) !== 0 || (diagPtr & 3) !== 0) return;
 
-  // diagnostica
-  const dOff = diagPtr / 4;
-  const maxRho = HEAPF32[dOff + 0];
-  const maxU   = HEAPF32[dOff + 1];
-  const rms    = HEAPF32[dOff + 2];
-  const energy = HEAPF32[dOff + 3];
+    const heapLen = HEAPF32.length;
+    const hOff = statePtr >> 2;
+    const dOff = diagPtr >> 2;
 
-  // aggiorna fase UI
-  if (phase !== currentPhase) {
-    currentPhase = phase;
-    updatePhaseUI(phase);
-  }
+    if (hOff < 0 || hOff + 7 >= heapLen) return;
+    if (dOff < 0 || dOff + 3 >= heapLen) return;
 
-  // overlay timer
-  if (overlayTimer > 0) {
-    overlayTimer--;
-    if (overlayTimer === 0) document.getElementById("overlay").classList.remove("visible");
-  }
+    const nAliveRaw = HEAPF32[hOff + 0];
+    if (!Number.isFinite(nAliveRaw)) return;
 
-  // history charts (ogni 2 frame)
-  if (frameCount % 2 === 0) {
-    histDens[histIdx % CHART_LEN] = maxRho;
-    histTemp[histIdx % CHART_LEN] = maxU;
-    histRMS [histIdx % CHART_LEN] = rms;
-    histIdx++;
-  }
+    let nAlive = nAliveRaw | 0;
+    const nsActive = HEAPF32[hOff + 1] | 0;
+    const nsX = HEAPF32[hOff + 2];
+    const nsY = HEAPF32[hOff + 3];
+    const nsPulse = HEAPF32[hOff + 4];
+    const targetCamX = HEAPF32[hOff + 5];
+    const targetCamY = HEAPF32[hOff + 6];
 
-  // info panel
-  document.getElementById("infoN").textContent      = nAlive;
-  document.getElementById("infoTemp").textContent   = maxU.toFixed(4);
-  document.getElementById("infoDens").textContent   = maxRho.toFixed(4);
-  document.getElementById("infoRMS").textContent    = rms.toFixed(1) + " px";
-  document.getElementById("infoEnergy").textContent = energy.toFixed(1);
+    const maxParticlesFromHeap = Math.floor((heapLen - (hOff + 8)) / 4);
+    if (nAlive < 0) nAlive = 0;
+    if (nAlive > maxParticlesFromHeap) nAlive = maxParticlesFromHeap;
+    if (nAlive > N_PARTICLES) nAlive = N_PARTICLES;
 
-  // ── RENDERING ──
-  ctx.save();
-  drawBackground();
+    const maxRho = HEAPF32[dOff + 0];
+    const maxU   = HEAPF32[dOff + 1];
+    const rms    = HEAPF32[dOff + 2];
+    const energy = HEAPF32[dOff + 3];
 
-  // trasla canvas per seguire il centro di massa
-  ctx.translate(offX, offY);
+    if (!Number.isFinite(targetCamX) || !Number.isFinite(targetCamY)) return;
+    if (!Number.isFinite(maxRho) || !Number.isFinite(maxU) ||
+        !Number.isFinite(rms) || !Number.isFinite(energy)) return;
 
-  // disegna particelle
-  const pBase = (statePtr / 4) + 8;
-  for (let i = 0; i < nAlive; i++) {
-    const o   = pBase + i*4;
-    const px_ = HEAPF32[o + 0];
-    const py_ = HEAPF32[o + 1];
-    const u_  = HEAPF32[o + 2];
-    const r_  = HEAPF32[o + 3];
-    const rad = Math.min(1.8 + r_*0.55, 6.5);
-    const col = tempColor(u_, r_, phase);
+    camX += (targetCamX - camX) * CAM_LERP;
+    camY += (targetCamY - camY) * CAM_LERP;
+    const offX = W/2 - camX;
+    const offY = H/2 - camY;
 
-    if (r_ > 0.4) {
-      const glow = Math.min(r_*2.2, 13);
-      const grd  = ctx.createRadialGradient(px_,py_,0,px_,py_,rad+glow);
-      grd.addColorStop(0, col); grd.addColorStop(0.5,col); grd.addColorStop(1,"transparent");
-      ctx.globalAlpha = Math.min(0.25+r_*0.13, 0.62);
-      ctx.fillStyle = grd;
-      ctx.beginPath(); ctx.arc(px_,py_,rad+glow,0,Math.PI*2); ctx.fill();
+    if (phase !== currentPhase && phase >= 0 && phase < PHASE_NAMES.length) {
+      currentPhase = phase;
+      updatePhaseUI(phase);
     }
 
-    ctx.globalAlpha = Math.min(0.72+r_*0.1, 0.96);
-    ctx.fillStyle = col;
-    ctx.beginPath(); ctx.arc(px_,py_,rad,0,Math.PI*2); ctx.fill();
+    if (overlayTimer > 0) {
+      overlayTimer--;
+      if (overlayTimer === 0) document.getElementById("overlay").classList.remove("visible");
+    }
+
+    if (frameCount % 2 === 0) {
+      histDens[histIdx % CHART_LEN] = maxRho;
+      histTemp[histIdx % CHART_LEN] = maxU;
+      histRMS [histIdx % CHART_LEN] = rms;
+      histIdx++;
+    }
+
+    document.getElementById("infoN").textContent      = nAlive;
+    document.getElementById("infoTemp").textContent   = maxU.toFixed(4);
+    document.getElementById("infoDens").textContent   = maxRho.toFixed(4);
+    document.getElementById("infoRMS").textContent    = rms.toFixed(1) + " px";
+    document.getElementById("infoEnergy").textContent = energy.toFixed(1);
+
+    ctx.save();
+    drawBackground();
+    ctx.translate(offX, offY);
+
+    const pBase = hOff + 8;
+    for (let i = 0; i < nAlive; i++) {
+      const o = pBase + i * 4;
+      if (o + 3 >= heapLen) break;
+
+      const px_ = HEAPF32[o + 0];
+      const py_ = HEAPF32[o + 1];
+      const u_  = HEAPF32[o + 2];
+      const r_  = HEAPF32[o + 3];
+
+      if (!Number.isFinite(px_) || !Number.isFinite(py_) || !Number.isFinite(u_) || !Number.isFinite(r_)) {
+        continue;
+      }
+
+      const rad = Math.min(1.8 + r_ * 0.55, 6.5);
+      const col = tempColor(u_, r_, phase);
+
+      if (r_ > 0.4) {
+        const glow = Math.min(r_ * 2.2, 13);
+        const grd = ctx.createRadialGradient(px_, py_, 0, px_, py_, rad + glow);
+        grd.addColorStop(0, col);
+        grd.addColorStop(0.5, col);
+        grd.addColorStop(1, "transparent");
+        ctx.globalAlpha = Math.min(0.25 + r_ * 0.13, 0.62);
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(px_, py_, rad + glow, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = Math.min(0.72 + r_ * 0.1, 0.96);
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(px_, py_, rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+    if (nsActive) drawNeutronStar(nsX, nsY, nsPulse);
+
+    ctx.restore();
+    drawFlash(W/2, H/2);
+
+    if (frameCount % 4 === 0) {
+      drawChart(document.getElementById("chartDens"), histDens, "rgb(245,166,35)", document.getElementById("chartDensMax"));
+      drawChart(document.getElementById("chartTemp"), histTemp, "rgb(255,110,80)", document.getElementById("chartTempMax"));
+      drawChart(document.getElementById("chartRMS"), histRMS, "rgb(126,240,199)", document.getElementById("chartRMSMax"));
+    }
+
+    frameCount++;
+  } catch (err) {
+    paused = true;
+    wasmReady = false;
+    console.error("Errore nel loop della simulazione:", err);
+
+    const loadingText = document.querySelector("#loading-screen p");
+    if (loadingText) {
+      document.getElementById("loading-screen").classList.remove("hidden");
+      loadingText.textContent = "Errore runtime JS/WASM: " + err.message;
+    }
   }
-  ctx.globalAlpha = 1;
-
-  // stella di neutroni
-  if (nsActive) drawNeutronStar(nsX, nsY, nsPulse);
-
-  ctx.restore();
-
-  // flash supernova (in spazio schermo, non world)
-  drawFlash(W/2, H/2);
-
-  // charts (ogni 4 frame)
-  if (frameCount % 4 === 0) {
-    drawChart(document.getElementById("chartDens"), histDens, "rgb(245,166,35)", document.getElementById("chartDensMax"));
-    drawChart(document.getElementById("chartTemp"), histTemp, "rgb(255,110,80)",  document.getElementById("chartTempMax"));
-    drawChart(document.getElementById("chartRMS"),  histRMS,  "rgb(126,240,199)", document.getElementById("chartRMSMax"));
-  }
-
-  frameCount++;
 }
 
 // ── UI handlers ──

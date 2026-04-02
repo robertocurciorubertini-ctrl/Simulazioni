@@ -361,9 +361,6 @@ window.SIM_METADATA = {
   Una nube di gas e polvere interstellare, fredda e quasi immobile, inizia lentamente a contrarsi sotto il peso della propria gravità…
 </div>
 
-<!-- Carica prima il glue JS generato da Emscripten -->
-<script src="sim.js"></script>
-
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
 // Rendering e interfaccia — tutta la fisica è in sim.wasm (C)
@@ -391,7 +388,8 @@ const ctx    = canvas.getContext("2d");
 const W = canvas.width, H = canvas.height;
 
 let sim_init, sim_step, sim_get_state, sim_get_phase, sim_get_diagnostics;
-let HEAPF32;
+let simModuleInstance = null;
+let HEAPF32 = null;
 let wasmReady = false;
 let paused = false;
 let speed  = 1;
@@ -424,6 +422,26 @@ const NEBULA = [
 let camX = W/2, camY = H/2;
 const CAM_LERP = 0.04;
 
+// ── Caricamento modulo WASM ──
+SimModule().then(module => {
+  HEAPF32 = module.HEAPF32;
+
+  sim_init         = module.cwrap('sim_init',         null,    ['number']);
+  sim_step         = module.cwrap('sim_step',         null,    ['number']);
+  sim_get_state    = module.cwrap('sim_get_state',    'number', []);
+  sim_get_phase    = module.cwrap('sim_get_phase',    'number', []);
+  sim_get_diagnostics = module.cwrap('sim_get_diagnostics', 'number', []);
+
+  sim_init(N_PARTICLES);
+  wasmReady = true;
+
+  document.getElementById("loading-screen").classList.add("hidden");
+  requestAnimationFrame(loop);
+}).catch(err => {
+  document.querySelector("#loading-screen p").textContent =
+    "Errore caricamento WASM: " + err.message;
+});
+
 // ── Colore particella da temperatura e densità ──
 function tempColor(u, rho, phase) {
   const t = Math.min(u * 6, 1);
@@ -434,10 +452,15 @@ function tempColor(u, rho, phase) {
   if (phase >= 2) {
     return `rgb(${Math.min(255,(200+t*55))|0},${Math.min(255,(140+t*90))|0},${(40+t*50)|0})`;
   }
+  // collasso: blu-bianco freddo → arancio caldo
   const r = Math.min(255, 40  + t*215);
   const g = Math.min(255, 60  + t*140);
   const b = Math.min(255, 160 + Math.max(0,-t*110));
   return `rgb(${r|0},${g|0},${b|0})`;
+}
+
+function pRadius(rho, phase) {
+  return Math.min(1.8 + rho*0.55, 6.5);
 }
 
 // ── Rendering sfondo ──
@@ -448,15 +471,12 @@ function drawBackground() {
     const grd = ctx.createRadialGradient(nb.x,nb.y,0,nb.x,nb.y,nb.r);
     grd.addColorStop(0,`hsla(${nb.hue},65%,55%,${nb.a})`);
     grd.addColorStop(1,"transparent");
-    ctx.fillStyle = grd;
-    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
   }
   for (const s of BG_STARS) {
     ctx.globalAlpha = s.a;
     ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
 }
@@ -468,8 +488,7 @@ function drawFlash(cx, cy) {
   grd.addColorStop(0,  `rgba(255,245,210,${flashAlpha*0.92})`);
   grd.addColorStop(0.3,`rgba(255,160,80,${flashAlpha*0.55})`);
   grd.addColorStop(1,"transparent");
-  ctx.fillStyle = grd;
-  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
   flashAlpha *= 0.93;
   if (flashAlpha < 0.004) flashAlpha = 0;
 }
@@ -488,10 +507,7 @@ function drawNeutronStar(nx, ny, pulse) {
     ctx.strokeStyle = grd;
     ctx.lineWidth = 3 + beamA*5;
     ctx.globalAlpha = beamA*0.75;
-    ctx.beginPath();
-    ctx.moveTo(nx,ny);
-    ctx.lineTo(ex,ey);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(nx,ny); ctx.lineTo(ex,ey); ctx.stroke();
   }
   const p2 = 0.7+0.3*Math.sin(pulse*3.1);
   const grd2 = ctx.createRadialGradient(nx,ny,0,nx,ny,10*p2*3);
@@ -500,14 +516,10 @@ function drawNeutronStar(nx, ny, pulse) {
   grd2.addColorStop(1,  "transparent");
   ctx.fillStyle = grd2;
   ctx.globalAlpha = 0.9;
-  ctx.beginPath();
-  ctx.arc(nx,ny,10*p2*3,0,Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(nx,ny,10*p2*3,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1;
   ctx.fillStyle = "#e0f0ff";
-  ctx.beginPath();
-  ctx.arc(nx,ny,10,0,Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(nx,ny,10,0,Math.PI*2); ctx.fill();
   ctx.lineWidth = 1;
 }
 
@@ -520,9 +532,9 @@ function updatePhaseUI(n) {
     if (i === n) s.classList.add("active");
   });
   document.getElementById("infoPhase").textContent = PHASE_NAMES[n];
-  document.getElementById("narrative").textContent = NARRATIVES[n];
+  document.getElementById("narrative").textContent  = NARRATIVES[n];
   document.getElementById("overlayTitle").textContent = PHASE_NAMES[n];
-  document.getElementById("overlayDesc").textContent = OVERLAY_DESC[n];
+  document.getElementById("overlayDesc").textContent  = OVERLAY_DESC[n];
   document.getElementById("overlay").classList.add("visible");
   overlayTimer = 140;
   if (n === 3) flashAlpha = 1.0;
@@ -534,14 +546,12 @@ function drawChart(el, hist, color, maxEl) {
   const cCtx = el.getContext("2d");
   cCtx.fillStyle = "rgba(0,0,0,0.4)";
   cCtx.fillRect(0,0,cw,ch);
-
   const n = Math.min(histIdx, CHART_LEN);
   if (n < 2) return;
-
   let maxV = 0;
   for (let i = 0; i < n; i++) maxV = Math.max(maxV, hist[i]);
   if (maxV < 1e-6) return;
-
+  // grid
   cCtx.strokeStyle = "rgba(255,255,255,0.05)";
   cCtx.lineWidth = 1;
   for (let g = 1; g <= 3; g++) {
@@ -550,40 +560,32 @@ function drawChart(el, hist, color, maxEl) {
     cCtx.lineTo(cw, ch*(1-g/4));
     cCtx.stroke();
   }
-
+  // line
   cCtx.beginPath();
   cCtx.strokeStyle = color;
   cCtx.lineWidth = 1.5;
   for (let i = 0; i < n; i++) {
-    const hi = (histIdx - n + i + CHART_LEN) % CHART_LEN;
+    const hi = (histIdx - n + i) % CHART_LEN;
     const x  = (i/(CHART_LEN-1))*cw;
     const y  = ch - (hist[hi]/maxV)*(ch-3)-1;
-    if (i === 0) cCtx.moveTo(x,y);
-    else cCtx.lineTo(x,y);
+    i === 0 ? cCtx.moveTo(x,y) : cCtx.lineTo(x,y);
   }
   cCtx.stroke();
-
+  // fill
   cCtx.beginPath();
   for (let i = 0; i < n; i++) {
-    const hi = (histIdx - n + i + CHART_LEN) % CHART_LEN;
+    const hi = (histIdx - n + i) % CHART_LEN;
     const x  = (i/(CHART_LEN-1))*cw;
     const y  = ch - (hist[hi]/maxV)*(ch-3)-1;
-    if (i === 0) {
-      cCtx.moveTo(x,ch);
-      cCtx.lineTo(x,y);
-    } else {
-      cCtx.lineTo(x,y);
-    }
+    if (i===0){cCtx.moveTo(x,ch);cCtx.lineTo(x,y);}
+    else cCtx.lineTo(x,y);
   }
   cCtx.lineTo(((n-1)/(CHART_LEN-1))*cw,ch);
   cCtx.closePath();
-
   const gr = cCtx.createLinearGradient(0,0,0,ch);
   gr.addColorStop(0, color.replace("rgb","rgba").replace(")",",0.22)"));
   gr.addColorStop(1,"transparent");
-  cCtx.fillStyle = gr;
-  cCtx.fill();
-
+  cCtx.fillStyle = gr; cCtx.fill();
   if (maxEl) maxEl.textContent = maxV.toFixed(3);
 }
 
@@ -592,12 +594,15 @@ function loop() {
   requestAnimationFrame(loop);
   if (!wasmReady) return;
 
+  // step fisici
   if (!paused) sim_step(speed);
 
+  // leggi stato dal modulo WASM
   const statePtr = sim_get_state();
   const diagPtr  = sim_get_diagnostics();
   const phase    = sim_get_phase();
 
+  // header: [n_alive, ns_active, ns_x, ns_y, ns_pulse, cam_x, cam_y, 0]
   const hOff    = statePtr / 4;
   const nAlive  = HEAPF32[hOff + 0] | 0;
   const nsActive= HEAPF32[hOff + 1] | 0;
@@ -607,29 +612,32 @@ function loop() {
   const targetCamX = HEAPF32[hOff + 5];
   const targetCamY = HEAPF32[hOff + 6];
 
+  // camera lerp verso centro di massa
   camX += (targetCamX - camX) * CAM_LERP;
   camY += (targetCamY - camY) * CAM_LERP;
   const offX = W/2 - camX;
   const offY = H/2 - camY;
 
+  // diagnostica
   const dOff = diagPtr / 4;
   const maxRho = HEAPF32[dOff + 0];
   const maxU   = HEAPF32[dOff + 1];
   const rms    = HEAPF32[dOff + 2];
   const energy = HEAPF32[dOff + 3];
 
+  // aggiorna fase UI
   if (phase !== currentPhase) {
     currentPhase = phase;
     updatePhaseUI(phase);
   }
 
+  // overlay timer
   if (overlayTimer > 0) {
     overlayTimer--;
-    if (overlayTimer === 0) {
-      document.getElementById("overlay").classList.remove("visible");
-    }
+    if (overlayTimer === 0) document.getElementById("overlay").classList.remove("visible");
   }
 
+  // history charts (ogni 2 frame)
   if (frameCount % 2 === 0) {
     histDens[histIdx % CHART_LEN] = maxRho;
     histTemp[histIdx % CHART_LEN] = maxU;
@@ -637,16 +645,21 @@ function loop() {
     histIdx++;
   }
 
+  // info panel
   document.getElementById("infoN").textContent      = nAlive;
   document.getElementById("infoTemp").textContent   = maxU.toFixed(4);
   document.getElementById("infoDens").textContent   = maxRho.toFixed(4);
   document.getElementById("infoRMS").textContent    = rms.toFixed(1) + " px";
   document.getElementById("infoEnergy").textContent = energy.toFixed(1);
 
+  // ── RENDERING ──
   ctx.save();
   drawBackground();
+
+  // trasla canvas per seguire il centro di massa
   ctx.translate(offX, offY);
 
+  // disegna particelle
   const pBase = (statePtr / 4) + 8;
   for (let i = 0; i < nAlive; i++) {
     const o   = pBase + i*4;
@@ -660,33 +673,30 @@ function loop() {
     if (r_ > 0.4) {
       const glow = Math.min(r_*2.2, 13);
       const grd  = ctx.createRadialGradient(px_,py_,0,px_,py_,rad+glow);
-      grd.addColorStop(0, col);
-      grd.addColorStop(0.5, col);
-      grd.addColorStop(1, "transparent");
+      grd.addColorStop(0, col); grd.addColorStop(0.5,col); grd.addColorStop(1,"transparent");
       ctx.globalAlpha = Math.min(0.25+r_*0.13, 0.62);
       ctx.fillStyle = grd;
-      ctx.beginPath();
-      ctx.arc(px_,py_,rad+glow,0,Math.PI*2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(px_,py_,rad+glow,0,Math.PI*2); ctx.fill();
     }
 
     ctx.globalAlpha = Math.min(0.72+r_*0.1, 0.96);
     ctx.fillStyle = col;
-    ctx.beginPath();
-    ctx.arc(px_,py_,rad,0,Math.PI*2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(px_,py_,rad,0,Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
 
+  // stella di neutroni
   if (nsActive) drawNeutronStar(nsX, nsY, nsPulse);
 
   ctx.restore();
 
+  // flash supernova (in spazio schermo, non world)
   drawFlash(W/2, H/2);
 
+  // charts (ogni 4 frame)
   if (frameCount % 4 === 0) {
     drawChart(document.getElementById("chartDens"), histDens, "rgb(245,166,35)", document.getElementById("chartDensMax"));
-    drawChart(document.getElementById("chartTemp"), histTemp, "rgb(255,110,80)", document.getElementById("chartTempMax"));
+    drawChart(document.getElementById("chartTemp"), histTemp, "rgb(255,110,80)",  document.getElementById("chartTempMax"));
     drawChart(document.getElementById("chartRMS"),  histRMS,  "rgb(126,240,199)", document.getElementById("chartRMSMax"));
   }
 
@@ -705,11 +715,8 @@ document.getElementById("btnReset").addEventListener("click", () => {
   currentPhase = 0;
   flashAlpha = 0;
   histIdx = 0;
-  histDens.fill(0);
-  histTemp.fill(0);
-  histRMS.fill(0);
-  camX = W/2;
-  camY = H/2;
+  histDens.fill(0); histTemp.fill(0); histRMS.fill(0);
+  camX = W/2; camY = H/2;
   updatePhaseUI(0);
   document.getElementById("overlay").classList.remove("visible");
   document.getElementById("btnPlay").textContent = "⏸ Pausa";
@@ -718,41 +725,13 @@ document.getElementById("btnReset").addEventListener("click", () => {
 });
 
 document.getElementById("speedSlider").addEventListener("input", e => {
-  speed = parseInt(e.target.value, 10);
+  speed = parseInt(e.target.value);
   document.getElementById("speedLabel").textContent = `×${speed}`;
 });
-
-// ── Inizializzazione modulo WASM ──
-window.addEventListener("load", () => {
-  if (typeof SimModule !== "function") {
-    document.querySelector("#loading-screen p").textContent =
-      "Errore: sim.js non è stato caricato correttamente.";
-    return;
-  }
-
-  SimModule({
-    locateFile: (path) => "./" + path
-  }).then(module => {
-    HEAPF32 = module.HEAPF32;
-
-    sim_init = module.cwrap("sim_init", null, ["number"]);
-    sim_step = module.cwrap("sim_step", null, ["number"]);
-    sim_get_state = module.cwrap("sim_get_state", "number", []);
-    sim_get_phase = module.cwrap("sim_get_phase", "number", []);
-    sim_get_diagnostics = module.cwrap("sim_get_diagnostics", "number", []);
-
-    sim_init(N_PARTICLES);
-    wasmReady = true;
-
-    document.getElementById("loading-screen").classList.add("hidden");
-    requestAnimationFrame(loop);
-  }).catch(err => {
-    document.querySelector("#loading-screen p").textContent =
-      "Errore caricamento WASM: " + err.message;
-    console.error(err);
-  });
-});
 </script>
+
+<!-- Carica il glue JS generato da Emscripten (include automaticamente sim.wasm) -->
+<script src="sim.js"></script>
 
 </body>
 </html>

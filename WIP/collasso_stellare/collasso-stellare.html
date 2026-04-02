@@ -2,6 +2,8 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
+<!-- sim.js deve essere caricato prima del codice applicativo -->
+<script src="sim.js" defer></script>
 <script>
 window.SIM_METADATA = {
   title: "Collasso stellare",
@@ -423,7 +425,13 @@ let camX = W/2, camY = H/2;
 const CAM_LERP = 0.04;
 
 // ── Caricamento modulo WASM ──
-SimModule().then(module => {
+// sim.js è caricato con defer: aspettiamo che SimModule sia disponibile
+function waitForSimModule() {
+  if (typeof SimModule === 'undefined') {
+    setTimeout(waitForSimModule, 50);
+    return;
+  }
+  SimModule().then(module => {
   HEAPF32 = module.HEAPF32;
 
   sim_init         = module.cwrap('sim_init',         null,    ['number']);
@@ -438,9 +446,11 @@ SimModule().then(module => {
   document.getElementById("loading-screen").classList.add("hidden");
   requestAnimationFrame(loop);
 }).catch(err => {
-  document.querySelector("#loading-screen p").textContent =
-    "Errore caricamento WASM: " + err.message;
-});
+    document.querySelector("#loading-screen p").textContent =
+      "Errore caricamento WASM: " + err.message;
+  });
+}
+waitForSimModule();
 
 // ── Colore particella da temperatura e densità ──
 function tempColor(u, rho, phase) {
@@ -729,9 +739,6 @@ document.getElementById("speedSlider").addEventListener("input", e => {
   document.getElementById("speedLabel").textContent = `×${speed}`;
 });
 </script>
-
-<!-- Carica il glue JS generato da Emscripten (include automaticamente sim.wasm) -->
-<script src="sim.js"></script>
 
 </body>
 </html>

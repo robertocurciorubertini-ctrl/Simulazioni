@@ -3,25 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <link rel="icon" href="data:,">
-<!-- sim.js deve essere caricato prima del codice applicativo -->
 <script src="sim.js" defer></script>
-<script>
 <script>
 // Aggiungiamo la funzione mancante che sim.js si aspetta di trovare
 window.isFileURI = function(url) {
   return typeof url === 'string' && url.startsWith('file:');
 };
 
-window.SIM_METADATA = {
-  title: "Collasso stellare",
-  description: "Simulazione numerica del collasso gravitazionale di una nube stellare con evoluzione verso proto-stella, stella stabile, supernova e stella di neutroni.",
-  category: "Astrofisica",
-  icon: "✦",
-  order: 10,
-  tags: ["collasso gravitazionale", "SPH", "supernova", "stella di neutroni", "astrofisica"],
-  level: "avanzato"
-};
-</script>
 window.SIM_METADATA = {
   title: "Collasso stellare",
   description: "Simulazione numerica del collasso gravitazionale di una nube stellare con evoluzione verso proto-stella, stella stabile, supernova e stella di neutroni.",
@@ -662,9 +650,9 @@ function loop() {
 
   try {
     if (!refreshHeapViews()) {
-  console.warn("Memoria WASM non accessibile");
-  return;
-}
+      console.warn("Memoria WASM non accessibile");
+      return;
+    }
 
     if (!paused) sim_step(speed);
 

@@ -1,11 +1,13 @@
 /*
  * sim.c — SPH Stellar Collapse Simulation Core
  *
- * Versione con transizioni di fase riviste:
+ * Revisione:
  * - interfaccia HTML invariata
- * - buffer invariati
- * - dinamica SPH/gravità come nella versione migliorata
- * - logica di transizione meno rigida nella fase protostellare
+ * - stesso layout buffer
+ * - correzioni:
+ *   1) niente pseudo-orbite elastiche attorno alla stella di neutroni
+ *   2) ejecta da supernova più rarefatti e dissipativi
+ *   3) remnant compatto ancorato al vero centro del collasso
  */
 
 #include <math.h>
@@ -25,25 +27,22 @@
 #define VISC_BETA   2.0f
 #define VISC_EPS    0.01f
 
-/* Parametri runtime */
 static float g_G       = 12.0f;
 static float g_kpress  = 0.004f;
 static float g_gamma   = 1.66f;
 static float g_hsmooth = 20.0f;
-static float g_soft    = 200.0f;   /* softening gravitazionale in px^2 */
+static float g_soft    = 200.0f;
 static float g_cool0   = 0.9980f;
 static float g_cool1   = 0.9995f;
 static float g_mass    = 1.0f;
 
-/* Soglie di fase */
-static float g_thr01       = 0.15f;   /* nube -> protostella */
-static float g_thr12       = 0.40f;   /* protostella -> collasso nucleo */
-static float g_thr23t      = 800.0f;  /* collasso nucleo -> bounce */
+static float g_thr01       = 0.15f;
+static float g_thr12       = 0.40f;
+static float g_thr23t      = 800.0f;
 static float g_thr23rho    = 3.0f;
-static float g_thr34t      = 1100.0f; /* bounce -> remnant compatto */
-static float g_proto_maxt  = 380.0f;  /* fallback temporale per evitare blocco in protostella */
+static float g_thr34t      = 1100.0f;
+static float g_proto_maxt  = 380.0f;
 
-/* Stato particelle */
 int   N         = 0;
 float px[N_MAX], py[N_MAX];
 float vx[N_MAX], vy[N_MAX];
@@ -62,14 +61,16 @@ float diag_buf[8];
 float state_buf[8 + N_MAX * 4];
 int   diag_n_alive = 0;
 
-/* work arrays interni */
 static float du_dt[N_MAX];
+static int   ejecta_tag[N_MAX];
+static int   core_seeded = 0;
+static float collapse_cx = 0.0f;
+static float collapse_cy = 0.0f;
 
 static inline float clampf(float x, float a, float b) {
     return (x < a) ? a : ((x > b) ? b : x);
 }
 
-/* kernel B-spline cubico 2D */
 static float kernel(float dist) {
     float h = g_hsmooth;
     float q = dist / h;
@@ -81,7 +82,6 @@ static float kernel(float dist) {
     return norm * 0.25f * powf(2.0f - q, 3.0f);
 }
 
-/* gradiente di W rispetto a r_i - r_j */
 static void kernel_grad(float dx, float dy, float dist, float *gx, float *gy) {
     float h = g_hsmooth;
     float q = dist / h;
@@ -123,6 +123,44 @@ static void recount_alive(void) {
     diag_n_alive = 0;
     for (int i = 0; i < N; i++) {
         if (alive[i]) diag_n_alive++;
+    }
+}
+
+static void core_center(float *cx, float *cy) {
+    float max_rho = -1.0f;
+    int imax = -1;
+    for (int i = 0; i < N; i++) {
+        if (alive[i] && rho[i] > max_rho) {
+            max_rho = rho[i];
+            imax = i;
+        }
+    }
+
+    if (imax < 0) {
+        center_of_mass(cx, cy);
+        return;
+    }
+
+    float sx = 0.0f, sy = 0.0f, sw = 0.0f;
+    for (int i = 0; i < N; i++) {
+        if (!alive[i]) continue;
+        float dx = px[i] - px[imax];
+        float dy = py[i] - py[imax];
+        float r2 = dx*dx + dy*dy;
+        if (r2 < 45.0f * 45.0f) {
+            float w = rho[i] * rho[i];
+            sx += w * px[i];
+            sy += w * py[i];
+            sw += w;
+        }
+    }
+
+    if (sw > 1e-8f) {
+        *cx = sx / sw;
+        *cy = sy / sw;
+    } else {
+        *cx = px[imax];
+        *cy = py[imax];
     }
 }
 
@@ -234,7 +272,6 @@ void sim_set_params(float g_grav, float kpress, float cool, float soft) {
     if (soft > 0.0f) g_soft = soft;
 
     float gs = g_G / 12.0f;
-
     g_thr01      = 0.15f * gs;
     g_thr12      = 0.40f * gs;
     g_thr23rho   = 3.0f  * gs;
@@ -252,6 +289,9 @@ void sim_init(int n_req, float R, float omega0, float u0) {
     ns_x      = 0.0f;
     ns_y      = 0.0f;
     ns_pulse  = 0.0f;
+    core_seeded = 0;
+    collapse_cx = CANVAS_W * 0.5f;
+    collapse_cy = CANVAS_H * 0.5f;
 
     float cx = CANVAS_W / 2.0f;
     float cy = CANVAS_H / 2.0f;
@@ -272,10 +312,12 @@ void sim_init(int n_req, float R, float omega0, float u0) {
         rho[i] = 0.0f;
         p[i] = 0.0f;
         alive[i] = 1;
+        ejecta_tag[i] = 0;
     }
 
     for (int i = N; i < N_MAX; i++) {
         alive[i] = 0;
+        ejecta_tag[i] = 0;
     }
 
     recount_alive();
@@ -340,10 +382,10 @@ void sim_step(int iterations) {
 
             if (px[i] < -0.25f * CANVAS_W || px[i] > 1.25f * CANVAS_W ||
                 py[i] < -0.25f * CANVAS_H || py[i] > 1.25f * CANVAS_H) {
-                float cx = CANVAS_W * 0.5f;
-                float cy = CANVAS_H * 0.5f;
-                float dx = cx - px[i];
-                float dy = cy - py[i];
+                float ccx = CANVAS_W * 0.5f;
+                float ccy = CANVAS_H * 0.5f;
+                float dx = ccx - px[i];
+                float dy = ccy - py[i];
                 vx[i] += 0.002f * dx;
                 vy[i] += 0.002f * dy;
             }
@@ -352,14 +394,6 @@ void sim_step(int iterations) {
         float mean_rho = (diag_n_alive > 0) ? (sum_rho / (float)diag_n_alive) : 0.0f;
         float rho_contrast = (mean_rho > 1e-6f) ? (max_rho / mean_rho) : 0.0f;
 
-        /* Transizioni di fase:
-           - 0 -> 1: la nube comincia a condensare davvero
-           - 1 -> 2: o superi la soglia di densità, oppure dopo un tempo protostellare
-                     la condensazione è comunque abbastanza marcata (contrasto di densità
-                     e riscaldamento) da far partire il collasso del nucleo
-           - 2 -> 3: densità/temperatura elevate o tempo lungo
-           - 3 -> 4: remnant compatto su base temporale
-        */
         if (phase == 0 && max_rho > g_thr01) {
             phase = 1;
         }
@@ -384,41 +418,101 @@ void sim_step(int iterations) {
 
             if (density_trigger || thermo_trigger || time_trigger) {
                 phase = 3;
+                core_center(&collapse_cx, &collapse_cy);
+                core_seeded = 1;
             }
         }
 
         if (phase == 3) {
+            float core_x = collapse_cx;
+            float core_y = collapse_cy;
+            if (!core_seeded) {
+                core_center(&core_x, &core_y);
+                collapse_cx = core_x;
+                collapse_cy = core_y;
+                core_seeded = 1;
+            }
+
             for (int i = 0; i < N; i++) {
                 if (!alive[i]) continue;
-                float dx = px[i] - cmx;
-                float dy = py[i] - cmy;
+
+                float dx = px[i] - core_x;
+                float dy = py[i] - core_y;
                 float d  = sqrtf(dx*dx + dy*dy);
-                if (d > 1e-3f && d < 40.0f) {
-                    float boost = 6.5f * (1.0f - d / 40.0f);
+
+                if (d > 1e-3f && d < 48.0f) {
+                    float boost = 5.5f * (1.0f - d / 48.0f);
                     vx[i] += (dx / d) * boost;
                     vy[i] += (dy / d) * boost;
-                    u[i]  += 1.5f * boost;
+                    u[i]  += 1.2f * boost;
+
+                    if (d > 14.0f) {
+                        ejecta_tag[i] = 1;
+                    }
                 }
             }
 
             if (sim_time > g_thr34t) {
                 phase = 4;
                 ns_active = 1;
-                ns_x = cmx;
-                ns_y = cmy;
+                ns_x = collapse_cx;
+                ns_y = collapse_cy;
             }
         }
 
         if (ns_active) {
             ns_pulse += 0.3f;
+
             for (int i = 0; i < N; i++) {
                 if (!alive[i]) continue;
+
                 float dx = px[i] - ns_x;
                 float dy = py[i] - ns_y;
-                if (dx*dx + dy*dy < 144.0f) {
+                float r2 = dx*dx + dy*dy;
+                float r  = sqrtf(r2 + 1e-12f);
+
+                /* assorbimento del nucleo compatto */
+                if (r2 < 12.0f * 12.0f) {
                     alive[i] = 0;
+                    continue;
+                }
+
+                /* materiale espulso: rarefazione e damping, non "molla orbitale" */
+                if (ejecta_tag[i]) {
+                    rho[i] *= 0.992f;
+                    u[i]   *= 0.997f;
+                    p[i]   *= 0.985f;
+
+                    /* lieve drift radiale uscente per evitare pseudo-equilibri */
+                    if (r > 1e-4f) {
+                        vx[i] += 0.010f * (dx / r);
+                        vy[i] += 0.010f * (dy / r);
+                    }
+
+                    /* smorzamento trasversale: riduce l'effetto di orbite apparenti */
+                    float vr = (vx[i]*dx + vy[i]*dy) / r;
+                    float vtx = vx[i] - vr * dx / r;
+                    float vty = vy[i] - vr * dy / r;
+                    vx[i] -= 0.06f * vtx;
+                    vy[i] -= 0.06f * vty;
+
+                    /* se troppo rarefatto, smette di essere dinamicamente importante */
+                    if (rho[i] < 0.0025f) {
+                        vx[i] *= 0.996f;
+                        vy[i] *= 0.996f;
+                    }
+                } else {
+                    /* materiale non espulso ma ancora vicino al remnant:
+                       gravità centrale debole e monotona, senza termini elastici */
+                    float core_acc = 0.0f;
+                    if (r > 18.0f) {
+                        core_acc = 28.0f / (r2 + 1800.0f);
+                        vx[i] -= core_acc * dx;
+                        vy[i] -= core_acc * dy;
+                    }
                 }
             }
+
             recount_alive();
         }
 

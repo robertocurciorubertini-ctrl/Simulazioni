@@ -422,358 +422,297 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
      ════════════════════════════════════════════════════════════════════════ -->
 <script>
 
-/* ── Parametri UI ── */
+/* ── Parametri UI (sincronizzati con gli slider) ── */
 const params = {
   N:     400,
-  R:     190,
-  omega: 0.020,
+  R:     200,
+  omega: 0.000,
   u0:    0.00,
   G:     12.0,
   K:     0.004,
   cool:  0.998
 };
 
-const CANVAS_W = 760;
-const CANVAS_H = 760;
+const CANVAS_W = 760, CANVAS_H = 760;
 const PHASE_NAMES  = ['Nube Molecolare','Protostella in Formazione','Collasso del Nucleo','Rimbalzo — Supernova','Stella di Neutroni'];
 const PHASE_COLORS = ['#4a9eff','#f39c12','#e74c3c','#9b59b6','#2ecc71'];
 
 const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const loading = document.getElementById('loading');
-const loadingMsg = document.getElementById('loadingMsg');
+const ctx    = canvas.getContext('2d');
 
+/* ── Stelle di sfondo fisse ── */
 const BG_STARS = Array.from({length: 180}, () => [
   Math.random() * CANVAS_W,
   Math.random() * CANVAS_H,
-  Math.random() * 1.2 + 0.2,
-  0.12 + Math.random() * 0.16
+  Math.random() * 1.2 + 0.2
 ]);
 
-let running = false;
-let rafId = null;
+/* ── Stato loop ── */
+let running = false, rafId = null;
 const ITERS_PER_FRAME = 3;
 
-let Sim = null;
-let sim_set_params = null;
-let sim_init = null;
-let sim_step = null;
-let sim_get_state = null;
-let sim_get_diagnostics = null;
-let sim_get_phase = null;
-let sim_get_N = null;
+/* ════════════════════════════════════════════════════════════════════════
+   Caricamento WASM
+   ════════════════════════════════════════════════════════════════════════
 
-function stopLoop() {
-  running = false;
-  if (rafId !== null) {
-    cancelAnimationFrame(rafId);
-    rafId = null;
-  }
+   sim.js (prodotto da emcc con -s MODULARIZE=1 -s EXPORT_NAME=SimModule)
+   esporta una factory function SimModule() che restituisce una Promise.
+   Quando la Promise si risolve, il campo _asm contiene le funzioni C
+   esportate con prefisso underscore.
+
+   Le funzioni che restituiscono puntatori (sim_get_state, sim_get_diagnostics)
+   vanno lette dalla memoria lineare WASM tramite Module.HEAPF32.
+   Il puntatore è un byte offset: l'indice nell'array Float32 è ptr/4.
+*/
+
+let Sim = null;   /* istanza del modulo WASM */
+let sim_set_params, sim_init, sim_step, sim_get_state, sim_get_diagnostics, sim_get_phase, sim_get_N;
+
+document.getElementById('loadingMsg').textContent = 'Caricamento sim.js…';
+
+/* Carichiamo sim.js dinamicamente — deve stare nella stessa cartella dell'HTML */
+const scriptTag = document.createElement('script');
+scriptTag.src = 'sim.js';
+scriptTag.onerror = () => {
+  document.getElementById('loadingMsg').textContent =
+    'ERRORE: sim.js non trovato. Compila sim.c con Emscripten e metti sim.js + sim.wasm nella stessa cartella.';
+};
+scriptTag.onload = () => {
+  document.getElementById('loadingMsg').textContent = 'Istanziazione SimModule…';
+  SimModule().then(module => {
+    Sim = module;
+
+    /* Wrappiamo le funzioni esportate. Per quelle che non restituiscono
+       puntatori usiamo direttamente module._nomefunzione().
+       Per quelle che restituiscono puntatori dobbiamo leggere HEAPF32. */
+    sim_set_params = (G, K, cool, soft) => Sim._sim_set_params(G, K, cool, soft);
+    sim_init       = (N, R, omega, u0)  => Sim._sim_init(N, R, omega, u0);
+    sim_step       = (iters)            => Sim._sim_step(iters);
+    sim_get_phase  = ()                 => Sim._sim_get_phase();
+    sim_get_N      = ()                 => Sim._sim_get_N();
+
+    /* sim_get_diagnostics: restituisce ptr a float[8] nella memoria WASM */
+    sim_get_diagnostics = () => {
+      const ptr = Sim._sim_get_diagnostics();   /* byte offset */
+      return Sim.HEAPF32.subarray(ptr >> 2, (ptr >> 2) + 8);
+    };
+
+    /* sim_get_state: restituisce ptr a float[8 + n_alive*4] */
+    sim_get_state = () => {
+      const ptr      = Sim._sim_get_state();
+      const n_alive  = Sim.HEAPF32[ptr >> 2];  /* primo elemento = n_alive */
+      const len      = 8 + n_alive * 4;
+      return Sim.HEAPF32.subarray(ptr >> 2, (ptr >> 2) + len);
+    };
+
+    /* Pronto: nascondiamo il loading e inizializziamo */
+    document.getElementById('loading').style.display = 'none';
+    doInit();
+    render();
+    updateUI();
+
+  }).catch(err => {
+    document.getElementById('loadingMsg').textContent = 'Errore istanziazione WASM: ' + err;
+  });
+};
+document.head.appendChild(scriptTag);
+
+/* ── Inizializzazione simulazione ── */
+function doInit() {
+  sim_set_params(params.G, params.K, params.cool, 200);
+  sim_init(params.N, params.R, params.omega, params.u0);
 }
 
-function safeSetText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value;
-}
+/* ── Rendering Canvas ── */
+function render() {
+  if (!Sim) return;
 
-function safeSetHTML(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = value;
-}
-
-function setButtonsForStopped() {
-  document.getElementById('btnStart').disabled = !Sim;
-  document.getElementById('btnPause').disabled = true;
-}
-
-function setButtonsForRunning() {
-  document.getElementById('btnStart').disabled = true;
-  document.getElementById('btnPause').disabled = false;
-}
-
-function bindSlider(id, valId, key, fmt) {
-  const sl = document.getElementById(id);
-  const vl = document.getElementById(valId);
-  const refresh = () => {
-    params[key] = parseFloat(sl.value);
-    vl.textContent = fmt(params[key]);
-  };
-  sl.addEventListener('input', refresh);
-  refresh();
-}
-
-bindSlider('sN',     'vN',     'N',     v => String(v));
-bindSlider('sR',     'vR',     'R',     v => String(v));
-bindSlider('sOmega', 'vOmega', 'omega', v => v.toFixed(3));
-bindSlider('sU0',    'vU0',    'u0',    v => v.toFixed(2));
-bindSlider('sG',     'vG',     'G',     v => v.toFixed(1));
-bindSlider('sK',     'vK',     'K',     v => v.toFixed(3));
-bindSlider('sCool',  'vCool',  'cool',  v => v.toFixed(4));
-
-function drawBackground() {
   ctx.fillStyle = '#060312';
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-  for (const [sx, sy, sr, sa] of BG_STARS) {
+  /* Stelle di sfondo */
+  for (const [sx, sy, sr] of BG_STARS) {
     ctx.beginPath();
-    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,255,${sa})`;
+    ctx.arc(sx, sy, sr, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${0.18 + Math.random() * 0.08})`;
     ctx.fill();
   }
-}
-
-function doInit() {
-  if (!Sim) return;
-  stopLoop();
-
-  sim_set_params(params.G, params.K, params.cool, 200);
-  sim_init(params.N | 0, params.R, params.omega, params.u0);
-
-  /* Un passo iniziale rende non nulle rho e p già dal primo frame. */
-  sim_step(1);
-
-  render();
-  updateUI();
-  setButtonsForStopped();
-}
-
-function render() {
-  drawBackground();
-  if (!Sim || !sim_get_state) return;
 
   const state = sim_get_state();
-  if (!state || state.length < 8) return;
+  const n_alive  = state[0];
+  const ns_active = state[1];
+  const ns_x     = state[2], ns_y = state[3];
+  const ns_pulse  = state[4];
 
-  const nAlive = state[0] | 0;
-  const nsActive = state[1] > 0.5;
-  const nsX = state[2];
-  const nsY = state[3];
-  const nsPulse = state[4];
-  const cmx = state[5];
-  const cmy = state[6];
-
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.arc(cmx, cmy, 3, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
+  /* Calcola rho_max per normalizzazione colore */
   let rhoMax = 0;
-  let off = 8;
-  for (let i = 0; i < nAlive; i++) {
-    const rho = state[off + 3];
+  for (let i = 0; i < n_alive; i++) {
+    const rho = state[8 + i*4 + 3];
     if (rho > rhoMax) rhoMax = rho;
-    off += 4;
   }
 
-  off = 8;
-  for (let i = 0; i < nAlive; i++) {
-    const px = state[off++];
-    const py = state[off++];
-    const u = state[off++];
-    const rho = state[off++];
+  /* Particelle SPH */
+  for (let i = 0; i < n_alive; i++) {
+    const base = 8 + i * 4;
+    const px   = state[base];
+    const py   = state[base + 1];
+    /* u = state[base+2] — non usato nel colore qui sotto ma disponibile */
+    const rho  = state[base + 3];
 
-    const nr = rhoMax > 1e-9 ? Math.max(0, Math.min(1, rho / rhoMax)) : 0;
-    const radius = rhoMax > 1e-9 ? (1.8 + 3.0 * nr) : 2.4;
-    const alpha = rhoMax > 1e-9 ? (0.35 + 0.60 * nr) : 0.70;
+    const nr = rhoMax > 0 ? rho / rhoMax : 0;
 
-    let fill = `rgba(170,205,255,${alpha})`;
-    if (u > 1.2) fill = `rgba(255,215,120,${alpha})`;
-    if (u > 2.0) fill = `rgba(255,140,90,${alpha})`;
+    let R2, G2, B2;
+    if (nr < 0.3) {
+      R2 = Math.round(30  + nr*3*100);
+      G2 = Math.round(50  + nr*3*120);
+      B2 = Math.round(180 + nr*3*40);
+    } else if (nr < 0.7) {
+      const t = (nr - 0.3) / 0.4;
+      R2 = Math.round(130 + t*125);
+      G2 = Math.round(170 + t*85);
+      B2 = Math.round(220 - t*120);
+    } else {
+      const t = (nr - 0.7) / 0.3;
+      R2 = 255;
+      G2 = Math.round(255 - t*30);
+      B2 = Math.round(100 + t*155);
+    }
+
+    const alpha  = 0.55 + 0.45 * nr;
+    const radius = 2.5  + nr * 2.5;
 
     ctx.beginPath();
-    ctx.arc(px, py, radius, 0, Math.PI * 2);
-    ctx.fillStyle = fill;
+    ctx.arc(px, py, radius, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(${R2},${G2},${B2},${alpha})`;
     ctx.fill();
 
-    if (nr > 0.65) {
+    if (nr > 0.6) {
       ctx.beginPath();
-      ctx.arc(px, py, radius * 2.1, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,230,180,${0.05 + 0.08 * nr})`;
+      ctx.arc(px, py, radius * 2.5, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${R2},${G2},${B2},0.06)`;
       ctx.fill();
     }
   }
 
-  if (nsActive) {
-    const pulseR = 20 + 12 * nsPulse;
-    const grad = ctx.createRadialGradient(nsX, nsY, 0, nsX, nsY, pulseR);
-    grad.addColorStop(0, 'rgba(180,255,230,0.35)');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
+  /* Stella di neutroni */
+  if (ns_active) {
+    const t     = performance.now() / 1000;
+    const pulse = Math.sin(t * 6) * 0.3 + 0.7;
 
+    const grad = ctx.createRadialGradient(ns_x, ns_y, 0, ns_x, ns_y, 40 * pulse);
+    grad.addColorStop(0, 'rgba(150,255,200,0.25)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.beginPath();
-    ctx.arc(nsX, nsY, pulseR, 0, Math.PI * 2);
+    ctx.arc(ns_x, ns_y, 40 * pulse, 0, Math.PI*2);
     ctx.fillStyle = grad;
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(nsX, nsY, 6, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(210,255,235,0.95)';
+    ctx.arc(ns_x, ns_y, 6, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(180,255,220,${0.8 + 0.2*pulse})`;
     ctx.fill();
 
     ctx.save();
-    ctx.strokeStyle = `rgba(120,200,255,${0.12 + 0.10 * nsPulse})`;
+    ctx.strokeStyle = `rgba(120,200,255,${0.15*pulse})`;
     ctx.lineWidth = 3;
     for (const s of [-1, 1]) {
       ctx.beginPath();
-      ctx.moveTo(nsX, nsY);
-      ctx.lineTo(nsX, nsY + s * (30 + 20 * nsPulse));
+      ctx.moveTo(ns_x, ns_y);
+      ctx.lineTo(ns_x, ns_y + s * (30 + 20*pulse));
       ctx.stroke();
     }
     ctx.restore();
   }
 }
 
+/* ── Aggiornamento UI ── */
 function updateUI() {
-  if (!Sim || !sim_get_diagnostics) return;
-
+  if (!Sim) return;
   const d = sim_get_diagnostics();
-  if (!d || d.length < 8) return;
-
+  /* d[0]=max_rho  d[1]=max_u  d[2]=mean_rho  d[3]=sim_time
+     d[4]=M_J      d[5]=L_J    d[6]=n_alive   d[7]=phase   */
   const ph = d[7] | 0;
-  const phaseName = PHASE_NAMES[ph] ?? 'Fase sconosciuta';
-  const phaseColor = PHASE_COLORS[ph] ?? '#999999';
 
-  const badge = document.getElementById('phaseBadge');
-  badge.textContent = `Fase ${ph} — ${phaseName}`;
-  badge.style.borderColor = phaseColor;
+  document.getElementById('phaseBadge').textContent = `Fase ${ph} — ${PHASE_NAMES[ph]}`;
+  document.getElementById('phaseBadge').style.borderColor = PHASE_COLORS[ph];
+  document.getElementById('diagOverlay').innerHTML =
+    `ρ<sub>max</sub>: ${d[0].toFixed(3)} &nbsp;·&nbsp; t: ${d[3].toFixed(0)}`;
 
-  safeSetHTML('diagOverlay', `ρ<sub>max</sub>: ${d[0].toFixed(3)} &nbsp;·&nbsp; t: ${d[3].toFixed(0)}`);
-  safeSetText('dPhase', String(ph));
-  safeSetText('dAlive', String(d[6] | 0));
-  safeSetText('dRho', d[0].toFixed(4));
-  safeSetText('dU', d[1].toFixed(3));
-  safeSetText('dTime', d[3].toFixed(0));
-  safeSetText('dRhoMean', d[2].toFixed(4));
+  document.getElementById('dPhase').textContent   = ph;
+  document.getElementById('dAlive').textContent   = d[6] | 0;
+  document.getElementById('dRho').textContent     = d[0].toFixed(4);
+  document.getElementById('dU').textContent       = d[1].toFixed(3);
+  document.getElementById('dTime').textContent    = d[3].toFixed(0);
+  document.getElementById('dRhoMean').textContent = d[2].toFixed(4);
 
-  safeSetText('jMass', d[4] > 0 ? d[4].toExponential(2) : '—');
-  safeSetText('jLen',  d[5] > 0 ? `${d[5].toFixed(1)} px` : '—');
+  document.getElementById('jMass').textContent = d[4] > 0 ? d[4].toExponential(2) : '—';
+  document.getElementById('jLen').textContent  = d[5] > 0 ? d[5].toFixed(1) + ' px' : '—';
 
-  const Mcloud = d[6];
+  const M_cloud = d[6];
   const jStatus = document.getElementById('jStatus');
   if (d[5] > 0 && d[4] > 0) {
-    if (Mcloud > d[4] * 5) {
-      jStatus.textContent = 'COLLASSO';
-      jStatus.className = 'jeans-col';
-    } else if (Mcloud > d[4]) {
-      jStatus.textContent = 'Instabile';
-      jStatus.className = 'jeans-crit';
-    } else {
-      jStatus.textContent = 'Stabile';
-      jStatus.className = 'jeans-ok';
-    }
+    if (M_cloud > d[4] * 5)  { jStatus.textContent = 'COLLASSO';  jStatus.className = 'jeans-col';  }
+    else if (M_cloud > d[4]) { jStatus.textContent = 'Instabile'; jStatus.className = 'jeans-crit'; }
+    else                     { jStatus.textContent = 'Stabile';   jStatus.className = 'jeans-ok';   }
   } else {
-    jStatus.textContent = '—';
-    jStatus.className = '';
+    jStatus.textContent = '—'; jStatus.className = '';
   }
 
-  [0,1,2,3,4].forEach(i => {
-    const dot = document.getElementById(`pd${i}`);
-    if (!dot) return;
+  const pDots = [0,1,2,3,4].map(i => document.getElementById('pd'+i));
+  pDots.forEach((dot, i) => {
     dot.className = 'ph-dot';
     if (i < ph) dot.classList.add('done');
     else if (i === ph) dot.classList.add('current');
   });
 }
 
+/* ── Loop principale ── */
 function loop() {
-  if (!running || !Sim) return;
-
+  if (!running) return;
   sim_step(ITERS_PER_FRAME);
   render();
   updateUI();
   rafId = requestAnimationFrame(loop);
 }
 
+/* ── Bottoni ── */
 document.getElementById('btnStart').addEventListener('click', () => {
   if (!Sim || running) return;
-  running = true;
-  setButtonsForRunning();
-  loop();
+  running = true; loop();
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnPause').disabled = false;
 });
-
 document.getElementById('btnPause').addEventListener('click', () => {
-  stopLoop();
-  setButtonsForStopped();
+  running = false; cancelAnimationFrame(rafId);
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnPause').disabled = true;
 });
-
 document.getElementById('btnReset').addEventListener('click', () => {
-  doInit();
+  running = false; cancelAnimationFrame(rafId);
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnPause').disabled = true;
+  if (!Sim) return;
+  doInit(); render(); updateUI();
 });
 
-loadingMsg.textContent = 'Caricamento sim.js…';
-const scriptTag = document.createElement('script');
-scriptTag.src = 'sim.js';
-scriptTag.onerror = () => {
-  loadingMsg.textContent = 'ERRORE: sim.js non trovato nella stessa cartella del file HTML.';
-};
-
-function getWasmBuffer() {
-  if (!Sim) throw new Error('Modulo WASM non inizializzato');
-
-  if (Sim.HEAPU8 && Sim.HEAPU8.buffer) return Sim.HEAPU8.buffer;
-  if (Sim.HEAP8 && Sim.HEAP8.buffer) return Sim.HEAP8.buffer;
-  if (Sim.wasmMemory && Sim.wasmMemory.buffer) return Sim.wasmMemory.buffer;
-  if (typeof Module !== 'undefined' && Module && Module.HEAPU8 && Module.HEAPU8.buffer) return Module.HEAPU8.buffer;
-
-  throw new Error('Memoria WASM non accessibile: HEAPU8/HEAP8/wasmMemory assenti');
-}
-
-function readFloat32View(ptrBytes, lengthFloats) {
-  const buffer = getWasmBuffer();
-  return new Float32Array(buffer, ptrBytes, lengthFloats);
-}
-
-scriptTag.onload = () => {
-  loadingMsg.textContent = 'Istanziazione SimModule…';
-
-  const factory = window.SimModule;
-  if (typeof factory !== 'function') {
-    loadingMsg.textContent = 'ERRORE: SimModule non è definita in sim.js.';
-    return;
-  }
-
-  factory({
-    locateFile: (path) => path
-  }).then(module => {
-    Sim = module;
-
-    sim_set_params = (G, K, cool, soft) => Sim._sim_set_params(G, K, cool, soft);
-    sim_init = (N, R, omega, u0) => Sim._sim_init(N, R, omega, u0);
-    sim_step = (iters) => Sim._sim_step(iters);
-    sim_get_phase = () => Sim._sim_get_phase();
-    sim_get_N = () => Sim._sim_get_N();
-
-    sim_get_diagnostics = () => {
-      const ptr = Sim._sim_get_diagnostics();
-      return readFloat32View(ptr, 8);
-    };
-
-    sim_get_state = () => {
-      const ptr = Sim._sim_get_state();
-      const header = readFloat32View(ptr, 8);
-      const nAlive = header[0] | 0;
-      const len = 8 + nAlive * 4;
-      return readFloat32View(ptr, len);
-    };
-
-    loading.style.display = 'none';
-    doInit();
-    console.log('WASM inizializzato');
-    console.log('N particelle iniziali =', sim_get_N());
-    console.log('Fase iniziale =', sim_get_phase());
-    console.log('Buffer byteLength =', getWasmBuffer().byteLength);
-    console.log('State header =', Array.from(sim_get_state().slice(0, 8)));
-  }).catch(err => {
-    console.error(err);
-    loadingMsg.textContent = 'Errore istanziazione WASM: ' + err;
+/* ── Slider ── */
+function bindSlider(id, valId, key, fmt) {
+  const sl = document.getElementById(id);
+  const vl = document.getElementById(valId);
+  sl.addEventListener('input', () => {
+    params[key] = parseFloat(sl.value);
+    vl.textContent = fmt(params[key]);
   });
-};
-document.head.appendChild(scriptTag);
+  vl.textContent = fmt(params[key]);
+}
 
-setButtonsForStopped();
-drawBackground();
+bindSlider('sN',     'vN',     'N',     v => v);
+bindSlider('sR',     'vR',     'R',     v => v);
+bindSlider('sOmega', 'vOmega', 'omega', v => v.toFixed(3));
+bindSlider('sU0',    'vU0',    'u0',    v => v.toFixed(2));
+bindSlider('sG',     'vG',     'G',     v => v.toFixed(1));
+bindSlider('sK',     'vK',     'K',     v => v.toFixed(3));
+bindSlider('sCool',  'vCool',  'cool',  v => v.toFixed(4));
 
 </script>
 </body>

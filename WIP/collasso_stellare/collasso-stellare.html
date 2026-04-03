@@ -699,25 +699,20 @@ function applyParams() {
   g_thr34t   = 1100 / gs;
 }
 
-/* ── sim_init ── */
 function simInit() {
-  applyParams();
-  N        = Math.min(params.N, N_MAX);
-  simTime  = 0; phase = 0;
-  ns_active = 0; ns_pulse = 0;
-  const cx = CANVAS_W/2, cy = CANVAS_H/2;
-  const R  = params.R;
-  for (let i = 0; i < N; i++) {
-    const r     = R * Math.sqrt(Math.random());
-    const theta = Math.random() * 2 * Math.PI;
-    px[i] = cx + r * Math.cos(theta);
-    py[i] = cy + r * Math.sin(theta);
-    vx[i] = -params.omega * (py[i] - cy);
-    vy[i] =  params.omega * (px[i] - cx);
-    u[i]    = params.u0;
-    rho[i]  = 0;
-    alive[i] = 1;
-  }
+  if (!wasmReady) return;
+
+  // 1. Applica i parametri fisici (G, K, etc.) nel modulo C
+  // Assicurati che params.k sia minuscola o maiuscola a seconda di come l'hai definita
+  _sim_set_params(params.G, params.k, params.gamma, params.h, params.m);
+
+  // 2. Chiama la funzione di inizializzazione del C
+  // Il C creerà le particelle internamente usando R, Omega e u0 che gli passi
+  _sim_init(params.N, params.R, params.omega, params.u0);
+
+  // 3. Reset delle variabili locali JS per la grafica
+  currentPhase = 0;
+  frameCount = 0;
 }
 
 /* ── sim_step ── */
@@ -1066,9 +1061,11 @@ document.getElementById('btnReset').addEventListener('click', () => {
 });
 
 /* ── Slider ── */
+/* ── Slider ── */
 function bindSlider(id, valId, key, fmt) {
   const sl = document.getElementById(id);
   const vl = document.getElementById(valId);
+  if (!sl || !vl) return; // Evita errori se l'elemento manca
   sl.addEventListener('input', () => {
     params[key] = parseFloat(sl.value);
     vl.textContent = fmt(params[key]);
@@ -1081,11 +1078,13 @@ bindSlider('sR',     'vR',     'R',     v => v);
 bindSlider('sOmega', 'vOmega', 'omega', v => v.toFixed(3));
 bindSlider('sU0',    'vU0',    'u0',    v => v.toFixed(2));
 bindSlider('sG',     'vG',     'G',     v => v.toFixed(1));
-bindSlider('sK',     'vK',     'K',     v => v.toFixed(3));
+bindSlider('sK',     'vK',     'k',     v => v.toFixed(3)); // Nota: 'k' minuscola come nel C
 bindSlider('sCool',  'vCool',  'cool',  v => v.toFixed(4));
 
 /* ── Init ── */
-document.getElementById('loading').style.display = 'none';
+const loadingScreen = document.getElementById('loading-screen');
+if (loadingScreen) loadingScreen.style.display = 'none';
+
 simInit();
 render();
 updateUI(getDiagnostics());

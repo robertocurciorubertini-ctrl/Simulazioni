@@ -45,13 +45,16 @@
 #endif
 
 /* ── Costanti fisiche ───────────────────────────────────────────────────── */
+/* MODALITÀ DEBUG: parametri forzati per collasso rapido (~30s di sim).
+   G molto alta, pressione quasi nulla, raffreddamento istantaneo,
+   soglie di fase bassissime. Ripristinare i valori fisici dopo il test. */
 #define N_MAX        1000
-#define G_GRAV       4.8f
-#define SOFTENING    300.0f   /* ~ H_SMOOTH^2, evita singolarità gravitazionale */
-#define K_PRESS      0.008f   /* aumentato per pressione termica apprezzabile   */
+#define G_GRAV       25.0f    /* [DEBUG] era 4.8 — gravità molto aumentata      */
+#define SOFTENING    150.0f   /* [DEBUG] era 300 — softening ridotto a metà      */
+#define K_PRESS      0.001f   /* [DEBUG] era 0.008 — pressione quasi soppressa   */
 #define H_SMOOTH     20.0f
 #define MASS         1.0f
-#define GAMMA        1.66f    /* gas monoatomico, indice adiabatico 5/3         */
+#define GAMMA        1.66f
 #define CANVAS_W     760.0f
 #define CANVAS_H     760.0f
 
@@ -144,12 +147,11 @@ void sim_init(int n_requested) {
         px[i] = CANVAS_W / 2.0f + r * cosf(theta);
         py[i] = CANVAS_H / 2.0f + r * sinf(theta);
 
-        /* Velocità tangenziale piccola: simula rotazione lenta della nube */
-        float vt = 0.15f;
-        vx[i] = -vt * (py[i] - CANVAS_H / 2.0f) / 10.0f;
-        vy[i] =  vt * (px[i] - CANVAS_W / 2.0f) / 10.0f;
+        /* [DEBUG] nessuna rotazione: cade dritto verso il centro */
+        vx[i] = 0.0f;
+        vy[i] = 0.0f;
 
-        u[i]    = 0.01f; /* nube fredda all'inizio */
+        u[i]    = 0.0f; /* [DEBUG] fredda morta, nessuna pressione termica iniziale */
         rho[i]  = 0.0f;
         alive[i] = 1;
     }
@@ -260,9 +262,9 @@ void sim_step(int iterations) {
             float du_heat = (p[i] / rho[i]) * 0.001f;
             u[i] += du_heat;
             if (phase == 0)
-                u[i] *= 0.9995f;   /* raffreddamento lento in fase di collasso */
+                u[i] *= 0.95f;    /* [DEBUG] raffreddamento aggressivo in fase 0 */
             else
-                u[i] *= 0.9998f;   /* raffreddamento ancora più lento dopo */
+                u[i] *= 0.999f;
 
             if (rho[i] > max_rho) max_rho = rho[i];
         }
@@ -276,9 +278,10 @@ void sim_step(int iterations) {
          *   fase 2->3 (rimbalzo / bounce): t > 1500 oppure max_rho > 5
          *   fase 3->4 (stella di neutroni): t > 1800
          */
-        if (phase == 0 && max_rho > 0.25f) phase = 1;
-        if (phase == 1 && max_rho > 1.0f)  phase = 2;
-        if (phase == 2 && (sim_time > 1500.0f || max_rho > 5.0f)) phase = 3;
+        /* [DEBUG] soglie abbassate al minimo per forzare la progressione */
+        if (phase == 0 && max_rho > 0.08f) phase = 1;
+        if (phase == 1 && max_rho > 0.25f) phase = 2;
+        if (phase == 2 && (sim_time > 400.0f || max_rho > 1.5f)) phase = 3;
 
         if (phase == 3) {
             /* Rimbalzo: impulso repulsivo verso l'esterno per le particelle
@@ -293,7 +296,7 @@ void sim_step(int iterations) {
                     u[i]  += 3.0f;
                 }
             }
-            if (sim_time > 1800.0f) {
+            if (sim_time > 600.0f) {  /* [DEBUG] era 1800 */
                 phase     = 4;
                 ns_active = 1;
                 ns_x      = cmx;

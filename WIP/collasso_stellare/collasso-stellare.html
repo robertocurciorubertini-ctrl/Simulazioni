@@ -42,7 +42,6 @@ body {
   min-height: 100vh;
 }
 
-/* ── Header ── */
 header {
   background: var(--ink);
   color: var(--bg);
@@ -52,20 +51,9 @@ header {
   gap: 18px;
   border-bottom: 3px solid var(--accent);
 }
-header h1 {
-  font-family: var(--serif);
-  font-size: 1.55rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-header .sub {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: #aaa;
-  font-weight: 300;
-}
+header h1 { font-family: var(--serif); font-size: 1.55rem; font-weight: 500; letter-spacing: 0.01em; }
+header .sub { font-family: var(--mono); font-size: 0.72rem; color: #aaa; font-weight: 300; }
 
-/* ── Layout principale ── */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -76,7 +64,6 @@ header .sub {
   align-items: start;
 }
 
-/* ── Canvas + overlay ── */
 .canvas-wrap {
   position: relative;
   width: 760px;
@@ -115,7 +102,6 @@ canvas { display: block; width: 100%; height: 100%; }
   pointer-events: none;
 }
 
-/* ── Jeans panel ── */
 .jeans-panel {
   position: absolute;
   top: 14px; right: 14px;
@@ -133,262 +119,85 @@ canvas { display: block; width: 100%; height: 100%; }
 .jeans-panel .jeans-crit { color: #f2994a; }
 .jeans-panel .jeans-col  { color: #eb5757; }
 
-/* ── Sidebar ── */
-.sidebar {
-  padding-left: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+.sidebar { padding-left: 28px; display: flex; flex-direction: column; gap: 20px; }
 
-.panel {
-  background: var(--bg2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 16px 18px;
-}
+.panel { background: var(--bg2); border: 1.5px solid var(--border); border-radius: var(--r); padding: 16px 18px; }
 .panel-title {
-  font-family: var(--sans);
-  font-size: 0.72rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink3);
-  margin-bottom: 14px;
-  padding-bottom: 7px;
-  border-bottom: 1px solid var(--border);
+  font-family: var(--sans); font-size: 0.72rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink3);
+  margin-bottom: 14px; padding-bottom: 7px; border-bottom: 1px solid var(--border);
 }
 
-/* ── Sliders ── */
-.slider-row {
-  margin-bottom: 13px;
-}
+.slider-row { margin-bottom: 13px; }
 .slider-row:last-child { margin-bottom: 0; }
-
-.slider-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 4px;
-}
-.slider-name {
-  font-family: var(--sans);
-  font-size: 0.78rem;
-  color: var(--ink2);
-}
-.slider-val {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--accent);
-  font-weight: 500;
-  min-width: 48px;
-  text-align: right;
-}
-.slider-hint {
-  font-family: var(--sans);
-  font-size: 0.65rem;
-  color: var(--ink3);
-  margin-top: 2px;
-  font-style: italic;
-}
+.slider-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.slider-name  { font-family: var(--sans); font-size: 0.78rem; color: var(--ink2); }
+.slider-val   { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); font-weight: 500; min-width: 48px; text-align: right; }
+.slider-hint  { font-family: var(--sans); font-size: 0.65rem; color: var(--ink3); margin-top: 2px; font-style: italic; }
 
 input[type=range] {
-  width: 100%;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: var(--bg3);
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
+  width: 100%; height: 4px;
+  -webkit-appearance: none; appearance: none;
+  background: var(--bg3); border-radius: 2px; outline: none; cursor: pointer;
 }
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 2px solid var(--bg);
-  box-shadow: 0 0 0 1px var(--accent);
-  transition: transform 0.15s;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--accent); transition: transform 0.15s;
 }
 input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
-/* ── Buttons ── */
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 button {
-  font-family: var(--sans);
-  font-size: 0.78rem;
-  font-weight: 500;
-  padding: 7px 14px;
-  border-radius: 4px;
-  border: 1.5px solid var(--border);
-  background: var(--bg);
-  color: var(--ink2);
-  cursor: pointer;
-  transition: all 0.15s;
-  letter-spacing: 0.02em;
+  font-family: var(--sans); font-size: 0.78rem; font-weight: 500;
+  padding: 7px 14px; border-radius: 4px; border: 1.5px solid var(--border);
+  background: var(--bg); color: var(--ink2); cursor: pointer;
+  transition: all 0.15s; letter-spacing: 0.02em;
 }
 button:hover { background: var(--bg3); border-color: var(--ink3); color: var(--ink); }
-button.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 button.primary:hover { background: #a93226; }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── Stato diagnostica nella sidebar ── */
-.stat-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 12px;
-}
-.stat-item { }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
 .stat-item .sl { font-family: var(--sans); font-size: 0.65rem; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.05em; }
 .stat-item .sv { font-family: var(--mono); font-size: 0.82rem; color: var(--ink); font-weight: 500; }
 
-/* ── Progress fasi ── */
-.phase-progress {
-  display: flex;
-  gap: 4px;
-  margin-top: 4px;
-}
-.ph-dot {
-  flex: 1;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--bg3);
-  transition: background 0.5s;
-}
-.ph-dot.active   { background: var(--accent2); }
-.ph-dot.done     { background: var(--green); }
-.ph-dot.current  { background: var(--accent); }
+.phase-progress { display: flex; gap: 4px; margin-top: 4px; }
+.ph-dot { flex: 1; height: 5px; border-radius: 3px; background: var(--bg3); transition: background 0.5s; }
+.ph-dot.done    { background: var(--green); }
+.ph-dot.current { background: var(--accent); }
 
-.ph-labels {
-  display: flex;
-  gap: 4px;
-  margin-top: 4px;
-}
-.ph-label {
-  flex: 1;
-  font-family: var(--mono);
-  font-size: 0.55rem;
-  color: var(--ink3);
-  text-align: center;
-  overflow: hidden;
-  white-space: nowrap;
-}
+.ph-labels { display: flex; gap: 4px; margin-top: 4px; }
+.ph-label { flex: 1; font-family: var(--mono); font-size: 0.55rem; color: var(--ink3); text-align: center; overflow: hidden; white-space: nowrap; }
 
-/* ── Sezione teorica ── */
-#teoria {
-  max-width: 1140px;
-  margin: 10px auto 60px;
-  padding: 0 24px;
-}
+#teoria { max-width: 1140px; margin: 10px auto 60px; padding: 0 24px; }
+.teoria-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+.teoria-header h2 { font-family: var(--serif); font-size: 1.6rem; font-weight: 500; color: var(--ink); }
+.teoria-header .tag { font-family: var(--mono); font-size: 0.65rem; color: var(--ink3); background: var(--bg3); padding: 2px 8px; border-radius: 3px; border: 1px solid var(--border); }
 
-.teoria-header {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  margin-bottom: 28px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--border);
-}
-.teoria-header h2 {
-  font-family: var(--serif);
-  font-size: 1.6rem;
-  font-weight: 500;
-  color: var(--ink);
-}
-.teoria-header .tag {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--ink3);
-  background: var(--bg3);
-  padding: 2px 8px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-}
-
-.teoria-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 48px;
-}
-
-.teoria-section {
-  margin-bottom: 32px;
-}
-.teoria-section h3 {
-  font-family: var(--serif);
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.teoria-section h3 .num {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--bg);
-  background: var(--ink3);
-  padding: 1px 7px;
-  border-radius: 3px;
-  font-weight: 400;
-}
-.teoria-section p {
-  font-family: var(--serif);
-  font-size: 0.97rem;
-  color: var(--ink2);
-  line-height: 1.72;
-  text-align: justify;
-  hyphens: auto;
-}
+.teoria-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 48px; }
+.teoria-section { margin-bottom: 32px; }
+.teoria-section h3 { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--ink); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.teoria-section h3 .num { font-family: var(--mono); font-size: 0.7rem; color: var(--bg); background: var(--ink3); padding: 1px 7px; border-radius: 3px; font-weight: 400; }
+.teoria-section p { font-family: var(--serif); font-size: 0.97rem; color: var(--ink2); line-height: 1.72; text-align: justify; hyphens: auto; }
 .teoria-section p + p { margin-top: 10px; }
-
-.eq-box {
-  background: var(--bg2);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 4px 4px 0;
-  padding: 10px 16px;
-  margin: 12px 0;
-  font-size: 0.9rem;
-}
-
-.callout {
-  background: var(--bg2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 14px 18px;
-  margin: 16px 0;
-  font-family: var(--serif);
-  font-size: 0.9rem;
-  color: var(--ink2);
-  line-height: 1.65;
-}
+.eq-box { background: var(--bg2); border-left: 3px solid var(--accent); border-radius: 0 4px 4px 0; padding: 10px 16px; margin: 12px 0; font-size: 0.9rem; }
+.callout { background: var(--bg2); border: 1.5px solid var(--border); border-radius: var(--r); padding: 14px 18px; margin: 16px 0; font-family: var(--serif); font-size: 0.9rem; color: var(--ink2); line-height: 1.65; }
 .callout strong { color: var(--ink); }
+.divider { grid-column: 1 / -1; height: 1px; background: var(--border); margin: 8px 0 24px; }
 
-.divider {
-  grid-column: 1 / -1;
-  height: 1px;
-  background: var(--border);
-  margin: 8px 0 24px;
-}
-
-/* ── Loading ── */
+/* ── Loading overlay ── */
 #loading {
   position: fixed; inset: 0;
   background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-  gap: 18px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 999; gap: 18px;
 }
-#loading h2 { font-family: var(--serif); font-size: 1.3rem; color: var(--ink2); }
+#loading h2    { font-family: var(--serif); font-size: 1.3rem; color: var(--ink2); }
+#loading .sub  { font-family: var(--mono); font-size: 0.75rem; color: var(--ink3); }
 .spinner {
   width: 36px; height: 36px;
   border: 3px solid var(--border);
@@ -397,24 +206,22 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   animation: spin 0.9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 </style>
 </head>
 <body>
 
 <div id="loading">
   <div class="spinner"></div>
-  <h2>Compilazione modulo WASM…</h2>
+  <h2>Caricamento modulo WASM…</h2>
+  <div class="sub" id="loadingMsg">Inizializzazione SimModule</div>
 </div>
 
 <header>
   <h1>Collasso Stellare &amp; Formazione Stellare</h1>
-  <span class="sub">Simulazione SPH (Smoothed Particle Hydrodynamics) · 2D</span>
+  <span class="sub">Simulazione SPH (Smoothed Particle Hydrodynamics) · 2D · Core in WebAssembly</span>
 </header>
 
 <div class="main-grid">
-
-  <!-- Canvas -->
   <div>
     <div class="canvas-wrap">
       <canvas id="c" width="760" height="760"></canvas>
@@ -424,16 +231,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
         <div>L<sub>J</sub>: <span id="jLen">—</span></div>
         <div>Stato: <span id="jStatus">—</span></div>
       </div>
-      <div class="diag-overlay" id="diagOverlay">
-        ρ<sub>max</sub>: — · t: —
-      </div>
+      <div class="diag-overlay" id="diagOverlay">ρ<sub>max</sub>: — · t: —</div>
     </div>
   </div>
 
-  <!-- Sidebar -->
   <div class="sidebar">
 
-    <!-- Controlli simulazione -->
     <div class="panel">
       <div class="panel-title">Controlli</div>
       <div class="btn-row" style="margin-bottom:12px">
@@ -446,7 +249,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       </div>
     </div>
 
-    <!-- Parametri nube iniziale -->
     <div class="panel">
       <div class="panel-title">Nube Iniziale</div>
 
@@ -487,7 +289,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       </div>
     </div>
 
-    <!-- Parametri fisici -->
     <div class="panel">
       <div class="panel-title">Parametri Fisici</div>
 
@@ -512,14 +313,13 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <div class="slider-row">
         <div class="slider-label">
           <span class="slider-name">Raffreddamento</span>
-          <span class="slider-val" id="vCool">0.998</span>
+          <span class="slider-val" id="vCool">0.9980</span>
         </div>
         <input type="range" id="sCool" min="0.96" max="0.9999" step="0.0001" value="0.998">
         <div class="slider-hint">Perdita radiativa per passo (1 = adiabatico)</div>
       </div>
     </div>
 
-    <!-- Stato diagnostica -->
     <div class="panel">
       <div class="panel-title">Diagnostica</div>
       <div class="stat-grid">
@@ -532,7 +332,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       </div>
       <div style="margin-top:12px">
         <div style="font-family:var(--sans);font-size:0.65rem;color:var(--ink3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Progressione fasi</div>
-        <div class="phase-progress" id="phaseBar">
+        <div class="phase-progress">
           <div class="ph-dot" id="pd0"></div>
           <div class="ph-dot" id="pd1"></div>
           <div class="ph-dot" id="pd2"></div>
@@ -557,73 +357,73 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   <div class="teoria-header">
     <h2>La Vita di una Stella</h2>
     <span class="tag">nota teorica</span>
-    <span class="tag">versione introduttiva</span>
+    <span class="tag">SPH · WASM</span>
   </div>
 
   <div class="teoria-grid">
 
     <div class="teoria-section">
       <h3><span class="num">01</span> Le Nubi Molecolari e il Criterio di Jeans</h3>
-      <p>Le stelle nascono all'interno di enormi nubi di gas e polvere — le <em>nubi molecolari giganti</em> — costituite prevalentemente da idrogeno molecolare (H₂), elio e tracce di molecole più complesse. Queste strutture hanno dimensioni dell'ordine di decine di parsec e masse che possono raggiungere milioni di masse solari, ma la loro densità è così bassa (poche centinaia di molecole per cm³) che un campione delle dimensioni della Terra conterrebbe meno gas di qualsiasi vuoto realizzabile in laboratorio.</p>
-      <p>La domanda fondamentale è: quando una nube comincia a collassare? La risposta fu data da James Jeans nel 1902. Egli mostrò che un mezzo auto-gravitante è instabile se la sua dimensione supera una lunghezza critica $\lambda_J$, detta <em>lunghezza di Jeans</em>, oltre la quale la forza gravitazionale prevale sulla pressione del gas. La condizione di instabilità si ottiene confrontando il tempo di <em>free-fall</em> (caduta libera gravitazionale) con il tempo di attraversamento del suono:</p>
+      <p>Le stelle nascono all'interno di enormi nubi di gas e polvere — le <em>nubi molecolari giganti</em> — costituite prevalentemente da idrogeno molecolare (H₂), elio e tracce di molecole più complesse. La domanda fondamentale è: quando una nube comincia a collassare? La risposta fu data da James Jeans nel 1902. Egli mostrò che un mezzo auto-gravitante è instabile se la sua dimensione supera una lunghezza critica $\lambda_J$, oltre la quale la forza gravitazionale prevale sulla pressione del gas:</p>
       <div class="eq-box">
         $$\lambda_J = c_s \sqrt{\frac{\pi}{G\rho}}, \qquad M_J = \frac{\pi}{6}\rho\,\lambda_J^3$$
       </div>
-      <p>dove $c_s = \sqrt{\gamma P/\rho}$ è la velocità del suono adiabatica, $G$ è la costante di gravitazione universale e $\rho$ è la densità del mezzo. Se la massa della nube supera $M_J$, o la sua dimensione supera $\lambda_J$, nessun gradiente di pressione riesce a impedire il collasso: la perturbazione gravitazionale cresce esponenzialmente.</p>
+      <p>dove $c_s = \sqrt{\gamma P/\rho}$ è la velocità del suono adiabatica. Se la massa della nube supera $M_J$, nessun gradiente di pressione riesce a impedire il collasso: la perturbazione gravitazionale cresce esponenzialmente.</p>
       <div class="callout">
-        <strong>Nella simulazione</strong> il pannello in alto a destra mostra in tempo reale $M_J$ e $L_J$ nelle unità adimensionali del modello. Quando il sistema si trova in regime di instabilità ($M_\text{nube} > M_J$), il colore cambia verso il rosso.
+        <strong>Nella simulazione</strong> il pannello in alto a destra mostra in tempo reale $M_J$ e $L_J$ nelle unità adimensionali del modello. Quando il sistema si trova in regime di instabilità, il colore cambia verso il rosso.
       </div>
     </div>
 
     <div class="teoria-section">
-      <h3><span class="num">02</span> Il Collasso e la Fase Protostellare</h3>
-      <p>Una volta avviato il collasso, la nube si frammenta e si contrae su scale temporali del <em>tempo di free-fall</em>, che per una nube tipica è dell'ordine di qualche milione di anni. Durante questa fase il gas si riscalda per compressione adiabatica: parte dell'energia gravitazionale liberata viene convertita in energia termica. Inizialmente la nube è <em>otticamente sottile</em> — la radiazione generata dalla compressione fugge liberamente — e il gas può raffreddarsi efficientemente, accelerando il collasso.</p>
-      <p>Quando però la densità aumenta abbastanza da rendere la nube <em>otticamente spessa</em>, il calore non riesce più a fuoriuscire e la pressione termica comincia a opporsi alla gravità. Si forma un nucleo denso e caldo, la <em>protostella</em>, immersa in un involucro di gas in caduta. La protostella è circondata da un disco di accrescimento: il momento angolare del gas in collasso, per conservazione, produce una struttura differenzialmente rotante intorno al nucleo centrale.</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="teoria-section">
-      <h3><span class="num">03</span> La Sequenza Principale: Equilibrio Idrostatico</h3>
-      <p>La fase di accrescimento termina quando la temperatura al centro della protostella raggiunge circa $10^7$ K, sufficienti ad innescare la fusione nucleare dell'idrogeno in elio attraverso la <em>catena p-p</em> (protone-protone) o il ciclo CNO (carbonio-azoto-ossigeno), a seconda della massa stellare. A questo punto la stella raggiunge un equilibrio stabile: la pressione di radiazione e la pressione termica del gas bilanciano esattamente la forza di gravità. Questa condizione è detta <em>equilibrio idrostatico</em>:</p>
+      <h3><span class="num">02</span> Il Metodo SPH (Smoothed Particle Hydrodynamics)</h3>
+      <p>La simulazione usa il metodo SPH, in cui il fluido è rappresentato da un insieme di particelle, ciascuna con massa, posizione, velocità ed energia interna. Le quantità continue (densità, pressione) vengono stimate per interpolazione pesata tramite un <em>kernel</em> $W(r,h)$, una funzione a supporto compatto di larghezza $h$:</p>
       <div class="eq-box">
-        $$\frac{dP}{dr} = -\frac{G M(r)}{r^2}\rho(r)$$
+        $$\rho_i = \sum_j m_j\, W(|\mathbf{r}_i - \mathbf{r}_j|, h)$$
       </div>
-      <p>La stella entra nella <em>sequenza principale</em>, una fase stabile che per una stella come il Sole dura circa 10 miliardi di anni. La posizione di una stella sulla sequenza principale del diagramma HR (Hertzsprung-Russell) è determinata quasi unicamente dalla sua massa: stelle più massicce sono più luminose e più calde, ma bruciano l'idrogeno molto più in fretta.</p>
-    </div>
-
-    <div class="teoria-section">
-      <h3><span class="num">04</span> L'Evoluzione Post-Sequenza Principale</h3>
-      <p>Quando l'idrogeno nel nucleo si esaurisce, la stella non riesce più a sostenere la pressione necessaria contro la gravità. Il nucleo si contrae e si scalda, mentre gli strati esterni si espandono enormemente: la stella diventa una <em>gigante rossa</em>. Il nucleo in contrazione raggiunge temperature sufficienti a bruciare l'elio in carbonio e ossigeno (processo triplo-alfa). Per stelle di massa superiore a circa 8 masse solari, le fusioni nucleari proseguono attraverso elementi sempre più pesanti — carbonio, neon, ossigeno, silicio — fino al ferro (Fe), il nucleo atomico con la massima energia di legame per nucleone.</p>
-      <p>Il ferro non può essere fuso in modo esotermico: qualsiasi fusione del ferro <em>assorbe</em> energia invece di liberarla. Quando il nucleo di ferro supera la <em>massa limite di Chandrasekhar</em> ($M_\text{Ch} \approx 1.44\,M_\odot$), la pressione di degenerazione degli elettroni — l'unica forza che ancora sorregge il nucleo — non è più sufficiente e il collasso diventa inevitabile.</p>
+      <p>Qui si usa il kernel B-spline cubico 2D, la scelta standard perché è $C^2$, non oscilla e ha gradiente ben definito. L'equazione del moto per la particella $i$ include la forza di pressione $-\nabla P / \rho$, la gravità con softening $\varepsilon$, e la viscosità artificiale di Monaghan per catturare gli urti senza instabilità numeriche.</p>
     </div>
 
     <div class="divider"></div>
 
     <div class="teoria-section">
-      <h3><span class="num">05</span> Il Collasso del Nucleo e la Supernova di Tipo II</h3>
-      <p>Il collasso del nucleo di ferro avviene in meno di un secondo. Gli elettroni vengono catturati dai protoni (<em>cattura elettronica</em>: $e^- + p \to n + \nu_e$) producendo un flusso enorme di neutrini e trasformando il nucleo in un oggetto composto quasi interamente di neutroni. Quando la densità del nucleo supera la densità nucleare ($\sim 2.7\times 10^{17}$ kg/m³), la forza nucleare forte diventa repulsiva e il collasso si arresta bruscamente.</p>
-      <p>Questo <em>bounce</em> (rimbalzo) genera un'onda d'urto che si propaga verso l'esterno. Inizialmente l'onda perde energia nel dissociare i nuclei pesanti, ma viene rilanciata dall'enorme flusso di neutrini emessi dal nucleo: anche se solo l'1% dell'energia dei neutrini viene depositato nel gas circostante, è sufficiente a espellere gli strati esterni della stella con velocità dell'ordine di $10^4$ km/s. Questa è la <em>supernova di tipo II</em>, uno degli eventi più energetici dell'universo.</p>
-      <div class="callout">
-        <strong>Nella simulazione</strong> la fase 3 (rimbalzo) applica un impulso radiale verso l'esterno alle particelle vicino al centro di massa, mimando l'onda d'urto. La fase 4 rappresenta la stella di neutroni residua, che assorbe le particelle che le cadono addosso.
+      <h3><span class="num">03</span> L'Equazione di Stato e il Raffreddamento</h3>
+      <p>La pressione segue una legge politropica $P = K\rho^\gamma$ con $\gamma = 5/3$ (gas monoatomico). Nelle fasi iniziali (0–1) il gas è otticamente sottile e può raffreddarsi: ogni passo l'energia interna viene moltiplicata per un fattore $\eta < 1$ (il parametro <em>raffreddamento</em> nello slider), mimando la perdita radiativa. Nelle fasi successive il raffreddamento diventa meno efficiente e si aggiunge il termine di pressione termica $(\gamma-1)\rho u$.</p>
+      <div class="eq-box">
+        $$P_i = K\rho_i^\gamma + (\gamma-1)\rho_i u_i \qquad \text{(fase} \geq 2\text{)}$$
       </div>
     </div>
 
     <div class="teoria-section">
-      <h3><span class="num">06</span> I Resti: Stelle di Neutroni e Buchi Neri</h3>
-      <p>Ciò che rimane al centro dell'esplosione dipende dalla massa del progenitore. Per stelle con massa originale tra circa 8 e 20 masse solari, il nucleo residuo — una <em>stella di neutroni</em> — ha una massa di circa 1.4–2 $M_\odot$ concentrata in una sfera di soli 10–12 km di raggio. La densità interna eguaglia quella del nucleo atomico. La stella di neutroni è sorretta dalla <em>pressione di degenerazione dei neutroni</em> (principio di esclusione di Pauli applicato ai neutroni), che impedisce un'ulteriore compressione.</p>
-      <p>Se la massa del resto supera circa 2–3 $M_\odot$ (il limite di Tolman-Oppenheimer-Volkoff, ancora non determinato con precisione), nessuna forza nota riesce a contrastare la gravità: il nucleo collassa in un <em>buco nero</em>. Attorno al buco nero può formarsi un disco di accrescimento dal quale vengono emessi potenti getti relativistici perpendicolare al piano orbitale — i <em>gamma-ray burst</em> di breve durata sono associati proprio a questo meccanismo. Il gas espulso dalla supernova si disperde nello spazio interstellare arricchendolo degli elementi pesanti prodotti dalla nucleosintesi stellare — compreso il ferro, il nichel, il calcio e l'ossigeno presenti nei nostri corpi.</p>
+      <h3><span class="num">04</span> Il Collasso del Nucleo e la Supernova di Tipo II</h3>
+      <p>Quando la densità supera la soglia critica e il tempo di free-fall è trascorso, il modello entra nella fase di rimbalzo (fase 3). Un impulso radiale verso l'esterno viene applicato alle particelle vicine al centro di massa, mimando l'onda d'urto della supernova generata dal rimbalzo del nucleo sulla densità nucleare. L'energia viene depositata nel gas circostante con un meccanismo analogo al trasporto di neutrini nelle simulazioni complete.</p>
+      <div class="callout">
+        <strong>Il core C compilato in WASM</strong> esegue l'intero ciclo SPH — calcolo densità, forze, integrazione leapfrog — senza passare dati a JavaScript frame per frame: solo al momento del rendering JS legge il buffer di stato prodotto da <code>sim_get_state()</code>.
+      </div>
     </div>
 
-  </div><!-- /teoria-grid -->
-</div><!-- /teoria -->
+    <div class="divider"></div>
+
+    <div class="teoria-section">
+      <h3><span class="num">05</span> La Stella di Neutroni</h3>
+      <p>Il resto compatto della supernova è una <em>stella di neutroni</em>: una sfera di circa 10–12 km di raggio con massa di $1.4$–$2\,M_\odot$, sorretta dalla pressione di degenerazione dei neutroni (principio di esclusione di Pauli). Nella simulazione la stella di neutroni è un oggetto puntiforme che assorbe le particelle SPH che le cadono entro 12 px, mentre il nucleo pulsa con periodo fisso mimando l'emissione di un pulsar.</p>
+    </div>
+
+    <div class="teoria-section">
+      <h3><span class="num">06</span> Architettura WASM e Prestazioni</h3>
+      <p>Il core fisico gira interamente in WebAssembly (WASM), compilato da C con Emscripten a ottimizzazione <code>-O2</code>. JavaScript si occupa solo del rendering Canvas e dell'interfaccia utente. La comunicazione avviene tramite memoria condivisa lineare: <code>sim_get_state()</code> restituisce un puntatore a un buffer interno che JS legge direttamente come <code>Float32Array</code>, senza copia. Questo permette di simulare 600–800 particelle a frame rate fluido anche su macchine di classe media.</p>
+    </div>
+
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════════════════════════════════════
-     JavaScript
+     JavaScript — carica il modulo WASM prodotto da Emscripten e gestisce
+     rendering + UI. Tutta la fisica è nel C.
      ════════════════════════════════════════════════════════════════════════ -->
 <script>
-/* ── Parametri di default (sync con slider) ─────────────────────────────── */
-let params = {
+
+/* ── Parametri UI (sincronizzati con gli slider) ── */
+const params = {
   N:     400,
   R:     200,
   omega: 0.000,
@@ -633,435 +433,272 @@ let params = {
   cool:  0.998
 };
 
-/* ── WASM inline (sim.c compilato in JS puro equivalente) ───────────────── */
-/* Poiché non disponiamo di un server Emscripten, reimplementiamo il core
-   SPH direttamente in JavaScript con la stessa fisica del sim.c.          */
+const CANVAS_W = 760, CANVAS_H = 760;
+const PHASE_NAMES  = ['Nube Molecolare','Protostella in Formazione','Collasso del Nucleo','Rimbalzo — Supernova','Stella di Neutroni'];
+const PHASE_COLORS = ['#4a9eff','#f39c12','#e74c3c','#9b59b6','#2ecc71'];
 
-const N_MAX    = 1000;
-const CANVAS_W = 760;
-const CANVAS_H = 760;
-const VISC_A   = 1.0, VISC_B = 2.0, VISC_EPS = 0.01;
-
-let N = 0;
-const px  = new Float32Array(N_MAX), py  = new Float32Array(N_MAX);
-const vx  = new Float32Array(N_MAX), vy  = new Float32Array(N_MAX);
-const ax  = new Float32Array(N_MAX), ay  = new Float32Array(N_MAX);
-const rho = new Float32Array(N_MAX), pr  = new Float32Array(N_MAX);
-const u   = new Float32Array(N_MAX);
-const alive = new Uint8Array(N_MAX);
-
-let simTime  = 0, phase = 0;
-let ns_active = 0, ns_x = 0, ns_y = 0, ns_pulse = 0;
-let diag_n_alive = 0;
-
-/* ── Kernel B-spline cubico 2D ── */
-function kernel(dist, h) {
-  const q = dist / h;
-  if (q >= 2) return 0;
-  const norm = 10 / (7 * Math.PI * h * h);
-  if (q <= 1) return norm * (1 - 1.5*q*q + 0.75*q*q*q);
-  const t = 2 - q;
-  return norm * 0.25 * t * t * t;
-}
-
-function kernelGrad(dx, dy, dist, h, out) {
-  const q = dist / h;
-  if (q >= 2 || dist < 1e-6) { out[0] = 0; out[1] = 0; return; }
-  const norm = 10 / (7 * Math.PI * h * h * h);
-  const dWdq = q <= 1
-    ? norm * (-3*q + 2.25*q*q)
-    : norm * (-0.75 * (2-q) * (2-q));
-  out[0] = dWdq * dx / dist;
-  out[1] = dWdq * dy / dist;
-}
-
-function centerOfMass() {
-  let sx = 0, sy = 0, cnt = 0;
-  for (let i = 0; i < N; i++) if (alive[i]) { sx += px[i]; sy += py[i]; cnt++; }
-  return cnt > 0 ? [sx/cnt, sy/cnt] : [CANVAS_W/2, CANVAS_H/2];
-}
-
-/* ── sim_set_params via params object ── */
-let g_G, g_K, g_cool0, g_cool1, g_soft, g_gamma = 1.66;
-let g_thr01, g_thr12, g_thr23t, g_thr23rho, g_thr34t;
-
-function applyParams() {
-  g_G    = params.G;
-  g_K    = params.K;
-  g_cool0 = params.cool;
-  g_cool1 = 1 - (1 - params.cool) * 0.25;
-  g_soft  = 200;
-  const gs = g_G / 12;
-  g_thr01    = 0.15 * gs;
-  g_thr12    = 0.60 * gs;
-  g_thr23rho = 3.0  * gs;
-  g_thr23t   = 800  / gs;
-  g_thr34t   = 1100 / gs;
-}
-
-function simInit() {
-  if (!wasmReady) return;
-
-  // Invia i parametri fisici al file C
-  _sim_set_params(params.G, params.k, params.gamma, params.h, params.m);
-
-  // Inizializza la nube direttamente nella memoria del C
-  _sim_init(params.N, params.R, params.omega, params.u0);
-  
-  running = false; 
-  simTime = 0;
-}
-/* ── sim_step ── */
-const gOut = new Float32Array(2);
-
-function simStep(iters) {
-  const dt   = 0.2;
-  const h    = 20;
-  const h2   = h * 2;
-  const h2sq = h2 * h2;
-
-  for (let step = 0; step < iters; step++) {
-
-    /* Thinning in fase stabile */
-    if (phase === 4 && diag_n_alive > 80 && (Math.round(simTime/dt) % 50 === 0)) {
-      const far2 = (CANVAS_W * 1.2) ** 2;
-      for (let i = 0; i < N; i++) {
-        if (!alive[i]) continue;
-        const ddx = px[i]-ns_x, ddy = py[i]-ns_y;
-        if (rho[i] < 0.003 && ddx*ddx+ddy*ddy > far2) alive[i] = 0;
-      }
-    }
-
-    /* 1. Densità e pressione */
-    for (let i = 0; i < N; i++) {
-      if (!alive[i]) continue;
-      rho[i] = 0.01;
-      for (let j = 0; j < N; j++) {
-        if (!alive[j]) continue;
-        const dx = px[i]-px[j], dy = py[i]-py[j];
-        const r2 = dx*dx+dy*dy;
-        if (r2 < h2sq) rho[i] += kernel(Math.sqrt(r2), h);
-      }
-      pr[i] = g_K * Math.pow(rho[i], g_gamma);
-      if (phase >= 2) pr[i] += (g_gamma-1) * rho[i] * u[i];
-    }
-
-    /* 2. Forze */
-    for (let i = 0; i < N; i++) {
-      if (!alive[i]) continue;
-      ax[i] = 0; ay[i] = 0;
-      for (let j = 0; j < N; j++) {
-        if (i === j || !alive[j]) continue;
-        const dx   = px[j]-px[i], dy = py[j]-py[i];
-        const r2   = dx*dx+dy*dy;
-        const dist = Math.sqrt(r2);
-
-        const fg = g_G / (r2 + g_soft);
-        ax[i] += fg * dx / dist;
-        ay[i] += fg * dy / dist;
-
-        if (dist < h2) {
-          kernelGrad(-dx, -dy, dist, h, gOut);
-          const pi2 = pr[i]/(rho[i]*rho[i]), pj2 = pr[j]/(rho[j]*rho[j]);
-          const pc  = pi2 + pj2;
-          ax[i] -= pc * gOut[0];
-          ay[i] -= pc * gOut[1];
-
-          const dvx = vx[i]-vx[j], dvy = vy[i]-vy[j];
-          const vdr = dvx*(-dx) + dvy*(-dy);
-          if (vdr < 0) {
-            const rm  = 0.5*(rho[i]+rho[j]);
-            const ci  = Math.sqrt(g_gamma*pr[i]/rho[i]);
-            const cj  = Math.sqrt(g_gamma*pr[j]/rho[j]);
-            const cm  = 0.5*(ci+cj);
-            const mu  = h * vdr / (r2 + VISC_EPS*h*h);
-            const Piv = (-VISC_A*cm*mu + VISC_B*mu*mu) / rm;
-            ax[i] -= Piv * gOut[0];
-            ay[i] -= Piv * gOut[1];
-          }
-        }
-      }
-    }
-
-    /* 3. Integrazione */
-    let max_rho = 0, sum_rho = 0;
-    const [cmx, cmy] = centerOfMass();
-    diag_n_alive = 0;
-
-    for (let i = 0; i < N; i++) {
-      if (!alive[i]) continue;
-      diag_n_alive++;
-      vx[i] += ax[i]*dt; vy[i] += ay[i]*dt;
-      px[i] += vx[i]*dt; py[i] += vy[i]*dt;
-      u[i]  += (pr[i]/rho[i]) * 0.001;
-      u[i]  *= (phase === 0) ? g_cool0 : g_cool1;
-      if (rho[i] > max_rho) max_rho = rho[i];
-      sum_rho += rho[i];
-    }
-
-    /* 4. Transizioni */
-    if (phase === 0 && max_rho > g_thr01) phase = 1;
-    if (phase === 1 && max_rho > g_thr12) phase = 2;
-    if (phase === 2 && (simTime > g_thr23t || max_rho > g_thr23rho)) phase = 3;
-
-    if (phase === 3) {
-      const [cmx3, cmy3] = centerOfMass();
-      for (let i = 0; i < N; i++) {
-        if (!alive[i]) continue;
-        const dx = px[i]-cmx3, dy = py[i]-cmy3;
-        const d  = Math.sqrt(dx*dx+dy*dy);
-        if (d > 1e-3 && d < 40) {
-          vx[i] += (dx/d)*10; vy[i] += (dy/d)*10; u[i] += 3;
-        }
-      }
-      if (simTime > g_thr34t) {
-        phase = 4; ns_active = 1;
-        const [cnx,cny] = centerOfMass();
-        ns_x = cnx; ns_y = cny;
-      }
-    }
-
-    if (ns_active) {
-      ns_pulse += 0.3;
-      for (let i = 0; i < N; i++) {
-        if (!alive[i]) continue;
-        const dx = px[i]-ns_x, dy = py[i]-ns_y;
-        if (dx*dx+dy*dy < 144) alive[i] = 0;
-      }
-    }
-
-    simTime += dt;
-  }
-}
-
-/* ── Diagnostica ── */
-function getDiagnostics() {
-  let mr=0, mu=0, sr=0, scs2=0, cnt=0;
-  for (let i=0;i<N;i++) {
-    if (!alive[i]) continue;
-    if (rho[i]>mr) mr=rho[i];
-    if (u[i]>mu)   mu=u[i];
-    sr   += rho[i];
-    scs2 += g_gamma * pr[i] / rho[i];
-    cnt++;
-  }
-  const mean_rho = cnt>0 ? sr/cnt : 0;
-  const mean_cs2 = cnt>0 ? scs2/cnt : 0;
-  const Sigma    = mean_rho;
-  let L_J=0, M_J=0;
-  if (g_G>0 && Sigma>1e-6) {
-    L_J = Math.sqrt(mean_cs2 / (g_G * Sigma));
-    M_J = Sigma * L_J * L_J;
-  }
-  return { mr, mu, mean_rho, simTime, M_J, L_J, n:diag_n_alive, phase };
-}
-
-/* ── Rendering Canvas ── */
 const canvas = document.getElementById('c');
 const ctx    = canvas.getContext('2d');
 
-const PHASE_NAMES = [
-  'Nube Molecolare',
-  'Protostella in Formazione',
-  'Collasso del Nucleo',
-  'Rimbalzo — Supernova',
-  'Stella di Neutroni'
-];
-const PHASE_COLORS = ['#4a9eff','#f39c12','#e74c3c','#9b59b6','#2ecc71'];
+/* ── Stelle di sfondo fisse ── */
+const BG_STARS = Array.from({length: 180}, () => [
+  Math.random() * CANVAS_W,
+  Math.random() * CANVAS_H,
+  Math.random() * 1.2 + 0.2
+]);
 
+/* ── Stato loop ── */
+let running = false, rafId = null;
+const ITERS_PER_FRAME = 3;
+
+/* ════════════════════════════════════════════════════════════════════════
+   Caricamento WASM
+   ════════════════════════════════════════════════════════════════════════
+
+   sim.js (prodotto da emcc con -s MODULARIZE=1 -s EXPORT_NAME=SimModule)
+   esporta una factory function SimModule() che restituisce una Promise.
+   Quando la Promise si risolve, il campo _asm contiene le funzioni C
+   esportate con prefisso underscore.
+
+   Le funzioni che restituiscono puntatori (sim_get_state, sim_get_diagnostics)
+   vanno lette dalla memoria lineare WASM tramite Module.HEAPF32.
+   Il puntatore è un byte offset: l'indice nell'array Float32 è ptr/4.
+*/
+
+let Sim = null;   /* istanza del modulo WASM */
+let sim_set_params, sim_init, sim_step, sim_get_state, sim_get_diagnostics, sim_get_phase, sim_get_N;
+
+document.getElementById('loadingMsg').textContent = 'Caricamento sim.js…';
+
+/* Carichiamo sim.js dinamicamente — deve stare nella stessa cartella dell'HTML */
+const scriptTag = document.createElement('script');
+scriptTag.src = 'sim.js';
+scriptTag.onerror = () => {
+  document.getElementById('loadingMsg').textContent =
+    'ERRORE: sim.js non trovato. Compila sim.c con Emscripten e metti sim.js + sim.wasm nella stessa cartella.';
+};
+scriptTag.onload = () => {
+  document.getElementById('loadingMsg').textContent = 'Istanziazione SimModule…';
+  SimModule().then(module => {
+    Sim = module;
+
+    /* Wrappiamo le funzioni esportate. Per quelle che non restituiscono
+       puntatori usiamo direttamente module._nomefunzione().
+       Per quelle che restituiscono puntatori dobbiamo leggere HEAPF32. */
+    sim_set_params = (G, K, cool, soft) => Sim._sim_set_params(G, K, cool, soft);
+    sim_init       = (N, R, omega, u0)  => Sim._sim_init(N, R, omega, u0);
+    sim_step       = (iters)            => Sim._sim_step(iters);
+    sim_get_phase  = ()                 => Sim._sim_get_phase();
+    sim_get_N      = ()                 => Sim._sim_get_N();
+
+    /* sim_get_diagnostics: restituisce ptr a float[8] nella memoria WASM */
+    sim_get_diagnostics = () => {
+      const ptr = Sim._sim_get_diagnostics();   /* byte offset */
+      return Sim.HEAPF32.subarray(ptr >> 2, (ptr >> 2) + 8);
+    };
+
+    /* sim_get_state: restituisce ptr a float[8 + n_alive*4] */
+    sim_get_state = () => {
+      const ptr      = Sim._sim_get_state();
+      const n_alive  = Sim.HEAPF32[ptr >> 2];  /* primo elemento = n_alive */
+      const len      = 8 + n_alive * 4;
+      return Sim.HEAPF32.subarray(ptr >> 2, (ptr >> 2) + len);
+    };
+
+    /* Pronto: nascondiamo il loading e inizializziamo */
+    document.getElementById('loading').style.display = 'none';
+    doInit();
+    render();
+    updateUI();
+
+  }).catch(err => {
+    document.getElementById('loadingMsg').textContent = 'Errore istanziazione WASM: ' + err;
+  });
+};
+document.head.appendChild(scriptTag);
+
+/* ── Inizializzazione simulazione ── */
+function doInit() {
+  sim_set_params(params.G, params.K, params.cool, 200);
+  sim_init(params.N, params.R, params.omega, params.u0);
+}
+
+/* ── Rendering Canvas ── */
 function render() {
-  const W = CANVAS_W, H = CANVAS_H;
-  ctx.clearRect(0,0,W,H);
+  if (!Sim) return;
 
-  /* sfondo stellato */
   ctx.fillStyle = '#060312';
-  ctx.fillRect(0,0,W,H);
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-  /* stelle di sfondo (fisse, generate una volta) */
-  if (!render._stars) {
-    render._stars = [];
-    for (let i=0;i<180;i++)
-      render._stars.push([Math.random()*W, Math.random()*H, Math.random()*1.2+0.2]);
-  }
-  for (const [sx,sy,sr] of render._stars) {
+  /* Stelle di sfondo */
+  for (const [sx, sy, sr] of BG_STARS) {
     ctx.beginPath();
-    ctx.arc(sx,sy,sr,0,Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${0.2+Math.random()*0.1})`;
+    ctx.arc(sx, sy, sr, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${0.18 + Math.random() * 0.08})`;
     ctx.fill();
   }
 
-  /* particelle SPH */
-  const rhoMax = Math.max(...Array.from({length:N},(_,i)=>alive[i]?rho[i]:0));
+  const state = sim_get_state();
+  const n_alive  = state[0];
+  const ns_active = state[1];
+  const ns_x     = state[2], ns_y = state[3];
+  const ns_pulse  = state[4];
 
-  for (let i=0;i<N;i++) {
-    if (!alive[i]) continue;
-    const nr   = rhoMax > 0 ? rho[i]/rhoMax : 0;
-    const nu   = Math.min(u[i]/2, 1);
+  /* Calcola rho_max per normalizzazione colore */
+  let rhoMax = 0;
+  for (let i = 0; i < n_alive; i++) {
+    const rho = state[8 + i*4 + 3];
+    if (rho > rhoMax) rhoMax = rho;
+  }
 
-    /* colore: blu (freddo) → giallo → bianco (caldo) */
-    let R2,G2,B2;
+  /* Particelle SPH */
+  for (let i = 0; i < n_alive; i++) {
+    const base = 8 + i * 4;
+    const px   = state[base];
+    const py   = state[base + 1];
+    /* u = state[base+2] — non usato nel colore qui sotto ma disponibile */
+    const rho  = state[base + 3];
+
+    const nr = rhoMax > 0 ? rho / rhoMax : 0;
+
+    let R2, G2, B2;
     if (nr < 0.3) {
       R2 = Math.round(30  + nr*3*100);
       G2 = Math.round(50  + nr*3*120);
       B2 = Math.round(180 + nr*3*40);
     } else if (nr < 0.7) {
-      const t = (nr-0.3)/0.4;
+      const t = (nr - 0.3) / 0.4;
       R2 = Math.round(130 + t*125);
       G2 = Math.round(170 + t*85);
       B2 = Math.round(220 - t*120);
     } else {
-      const t = (nr-0.7)/0.3;
-      R2 = Math.round(255);
+      const t = (nr - 0.7) / 0.3;
+      R2 = 255;
       G2 = Math.round(255 - t*30);
       B2 = Math.round(100 + t*155);
     }
 
-    const alpha = 0.55 + 0.45*nr;
-    const radius = 2.5 + nr*2.5;
+    const alpha  = 0.55 + 0.45 * nr;
+    const radius = 2.5  + nr * 2.5;
 
     ctx.beginPath();
-    ctx.arc(px[i], py[i], radius, 0, Math.PI*2);
+    ctx.arc(px, py, radius, 0, Math.PI*2);
     ctx.fillStyle = `rgba(${R2},${G2},${B2},${alpha})`;
     ctx.fill();
 
-    /* alone per le più calde */
     if (nr > 0.6) {
       ctx.beginPath();
-      ctx.arc(px[i], py[i], radius*2.5, 0, Math.PI*2);
+      ctx.arc(px, py, radius * 2.5, 0, Math.PI*2);
       ctx.fillStyle = `rgba(${R2},${G2},${B2},0.06)`;
       ctx.fill();
     }
   }
 
-  /* stella di neutroni */
+  /* Stella di neutroni */
   if (ns_active) {
-    const t = performance.now()/1000;
-    const pulse = Math.sin(t*6)*0.3+0.7;
+    const t     = performance.now() / 1000;
+    const pulse = Math.sin(t * 6) * 0.3 + 0.7;
 
-    /* alone esterno */
-    const grad = ctx.createRadialGradient(ns_x,ns_y,0,ns_x,ns_y,40*pulse);
-    grad.addColorStop(0,'rgba(150,255,200,0.25)');
-    grad.addColorStop(1,'rgba(0,0,0,0)');
+    const grad = ctx.createRadialGradient(ns_x, ns_y, 0, ns_x, ns_y, 40 * pulse);
+    grad.addColorStop(0, 'rgba(150,255,200,0.25)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.beginPath();
-    ctx.arc(ns_x,ns_y,40*pulse,0,Math.PI*2);
+    ctx.arc(ns_x, ns_y, 40 * pulse, 0, Math.PI*2);
     ctx.fillStyle = grad;
     ctx.fill();
 
-    /* nucleo */
     ctx.beginPath();
-    ctx.arc(ns_x,ns_y,6,0,Math.PI*2);
-    ctx.fillStyle = `rgba(180,255,220,${0.8+0.2*pulse})`;
+    ctx.arc(ns_x, ns_y, 6, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(180,255,220,${0.8 + 0.2*pulse})`;
     ctx.fill();
 
-    /* jet (fasci relativistici) */
     ctx.save();
     ctx.strokeStyle = `rgba(120,200,255,${0.15*pulse})`;
     ctx.lineWidth = 3;
-    for (const s of [-1,1]) {
+    for (const s of [-1, 1]) {
       ctx.beginPath();
       ctx.moveTo(ns_x, ns_y);
-      ctx.lineTo(ns_x, ns_y + s*(30+20*pulse));
+      ctx.lineTo(ns_x, ns_y + s * (30 + 20*pulse));
       ctx.stroke();
     }
     ctx.restore();
   }
 }
 
-/* ── UI update ── */
-const phaseBadge = document.getElementById('phaseBadge');
-const jMass      = document.getElementById('jMass');
-const jLen       = document.getElementById('jLen');
-const jStatus    = document.getElementById('jStatus');
-const diagOv     = document.getElementById('diagOverlay');
-const dPhase     = document.getElementById('dPhase');
-const dAlive     = document.getElementById('dAlive');
-const dRho       = document.getElementById('dRho');
-const dU         = document.getElementById('dU');
-const dTime      = document.getElementById('dTime');
-const dRhoMean   = document.getElementById('dRhoMean');
-const pDots      = [0,1,2,3,4].map(i=>document.getElementById('pd'+i));
+/* ── Aggiornamento UI ── */
+function updateUI() {
+  if (!Sim) return;
+  const d = sim_get_diagnostics();
+  /* d[0]=max_rho  d[1]=max_u  d[2]=mean_rho  d[3]=sim_time
+     d[4]=M_J      d[5]=L_J    d[6]=n_alive   d[7]=phase   */
+  const ph = d[7] | 0;
 
-function updateUI(d) {
-  phaseBadge.textContent = `Fase ${d.phase} — ${PHASE_NAMES[d.phase]}`;
-  phaseBadge.style.borderColor = PHASE_COLORS[d.phase];
+  document.getElementById('phaseBadge').textContent = `Fase ${ph} — ${PHASE_NAMES[ph]}`;
+  document.getElementById('phaseBadge').style.borderColor = PHASE_COLORS[ph];
+  document.getElementById('diagOverlay').innerHTML =
+    `ρ<sub>max</sub>: ${d[0].toFixed(3)} &nbsp;·&nbsp; t: ${d[3].toFixed(0)}`;
 
-  diagOv.innerHTML = `ρ<sub>max</sub>: ${d.mr.toFixed(3)} &nbsp;·&nbsp; t: ${d.simTime.toFixed(0)}`;
+  document.getElementById('dPhase').textContent   = ph;
+  document.getElementById('dAlive').textContent   = d[6] | 0;
+  document.getElementById('dRho').textContent     = d[0].toFixed(4);
+  document.getElementById('dU').textContent       = d[1].toFixed(3);
+  document.getElementById('dTime').textContent    = d[3].toFixed(0);
+  document.getElementById('dRhoMean').textContent = d[2].toFixed(4);
 
-  dPhase.textContent   = d.phase;
-  dAlive.textContent   = d.n;
-  dRho.textContent     = d.mr.toFixed(4);
-  dU.textContent       = d.mu.toFixed(3);
-  dTime.textContent    = d.simTime.toFixed(0);
-  dRhoMean.textContent = d.mean_rho.toFixed(4);
+  document.getElementById('jMass').textContent = d[4] > 0 ? d[4].toExponential(2) : '—';
+  document.getElementById('jLen').textContent  = d[5] > 0 ? d[5].toFixed(1) + ' px' : '—';
 
-  /* Jeans */
-  jMass.textContent = d.M_J > 0 ? d.M_J.toExponential(2) : '—';
-  jLen.textContent  = d.L_J > 0 ? d.L_J.toFixed(1)+' px' : '—';
-
-  /* Stima massa nube in unità adimensionali: N particelle * MASS=1 */
-  const M_cloud = d.n;
-  if (d.L_J > 0 && d.M_J > 0) {
-    if (M_cloud > d.M_J * 5) {
-      jStatus.textContent = 'COLLASSO';
-      jStatus.className   = 'jeans-col';
-    } else if (M_cloud > d.M_J) {
-      jStatus.textContent = 'Instabile';
-      jStatus.className   = 'jeans-crit';
-    } else {
-      jStatus.textContent = 'Stabile';
-      jStatus.className   = 'jeans-ok';
-    }
+  const M_cloud = d[6];
+  const jStatus = document.getElementById('jStatus');
+  if (d[5] > 0 && d[4] > 0) {
+    if (M_cloud > d[4] * 5)  { jStatus.textContent = 'COLLASSO';  jStatus.className = 'jeans-col';  }
+    else if (M_cloud > d[4]) { jStatus.textContent = 'Instabile'; jStatus.className = 'jeans-crit'; }
+    else                     { jStatus.textContent = 'Stabile';   jStatus.className = 'jeans-ok';   }
   } else {
-    jStatus.textContent = '—';
-    jStatus.className   = '';
+    jStatus.textContent = '—'; jStatus.className = '';
   }
 
-  /* Progress bar fasi */
+  const pDots = [0,1,2,3,4].map(i => document.getElementById('pd'+i));
   pDots.forEach((dot, i) => {
     dot.className = 'ph-dot';
-    if (i < d.phase) dot.classList.add('done');
-    else if (i === d.phase) dot.classList.add('current');
+    if (i < ph) dot.classList.add('done');
+    else if (i === ph) dot.classList.add('current');
   });
 }
 
 /* ── Loop principale ── */
-let running = false, rafId = null;
-const ITERS_PER_FRAME = 3;
-
 function loop() {
   if (!running) return;
-  simStep(ITERS_PER_FRAME);
+  sim_step(ITERS_PER_FRAME);
   render();
-  const d = getDiagnostics();
-  updateUI(d);
+  updateUI();
   rafId = requestAnimationFrame(loop);
 }
 
 /* ── Bottoni ── */
 document.getElementById('btnStart').addEventListener('click', () => {
-  if (!running) { running = true; loop(); }
-  document.getElementById('btnStart').disabled  = true;
-  document.getElementById('btnPause').disabled  = false;
+  if (!Sim || running) return;
+  running = true; loop();
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnPause').disabled = false;
 });
 document.getElementById('btnPause').addEventListener('click', () => {
   running = false; cancelAnimationFrame(rafId);
-  document.getElementById('btnStart').disabled  = false;
-  document.getElementById('btnPause').disabled  = true;
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnPause').disabled = true;
 });
 document.getElementById('btnReset').addEventListener('click', () => {
   running = false; cancelAnimationFrame(rafId);
-  simInit(); render();
-  document.getElementById('btnStart').disabled  = false;
-  document.getElementById('btnPause').disabled  = true;
-  updateUI(getDiagnostics());
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnPause').disabled = true;
+  if (!Sim) return;
+  doInit(); render(); updateUI();
 });
 
-/* ── Slider ── */
 /* ── Slider ── */
 function bindSlider(id, valId, key, fmt) {
   const sl = document.getElementById(id);
   const vl = document.getElementById(valId);
-  if (!sl || !vl) return; // Evita errori se l'elemento manca
   sl.addEventListener('input', () => {
     params[key] = parseFloat(sl.value);
     vl.textContent = fmt(params[key]);
@@ -1074,16 +711,9 @@ bindSlider('sR',     'vR',     'R',     v => v);
 bindSlider('sOmega', 'vOmega', 'omega', v => v.toFixed(3));
 bindSlider('sU0',    'vU0',    'u0',    v => v.toFixed(2));
 bindSlider('sG',     'vG',     'G',     v => v.toFixed(1));
-bindSlider('sK',     'vK',     'k',     v => v.toFixed(3));
-    bindSlider('sCool',  'vCool',  'cool',  v => v.toFixed(4));
+bindSlider('sK',     'vK',     'K',     v => v.toFixed(3));
+bindSlider('sCool',  'vCool',  'cool',  v => v.toFixed(4));
 
-    /* ── Init ── */
-    document.getElementById('loading').style.display = 'none';
-    
-    // Importante: simInit deve chiamare le funzioni WASM
-    simInit(); 
-    render();
-    updateUI(getDiagnostics());
 </script>
 </body>
 </html>

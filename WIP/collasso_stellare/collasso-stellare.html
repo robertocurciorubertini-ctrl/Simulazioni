@@ -702,19 +702,15 @@ function applyParams() {
 function simInit() {
   if (!wasmReady) return;
 
-  // 1. Applica i parametri fisici (G, K, etc.) nel modulo C
-  // Assicurati che params.k sia minuscola o maiuscola a seconda di come l'hai definita
+  // Invia i parametri fisici al file C
   _sim_set_params(params.G, params.k, params.gamma, params.h, params.m);
 
-  // 2. Chiama la funzione di inizializzazione del C
-  // Il C creerà le particelle internamente usando R, Omega e u0 che gli passi
+  // Inizializza la nube direttamente nella memoria del C
   _sim_init(params.N, params.R, params.omega, params.u0);
-
-  // 3. Reset delle variabili locali JS per la grafica
-  currentPhase = 0;
-  frameCount = 0;
+  
+  running = false; 
+  simTime = 0;
 }
-
 /* ── sim_step ── */
 const gOut = new Float32Array(2);
 
@@ -1078,16 +1074,16 @@ bindSlider('sR',     'vR',     'R',     v => v);
 bindSlider('sOmega', 'vOmega', 'omega', v => v.toFixed(3));
 bindSlider('sU0',    'vU0',    'u0',    v => v.toFixed(2));
 bindSlider('sG',     'vG',     'G',     v => v.toFixed(1));
-bindSlider('sK',     'vK',     'k',     v => v.toFixed(3)); // Nota: 'k' minuscola come nel C
-bindSlider('sCool',  'vCool',  'cool',  v => v.toFixed(4));
+bindSlider('sK',     'vK',     'k',     v => v.toFixed(3));
+    bindSlider('sCool',  'vCool',  'cool',  v => v.toFixed(4));
 
-/* ── Init ── */
-const loadingScreen = document.getElementById('loading-screen');
-if (loadingScreen) loadingScreen.style.display = 'none';
-
-simInit();
-render();
-updateUI(getDiagnostics());
+    /* ── Init ── */
+    document.getElementById('loading').style.display = 'none';
+    
+    // Importante: simInit deve chiamare le funzioni WASM
+    simInit(); 
+    render();
+    updateUI(getDiagnostics());
 </script>
 </body>
 </html>

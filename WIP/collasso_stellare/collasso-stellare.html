@@ -957,7 +957,7 @@ function render() {
     ctx.save();
     ctx.strokeStyle = `rgba(120,200,255,${0.15*pulse})`;
     ctx.lineWidth = 3;
-    for (let s=[-1,1]) {
+    for (const s of [-1,1]) {
       ctx.beginPath();
       ctx.moveTo(ns_x, ns_y);
       ctx.lineTo(ns_x, ns_y + s*(30+20*pulse));

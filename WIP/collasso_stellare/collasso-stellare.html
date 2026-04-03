@@ -525,12 +525,22 @@ function doInit() {
 
 /* ── Rendering Canvas ── */
 function render() {
-  if (!Sim) return;
+  if (!wasmReady) return; // Usa la tua variabile di controllo per il modulo
 
+  // 1. Prendi i dati dal C
+  const ptr = _sim_get_state();
+  const n_total = _sim_get_N(); 
+  // Creiamo la vista sulla memoria WASM
+  const state = new Float32Array(Module.HEAPF32.buffer, ptr, 8 + n_total * 4);
+
+  const n_alive   = state[0]; // Questo è diag_n_alive passato dal C
+  const ns_active = state[1];
+  const ns_x = state[2], ns_y = state[3];
+  const ns_pulse = state[4];
+
+  // --- DISEGNO SFONDO (Tieni il tuo) ---
   ctx.fillStyle = '#060312';
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-  /* Stelle di sfondo */
   for (const [sx, sy, sr] of BG_STARS) {
     ctx.beginPath();
     ctx.arc(sx, sy, sr, 0, Math.PI*2);
@@ -538,44 +548,35 @@ function render() {
     ctx.fill();
   }
 
-  const state = sim_get_state();
-  const n_alive  = state[0];
-  const ns_active = state[1];
-  const ns_x     = state[2], ns_y = state[3];
-  const ns_pulse  = state[4];
-
-  /* Calcola rho_max per normalizzazione colore */
+  // --- CALCOLO RHO_MAX (Corretto per il layout del tuo sim.c) ---
   let rhoMax = 0;
-  for (let i = 0; i < n_alive; i++) {
-    const rho = state[8 + i*4 + 3];
+  for (let i = 0; i < n_total; i++) {
+    const rho = state[8 + i*4 + 3]; // rho è il quarto elemento di ogni particella
     if (rho > rhoMax) rhoMax = rho;
   }
 
-  /* Particelle SPH */
-  for (let i = 0; i < n_alive; i++) {
+  // --- DISEGNO PARTICELLE ---
+  for (let i = 0; i < n_total; i++) {
     const base = 8 + i * 4;
-    const px   = state[base];
-    const py   = state[base + 1];
-    /* u = state[base+2] — non usato nel colore qui sotto ma disponibile */
-    const rho  = state[base + 3];
+    const px  = state[base];
+    const py  = state[base + 1];
+    const u   = state[base + 2];
+    const rho = state[base + 3];
+
+    if (rho <= 0) continue; // Salta le particelle "morte" (thinning)
 
     const nr = rhoMax > 0 ? rho / rhoMax : 0;
 
+    // --- LA TUA LOGICA COLORI (Mantienila uguale) ---
     let R2, G2, B2;
     if (nr < 0.3) {
-      R2 = Math.round(30  + nr*3*100);
-      G2 = Math.round(50  + nr*3*120);
-      B2 = Math.round(180 + nr*3*40);
+      R2 = Math.round(30 + nr*3*100); G2 = Math.round(50 + nr*3*120); B2 = Math.round(180 + nr*3*40);
     } else if (nr < 0.7) {
       const t = (nr - 0.3) / 0.4;
-      R2 = Math.round(130 + t*125);
-      G2 = Math.round(170 + t*85);
-      B2 = Math.round(220 - t*120);
+      R2 = Math.round(130 + t*125); G2 = Math.round(170 + t*85); B2 = Math.round(220 - t*120);
     } else {
       const t = (nr - 0.7) / 0.3;
-      R2 = 255;
-      G2 = Math.round(255 - t*30);
-      B2 = Math.round(100 + t*155);
+      R2 = 255; G2 = Math.round(255 - t*30); B2 = Math.round(100 + t*155);
     }
 
     const alpha  = 0.55 + 0.45 * nr;
@@ -594,7 +595,11 @@ function render() {
     }
   }
 
-  /* Stella di neutroni */
+  // --- DISEGNO STELLA DI NEUTRONI (Se attiva) ---
+  if (ns_active > 0.5) {
+     drawNeutronStar(ns_x, ns_y, ns_pulse); // Crea una piccola funzione a parte o incollala qui
+  }
+}  /* Stella di neutroni */
   if (ns_active) {
     const t     = performance.now() / 1000;
     const pulse = Math.sin(t * 6) * 0.3 + 0.7;
@@ -669,12 +674,29 @@ function updateUI() {
 /* ── Loop principale ── */
 function loop() {
   if (!running) return;
-  sim_step(ITERS_PER_FRAME);
-  render();
-  updateUI();
+
+  // 1. Esegui i calcoli fisici nel C
+  Module._sim_step(ITERS_PER_FRAME);
+
+  // 2. Prendi i dati aggiornati dalla memoria del C
+  const ptr = Module._sim_get_state();
+  const n_total = Module._sim_get_N();
+  // Creiamo una vista sulla memoria WASM (8 valori header + 4 float per ogni particella)
+  const data = new Float32Array(Module.HEAPF32.buffer, ptr, 8 + n_total * 4);
+
+  // 3. Disegna usando i dati appena presi
+  render(data, n_total);
+
+  // 4. Aggiorna la UI con i diagnostici del C
+  const diagPtr = Module._sim_get_diagnostics();
+  const d = new Float32Array(Module.HEAPF32.buffer, diagPtr, 8);
+  updateUI({
+    mr: d[0], mu: d[1], mean_rho: d[2], simTime: d[3],
+    M_J: d[4], L_J: d[5], n: d[6], phase: d[7]
+  });
+
   rafId = requestAnimationFrame(loop);
 }
-
 /* ── Bottoni ── */
 document.getElementById('btnStart').addEventListener('click', () => {
   if (!Sim || running) return;

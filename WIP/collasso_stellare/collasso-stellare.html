@@ -708,6 +708,23 @@ scriptTag.src = 'sim.js';
 scriptTag.onerror = () => {
   loadingMsg.textContent = 'ERRORE: sim.js non trovato nella stessa cartella del file HTML.';
 };
+
+function getWasmBuffer() {
+  if (!Sim) throw new Error('Modulo WASM non inizializzato');
+
+  if (Sim.HEAPU8 && Sim.HEAPU8.buffer) return Sim.HEAPU8.buffer;
+  if (Sim.HEAP8 && Sim.HEAP8.buffer) return Sim.HEAP8.buffer;
+  if (Sim.wasmMemory && Sim.wasmMemory.buffer) return Sim.wasmMemory.buffer;
+  if (typeof Module !== 'undefined' && Module && Module.HEAPU8 && Module.HEAPU8.buffer) return Module.HEAPU8.buffer;
+
+  throw new Error('Memoria WASM non accessibile: HEAPU8/HEAP8/wasmMemory assenti');
+}
+
+function readFloat32View(ptrBytes, lengthFloats) {
+  const buffer = getWasmBuffer();
+  return new Float32Array(buffer, ptrBytes, lengthFloats);
+}
+
 scriptTag.onload = () => {
   loadingMsg.textContent = 'Istanziazione SimModule…';
 
@@ -730,14 +747,15 @@ scriptTag.onload = () => {
 
     sim_get_diagnostics = () => {
       const ptr = Sim._sim_get_diagnostics();
-      return Sim.HEAPF32.subarray(ptr >> 2, (ptr >> 2) + 8);
+      return readFloat32View(ptr, 8);
     };
 
     sim_get_state = () => {
       const ptr = Sim._sim_get_state();
-      const nAlive = Sim.HEAPF32[ptr >> 2] | 0;
+      const header = readFloat32View(ptr, 8);
+      const nAlive = header[0] | 0;
       const len = 8 + nAlive * 4;
-      return Sim.HEAPF32.subarray(ptr >> 2, (ptr >> 2) + len);
+      return readFloat32View(ptr, len);
     };
 
     loading.style.display = 'none';
@@ -745,6 +763,7 @@ scriptTag.onload = () => {
     console.log('WASM inizializzato');
     console.log('N particelle iniziali =', sim_get_N());
     console.log('Fase iniziale =', sim_get_phase());
+    console.log('Buffer byteLength =', getWasmBuffer().byteLength);
     console.log('State header =', Array.from(sim_get_state().slice(0, 8)));
   }).catch(err => {
     console.error(err);

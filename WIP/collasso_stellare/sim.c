@@ -1,22 +1,11 @@
 /*
  * sim.c — SPH Stellar Collapse Simulation Core
  *
- * Versione rivista:
- * - API JavaScript invariata
- * - layout dei buffer invariato
- * - fisica SPH resa più coerente
- *   * densità/pressione inizializzate già in sim_init()
- *   * gravità softening con legge ~ 1/(r^2 + eps^2)^(3/2)
- *   * forza di pressione SPH simmetrica
- *   * viscosità artificiale di Monaghan
- *   * equazione energetica SPH tramite termine di compressione/urto
- *   * integrazione kick-drift-kick
- *
- * NOTA IMPORTANTE:
- * Questo file mantiene intenzionalmente intatta l'interfaccia con l'HTML:
- *   sim_set_params, sim_init, sim_step, sim_get_state,
- *   sim_get_diagnostics, sim_get_phase, sim_get_N
- * e mantiene invariato anche il layout dei buffer di uscita.
+ * Versione con transizioni di fase riviste:
+ * - interfaccia HTML invariata
+ * - buffer invariati
+ * - dinamica SPH/gravità come nella versione migliorata
+ * - logica di transizione meno rigida nella fase protostellare
  */
 
 #include <math.h>
@@ -47,11 +36,12 @@ static float g_cool1   = 0.9995f;
 static float g_mass    = 1.0f;
 
 /* Soglie di fase */
-static float g_thr01    = 0.15f;
-static float g_thr12    = 0.60f;
-static float g_thr23t   = 800.0f;
-static float g_thr23rho = 3.0f;
-static float g_thr34t   = 1100.0f;
+static float g_thr01       = 0.15f;   /* nube -> protostella */
+static float g_thr12       = 0.40f;   /* protostella -> collasso nucleo */
+static float g_thr23t      = 800.0f;  /* collasso nucleo -> bounce */
+static float g_thr23rho    = 3.0f;
+static float g_thr34t      = 1100.0f; /* bounce -> remnant compatto */
+static float g_proto_maxt  = 380.0f;  /* fallback temporale per evitare blocco in protostella */
 
 /* Stato particelle */
 int   N         = 0;
@@ -79,14 +69,15 @@ static inline float clampf(float x, float a, float b) {
     return (x < a) ? a : ((x > b) ? b : x);
 }
 
-/* Kernel B-spline cubico 2D */
+/* kernel B-spline cubico 2D */
 static float kernel(float dist) {
     float h = g_hsmooth;
     float q = dist / h;
     if (q >= 2.0f) return 0.0f;
     float norm = 10.0f / (7.0f * M_PI * h * h);
-    if (q <= 1.0f)
+    if (q <= 1.0f) {
         return norm * (1.0f - 1.5f*q*q + 0.75f*q*q*q);
+    }
     return norm * 0.25f * powf(2.0f - q, 3.0f);
 }
 
@@ -99,10 +90,12 @@ static void kernel_grad(float dx, float dy, float dist, float *gx, float *gy) {
         *gy = 0.0f;
         return;
     }
+
     float norm = 10.0f / (7.0f * M_PI * h * h * h);
     float dWdq = (q <= 1.0f)
         ? norm * (-3.0f*q + 2.25f*q*q)
         : norm * (-0.75f * powf(2.0f - q, 2.0f));
+
     *gx = dWdq * dx / dist;
     *gy = dWdq * dy / dist;
 }
@@ -126,6 +119,13 @@ static void center_of_mass(float *cx, float *cy) {
     }
 }
 
+static void recount_alive(void) {
+    diag_n_alive = 0;
+    for (int i = 0; i < N; i++) {
+        if (alive[i]) diag_n_alive++;
+    }
+}
+
 static void update_density_pressure(void) {
     float h2   = 2.0f * g_hsmooth;
     float h2sq = h2 * h2;
@@ -133,7 +133,7 @@ static void update_density_pressure(void) {
     for (int i = 0; i < N; i++) {
         if (!alive[i]) continue;
 
-        rho[i] = 0.01f; /* floor numerico */
+        rho[i] = 0.01f;
 
         for (int j = 0; j < N; j++) {
             if (!alive[j]) continue;
@@ -146,15 +146,12 @@ static void update_density_pressure(void) {
         }
 
         p[i] = g_kpress * powf(rho[i], g_gamma);
-
-        /* contributo termico esplicito nelle fasi più calde */
         if (phase >= 2) {
             p[i] += (g_gamma - 1.0f) * rho[i] * u[i];
         }
 
-        /* floor di sicurezza */
         if (rho[i] < 1e-4f) rho[i] = 1e-4f;
-        if (p[i]   < 0.0f)  p[i]   = 0.0f;
+        if (p[i] < 0.0f) p[i] = 0.0f;
     }
 }
 
@@ -178,8 +175,6 @@ static void update_forces_and_energy_rhs(void) {
             float r2 = rx*rx + ry*ry;
             float dist = sqrtf(r2 + 1e-12f);
 
-            /* Gravità softened: a ~ r / (r^2 + eps^2)^(3/2)
-               Qui g_soft ha dimensione di px^2. */
             float invr3 = 1.0f / powf(r2 + g_soft, 1.5f);
             float ag = g_G * g_mass * invr3;
 
@@ -190,7 +185,6 @@ static void update_forces_and_energy_rhs(void) {
 
             if (dist < h2) {
                 float gx, gy;
-                /* gradiente rispetto a r_i - r_j = -(r_j - r_i) */
                 kernel_grad(-rx, -ry, dist, &gx, &gy);
 
                 float rhoi = fmaxf(rho[i], 1e-4f);
@@ -199,12 +193,11 @@ static void update_forces_and_energy_rhs(void) {
                 float pi2 = p[i] / (rhoi * rhoi);
                 float pj2 = p[j] / (rhoj * rhoj);
 
-                /* viscosità artificiale di Monaghan */
                 float dvx = vx[i] - vx[j];
                 float dvy = vy[i] - vy[j];
                 float vij_rij = dvx * (-rx) + dvy * (-ry);
-                float Pi_ij = 0.0f;
 
+                float Pi_ij = 0.0f;
                 if (vij_rij < 0.0f) {
                     float csi = sqrtf(fmaxf(g_gamma * p[i] / rhoi, 1e-6f));
                     float csj = sqrtf(fmaxf(g_gamma * p[j] / rhoj, 1e-6f));
@@ -216,29 +209,17 @@ static void update_forces_and_energy_rhs(void) {
                 }
 
                 float coeff = g_mass * (pi2 + pj2 + Pi_ij);
-
-                /* pressione/viscosità: forma antisimmetrica */
                 ax[i] -= coeff * gx;
                 ay[i] -= coeff * gy;
                 ax[j] += coeff * gx;
                 ay[j] += coeff * gy;
 
-                /* equazione dell'energia interna:
-                   du_i/dt = 1/2 sum_j m_j (Pi/rho^2 + Pj/rho^2 + Pi_ij) v_ij · gradW_ij
-                   con gradW_ij rispetto a r_i - r_j */
                 float vij_gradW = dvx * gx + dvy * gy;
                 float e_coeff = 0.5f * g_mass * (pi2 + pj2 + Pi_ij) * vij_gradW;
                 du_dt[i] += e_coeff;
                 du_dt[j] += e_coeff;
             }
         }
-    }
-}
-
-static void recount_alive(void) {
-    diag_n_alive = 0;
-    for (int i = 0; i < N; i++) {
-        if (alive[i]) diag_n_alive++;
     }
 }
 
@@ -252,12 +233,14 @@ void sim_set_params(float g_grav, float kpress, float cool, float soft) {
     }
     if (soft > 0.0f) g_soft = soft;
 
-    float gs   = g_G / 12.0f;
-    g_thr01    = 0.15f * gs;
-    g_thr12    = 0.60f * gs;
-    g_thr23rho = 3.0f  * gs;
-    g_thr23t   = 800.0f  / fmaxf(gs, 1e-3f);
-    g_thr34t   = 1100.0f / fmaxf(gs, 1e-3f);
+    float gs = g_G / 12.0f;
+
+    g_thr01      = 0.15f * gs;
+    g_thr12      = 0.40f * gs;
+    g_thr23rho   = 3.0f  * gs;
+    g_thr23t     = 800.0f  / fmaxf(gs, 1e-3f);
+    g_thr34t     = 1100.0f / fmaxf(gs, 1e-3f);
+    g_proto_maxt = 380.0f  / fmaxf(gs, 1e-3f);
 }
 
 EMSCRIPTEN_KEEPALIVE
@@ -280,15 +263,14 @@ void sim_init(int n_req, float R, float omega0, float u0) {
         px[i] = cx + r * cosf(theta);
         py[i] = cy + r * sinf(theta);
 
-        /* rotazione rigida */
         vx[i] = -omega0 * (py[i] - cy);
         vy[i] =  omega0 * (px[i] - cx);
 
         ax[i] = 0.0f;
         ay[i] = 0.0f;
-        u[i]  = fmaxf(u0, 1e-4f);
+        u[i] = fmaxf(u0, 1e-4f);
         rho[i] = 0.0f;
-        p[i]   = 0.0f;
+        p[i] = 0.0f;
         alive[i] = 1;
     }
 
@@ -307,7 +289,6 @@ void sim_step(int iterations) {
 
     for (int step = 0; step < iterations; step++) {
 
-        /* thinning in fase finale */
         if (phase == 4 && diag_n_alive > 80 && ((int)(sim_time / dt) % 50 == 0)) {
             float far2 = (CANVAS_W * 1.2f) * (CANVAS_W * 1.2f);
             for (int i = 0; i < N; i++) {
@@ -321,26 +302,23 @@ void sim_step(int iterations) {
             recount_alive();
         }
 
-        /* 1) kick di mezzo passo */
         for (int i = 0; i < N; i++) {
             if (!alive[i]) continue;
             vx[i] += 0.5f * dt * ax[i];
             vy[i] += 0.5f * dt * ay[i];
         }
 
-        /* 2) drift */
         for (int i = 0; i < N; i++) {
             if (!alive[i]) continue;
             px[i] += dt * vx[i];
             py[i] += dt * vy[i];
         }
 
-        /* 3) nuovo stato idrodinamico */
         update_density_pressure();
         update_forces_and_energy_rhs();
 
-        /* 4) secondo mezzo kick + energia interna */
         float max_rho = 0.0f;
+        float max_u   = 0.0f;
         float sum_rho = 0.0f;
         float cmx, cmy;
         center_of_mass(&cmx, &cmy);
@@ -352,17 +330,14 @@ void sim_step(int iterations) {
             vx[i] += 0.5f * dt * ax[i];
             vy[i] += 0.5f * dt * ay[i];
 
-            /* heating/cooling */
             u[i] += dt * du_dt[i];
             u[i] *= (phase == 0) ? g_cool0 : g_cool1;
-
-            /* floors / clamp */
             u[i] = clampf(u[i], 1e-5f, 50.0f);
 
             if (rho[i] > max_rho) max_rho = rho[i];
+            if (u[i] > max_u) max_u = u[i];
             sum_rho += rho[i];
 
-            /* confinamento morbido per evitare escape numerici dal canvas */
             if (px[i] < -0.25f * CANVAS_W || px[i] > 1.25f * CANVAS_W ||
                 py[i] < -0.25f * CANVAS_H || py[i] > 1.25f * CANVAS_H) {
                 float cx = CANVAS_W * 0.5f;
@@ -374,12 +349,44 @@ void sim_step(int iterations) {
             }
         }
 
-        /* transizioni di fase */
-        if (phase == 0 && max_rho > g_thr01) phase = 1;
-        if (phase == 1 && max_rho > g_thr12) phase = 2;
-        if (phase == 2 && (sim_time > g_thr23t || max_rho > g_thr23rho)) phase = 3;
+        float mean_rho = (diag_n_alive > 0) ? (sum_rho / (float)diag_n_alive) : 0.0f;
+        float rho_contrast = (mean_rho > 1e-6f) ? (max_rho / mean_rho) : 0.0f;
 
-        /* fase 3: bounce / shock */
+        /* Transizioni di fase:
+           - 0 -> 1: la nube comincia a condensare davvero
+           - 1 -> 2: o superi la soglia di densità, oppure dopo un tempo protostellare
+                     la condensazione è comunque abbastanza marcata (contrasto di densità
+                     e riscaldamento) da far partire il collasso del nucleo
+           - 2 -> 3: densità/temperatura elevate o tempo lungo
+           - 3 -> 4: remnant compatto su base temporale
+        */
+        if (phase == 0 && max_rho > g_thr01) {
+            phase = 1;
+        }
+
+        if (phase == 1) {
+            int density_trigger = (max_rho > g_thr12);
+            int proto_timeout_trigger =
+                (sim_time > g_proto_maxt &&
+                 max_rho > 0.75f * g_thr12 &&
+                 rho_contrast > 2.5f &&
+                 max_u > 0.08f);
+
+            if (density_trigger || proto_timeout_trigger) {
+                phase = 2;
+            }
+        }
+
+        if (phase == 2) {
+            int density_trigger = (max_rho > g_thr23rho);
+            int thermo_trigger  = (max_rho > 0.82f * g_thr23rho && max_u > 0.22f && rho_contrast > 3.5f);
+            int time_trigger    = (sim_time > g_thr23t);
+
+            if (density_trigger || thermo_trigger || time_trigger) {
+                phase = 3;
+            }
+        }
+
         if (phase == 3) {
             for (int i = 0; i < N; i++) {
                 if (!alive[i]) continue;
@@ -393,6 +400,7 @@ void sim_step(int iterations) {
                     u[i]  += 1.5f * boost;
                 }
             }
+
             if (sim_time > g_thr34t) {
                 phase = 4;
                 ns_active = 1;
@@ -401,7 +409,6 @@ void sim_step(int iterations) {
             }
         }
 
-        /* fase 4: assorbimento nel core compatto */
         if (ns_active) {
             ns_pulse += 0.3f;
             for (int i = 0; i < N; i++) {

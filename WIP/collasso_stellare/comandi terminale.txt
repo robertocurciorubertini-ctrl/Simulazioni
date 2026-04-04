@@ -1,0 +1,10 @@
+Comandi per entrare nell'ambiente Emscripten:
+
+cd C:\Users\rober\emsdk
+emsdk_env.bat
+
+
+comando per generare file collasso stellare:
+
+cd \Users\rober\OneDrive\Desktop\Simulazioni\WIP\collasso_stellare
+emcc sim.c -o sim.js -s EXPORTED_FUNCTIONS="[\"_sim_set_params\",\"_sim_init\",\"_sim_step\",\"_sim_get_state\",\"_sim_get_diagnostics\",\"_sim_get_phase\",\"_sim_get_N\"]" -s EXPORTED_RUNTIME_METHODS="[\"ccall\",\"cwrap\",\"HEAPF32\",\"HEAPU8\",\"HEAP8\"]" -s MODULARIZE=1 -s EXPORT_NAME=\"SimModule\" -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 -O2 -lm

@@ -148,6 +148,10 @@ canvas{border:1px solid var(--border);display:block;
         <div class="lr">Zoom<span class="val" id="vZ">1.0</span>×</div>
         <input type="range" id="sZ" min="0.3" max="3.5" step="0.05" value="1.0">
       </label>
+      <label style="margin-top:8px">
+        <div class="lr">Pitch camera<span class="val" id="vP">0.60</span> rad</div>
+        <input type="range" id="sP" min="0.10" max="1.40" step="0.01" value="0.60">
+      </label>
     </div>
 
     <div>
@@ -247,7 +251,12 @@ Module.onFrameReady = function() {
     canvas.height = H;
   }
   /* Il buffer WASM è RGBA; ImageData è anche RGBA → copia diretta */
-  const src = new Uint8Array(Module.HEAPU8.buffer, ptr, W*H*4);
+  const heap = (typeof HEAPU8 !== 'undefined') ? HEAPU8 : Module.HEAPU8;
+  if (!heap) {
+    console.error('HEAPU8 non disponibile');
+    return;
+  }
+  const src = heap.subarray(ptr, ptr + W*H*4);
   imgData.data.set(src);
   ctx.putImageData(imgData, 0, 0);
 };
@@ -341,6 +350,7 @@ bindSlider('sA','vA',3, v => {
   document.getElementById('stA').textContent = v.toFixed(3);
 });
 bindSlider('sZ','vZ',1, v => Module._set_zoom(v));
+bindSlider('sP','vP',2, v => Module._set_pitch(v));
 bindSlider('sN','vN',0, v => Module._set_nrays(v));
 bindSlider('sR','vR',0, v => Module._set_remit(v));
 

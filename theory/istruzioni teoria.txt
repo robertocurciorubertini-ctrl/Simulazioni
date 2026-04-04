@@ -1,0 +1,7 @@
+istruzioni per reintrodurre la teoria:
+
+spostare tutto nella directory \Simulazioni
+
+generate_theory fa la build per la teoria creando il file theory.json dentro la directory \thoery
+
+build_site fa la build contemporaneamente del generate_theory e del generate_sim

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Il Moto Armonico - Liceo Artistico</title>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+    :root {
+      --bg: #fef7f0;
+      --text: #2d1810;
+      --muted: #6b5448;
+      --accent: #d97706;
+      --accent-light: #fbbf24;
+      --border: #e7d4c4;
+      --card-bg: #ffffff;
+      --shadow: 0 8px 24px rgba(45,24,16,0.08);
+      --radius: 16px;
+      --maxw: 900px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Georgia', 'Palatino', 'Times New Roman', serif;
+      background: linear-gradient(135deg, #fef7f0 0%, #fce8d8 100%);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 18px;
+    }
+    .container { 
+      width: min(var(--maxw), calc(100% - 40px)); 
+      margin: 0 auto; 
+    }
+    .hero { 
+      padding: 60px 0 40px; 
+      text-align: center;
+    }
+    .hero-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+    h1 { 
+      margin: 0 0 16px; 
+      font-size: clamp(2.2rem, 5vw, 3.2rem); 
+      line-height: 1.15;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .subtitle { 
+      max-width: 700px; 
+      color: var(--muted); 
+      font-size: 1.15rem; 
+      margin: 0 auto 30px;
+      font-style: italic;
+    }
+    .quick-nav { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 12px; 
+      margin-top: 30px;
+      justify-content: center;
+    }
+    .quick-nav a {
+      text-decoration: none; 
+      color: var(--text); 
+      background: var(--card-bg);
+      border: 2px solid var(--border); 
+      padding: 10px 18px; 
+      border-radius: 25px; 
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      font-family: sans-serif;
+    }
+    .quick-nav a:hover {
+      border-color: var(--accent);
+      background: #fff8f0;
+      transform: translateY(-2px);
+    }
+    main { padding: 40px 0 80px; }
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--border); 
+      border-radius: var(--radius);
+      box-shadow: var(--shadow); 
+      padding: 36px; 
+      margin-bottom: 30px;
+    }
+    h2 { 
+      margin: 0 0 20px; 
+      font-size: 1.9rem;
+      color: var(--accent);
+      border-bottom: 3px solid var(--accent-light);
+      padding-bottom: 12px;
+    }
+    h3 { 
+      margin: 28px 0 14px; 
+      font-size: 1.35rem; 
+      color: var(--accent);
+    }
+    p { 
+      margin: 0 0 18px; 
+      text-align: justify;
+    }
+    .intro-text {
+      font-size: 1.15rem;
+      color: var(--muted);
+      background: #fff8f0;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 5px solid var(--accent-light);
+      margin-bottom: 24px;
+    }
+    .key-concept {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      padding: 20px 24px;
+      border-radius: 14px;
+      border: 2px solid var(--accent-light);
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(217,119,6,0.15);
+    }
+    .key-concept h4 {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .key-concept h4::before {
+      content: "💡";
+      font-size: 1.3rem;
+    }
+    .formula-box {
+      margin: 20px 0;
+      padding: 20px 24px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+    .formula-label {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .visual-explanation {
+      background: #e0f2fe;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 5px solid #0284c7;
+      margin: 24px 0;
+    }
+    .visual-explanation h4 {
+      margin: 0 0 12px;
+      color: #0369a1;
+      font-size: 1.1rem;
+    }
+    .example-box {
+      background: #f0fdf4;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 5px solid #16a34a;
+      margin: 24px 0;
+    }
+    .example-box h4 {
+      margin: 0 0 12px;
+      color: #15803d;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .example-box h4::before {
+      content: "📌";
+      font-size: 1.2rem;
+    }
+    ul { 
+      margin: 12px 0; 
+      padding-left: 32px; 
+    }
+    li { 
+      margin-bottom: 10px; 
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 24px 0;
+    }
+    .comparison-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+    }
+    .comparison-card h4 {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+    @media (max-width: 680px) { 
+      .comparison-grid { 
+        grid-template-columns: 1fr; 
+      }
+      .card {
+        padding: 24px;
+      }
+      body {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body><a href="../../meccanica/moto-armonico.html" style="position: fixed; top: 20px; right: 20px; padding: 10px 16px; background: #1f6feb; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.18); z-index: 1000;">Apri simulazione</a>
+<header class="hero">
+<div class="container">
+<span class="hero-icon">〰️</span>
+<h1>Il Moto Armonico</h1>
+<p class="subtitle">
+        Un viaggio alla scoperta delle oscillazioni: come un pendolo, una molla o una corda di chitarra si muovono seguendo leggi naturali eleganti e universali
+      </p>
+<nav class="quick-nav">
+<a href="#cosa-e">Cos'è?</a>
+<a href="#moto-circolare">Dal cerchio all'oscillazione</a>
+<a href="#grandezze">Le grandezze fondamentali</a>
+<a href="#vettori">Posizione, velocità e accelerazione</a>
+<a href="#esempi">Esempi nella realtà</a>
+</nav>
+</div>
+</header>
+<main class="container">
+<section class="card" id="cosa-e">
+<h2>Che cos'è il moto armonico?</h2>
+<div class="intro-text">
+        Immagina di tirare una molla e poi lasciarla andare. La molla inizierà a oscillare avanti e indietro, passando ripetutamente per la stessa posizione. Questo movimento regolare e ripetitivo è ciò che chiamiamo <strong>moto armonico</strong>.
+      </div>
+<p>
+        Il moto armonico è uno dei movimenti più comuni in natura. Lo troviamo ovunque: in un pendolo che oscilla, in una corda di chitarra che vibra, nelle onde del mare, persino nel modo in cui gli atomi vibrano all'interno dei materiali. È un movimento che si ripete identico a sé stesso dopo un certo intervallo di tempo, seguendo sempre lo stesso percorso.
+      </p>
+<h3>La caratteristica fondamentale: la posizione di equilibrio</h3>
+<p>
+        Ogni moto armonico ha un punto speciale chiamato <strong>posizione di equilibrio</strong>. È il punto in cui l'oggetto "vorrebbe stare" se non fosse disturbato. Quando spostiamo l'oggetto da questa posizione, compare una forza che cerca sempre di riportarlo indietro. È come se l'oggetto fosse legato al punto di equilibrio da un elastico invisibile.
+      </p>
+<div class="key-concept">
+<h4>Concetto chiave</h4>
+<p>
+          Nel moto armonico, più l'oggetto si allontana dalla posizione di equilibrio, più forte è la forza che lo spinge a tornare indietro. Questa è la "legge" che governa tutte le oscillazioni armoniche.
+        </p>
+</div>
+<p>
+        Il risultato di questa forza di richiamo è un movimento che va avanti e indietro, sempre con lo stesso ritmo. L'oggetto passa per la posizione di equilibrio, va oltre per inerzia, rallenta, si ferma per un istante all'estremità opposta, poi torna indietro ripetendo il ciclo all'infinito (almeno in teoria, senza attriti).
+      </p>
+</section>
+<section class="card" id="moto-circolare">
+<h2>Il legame sorprendente tra cerchio e oscillazione</h2>
+<p>
+        Esiste un modo molto elegante per capire il moto armonico: immaginare un punto che si muove su una circonferenza con velocità costante. Questo si chiama <strong>moto circolare uniforme</strong>. Ora, se guardiamo solo la proiezione di questo punto su un asse (ad esempio l'asse orizzontale), vedremo che si muove esattamente con un moto armonico!
+      </p>
+<div class="visual-explanation">
+<h4>🎨 Visualizza questo concetto</h4>
+<p>
+          Pensa a una ruota panoramica vista di lato. Mentre la ruota gira con velocità costante, se guardi solo l'altezza di una cabina (ignorando lo spostamento orizzontale), vedrai che sale e scende con un movimento armonico. La cabina sembra accelerare quando passa per il centro e rallentare quando raggiunge il punto più alto o più basso.
+        </p>
+</div>
+<h3>Perché questo è utile?</h3>
+<p>
+        Questa connessione tra moto circolare e moto armonico è molto utile perché ci permette di capire come cambiano nel tempo tutte le grandezze del moto (posizione, velocità, accelerazione) semplicemente guardando come si proiettano i vettori del moto circolare sull'asse dell'oscillazione.
+      </p>
+<p>
+        Nel moto circolare, abbiamo tre vettori importanti che partono dal punto in movimento:
+      </p>
+<ul>
+<li><strong>Il vettore posizione (r)</strong>: va dal centro del cerchio al punto che si muove</li>
+<li><strong>Il vettore velocità (v)</strong>: è sempre tangente al cerchio</li>
+<li><strong>Il vettore accelerazione (a)</strong>: punta sempre verso il centro del cerchio</li>
+</ul>
+<p>
+        Quando proiettiamo questi vettori sull'asse orizzontale (o verticale), otteniamo esattamente la posizione, la velocità e l'accelerazione del moto armonico. Questo spiega perché tutte queste grandezze hanno un andamento sinusoidale nel tempo.
+      </p>
+</section>
+<section class="card" id="grandezze">
+<h2>Le grandezze fondamentali</h2>
+<p>
+        Per descrivere completamente un moto armonico, dobbiamo conoscere alcune grandezze fondamentali. Queste ci dicono "quanto è ampia" l'oscillazione e "quanto è veloce".
+      </p>
+<h3>L'ampiezza (A)</h3>
+<p>
+        L'<strong>ampiezza</strong> è la massima distanza che l'oggetto raggiunge dalla posizione di equilibrio. È come misurare "quanto lontano" arriva l'oscillazione. Se tiriamo una molla di più, l'ampiezza aumenta; se la tiriamo di meno, l'ampiezza diminuisce.
+      </p>
+<div class="example-box">
+<h4>Esempio pratico</h4>
+<p>
+          In un'altalena, l'ampiezza corrisponde all'altezza massima che raggiungi. Se ti fai spingere forte, l'ampiezza è grande; se oscilli piano, l'ampiezza è piccola.
+        </p>
+</div>
+<h3>Il periodo (T)</h3>
+<p>
+        Il <strong>periodo</strong> è il tempo che l'oggetto impiega per compiere un'oscillazione completa, cioè per tornare nella stessa posizione con la stessa velocità. Si misura in secondi (s). Un periodo lungo significa che l'oscillazione è lenta; un periodo corto significa che è veloce.
+      </p>
+<div class="formula-box">
+        $$T = \frac{2\pi}{\omega}$$
+        <div class="formula-label">dove ω (omega) è la pulsazione (velocità angolare)</div>
+</div>
+<h3>La frequenza (f)</h3>
+<p>
+        La <strong>frequenza</strong> ci dice quante oscillazioni complete avvengono in un secondo. È l'inverso del periodo. Si misura in Hertz (Hz), dove 1 Hz significa "una oscillazione al secondo". Se il periodo è lungo, la frequenza è bassa; se il periodo è corto, la frequenza è alta.
+      </p>
+<div class="formula-box">
+        $$f = \frac{1}{T}$$
+        <div class="formula-label">frequenza = inverso del periodo</div>
+</div>
+<div class="key-concept">
+<h4>Relazione importante</h4>
+<p>
+          Periodo e frequenza sono due facce della stessa medaglia: se uno raddoppia, l'altro si dimezza. Un'oscillazione veloce ha periodo piccolo e frequenza alta; un'oscillazione lenta ha periodo grande e frequenza bassa.
+        </p>
+</div>
+<h3>La pulsazione (ω)</h3>
+<p>
+        La <strong>pulsazione</strong> (chiamata anche velocità angolare) è strettamente legata alla frequenza, ma è più comoda per i calcoli. Si misura in radianti al secondo (rad/s). È legata alla frequenza dalla formula:
+      </p>
+<div class="formula-box">
+        $$\omega = 2\pi f$$
+        <div class="formula-label">pulsazione = 2π × frequenza</div>
+</div>
+<p>
+        La pulsazione ci dice quanto velocemente "gira" il punto nel moto circolare che genera il nostro moto armonico. È la grandezza che compare più spesso nelle formule perché semplifica i calcoli.
+      </p>
+</div>
+</section>
+<section class="card" id="vettori">
+<h2>Posizione, velocità e accelerazione nel tempo</h2>
+<p>
+        Ora che conosciamo le grandezze fondamentali, possiamo capire come cambiano nel tempo la posizione, la velocità e l'accelerazione dell'oggetto che oscilla. Tutte e tre queste grandezze hanno un andamento sinusoidale, cioè variano seguendo le funzioni seno e coseno.
+      </p>
+<h3>La posizione x(t)</h3>
+<p>
+        La posizione dell'oggetto nel tempo segue una curva sinusoidale. Parte da un punto, arriva al massimo spostamento (l'ampiezza A), torna indietro passando per l'equilibrio, raggiunge il massimo spostamento dall'altra parte, e poi torna di nuovo indietro. Questo ciclo si ripete all'infinito.
+      </p>
+<div class="visual-explanation">
+<h4>Come si muove la posizione</h4>
+<p>
+          Immagina di tracciare un grafico mentre l'oggetto oscilla. Sull'asse orizzontale metti il tempo, sull'asse verticale la posizione. La curva che ottieni è una sinusoide perfetta, che sale e scende tra +A e -A.
+        </p>
+</div>
+
+<h3>La velocità v(t)</h3>
+<p>
+        La velocità ci dice quanto velocemente l'oggetto si sta muovendo in ogni istante. Nel moto armonico, la velocità è <strong>massima quando l'oggetto passa per la posizione di equilibrio</strong> (dove la forza di richiamo è zero, ma l'oggetto ha molta inerzia) e <strong>zero agli estremi</strong> dell'oscillazione (dove l'oggetto si ferma per un istante prima di invertire la direzione).
+      </p>
+<div class="formula-box">
+        $$v_{max} = A\omega$$
+        <div class="formula-label">velocità massima = ampiezza × pulsazione</div>
+</div>
+<p>
+        Anche la velocità ha un andamento sinusoidale, ma è sfasato di un quarto di periodo rispetto alla posizione. Quando la posizione è massima, la velocità è zero; quando la posizione è zero, la velocità è massima.
+      </p>
+
+<h3>L'accelerazione a(t)</h3>
+<p>
+        L'accelerazione ci dice come sta cambiando la velocità. Nel moto armonico, l'accelerazione è sempre diretta verso la posizione di equilibrio ed è proporzionale allo spostamento dalla stessa. Questo significa che <strong>l'accelerazione è massima agli estremi</strong> dell'oscillazione (dove la forza di richiamo è più intensa) e <strong>zero in equilibrio</strong> (dove non c'è forza di richiamo).
+      </p>
+<div class="formula-box">
+        $$a_{max} = A\omega^2$$
+        <div class="formula-label">accelerazione massima = ampiezza × pulsazione²</div>
+</div>
+<p>
+        L'accelerazione è sfasata di mezzo periodo rispetto alla posizione: quando la posizione è massima positiva, l'accelerazione è massima ma negativa (cioè punta verso l'equilibrio); quando la posizione è massima negativa, l'accelerazione è massima positiva.
+      </p>
+<div class="comparison-grid">
+<div class="comparison-card">
+<h4>⚖️ In equilibrio (x = 0)</h4>
+<p><strong>Posizione:</strong> zero</p>
+<p><strong>Velocità:</strong> massima</p>
+<p><strong>Accelerazione:</strong> zero</p>
+<p style="margin-top: 12px; color: var(--muted); font-size: 0.95rem;">
+            L'oggetto passa velocissimo per l'equilibrio ma non accelera perché non c'è forza.
+          </p>
+</div>
+<div class="comparison-card">
+<h4>↔️ Agli estremi (x = ±A)</h4>
+<p><strong>Posizione:</strong> massima</p>
+<p><strong>Velocità:</strong> zero</p>
+<p><strong>Accelerazione:</strong> massima</p>
+<p style="margin-top: 12px; color: var(--muted); font-size: 0.95rem;">
+            L'oggetto si ferma per un istante ma l'accelerazione è massima perché la forza di richiamo è più forte.
+          </p>
+</div>
+</div>
+
+<div class="key-concept">
+<h4>L'importanza degli sfasamenti</h4>
+<p>
+          Le tre grandezze (posizione, velocità, accelerazione) sono tutte sinusoidali e hanno la stessa frequenza, ma sono sfasate tra loro di un quarto di periodo (π/2 radianti). Questo significa che quando una è al massimo, le altre possono essere a zero o al minimo. Questa relazione di fase è ciò che caratterizza il moto armonico.
+        </p>
+</div>
+</section>
+<section class="card" id="esempi">
+<h2>Il moto armonico nella realtà</h2>
+<p>
+        Il moto armonico non è solo una teoria astratta: lo incontriamo continuamente nella vita quotidiana e in moltissimi fenomeni naturali e tecnologici. Vediamo alcuni esempi concreti.
+      </p>
+<h3>🔩 Il sistema massa-molla</h3>
+<p>
+        Questo è l'esempio più classico e più semplice da capire. Immagina una massa attaccata a una molla. Se tiri la massa e poi la lasci andare, questa inizierà a oscillare avanti e indietro. La molla cerca sempre di tornare alla sua lunghezza naturale, e questa è la forza di richiamo che genera il moto armonico.
+      </p>
+<div class="example-box">
+<h4>Applicazioni pratiche</h4>
+<p>
+          Le sospensioni delle automobili funzionano esattamente come un sistema massa-molla. Quando l'auto passa su una buca, le molle si comprimono e poi oscillano, assorbendo l'urto. Gli ammortizzatori servono a smorzare queste oscillazioni per rendere la guida più confortevole.
+        </p>
+</div>
+
+<h3>⏰ Il pendolo</h3>
+<p>
+        Un pendolo è un peso appeso a un filo che può oscillare liberamente. Quando lo sposti dalla posizione verticale e lo lasci andare, oscilla avanti e indietro. Per piccole oscillazioni (angoli non troppo grandi), il moto del pendolo è molto simile a un moto armonico.
+      </p>
+<div class="visual-explanation">
+<h4>Perché il pendolo è armonico?</h4>
+<p>
+          Quando il pendolo è spostato dalla verticale, la componente della forza peso che agisce lungo la traiettoria tende a riportarlo verso il basso. Questa forza è (approssimativamente) proporzionale allo spostamento angolare, proprio come nel moto armonico. Per questo il pendolo ha avuto un ruolo fondamentale negli orologi meccanici: la regolarità delle sue oscillazioni permetteva di misurare il tempo con precisione.
+        </p>
+</div>
+
+<h3>🎸 Le corde degli strumenti musicali</h3>
+<p>
+        Quando pizzichi una corda di chitarra, essa inizia a vibrare con un moto armonico (o meglio, con una sovrapposizione di più moti armonici a frequenze diverse). La frequenza dell'oscillazione determina la nota che senti: frequenze alte corrispondono a note acute, frequenze basse a note gravi.
+      </p>
+<div class="example-box">
+<h4>La musica è fisica!</h4>
+<p>
+          Ogni strumento musicale produce suono grazie a qualcosa che vibra con moto armonico: le corde negli strumenti a corda, l'aria nelle colonne d'aria degli strumenti a fiato, le membrane nei tamburi. La qualità del suono (il "timbro") dipende da quali frequenze armoniche sono presenti insieme alla fondamentale.
+        </p>
+</div>
+<h3>🌊 Le onde</h3>
+<p>
+        Anche le onde sono collegate al moto armonico. Un'onda è essenzialmente un'oscillazione che si propaga nello spazio. Se osservi un punto fisso attraversato da un'onda (ad esempio un galleggiante sul mare), vedrai quel punto oscillare su e giù con un moto armonico mentre l'onda passa.
+      </p>
+<h3>⚛️ Gli atomi nei cristalli</h3>
+<p>
+        A livello microscopico, gli atomi in un cristallo non sono fermi: vibrano continuamente attorno alla loro posizione di equilibrio con un moto armonico. Queste vibrazioni dipendono dalla temperatura: più il materiale è caldo, più gli atomi vibrano intensamente. Questo è alla base di moltissime proprietà dei materiali, dal calore specifico alla conducibilità termica.
+      </p>
+<div class="key-concept">
+<h4>L'universalità del moto armonico</h4>
+<p>
+          Il moto armonico appare ovunque in natura perché è il modo più semplice in cui un sistema risponde quando viene spostato leggermente da una posizione di equilibrio stabile. È come se fosse la "risposta naturale" di qualsiasi sistema che cerca di mantenere l'equilibrio. Questa universalità lo rende uno dei concetti più importanti di tutta la fisica.
+        </p>
+</div>
+
+</section>
+<section class="card">
+<h2>🎮 Esplora interattivamente</h2>
+<p>
+        Per comprendere davvero il moto armonico, è fondamentale <strong>vederlo in azione</strong>. La simulazione interattiva ti permette di:
+      </p>
+<ul>
+<li>Osservare il movimento del punto sul cerchio e la sua proiezione armonica</li>
+<li>Vedere i vettori posizione, velocità e accelerazione cambiare nel tempo</li>
+<li>Seguire l'andamento dei grafici in tempo reale</li>
+<li>Modificare il raggio e la velocità angolare per esplorare diverse situazioni</li>
+<li>Fermare la simulazione in posizioni chiave per analizzare i vettori</li>
+<li>Visualizzare il sistema massa-molla che oscilla sincronizzato</li>
+</ul>
+
+</section>
+</main>
+</body>
+</html>

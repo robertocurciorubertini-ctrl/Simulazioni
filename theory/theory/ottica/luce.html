@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teoria della luce</title>
+
+  <script>
+    window.THEORY_METADATA = {
+      title: "Luce e fenomeni ottici",
+      description: "Introduzione alla luce come onda elettromagnetica: riflessione, rifrazione, diffusione, dispersione, interferenza e diffrazione.",
+      section: "Ottica",
+      sectionSlug: "ottica",
+      order: 1,
+      tags: ["luce", "ottica", "riflessione", "rifrazione", "diffrazione", "interferenza", "dispersione", "colore"],
+      level: "base"
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --panel-2: #fbfcff;
+      --text: #1e2430;
+      --muted: #5f6b7a;
+      --border: #d9e0ea;
+      --accent: #2d6cdf;
+      --accent-soft: rgba(45, 108, 223, 0.12);
+      --shadow: 0 10px 30px rgba(25, 35, 52, 0.08);
+      --radius: 18px;
+      --max: 1180px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top left, #ffffff 0%, #f8faff 35%, #f1f4f9 100%);
+      line-height: 1.65;
+    }
+    .page { max-width: var(--max); margin: 0 auto; padding: 28px 20px 56px; }
+    .panel {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero { padding: 30px; margin-bottom: 22px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px;
+      background: var(--accent-soft); color: #194aa5;
+      font-size: 0.86rem; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 14px;
+    }
+    h1, h2, h3 { letter-spacing: -0.02em; line-height: 1.18; }
+    .hero h1 { margin: 0 0 10px; font-size: clamp(2rem, 3.4vw, 3rem); }
+    .hero p { margin: 0; max-width: 980px; color: var(--muted); font-size: 1.03rem; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; gap: 22px; align-items: start; }
+    .toc { position: sticky; top: 18px; padding: 18px; }
+    .toc h2 { margin: 0 0 12px; font-size: 1rem; }
+    .toc a {
+      display: block; text-decoration: none; color: var(--muted);
+      padding: 9px 10px; border-radius: 10px;
+      transition: background 0.15s ease, color 0.15s ease; font-size: 0.95rem;
+    }
+    .toc a:hover { background: var(--accent-soft); color: var(--accent); }
+    .content { display: grid; gap: 22px; }
+    section.card { padding: 26px; }
+    section.card h2 { margin: 0 0 14px; font-size: 1.5rem; }
+    section.card h3 { margin: 22px 0 10px; font-size: 1.08rem; color: #1e40af; }
+    p { margin: 0 0 14px; }
+    ul { margin: 0 0 14px; padding-left: 22px; }
+    li { margin-bottom: 7px; }
+    .lead { color: var(--muted); font-size: 1.02rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+    .info-box, .image-slot, .formula-box, .cta-box {
+      border: 1px solid var(--border); border-radius: 14px; background: #fff;
+    }
+    .info-box, .formula-box, .cta-box { padding: 16px; }
+    .info-box h3, .formula-box h3, .cta-box h3 { margin-top: 0; }
+    .image-slot {
+      padding: 18px; min-height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; color: var(--muted);
+      background: linear-gradient(180deg, #fcfdff, #f7faff); border-style: dashed;
+    }
+    .image-slot img { max-width: 100%; height: auto; border-radius: 10px; }
+    .image-slot.small { min-height: 170px; }
+    .formula-box { background: linear-gradient(180deg, #ffffff, #fbfdff); }
+    .equation {
+      margin: 12px 0; padding: 12px 14px; border-radius: 12px;
+      background: #f7faff; border: 1px solid #dfe7f5;
+      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+      font-size: 1.06rem; overflow-x: auto;
+    }
+    .var-list { display: grid; gap: 8px; margin-top: 12px; color: var(--muted); font-size: 0.96rem; }
+    .callout {
+      margin: 16px 0; padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft); border-radius: 0 12px 12px 0;
+    }
+    .highlight {
+      background: #fffbea; border: 1px solid #f6e7a8;
+      border-radius: 14px; padding: 16px 18px; margin: 14px 0;
+    }
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    .button-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; border: 1px solid #bfd2fb;
+      background: linear-gradient(180deg, #eff5ff, #e7f0ff);
+      color: #194aa5; padding: 11px 16px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 6px 18px rgba(25, 35, 52, 0.05);
+    }
+    .button-link:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(25, 35, 52, 0.08); }
+    .nav-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; padding: 11px 18px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700;
+      border: 1px solid #bfd2fb;
+      background: linear-gradient(180deg, #eff5ff, #e7f0ff);
+      color: #194aa5;
+      transition: transform 0.15s ease;
+    }
+    .nav-link:hover { transform: translateY(-1px); }
+    .nav-link.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .nav-link.primary:hover { background: #1d4ed8; }
+    .mini-note { color: var(--muted); font-size: 0.92rem; margin-top: 10px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+    .summary-card { border: 1px solid var(--border); background: #fff; border-radius: 14px; padding: 16px; }
+    .summary-card h3 { margin: 0 0 8px; font-size: 1rem; }
+    footer.panel { margin-top: 22px; padding: 20px 24px; color: var(--muted); font-size: 0.96rem; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .grid-2, .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+<body>
+  <div class="page">
+    <header class="hero panel">
+      <div class="eyebrow">Ottica · Teoria</div>
+      <h1>La luce: natura, propagazione e fenomeni ottici</h1>
+      <p>
+        La luce è una radiazione elettromagnetica trasversale che si propaga nel vuoto alla velocità $c \approx 3.0 \times 10^8$ m/s. Può essere descritta con strumenti diversi a seconda del fenomeno studiato: l'<strong>ottica geometrica</strong> (basata sui raggi) è sufficiente per riflessione e rifrazione; l'<strong>ottica ondulatoria</strong> è necessaria per comprendere interferenza, diffrazione e dispersione. In questa pagina sono raccolti tutti i principali fenomeni ottici di base.
+      </p>
+    </header>
+
+    <div class="layout">
+      <aside class="toc panel">
+        <h2>Indice</h2>
+        <a href="#natura">1. Che cos'è la luce</a>
+        <a href="#spettro">2. Spettro e colore</a>
+        <a href="#riflessione">3. Riflessione</a>
+        <a href="#diffusione">4. Diffusione e scattering</a>
+        <a href="#rifrazione">5. Rifrazione</a>
+        <a href="#dispersione">6. Dispersione e arcobaleno</a>
+        <a href="#interferenza">7. Interferenza</a>
+        <a href="#diffrazione">8. Diffrazione</a>
+        <a href="#sintesi">9. Sintesi finale</a>
+      </aside>
+
+      <main class="content">
+
+        <!-- 1. NATURA DELLA LUCE -->
+        <section class="card panel" id="natura">
+          <h2>1. Che cos'è la luce</h2>
+          <p class="lead">
+            La luce è un'onda elettromagnetica trasversale: un campo elettrico $\vec{E}$ e un campo magnetico $\vec{B}$ oscillano perpendicolarmente tra loro e perpendicolarmente alla direzione di propagazione.
+          </p>
+          <p>
+            Nel vuoto tutte le onde elettromagnetiche si propagano con la velocità $c$, indipendentemente dalla frequenza. Questa velocità è una costante fondamentale della natura:
+          </p>
+          <div class="formula-box">
+            <h3>Relazioni fondamentali</h3>
+            <div class="equation">\[ c = \lambda f \qquad f = \frac{1}{T} \qquad \lambda = \frac{c}{f} \]</div>
+            <div class="var-list">
+              <div><strong>c</strong>: velocità della luce nel vuoto ≈ 2.998 × 10⁸ m/s.</div>
+              <div><strong>λ</strong>: lunghezza d'onda, distanza tra due creste consecutive (m).</div>
+              <div><strong>f</strong>: frequenza, numero di oscillazioni per unità di tempo (Hz).</div>
+              <div><strong>T</strong>: periodo, tempo di un'oscillazione completa (s).</div>
+            </div>
+          </div>
+          <p>
+            La <strong>frequenza</strong> è la grandezza che identifica univocamente il tipo di radiazione: essa non cambia quando la luce passa da un mezzo a un altro. La lunghezza d'onda, invece, cambia perché cambia la velocità di propagazione nel mezzo (vedi sezione sulla rifrazione).
+          </p>
+
+          <div class="grid-2">
+            <div class="info-box">
+              <h3>Dualità onda-corpuscolo</h3>
+              <p>
+                In fisica classica la luce è descritta come onda. In fisica moderna (fotonica e meccanica quantistica) l'energia elettromagnetica è scambiata in pacchetti discreti chiamati <strong>fotoni</strong>. L'energia di un fotone è $E = hf$, dove $h = 6.626 \times 10^{-34}$ J·s è la costante di Planck. I due modelli non sono in contraddizione: quello ondulatorio descrive la propagazione, quello corpuscolare descrive l'interazione con la materia.
+              </p>
+            </div>
+            <div class="image-slot">
+              <img src="onda_em.jpg" alt="Struttura dell'onda elettromagnetica: campo E e campo B perpendicolari" />
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. SPETTRO -->
+        <section class="card panel" id="spettro">
+          <h2>2. Spettro elettromagnetico, luce visibile e colore</h2>
+          <p>
+            Lo spettro elettromagnetico si estende dalle onde radio (lunghezze d'onda da kilometri a centimetri) fino ai raggi gamma (lunghezze d'onda inferiori al picometro). La luce visibile occupa solo una piccola finestra: circa da <strong>380 nm</strong> (violetto) a <strong>750 nm</strong> (rosso), dove 1 nm = 10⁻⁹ m.
+          </p>
+          <p>
+            All'interno dello spettro visibile, la lunghezza d'onda determina il colore percepito: lunghezze d'onda minori corrispondono ai colori verso il violetto e il blu; lunghezze d'onda maggiori corrispondono all'arancione e al rosso. La <strong>luce bianca</strong> è la sovrapposizione di tutte le lunghezze d'onda visibili.
+          </p>
+
+          <div class="grid-2">
+            <div class="image-slot">
+              <img src="spettro_em.png" alt="Spettro elettromagnetico con regione visibile evidenziata" />
+            </div>
+            <div class="info-box">
+              <h3>Da cosa dipende il colore di un oggetto</h3>
+              <p>
+                Un oggetto appare colorato perché <strong>assorbe selettivamente</strong> alcune componenti della luce incidente e ne riflette o diffonde altre. Un oggetto verde assorbe efficientemente le componenti rosse e blu e diffonde quelle verdi. Un oggetto nero assorbe quasi tutta la radiazione incidente; un oggetto bianco la diffonde tutta.
+              </p>
+              <p>
+                Il colore percepito dipende quindi dalla radiazione illuminante, dalle proprietà ottiche del materiale e dalla risposta del sistema visivo umano (che ha tre tipi di coni sensibili a diverse gamme di lunghezze d'onda).
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            Distinzione fondamentale: nel <strong>colore per emissione</strong> (sorgenti luminose: lampade, schermi) i colori si sommano e il bianco si ottiene combinando rosso, verde e blu (modello RGB). Nel <strong>colore per assorbimento/riflessione</strong> (pigmenti, inchiostri) i colori si sottraggono e il nero si ottiene combinando ciano, magenta e giallo (modello CMY).
+          </div>
+        </section>
+
+        <!-- 3. RIFLESSIONE -->
+        <section class="card panel" id="riflessione">
+          <h2>3. Riflessione della luce</h2>
+          <p>
+            Quando un raggio luminoso raggiunge la superficie di separazione tra due mezzi, una parte dell'energia viene <strong>riflessa</strong> nel primo mezzo. La geometria della riflessione è descritta da due leggi:
+          </p>
+          <div class="formula-box">
+            <h3>Leggi della riflessione</h3>
+            <div class="equation">\[ \theta_i = \theta_r \]</div>
+            <div class="var-list">
+              <div><strong>θ<sub>i</sub></strong>: angolo di incidenza rispetto alla <em>normale</em> alla superficie (non rispetto alla superficie stessa).</div>
+              <div><strong>θ<sub>r</sub></strong>: angolo di riflessione rispetto alla normale.</div>
+              <div>Seconda legge: il raggio incidente, la normale e il raggio riflesso giacciono sullo stesso piano.</div>
+            </div>
+          </div>
+          <p>
+            È essenziale ricordare che gli angoli si misurano rispetto alla <strong>normale alla superficie</strong>, non rispetto alla superficie stessa. La normale è la retta perpendicolare alla superficie nel punto di incidenza.
+          </p>
+
+          <div class="grid-2">
+            <div class="info-box">
+              <h3>Riflessione speculare</h3>
+              <p>
+                Su superfici perfettamente lisce (specchi ideali) un fascio di raggi paralleli viene riflesso mantenendo il parallelismo: tutti i raggi rispettano la stessa legge $\theta_i = \theta_r$, e la geometria dei raggi si conserva. Questo consente la formazione di immagini nitide.
+              </p>
+            </div>
+            <div class="info-box">
+              <h3>Riflessione diffusa</h3>
+              <p>
+                Su superfici rugose (scala della lunghezza d'onda), la normale locale cambia punto per punto in modo irregolare. Anche se la legge $\theta_i = \theta_r$ vale localmente in ogni punto, i raggi riflessi sono distribuiti in molte direzioni: non si forma un'immagine ma il corpo appare illuminato da ogni direzione di osservazione.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top:16px;">
+            <div class="image-slot">
+              <img src="riflessione.jpg" alt="Schema riflessione speculare e diffusa" />
+            </div>
+            <div class="cta-box">
+              <h3>Simulazione collegata</h3>
+              <p>Esplora la riflessione su specchi piani e curvi, e osserva la formazione delle immagini.</p>
+              <div class="button-row">
+                <a class="nav-link primary" href="../../ottica/specchi-e-lenti.html">Apri simulazione</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. DIFFUSIONE -->
+        <section class="card panel" id="diffusione">
+          <h2>4. Diffusione della luce e scattering</h2>
+          <p>
+            La <strong>diffusione</strong> (o <strong>scattering</strong>) è la redistribuzione della luce in molte direzioni a seguito dell'interazione con particelle, molecole o disomogeneità del mezzo. È il meccanismo grazie al quale vediamo quasi tutto ciò che ci circonda: gli oggetti non luminosi sono visibili perché diffondono la luce che li illumina.
+          </p>
+          <p>
+            Nel <strong>scattering di Rayleigh</strong>, dominante quando le particelle (molecole) sono molto più piccole della lunghezza d'onda, l'intensità diffusa è proporzionale a $\lambda^{-4}$: le lunghezze d'onda corte (blu, violetto) vengono diffuse molto più efficacemente di quelle lunghe (rosso).
+          </p>
+
+          <div class="grid-2">
+            <div class="info-box">
+              <h3>Perché il cielo è azzurro</h3>
+              <p>
+                Le molecole dell'atmosfera (N₂, O₂) diffondono per scattering di Rayleigh. La luce solare bianca perde le componenti blu e violette, che vengono deflesse in tutte le direzioni. L'osservatore che guarda in qualsiasi direzione (tranne verso il Sole) riceve queste componenti diffuse: il cielo appare azzurro. Il violetto è diffuso ancora più del blu, ma il nostro occhio è meno sensibile ad esso.
+              </p>
+            </div>
+            <div class="info-box">
+              <h3>Perché i tramonti sono rossi</h3>
+              <p>
+                Quando il Sole è basso sull'orizzonte, la luce percorre uno spessore di atmosfera molto maggiore prima di raggiungere l'osservatore. Le componenti blu vengono quasi completamente diffuse fuori dalla linea di vista. La luce che arriva direttamente è quindi arricchita nelle componenti rosse e arancioni, che hanno minore sezione d'urto di scattering.
+              </p>
+            </div>
+          </div>
+
+          <div class="image-slot" style="margin-top:14px; min-height:180px;">
+            <img src="tramonto.jpg" alt="Tramonto rossastro causato dallo scattering atmosferico" />
+          </div>
+        </section>
+
+        <!-- 5. RIFRAZIONE -->
+        <section class="card panel" id="rifrazione">
+          <h2>5. Rifrazione della luce</h2>
+          <p>
+            Quando la luce passa da un mezzo a un altro, la sua velocità di propagazione cambia. Se il raggio incide obliquamente sulla superficie di separazione, cambia anche la sua direzione: questo fenomeno è la <strong>rifrazione</strong>. La causa fisica è il fatto che la frequenza dell'onda rimane costante nel passaggio tra mezzi, ma la velocità cambia, quindi cambia la lunghezza d'onda e di conseguenza la direzione di propagazione.
+          </p>
+
+          <div class="formula-box">
+            <h3>Legge di Snell-Cartesio</h3>
+            <div class="equation">\[ n_1 \sin \theta_i = n_2 \sin \theta_t \]</div>
+            <div class="equation">\[ n = \frac{c}{v} \]</div>
+            <div class="var-list">
+              <div><strong>n₁</strong>, <strong>n₂</strong>: indici di rifrazione dei due mezzi (adimensionali, ≥ 1).</div>
+              <div><strong>θ<sub>i</sub></strong>: angolo di incidenza rispetto alla normale alla superficie di separazione.</div>
+              <div><strong>θ<sub>t</sub></strong>: angolo di rifrazione (trasmissione) rispetto alla normale.</div>
+              <div><strong>n</strong>: indice di rifrazione del mezzo; per l'aria n ≈ 1.0003, per l'acqua n ≈ 1.33, per il vetro n ≈ 1.5.</div>
+              <div><strong>v</strong>: velocità della luce nel mezzo (m/s); si ha sempre v = c/n.</div>
+            </div>
+          </div>
+
+          <p>
+            Se la luce entra in un mezzo con indice maggiore (velocità minore), il raggio si avvicina alla normale ($\theta_t < \theta_i$). Se entra in un mezzo con indice minore (velocità maggiore), si allontana dalla normale ($\theta_t > \theta_i$).
+          </p>
+
+          <div class="callout">
+            Nel passaggio tra mezzi, la <strong>frequenza</strong> della luce resta invariata (è determinata dalla sorgente). Cambiano invece la <strong>velocità</strong> ($v = c/n$) e la <strong>lunghezza d'onda</strong> ($\lambda_{\text{mezzo}} = \lambda_0 / n$, dove $\lambda_0$ è la lunghezza d'onda nel vuoto). Questo punto è fondamentale e viene spesso confuso: non è la frequenza a cambiare con il mezzo, ma la lunghezza d'onda.
+          </div>
+
+          <div class="grid-2">
+            <div class="info-box">
+              <h3>Riflessione totale interna</h3>
+              <p>
+                Quando la luce cerca di passare da un mezzo più denso otticamente a uno meno denso ($n_1 > n_2$), l'angolo di rifrazione $\theta_t$ cresce al crescere di $\theta_i$. Esiste un <strong>angolo critico</strong> $\theta_c$ oltre il quale non esiste soluzione reale per $\theta_t$: tutta la luce viene riflessa internamente.
+              </p>
+              <div class="equation">\[ \sin \theta_c = \frac{n_2}{n_1} \qquad (\text{con } n_1 > n_2) \]</div>
+              <p>Per il vetro-aria: $\theta_c \approx 42°$. Questo fenomeno è alla base delle <strong>fibre ottiche</strong> e dei prismi nei binocoli.</p>
+            </div>
+            <div class="image-slot">
+              <img src="rifrazione.png" alt="Schema della rifrazione con angoli di incidenza e rifrazione" />
+            </div>
+          </div>
+
+          <div class="cta-box" style="margin-top:16px;">
+            <h3>Simulazione collegata</h3>
+            <p>Visualizza la rifrazione al variare dell'angolo di incidenza e degli indici dei due mezzi. Osserva la riflessione totale interna quando si supera l'angolo critico.</p>
+            <div class="button-row">
+              <a class="nav-link primary" href="../../ottica/rifrazione.html">Apri simulazione</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. DISPERSIONE -->
+        <section class="card panel" id="dispersione">
+          <h2>6. Dispersione della luce e formazione dell'arcobaleno</h2>
+          <p>
+            L'indice di rifrazione di un materiale reale non è costante, ma dipende dalla lunghezza d'onda: $n = n(\lambda)$. Questa proprietà si chiama <strong>dispersione cromatica</strong>. In quasi tutti i materiali trasparenti l'indice cresce al diminuire della lunghezza d'onda (dispersione normale): il violetto viene rifratato di più del rosso.
+          </p>
+          <p>
+            Quando la luce bianca attraversa un prisma o una goccia d'acqua, le diverse componenti cromatiche vengono deviate in misura leggermente diversa, separandosi spazialmente. Questo è il meccanismo della <strong>dispersione</strong>.
+          </p>
+
+          <div class="grid-2">
+            <div class="image-slot">
+              <img src="dispersione.jpg" alt="Dispersione della luce bianca attraverso un prisma" />
+            </div>
+            <div class="info-box">
+              <h3>Arcobaleno: la fisica dettagliata</h3>
+              <p>
+                Nell'arcobaleno primario la luce solare entra in una goccia sferica, viene rifratta, si riflette internamente una volta sulla parete opposta della goccia, poi viene rifratta di nuovo in uscita. La dispersione in ingresso e in uscita separa i colori: il rosso emerge a circa 42° rispetto alla direzione del Sole, il violetto a circa 40°. Nell'arcobaleno secondario (più raro, sopra il primario) la luce si riflette internamente due volte: i colori sono invertiti e l'intensità è minore.
+              </p>
+              <p>
+                L'arcobaleno non è un oggetto nello spazio: ogni osservatore vede luce proveniente da gocce diverse, e la sua posizione è determinata dalla geometria dell'osservazione.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. INTERFERENZA -->
+        <section class="card panel" id="interferenza">
+          <h2>7. Interferenza e principio di sovrapposizione</h2>
+          <p>
+            Quando due o più onde si sovrappongono nello stesso punto, l'ampiezza risultante è la <strong>somma vettoriale</strong> delle ampiezze delle singole onde: questo è il <strong>principio di sovrapposizione</strong>. L'interferenza è il risultato di questa sovrapposizione.
+          </p>
+          <p>
+            Se due onde arrivano nello stesso punto <strong>in fase</strong> (differenza di fase multipla intera di $2\pi$, ovvero differenza di cammino multipla intera di $\lambda$), si ha <strong>interferenza costruttiva</strong> e l'ampiezza risultante è massima. Se arrivano in <strong>opposizione di fase</strong> (differenza di cammino pari a un numero semintero di $\lambda$), si ha <strong>interferenza distruttiva</strong> e le ampiezze si cancellano.
+          </p>
+
+          <div class="formula-box">
+            <h3>Esperimento della doppia fenditura (Young)</h3>
+            <div class="equation">\[ \delta = d \sin \theta \]</div>
+            <div class="equation">\[ \delta = m\lambda \qquad (\text{massimi, } m = 0, \pm 1, \pm 2, \ldots) \]</div>
+            <div class="equation">\[ \delta = \left(m + \frac{1}{2}\right)\lambda \qquad (\text{minimi}) \]</div>
+            <div class="var-list">
+              <div><strong>δ</strong>: differenza di cammino tra i raggi provenienti dalle due fenditure.</div>
+              <div><strong>d</strong>: distanza tra le due fenditure.</div>
+              <div><strong>θ</strong>: angolo della direzione di osservazione rispetto all'asse centrale.</div>
+              <div><strong>m</strong>: ordine della frangia (intero per i massimi).</div>
+              <div><strong>λ</strong>: lunghezza d'onda della luce monocromatica.</div>
+            </div>
+          </div>
+
+          <p>
+            La posizione delle frange luminose sullo schermo (a distanza $L$ dalle fenditure) è:
+          </p>
+          <div class="formula-box">
+            <div class="equation">\[ y_m = \frac{m\lambda L}{d} \qquad (\text{per piccoli angoli}) \]</div>
+            <div class="var-list">
+              <div><strong>y_m</strong>: posizione della frangia di ordine m sullo schermo.</div>
+              <div><strong>L</strong>: distanza tra le fenditure e lo schermo.</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="info-box">
+              <h3>Coerenza: condizione necessaria</h3>
+              <p>
+                Per osservare interferenza stabile è necessario che le due sorgenti siano <strong>coerenti</strong>: devono avere la stessa frequenza e una differenza di fase fissa nel tempo. Sorgenti incoerenti (come due lampade separate) producono frange che si spostano così rapidamente da non essere osservabili. Le sorgenti laser sono altamente coerenti.
+              </p>
+            </div>
+            <div class="image-slot">
+              <img src="interferenza.jpg" alt="Frange di interferenza nella doppia fenditura di Young" />
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. DIFFRAZIONE -->
+        <section class="card panel" id="diffrazione">
+          <h2>8. Diffrazione della luce</h2>
+          <p>
+            La <strong>diffrazione</strong> è la tendenza di un'onda ad "aggirare" gli ostacoli e a espandersi lateralmente quando passa attraverso un'apertura. Il fenomeno è descritto dal <strong>principio di Huygens-Fresnel</strong>: ogni punto raggiunto da un fronte d'onda funge da sorgente di onde sferiche secondarie, la cui sovrapposizione determina il fronte d'onda successivo.
+          </p>
+          <p>
+            La diffrazione diventa apprezzabile quando le dimensioni dell'apertura (o dell'ostacolo) sono dell'ordine di grandezza della lunghezza d'onda $\lambda$. Se l'apertura è molto più grande di $\lambda$, la propagazione è ben descritta dall'ottica geometrica (raggi rettilinei). Se l'apertura è comparabile a $\lambda$, l'onda si espande apprezzabilmente oltre la direzione geometrica.
+          </p>
+
+          <div class="formula-box">
+            <h3>Fenditura singola: minimi di diffrazione</h3>
+            <div class="equation">\[ a \sin \theta = m\lambda \qquad (m = \pm 1, \pm 2, \ldots\; \text{— posizione dei minimi}) \]</div>
+            <div class="var-list">
+              <div><strong>a</strong>: larghezza della fenditura.</div>
+              <div><strong>θ</strong>: angolo rispetto alla direzione centrale.</div>
+              <div><strong>m</strong>: ordine del minimo (intero non nullo).</div>
+            </div>
+          </div>
+
+          <div class="callout">
+            Diffrazione e interferenza sono fisicamente lo stesso fenomeno: la figura di diffrazione da una fenditura singola si ottiene considerando ogni punto dell'apertura come sorgente secondaria e calcolando l'interferenza tra tutte le onde secondarie. La distinzione tra "interferenza" e "diffrazione" è quindi essenzialmente storica e convenzionale.
+          </div>
+
+          <div class="grid-2">
+            <div class="image-slot small">
+              <img src="diffrazione.jpg" alt="Figura di diffrazione da fenditura singola" />
+            </div>
+            <div class="info-box">
+              <h3>Limite di risoluzione degli strumenti ottici</h3>
+              <p>
+                La diffrazione impone un limite fisico fondamentale alla risoluzione di qualunque strumento ottico (microscopi, telescopi, fotocamere). Secondo il <strong>criterio di Rayleigh</strong>, due sorgenti puntiformi sono appena distinguibili quando il massimo centrale della figura di diffrazione dell'una cade sul primo minimo dell'altra. Per un'apertura circolare di diametro $D$:
+              </p>
+              <div class="equation">\[ \theta_{\text{min}} \approx 1.22\,\frac{\lambda}{D} \]</div>
+              <p>
+                Più grande è l'apertura e più piccola è la lunghezza d'onda, migliore è la risoluzione. È per questo che i radiotelescopi devono avere dimensioni enormi nonostante osservino lunghezze d'onda molto maggiori di quelle visibili.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. SINTESI -->
+        <section class="card panel" id="sintesi">
+          <h2>9. Sintesi finale</h2>
+          <p>
+            La luce può essere studiata con approcci diversi a seconda del fenomeno di interesse. Nell'<strong>ottica geometrica</strong> la luce è descritta da raggi rettilinei: questo modello è adeguato per riflessione, rifrazione e formazione di immagini con specchi e lenti, purché le dimensioni in gioco siano molto maggiori di $\lambda$. Nell'<strong>ottica ondulatoria</strong> si tiene conto della fase dell'onda: questo approccio è indispensabile per capire interferenza, diffrazione e dispersione.
+          </p>
+          <p>
+            I due modelli non sono in contraddizione ma complementari: l'ottica geometrica emerge come limite dell'ottica ondulatoria quando $\lambda \to 0$ rispetto alle dimensioni caratteristiche del problema.
+          </p>
+
+          <div class="summary-grid">
+            <div class="summary-card">
+              <h3>Riflessione</h3>
+              <p>Il raggio rimbalza sulla superficie con $\theta_i = \theta_r$. Se speculare, si formano immagini; se diffusa, l'oggetto diventa visibile da ogni direzione.</p>
+            </div>
+            <div class="summary-card">
+              <h3>Rifrazione</h3>
+              <p>La luce cambia direzione passando tra mezzi con indici diversi. La legge di Snell lega gli angoli agli indici. La frequenza è invariante; cambia la lunghezza d'onda.</p>
+            </div>
+            <div class="summary-card">
+              <h3>Dispersione</h3>
+              <p>$n = n(\lambda)$: diverse lunghezze d'onda vengono rifratte diversamente, separando i colori. Alla base dell'arcobaleno e della spettroscopia.</p>
+            </div>
+            <div class="summary-card">
+              <h3>Diffusione (scattering)</h3>
+              <p>La luce è redistribuita in molte direzioni. Spiega il colore del cielo (Rayleigh, $\propto \lambda^{-4}$) e perché vediamo gli oggetti opachi.</p>
+            </div>
+            <div class="summary-card">
+              <h3>Interferenza</h3>
+              <p>Sovrapposizione di onde coerenti: costruttiva (in fase) e distruttiva (in opposizione). Produce frange luminose e scure. Base della doppia fenditura di Young.</p>
+            </div>
+            <div class="summary-card">
+              <h3>Diffrazione</h3>
+              <p>Le onde si espandono attorno agli ostacoli. Significativa quando $\lambda \sim$ dimensioni dell'apertura. Impone un limite fisico alla risoluzione degli strumenti.</p>
+            </div>
+          </div>
+
+          <div class="cta-box" style="margin-top: 22px;">
+            <h3>Simulazioni collegate</h3>
+            <p>Esplora i fenomeni ottici descritti in questa pagina nelle simulazioni interattive.</p>
+            <div class="button-row">
+              <a class="nav-link primary" href="../../ottica/rifrazione.html">Rifrazione e riflessione totale</a>
+              <a class="nav-link" href="../../ottica/specchi-e-lenti.html">Specchi e lenti</a>
+              <a class="nav-link" href="../../ottica/interferenza-diffrazione.html">Interferenza e diffrazione</a>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <footer class="panel">
+      Questa pagina è la dispensa teorica di ottica. Gli spazi immagine possono essere sostituiti con fotografie, diagrammi o animazioni. I pulsanti aprono le simulazioni interattive corrispondenti.
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Teoria di Fisica</title>
+<style>
+:root {
+--bg-1: #07111f;
+--bg-2: #0d1b2a;
+--bg-3: #10263d;
+--card: rgba(255, 255, 255, 0.08);
+--card-border: rgba(255, 255, 255, 0.14);
+--panel: rgba(255, 255, 255, 0.05);
+--text: #eaf2ff;
+--muted: #b8c7e6;
+--accent: #61dafb;
+--accent-2: #7ef0c7;
+--shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+body {
+margin: 0;
+min-height: 100vh;
+font-family: "Segoe UI", Arial, sans-serif;
+color: var(--text);
+background:
+  radial-gradient(circle at top left, rgba(97, 218, 251, 0.15), transparent 30%),
+  radial-gradient(circle at top right, rgba(126, 240, 199, 0.12), transparent 25%),
+  linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+overflow-x: hidden;
+}
+
+.stars {
+position: fixed;
+inset: 0;
+pointer-events: none;
+opacity: 0.35;
+background-image:
+  radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+  radial-gradient(2px 2px at 140px 80px, #ffffff, transparent),
+  radial-gradient(1.5px 1.5px at 300px 120px, #ffffff, transparent),
+  radial-gradient(2px 2px at 500px 40px, #ffffff, transparent),
+  radial-gradient(1.5px 1.5px at 700px 150px, #ffffff, transparent),
+  radial-gradient(2px 2px at 900px 70px, #ffffff, transparent),
+  radial-gradient(1.5px 1.5px at 1100px 180px, #ffffff, transparent);
+background-size: 1200px 300px;
+animation: drift 20s linear infinite;
+}
+
+@keyframes drift {
+from { transform: translateY(0); }
+to   { transform: translateY(30px); }
+}
+
+.container {
+width: min(860px, calc(100% - 32px));
+margin: 0 auto;
+padding: 48px 0 64px;
+position: relative;
+z-index: 1;
+}
+
+/* ── top nav ── */
+.top-nav {
+display: flex;
+justify-content: flex-start;
+align-items: center;
+margin-bottom: 18px;
+padding: 0 6px;
+}
+
+.top-link {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+padding: 10px 16px;
+border-radius: 999px;
+text-decoration: none;
+color: var(--text);
+font-weight: 600;
+border: 1px solid rgba(255,255,255,0.14);
+background: rgba(255,255,255,0.06);
+backdrop-filter: blur(8px);
+transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.top-link:hover {
+transform: translateY(-1px);
+border-color: rgba(97, 218, 251, 0.35);
+background: rgba(97, 218, 251, 0.08);
+}
+
+/* ── hero ── */
+.hero {
+text-align: center;
+padding: 26px 16px 10px;
+}
+
+.hero-badge {
+display: inline-block;
+padding: 8px 14px;
+border: 1px solid rgba(97, 218, 251, 0.35);
+border-radius: 999px;
+background: rgba(97, 218, 251, 0.08);
+color: var(--accent);
+font-size: 0.9rem;
+letter-spacing: 0.04em;
+margin-bottom: 18px;
+backdrop-filter: blur(8px);
+}
+
+h1 {
+margin: 0;
+font-size: clamp(2.2rem, 5vw, 4rem);
+font-weight: 700;
+letter-spacing: 0.02em;
+text-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+.subtitle {
+max-width: 860px;
+margin: 18px auto 0;
+font-size: 1.08rem;
+line-height: 1.7;
+color: var(--muted);
+}
+
+/* ── search bar ── */
+.search-wrapper {
+margin: 28px 0 0;
+position: relative;
+}
+
+.search-wrapper svg {
+position: absolute;
+left: 16px;
+top: 50%;
+transform: translateY(-50%);
+width: 18px;
+height: 18px;
+fill: none;
+stroke: var(--muted);
+stroke-width: 2;
+stroke-linecap: round;
+stroke-linejoin: round;
+pointer-events: none;
+transition: stroke 0.2s;
+}
+
+#searchInput {
+width: 100%;
+padding: 14px 18px 14px 46px;
+border-radius: 16px;
+border: 1px solid var(--card-border);
+background: rgba(255,255,255,0.06);
+color: var(--text);
+font-size: 1rem;
+font-family: inherit;
+backdrop-filter: blur(10px);
+outline: none;
+transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+#searchInput::placeholder { color: var(--muted); opacity: 0.7; }
+
+#searchInput:focus {
+border-color: rgba(97, 218, 251, 0.5);
+background: rgba(97, 218, 251, 0.06);
+box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.12);
+}
+
+#searchInput:focus + svg,
+.search-wrapper:focus-within svg {
+stroke: var(--accent);
+}
+
+/* ── status ── */
+.status-message {
+margin-top: 14px;
+color: var(--muted);
+font-size: 0.95rem;
+text-align: center;
+}
+
+/* ── section grid (single column) ── */
+.section-grid {
+display: grid;
+gap: 18px;
+margin-top: 22px;
+}
+
+.topic-card {
+border-radius: 20px;
+padding: 22px 24px;
+border: 1px solid var(--card-border);
+background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+box-shadow: var(--shadow);
+transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.topic-card:hover {
+border-color: rgba(97, 218, 251, 0.28);
+transform: translateY(-2px);
+}
+
+.topic-head {
+display: flex;
+justify-content: space-between;
+gap: 14px;
+align-items: flex-start;
+flex-wrap: wrap;
+margin-bottom: 10px;
+}
+
+.topic-card h3 { margin: 0; font-size: 1.18rem; }
+
+.pill {
+padding: 8px 12px;
+border-radius: 999px;
+background: rgba(97, 218, 251, 0.08);
+border: 1px solid rgba(97, 218, 251, 0.18);
+color: var(--accent);
+font-size: 0.88rem;
+white-space: nowrap;
+}
+
+.topic-card p {
+margin: 0 0 16px;
+color: var(--muted);
+line-height: 1.7;
+}
+
+.topic-links {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+}
+
+.topic-link {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+padding: 10px 14px;
+border-radius: 12px;
+text-decoration: none;
+color: var(--text);
+font-weight: 600;
+border: 1px solid rgba(255,255,255,0.12);
+background: rgba(255,255,255,0.06);
+transition: background 0.2s, border-color 0.2s;
+}
+
+.topic-link:hover {
+background: rgba(255,255,255,0.1);
+border-color: rgba(255,255,255,0.2);
+}
+
+.topic-link.primary {
+color: #00141f;
+background: linear-gradient(135deg, var(--accent), var(--accent-2));
+border: none;
+}
+
+.topic-link.primary:hover { opacity: 0.88; }
+
+/* ── empty search result ── */
+.no-results {
+display: none;
+text-align: center;
+padding: 48px 16px;
+color: var(--muted);
+font-size: 1rem;
+}
+
+/* ── footer ── */
+.footer {
+text-align: center;
+margin-top: 32px;
+color: var(--muted);
+font-size: 0.92rem;
+opacity: 0.9;
+}
+
+@media (max-width: 760px) {
+.container {
+  width: min(100% - 20px, 860px);
+  padding-top: 26px;
+}
+}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="container">
+  <div class="top-nav">
+    <a class="top-link" href="../index.html" aria-label="Vai alle simulazioni">← Simulazioni</a>
+  </div>
+
+  <section class="hero">
+    <div class="hero-badge">Sezione teorica</div>
+    <h1>Teoria di Fisica</h1>
+    <p class="subtitle">
+      Raccolta di contenuti teorici sui principali argomenti della fisica, con definizioni,
+      leggi, modelli interpretativi e collegamenti alle simulazioni interattive.
+    </p>
+
+    <div class="search-wrapper">
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Cerca una sezione…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Cerca sezione teorica"
+      />
+      <!-- magnifier icon inserted after input so :focus-within works -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+      </svg>
+    </div>
+
+    <div id="statusMessage" class="status-message">Caricamento sezioni teoriche…</div>
+  </section>
+
+  <div id="sectionGrid" class="section-grid">
+    <section class="topic-card" id="loading">
+      <div class="topic-head">
+        <h3>Caricamento in corso</h3>
+        <span class="pill">Attendere</span>
+      </div>
+      <p>Le sezioni disponibili verranno generate automaticamente a partire da <code>theory.json</code>.</p>
+    </section>
+  </div>
+
+  <p class="no-results" id="noResults">Nessuna sezione corrisponde alla ricerca.</p>
+
+  <div class="footer">
+    Archivio teorico collegato alle simulazioni interattive del sito
+  </div>
+</div>
+
+<script>
+/* ── utility ── */
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function slugify(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function sectionHref(section) {
+  const slug = section.slug || slugify(section.title);
+  return `${slug}/index.html`;
+}
+
+function sectionPill(section) {
+  const count = Array.isArray(section.topics) ? section.topics.length : 0;
+  if (count === 0) return "In sviluppo";
+  if (count === 1) return "1 argomento";
+  return `${count} argomenti`;
+}
+
+function sectionDescription(section) {
+  return String(section.description || "").trim() || "Sezione teorica disponibile nel catalogo.";
+}
+
+/* ── search ── */
+function applySearch(query) {
+  const q = query.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const cards = document.querySelectorAll("#sectionGrid .topic-card");
+  let visible = 0;
+
+  cards.forEach(card => {
+    const title = (card.dataset.title || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const desc  = (card.dataset.desc  || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const match = !q || title.includes(q) || desc.includes(q);
+    card.style.display = match ? "" : "none";
+    if (match) visible++;
+  });
+
+  document.getElementById("noResults").style.display = (visible === 0 && q) ? "block" : "none";
+}
+
+document.getElementById("searchInput").addEventListener("input", e => applySearch(e.target.value));
+
+/* ── main load ── */
+async function loadTheoryIndex() {
+  const sectionGrid   = document.getElementById("sectionGrid");
+  const statusMessage = document.getElementById("statusMessage");
+
+  try {
+    const response = await fetch("./theory.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    const sections = Array.isArray(data.sections) ? data.sections : [];
+
+    if (!sections.length) {
+      sectionGrid.innerHTML = `
+        <section class="topic-card" id="nessuna-sezione">
+          <div class="topic-head">
+            <h3>Nessuna sezione disponibile</h3>
+            <span class="pill">Catalogo vuoto</span>
+          </div>
+          <p>Il file <code>theory.json</code> è stato caricato correttamente, ma non contiene ancora sezioni da mostrare.</p>
+        </section>`;
+      statusMessage.textContent = "Nessuna sezione teorica disponibile nel catalogo.";
+      return;
+    }
+
+    sectionGrid.innerHTML = sections.map(section => {
+      const id   = slugify(section.slug || section.title);
+      const desc = sectionDescription(section);
+      return `
+        <section class="topic-card" id="${escapeHtml(id)}"
+          data-title="${escapeHtml(section.title)}"
+          data-desc="${escapeHtml(desc)}">
+          <div class="topic-head">
+            <h3>${escapeHtml(section.title)}</h3>
+            <span class="pill">${escapeHtml(sectionPill(section))}</span>
+          </div>
+          <p>${escapeHtml(desc)}</p>
+          <div class="topic-links">
+            <a class="topic-link primary" href="${escapeHtml(sectionHref(section))}">Apri sezione</a>
+            <a class="topic-link" href="../index.html">Simulazioni collegate</a>
+          </div>
+        </section>`;
+    }).join("");
+
+    const n = sections.length;
+    statusMessage.textContent = `${n} ${n === 1 ? "sezione disponibile" : "sezioni disponibili"} nel catalogo teorico.`;
+
+  } catch (error) {
+    sectionGrid.innerHTML = `
+      <section class="topic-card" id="errore-caricamento">
+        <div class="topic-head">
+          <h3>Errore nel caricamento</h3>
+          <span class="pill">Verifica necessaria</span>
+        </div>
+        <p>Non è stato possibile leggere <code>theory.json</code>. Verifica che il file sia presente nella stessa cartella e che contenga un array <code>sections</code>.</p>
+      </section>`;
+    statusMessage.textContent = "Impossibile caricare il catalogo teorico.";
+    console.error(error);
+  }
+}
+
+loadTheoryIndex();
+</script>
+</body>
+</html>

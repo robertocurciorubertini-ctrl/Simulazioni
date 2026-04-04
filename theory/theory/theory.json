@@ -1,0 +1,93 @@
+{
+  "sections": [
+    {
+      "title": "Meccanica",
+      "slug": "meccanica",
+      "description": "",
+      "order": 1,
+      "topics": [
+        {
+          "title": "Moto rettilineo uniforme",
+          "file": "meccanica/moto-rettilineo-uniforme.html",
+          "description": "Definizione, legge oraria, rappresentazione grafica e interpretazione fisica del moto rettilineo uniforme.",
+          "order": 1,
+          "level": "base",
+          "tags": [
+            "cinematica",
+            "velocità costante",
+            "legge oraria"
+          ]
+        },
+        {
+          "title": "Moto uniformemente accelerato",
+          "file": "meccanica/moto-uniformemente-accelerato.html",
+          "description": "Teoria del moto uniformemente accelerato con definizione, leggi orarie, grafici e interpretazione fisica dell'accelerazione costante.",
+          "order": 5,
+          "level": "base",
+          "tags": [
+            "cinematica",
+            "accelerazione costante",
+            "grafici",
+            "legge oraria",
+            "velocità"
+          ]
+        },
+        {
+          "title": "Moto parabolico",
+          "file": "meccanica/moto-parabolico.html",
+          "description": "Spiegazione teorica del moto parabolico come composizione di un moto rettilineo uniforme orizzontale e di un moto uniformemente accelerato verticale.",
+          "order": 6,
+          "level": "base",
+          "tags": [
+            "moto parabolico",
+            "lancio obliquo",
+            "composizione dei moti",
+            "gravità",
+            "cinematica"
+          ]
+        },
+        {
+          "title": "Moto circolare",
+          "file": "meccanica/moto-circolare.html",
+          "description": "Spiegazione teorica del moto circolare uniforme, con introduzione dei radianti, delle grandezze angolari, della velocità tangenziale e dell'accelerazione centripeta.",
+          "order": 7,
+          "level": "intermedio",
+          "tags": [
+            "moto circolare",
+            "velocità angolare",
+            "accelerazione centripeta",
+            "periodo",
+            "frequenza",
+            "radianti",
+            "cinematica"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Ottica",
+      "slug": "ottica",
+      "description": "",
+      "order": 1,
+      "topics": [
+        {
+          "title": "Luce e fenomeni ottici",
+          "file": "ottica/luce.html",
+          "description": "Introduzione alla luce come onda elettromagnetica: riflessione, rifrazione, diffusione, dispersione, interferenza e diffrazione.",
+          "order": 1,
+          "level": "base",
+          "tags": [
+            "luce",
+            "ottica",
+            "riflessione",
+            "rifrazione",
+            "diffrazione",
+            "interferenza",
+            "dispersione",
+            "colore"
+          ]
+        }
+      ]
+    }
+  ]
+}

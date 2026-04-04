@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meccanica - Teoria di Fisica</title>
+
+  <style>
+    :root{
+      --bg: #0f172a;
+      --surface: #111827;
+      --surface-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #374151;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --shadow: 0 10px 25px rgba(0,0,0,0.4);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --maxw: 1180px;
+    }
+
+    *{
+      box-sizing: border-box;
+    }
+
+    body{
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    a{
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .back-link{
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .back-link:hover{
+      background: var(--surface-2);
+    }
+
+    .page{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .hero{
+      background: linear-gradient(135deg, #111827, #1f2937);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow{
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #1e3a8a;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    h1{
+      margin: 0 0 10px;
+      font-size: 2.5rem;
+    }
+
+    .hero p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .section-title{
+      margin: 20px 0;
+      font-size: 1.4rem;
+    }
+
+    .topics-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .topic-card{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .topic-card h3{
+      margin: 0;
+    }
+
+    .topic-card p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+
+    .btn{
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-primary{
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover{
+      background: var(--primary-dark);
+    }
+
+    .btn-disabled{
+      background: #374151;
+      color: #9ca3af;
+    }
+
+    .note{
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../index.html">← Teoria</a>
+    <a class="back-link" href="../../index.html">Simulazioni</a>
+  </div>
+</header>
+
+<main class="page">
+
+  <section class="hero">
+    <div class="eyebrow">Sezione teorica</div>
+    <h1 id="sectionTitle">Meccanica</h1>
+    <p id="sectionDescription">
+      Sezione dedicata ai principali modelli della meccanica classica.
+      I contenuti collegano formalismo teorico, interpretazione fisica e simulazioni.
+    </p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Argomenti</h2>
+
+    <div id="topicsGrid" class="topics-grid">
+
+      <div class="topic-card">
+        <h3>Caricamento in corso</h3>
+        <p>
+          Gli argomenti disponibili verranno letti automaticamente da <code>../theory.json</code>.
+        </p>
+        <div class="btn btn-disabled">Attendere</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div id="noteBox" class="note">
+    Questa pagina funge da indice della sezione.
+    Ogni argomento collegherà teoria e simulazioni corrispondenti.
+  </div>
+
+</main>
+
+<script>
+const SECTION_SLUG = "meccanica";
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function buildTopicCard(topic) {
+  const title = escapeHtml(topic.title || "Argomento");
+  const description = escapeHtml(topic.description || "Contenuto teorico disponibile.");
+  const file = String(topic.file || "");
+  const level = String(topic.level || "").trim();
+
+  const isCurrentIndex = file.toLowerCase().endsWith("/index.html") || file.toLowerCase() === "index.html";
+  const isAvailable = file && !isCurrentIndex;
+
+  const actionHtml = isAvailable
+    ? `<a class="btn btn-primary" href="../${escapeHtml(file)}">Apri contenuto</a>`
+    : `<div class="btn btn-disabled">In sviluppo</div>`;
+
+  const levelHtml = level
+    ? `<div class="btn btn-disabled" style="width: fit-content; cursor: default;">Livello: ${escapeHtml(level)}</div>`
+    : "";
+
+  return `
+    <div class="topic-card">
+      <h3>${title}</h3>
+      <p>${description}</p>
+      ${levelHtml}
+      ${actionHtml}
+    </div>
+  `;
+}
+
+async function loadSectionIndex() {
+  const titleEl = document.getElementById("sectionTitle");
+  const descriptionEl = document.getElementById("sectionDescription");
+  const topicsGrid = document.getElementById("topicsGrid");
+  const noteBox = document.getElementById("noteBox");
+
+  try {
+    const response = await fetch("../theory.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const sections = Array.isArray(data.sections) ? data.sections : [];
+    const section = sections.find(s => String(s.slug || "").toLowerCase() === SECTION_SLUG);
+
+    if (!section) {
+      topicsGrid.innerHTML = `
+        <div class="topic-card">
+          <h3>Sezione non trovata</h3>
+          <p>
+            La sezione <code>${escapeHtml(SECTION_SLUG)}</code> non è presente in <code>../theory.json</code>.
+          </p>
+          <div class="btn btn-disabled">Verifica necessaria</div>
+        </div>
+      `;
+      noteBox.innerHTML = `
+        Questa pagina non ha trovato una sezione compatibile nel catalogo teorico.
+      `;
+      return;
+    }
+
+    titleEl.textContent = section.title || "Sezione teorica";
+    descriptionEl.textContent = section.description || "Sezione teorica disponibile nel catalogo.";
+
+    const topics = Array.isArray(section.topics) ? section.topics : [];
+    const visibleTopics = topics.filter(topic => {
+      const file = String(topic.file || "").toLowerCase();
+      return !(file === "index.html" || file.endsWith("/index.html"));
+    });
+
+    if (!visibleTopics.length) {
+      topicsGrid.innerHTML = `
+        <div class="topic-card">
+          <h3>Nessun argomento disponibile</h3>
+          <p>
+            La sezione è presente nel catalogo, ma non contiene ancora pagine teoriche consultabili.
+          </p>
+          <div class="btn btn-disabled">In sviluppo</div>
+        </div>
+      `;
+      noteBox.innerHTML = `
+        Questa pagina funge da indice della sezione.
+        Gli argomenti compariranno automaticamente quando saranno presenti nel file <code>../theory.json</code>.
+      `;
+      return;
+    }
+
+    topicsGrid.innerHTML = visibleTopics.map(buildTopicCard).join("");
+
+    const count = visibleTopics.length;
+    noteBox.innerHTML = `
+      Questa pagina funge da indice della sezione.
+      Attualmente sono disponibili ${count} ${count === 1 ? "argomento" : "argomenti"} teorici nel catalogo dinamico.
+    `;
+  } catch (error) {
+    topicsGrid.innerHTML = `
+      <div class="topic-card">
+        <h3>Errore nel caricamento</h3>
+        <p>
+          Non è stato possibile leggere <code>../theory.json</code>. Verifica che il file sia presente e valido.
+        </p>
+        <div class="btn btn-disabled">Errore</div>
+      </div>
+    `;
+    noteBox.innerHTML = `
+      Si è verificato un errore durante il caricamento del catalogo della sezione.
+    `;
+    console.error(error);
+  }
+}
+
+loadSectionIndex();
+</script>
+
+</body>
+</html>

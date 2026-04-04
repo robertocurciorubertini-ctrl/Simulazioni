@@ -1,0 +1,434 @@
+<!-- ======================= -->
+<!-- FILE: moto-circolare.html -->
+<!-- ======================= -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moto circolare | Teoria</title>
+
+  <script>
+    window.THEORY_METADATA = {
+      title: "Moto circolare",
+      description: "Spiegazione teorica del moto circolare uniforme, con introduzione dei radianti, delle grandezze angolari, della velocità tangenziale e dell'accelerazione centripeta.",
+      section: "Meccanica",
+      sectionSlug: "meccanica",
+      icon: "⭕",
+      order: 7,
+      tags: ["moto circolare", "velocità angolare", "accelerazione centripeta", "periodo", "frequenza", "radianti", "cinematica"],
+      level: "intermedio"
+    };
+  </script>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #2563eb;
+      --accent-2: #1e40af;
+      --border: #dbe3ee;
+      --shadow: 0 10px 28px rgba(15,23,42,0.08);
+      --radius: 18px;
+      --maxw: 1050px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top left, #ffffff 0%, #f8faff 35%, #f1f4f9 100%);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .container { width: min(var(--maxw), calc(100% - 32px)); margin: 0 auto; }
+    .hero { padding: 72px 0 34px; }
+    .eyebrow {
+      display: inline-block; padding: 6px 12px; border: 1px solid var(--border);
+      border-radius: 999px; background: #e0ecff; color: #1e3a8a;
+      font-size: 0.92rem; margin-bottom: 18px;
+    }
+    h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.1; }
+    .subtitle { max-width: 850px; color: var(--muted); font-size: 1.08rem; margin: 0; }
+    .quick-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .quick-nav a {
+      text-decoration: none; color: var(--text); background: #ffffff;
+      border: 1px solid var(--border); padding: 10px 14px; border-radius: 999px; font-size: 0.95rem;
+    }
+    main { padding-bottom: 60px; }
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 24px; overflow: hidden;
+    }
+    .section { margin-bottom: 20px; }
+    h2 { margin: 0 0 14px; font-size: 1.55rem; }
+    h3 { margin: 22px 0 10px; font-size: 1.14rem; color: var(--accent-2); }
+    p { margin: 0 0 14px; }
+    .muted { color: var(--muted); }
+    ul { margin: 0; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .formula-box {
+      margin: 14px 0 16px; padding: 14px 16px; border-radius: 14px;
+      border: 1px solid #cfe0ff; background: #f8fbff;
+      overflow-x: auto;
+    }
+    .highlight {
+      border-left: 4px solid var(--accent); padding: 12px 14px;
+      background: #fffbea; border: 1px solid #f6e7a8; border-radius: 0 12px 12px 0;
+      color: var(--muted); margin: 14px 0 18px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .info-box {
+      padding: 16px; border-radius: 14px;
+      border: 1px solid var(--border); background: #f1f5f9;
+    }
+    .info-box h3 { margin-top: 0; font-size: 1rem; }
+    .example-box {
+      margin: 16px 0 8px; padding: 16px 18px; border-radius: 14px;
+      border: 1px solid #d1fae5; background: #f0fdf4;
+    }
+    .example-box h3 { margin-top: 0; font-size: 1rem; color: #065f46; }
+    .example-box p { margin-bottom: 8px; }
+    .image-block {
+      margin: 18px 0 8px; padding: 16px; border-radius: 16px;
+      border: 1px solid var(--border); background: #f1f5f9;
+    }
+    .image-frame {
+      width: 100%; min-height: 240px; border-radius: 14px;
+      border: 1px dashed #93c5fd; background: #f0f7ff;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .image-frame img { width: 100%; height: auto; display: block; object-fit: contain; }
+    .image-caption { margin-top: 10px; color: var(--muted); font-size: 0.96rem; }
+    .cta-box {
+      margin-top: 28px; padding: 20px; border-radius: 14px;
+      border: 1px solid #bfd2fb; background: #eff5ff;
+    }
+    .cta-box h3 { margin-top: 0; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    .nav-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; padding: 11px 20px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700;
+      border: 1px solid #bfd2fb;
+      background: linear-gradient(180deg,#eff5ff,#e7f0ff); color: #194aa5;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .nav-link:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+    .nav-link.primary {
+      background: var(--accent); color: #ffffff; border-color: var(--accent);
+    }
+    table.conv {
+      border-collapse: collapse; width: 100%; font-size: 0.97rem; margin: 14px 0;
+    }
+    table.conv th, table.conv td {
+      border: 1px solid var(--border); padding: 8px 14px; text-align: center;
+    }
+    table.conv th { background: #f1f5f9; font-weight: 600; }
+    @media (max-width: 860px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .hero { padding-top: 56px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <div class="eyebrow">Teoria · Meccanica</div>
+      <h1>Moto circolare</h1>
+      <p class="subtitle">
+        Il moto circolare descrive il movimento di un corpo lungo una traiettoria circolare. Anche quando il modulo della velocità resta costante, la sua direzione cambia continuamente: questo implica l'esistenza di un'accelerazione, detta centripeta, diretta verso il centro della traiettoria.
+      </p>
+      <nav class="quick-nav">
+        <a href="#idea-base">Idea fisica</a>
+        <a href="#radianti">Radianti</a>
+        <a href="#grandezze-angolari">Grandezze angolari</a>
+        <a href="#velocita">Velocità tangenziale</a>
+        <a href="#accelerazione">Accelerazione centripeta</a>
+        <a href="#uniforme">MCU</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ① IDEA FISICA -->
+    <section class="card section" id="idea-base">
+      <h2>Idea fisica fondamentale</h2>
+      <p>
+        Nel moto circolare il corpo percorre una traiettoria chiusa di raggio $r$ costante. La posizione lungo la traiettoria è descritta dall'angolo $\theta$ spazzato rispetto a una direzione di riferimento fissa. Tra l'arco percorso $s$ e l'angolo vale sempre:
+      </p>
+      <div class="formula-box">
+        $$s = r\theta$$
+      </div>
+      <p>
+        dove $\theta$ è espresso in <strong>radianti</strong>. La <strong>velocità angolare</strong> $\omega$ (omega, in rad/s) misura quanto rapidamente varia l'angolo nel tempo: un valore grande di $\omega$ significa molti giri al secondo, uno piccolo una rotazione lenta. Le relazioni fondamentali tra grandezze angolari e lineari, mediate dal raggio $r$, sono:
+      </p>
+      <div class="formula-box">
+        $$s = r\theta \qquad v = r\omega$$
+      </div>
+
+      <div class="image-block">
+        <div class="image-frame">
+          <img src="./traiettoria-circolare.png" alt="Schema della traiettoria circolare" />
+        </div>
+        <div class="image-caption">Traiettoria circolare di raggio $r$: angolo $\theta$, arco $s = r\theta$, vettore posizione.</div>
+      </div>
+
+    </section>
+
+    <!-- ② RADIANTI -->
+    <section class="card section" id="radianti">
+      <h2>I radianti</h2>
+      <p>
+        Gli angoli si possono misurare in gradi oppure in <strong>radianti</strong> (rad). I gradi sono la misura più familiare nella vita quotidiana, ma i radianti sono l'unità naturale in fisica e matematica perché rendono le formule molto più compatte: in particolare, la relazione $s = r\theta$ funziona direttamente solo quando $\theta$ è espresso in radianti.
+      </p>
+
+      <h3>Definizione di radiante</h3>
+      <p>
+        Un radiante è l'angolo al centro di una circonferenza che sottende un arco di lunghezza uguale al raggio. In formule, se $s$ è la lunghezza dell'arco e $r$ è il raggio:
+      </p>
+      <div class="formula-box">
+        $$\theta \;\text{(in rad)} = \frac{s}{r}$$
+      </div>
+      <p>
+        Quando l'arco percorso è pari all'intera circonferenza ($s = 2\pi r$), l'angolo corrispondente è:
+      </p>
+      <div class="formula-box">
+        $$\theta = \frac{2\pi r}{r} = 2\pi \approx 6{,}28 \;\text{rad}$$
+      </div>
+      <p>
+        Una rotazione completa vale quindi $2\pi$ radianti, che corrispondono esattamente a $360°$.
+      </p>
+
+      <h3>Come si converte tra gradi e radianti</h3>
+      <p>
+        Dall'equivalenza fondamentale $360° = 2\pi\,\text{rad}$ si ricavano le due formule di conversione:
+      </p>
+      <div class="formula-box">
+        $$\alpha\,(\text{rad}) = \alpha\,(°) \times \frac{\pi}{180°} \qquad\qquad \alpha\,(°) = \alpha\,(\text{rad}) \times \frac{180°}{\pi}$$
+      </div>
+
+      <p>La tabella seguente riporta i valori degli angoli più comuni:</p>
+      <table class="conv">
+        <thead>
+          <tr><th>Gradi (°)</th><th>Radianti (forma esatta)</th><th>Radianti (valore approssimato)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>$0°$</td><td>$0$</td><td>$0$</td></tr>
+          <tr><td>$30°$</td><td>$\dfrac{\pi}{6}$</td><td>$\approx 0{,}524$ rad</td></tr>
+          <tr><td>$45°$</td><td>$\dfrac{\pi}{4}$</td><td>$\approx 0{,}785$ rad</td></tr>
+          <tr><td>$60°$</td><td>$\dfrac{\pi}{3}$</td><td>$\approx 1{,}047$ rad</td></tr>
+          <tr><td>$90°$</td><td>$\dfrac{\pi}{2}$</td><td>$\approx 1{,}571$ rad</td></tr>
+          <tr><td>$180°$</td><td>$\pi$</td><td>$\approx 3{,}142$ rad</td></tr>
+          <tr><td>$270°$</td><td>$\dfrac{3\pi}{2}$</td><td>$\approx 4{,}712$ rad</td></tr>
+          <tr><td>$360°$</td><td>$2\pi$</td><td>$\approx 6{,}283$ rad</td></tr>
+        </tbody>
+      </table>
+
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="example-box">
+          <h3>Esempio 1 — da gradi a radianti</h3>
+          <p>Convertire $120°$ in radianti:</p>
+          <p style="margin:0;">
+            $$120° \times \frac{\pi}{180°} = \frac{120\pi}{180} = \frac{2\pi}{3} \approx 2{,}09\;\text{rad}$$
+          </p>
+        </div>
+        <div class="example-box">
+          <h3>Esempio 2 — da radianti a gradi</h3>
+          <p>Convertire $\dfrac{3\pi}{4}$ rad in gradi:</p>
+          <p style="margin:0;">
+            $$\frac{3\pi}{4} \times \frac{180°}{\pi} = \frac{3 \times 180°}{4} = 135°$$
+          </p>
+        </div>
+      </div>
+
+      <div class="example-box" style="margin-top:16px;">
+        <h3>Esempio 3 — calcolo dell'arco percorso</h3>
+        <p>Una ruota di raggio $r = 0{,}5$ m ruota di $\theta = 60° = \dfrac{\pi}{3}$ rad. Qual è la lunghezza dell'arco percorso dal bordo?</p>
+        <p>
+          $$s = r\theta = 0{,}5\;\text{m} \times \frac{\pi}{3} \approx 0{,}5 \times 1{,}047 \approx 0{,}52\;\text{m}$$
+        </p>
+        <p style="margin:0;">Si noti che se si usasse $\theta = 60$ senza convertire in radianti si otterrebbe $s = 30$ m, un risultato completamente sbagliato: la formula $s = r\theta$ richiede tassativamente $\theta$ in radianti.</p>
+      </div>
+
+      <div class="highlight" style="margin-top:18px;">
+        Il radiante non è una vera unità di misura dimensionale: è un numero puro (rapporto tra due lunghezze, $s/r$). Nelle formule fisiche è quindi lecito scriverlo o ometterlo a seconda del contesto, purché si sia coerenti.
+      </div>
+    </section>
+
+    <!-- ③ GRANDEZZE ANGOLARI -->
+    <section class="card section" id="grandezze-angolari">
+      <h2>Grandezze angolari</h2>
+      <p>
+        Per descrivere il moto circolare si usano grandezze angolari che hanno un ruolo del tutto analogo alle grandezze lineari del moto rettilineo. Le più importanti sono l'angolo $\theta$, la velocità angolare $\omega$, il periodo $T$ e la frequenza $f$.
+      </p>
+
+      <div class="grid-2" style="margin-bottom:18px;">
+        <div class="info-box">
+          <h3>Analogia con il moto rettilineo</h3>
+          <p style="margin:0;">Ad ogni grandezza lineare corrisponde una grandezza angolare: la posizione $x$ corrisponde all'angolo $\theta$, la velocità $v$ corrisponde alla velocità angolare $\omega$. Il raggio $r$ è il fattore di proporzionalità che le collega: $s = r\theta$ e $v = r\omega$.</p>
+        </div>
+        <div class="info-box">
+          <h3>Segno di $\omega$</h3>
+          <p style="margin:0;">Per convenzione $\omega > 0$ indica rotazione in senso antiorario, $\omega < 0$ in senso orario.</p>
+        </div>
+      </div>
+
+      <h3>Velocità angolare $\omega$</h3>
+      <p>
+        La velocità angolare misura quanti radianti vengono percorsi nell'unità di tempo. Per un moto con velocità costante (MCU) vale:
+      </p>
+      <div class="formula-box">
+        $$\omega = \frac{\Delta\theta}{\Delta t}$$
+      </div>
+      <p>
+        dove $\Delta\theta$ è la variazione di angolo e $\Delta t$ è il tempo impiegato. L'unità di misura è il radiante al secondo (rad/s).
+      </p>
+
+      <h3>Periodo e frequenza</h3>
+      <p>
+        Il <strong>periodo</strong> $T$ è il tempo necessario per compiere una rivoluzione completa ($\Delta\theta = 2\pi$ rad). Applicando la definizione di $\omega$:
+      </p>
+      <div class="formula-box">
+        $$T = \frac{2\pi}{\omega}$$
+      </div>
+      <p>
+        La <strong>frequenza</strong> $f$ è il numero di rivoluzioni compiute in un secondo ed è l'inverso del periodo:
+      </p>
+      <div class="formula-box">
+        $$f = \frac{1}{T} = \frac{\omega}{2\pi} \qquad \Longrightarrow \qquad \omega = 2\pi f$$
+      </div>
+      <p class="muted">$T$ in secondi (s), $f$ in hertz (Hz = 1/s), $\omega$ in rad/s.</p>
+
+      <div class="example-box">
+        <h3>Esempio — un disco che gira a 45 rpm</h3>
+        <p>Un vecchio disco in vinile gira a 45 rpm (giri al minuto). Calcolare $f$, $\omega$ e $T$.</p>
+        <p>Si converte prima in giri al secondo: $f = \dfrac{45}{60} = 0{,}75$ Hz.</p>
+        <p>Poi la velocità angolare: $\omega = 2\pi f = 2\pi \times 0{,}75 \approx 4{,}71$ rad/s.</p>
+        <p style="margin:0;">E il periodo: $T = \dfrac{1}{f} = \dfrac{1}{0{,}75} \approx 1{,}33$ s — ovvero ogni giro completo dura circa un secondo e un terzo.</p>
+      </div>
+    </section>
+
+    <!-- ④ VELOCITÀ TANGENZIALE -->
+    <section class="card section" id="velocita">
+      <h2>Velocità tangenziale</h2>
+      <p>
+        La velocità tangenziale $v$ è il modulo del vettore velocità del corpo; è sempre diretta nella direzione tangente alla traiettoria circolare nel punto considerato, perpendicolare al raggio. Vale:
+      </p>
+      <div class="formula-box">
+        $$v = r\omega = \frac{2\pi r}{T}$$
+      </div>
+      <p>
+        A parità di velocità angolare, un punto più lontano dal centro (raggio maggiore) ha una velocità tangenziale maggiore. Questo spiega, per esempio, perché la velocità lineare di un punto sulla superficie terrestre è massima all'equatore e si annulla ai poli.
+      </p>
+
+      <div class="image-block">
+        <div class="image-frame">
+          <img src="./velocita-tangenziale.png" alt="Schema della velocità tangenziale" />
+        </div>
+        <div class="image-caption">Il vettore velocità $\vec{v}$ è sempre tangente alla traiettoria e perpendicolare al raggio.</div>
+      </div>
+
+      <div class="image-block">
+        <div class="image-frame">
+          <img src="./periodo-frequenza-moto-circolare.png" alt="Relazione tra periodo, frequenza e velocità angolare" />
+        </div>
+        <div class="image-caption">Schema riassuntivo delle relazioni tra $T$, $f$, $\omega$ e $v$.</div>
+      </div>
+
+      <div class="example-box">
+        <h3>Esempio — velocità tangenziale della Terra</h3>
+        <p>La Terra compie una rivoluzione attorno al Sole in $T = 365{,}25$ giorni $= 3{,}156 \times 10^7$ s, con raggio orbitale medio $r = 1{,}496 \times 10^{11}$ m. La velocità tangenziale è:</p>
+        <p style="margin:0;">$$v = \frac{2\pi r}{T} = \frac{2\pi \times 1{,}496 \times 10^{11}}{3{,}156 \times 10^7} \approx 29{,}8\;\text{km/s}$$</p>
+      </div>
+    </section>
+
+    <!-- ⑤ ACCELERAZIONE CENTRIPETA -->
+    <section class="card section" id="accelerazione">
+      <h2>Accelerazione centripeta</h2>
+      <p>
+        Il cambiamento continuo di direzione del vettore velocità produce un'accelerazione diretta <em>verso il centro</em> della circonferenza, chiamata <strong>accelerazione centripeta</strong> (dal latino <em>centrum petere</em>, "tendere verso il centro"). Si può dimostrare geometricamente che il suo modulo è:
+      </p>
+      <div class="formula-box">
+        $$a_c = \frac{v^2}{r} = r\omega^2$$
+      </div>
+      <p>
+        L'accelerazione centripeta è sempre perpendicolare alla velocità e punta verso il centro della traiettoria. Non modifica il modulo della velocità, ma ne cambia continuamente la direzione: è l'accelerazione che "curva" la traiettoria tenendola circolare.
+      </p>
+
+      <div class="image-block">
+        <div class="image-frame">
+          <img src="./accelerazione-centripeta.png" alt="Schema dell'accelerazione centripeta" />
+        </div>
+        <div class="image-caption">Accelerazione centripeta $\vec{a}_c$ sempre diretta verso il centro della traiettoria.</div>
+      </div>
+
+      <div class="highlight">
+        È fondamentale non confondere l'accelerazione centripeta con la "forza centrifuga". La forza centrifuga è una <em>forza fittizia</em> che appare solo in un sistema di riferimento non inerziale (rotante). In un sistema di riferimento inerziale esiste solo la forza reale diretta verso il centro che produce l'accelerazione centripeta.
+      </div>
+
+      <div class="example-box">
+        <h3>Esempio — accelerazione in curva</h3>
+        <p>Un'auto percorre una curva circolare di raggio $r = 50$ m a velocità costante $v = 72$ km/h $= 20$ m/s. L'accelerazione centripeta è:</p>
+        <p style="margin:0;">$$a_c = \frac{v^2}{r} = \frac{20^2}{50} = \frac{400}{50} = 8\;\text{m/s}^2$$</p>
+      </div>
+    </section>
+
+    <!-- ⑥ MCU -->
+    <section class="card section" id="uniforme">
+      <h2>Moto circolare uniforme (MCU)</h2>
+      <p>
+        Nel moto circolare uniforme (MCU) la velocità angolare è costante nel tempo. Tutte le grandezze scalari — velocità tangenziale, accelerazione centripeta — mantengono un modulo costante, anche se la loro direzione cambia a ogni istante.
+      </p>
+      <div class="formula-box">
+        $$\omega = \text{costante}$$
+      </div>
+      <p>
+        In ogni intervallo di tempo uguale il corpo spazza lo stesso angolo: il moto è quindi perfettamente regolare e periodico.
+      </p>
+
+      <div class="grid-2">
+        <div class="info-box">
+          <h3>Riepilogo formule del MCU</h3>
+          <ul style="font-size:0.97rem;">
+            <li>Arco percorso: $s = r\theta$</li>
+            <li>Velocità angolare: $\omega = \dfrac{\Delta\theta}{\Delta t}$</li>
+            <li>Velocità tangenziale: $v = r\omega$</li>
+            <li>Periodo: $T = \dfrac{2\pi}{\omega}$</li>
+            <li>Frequenza: $f = \dfrac{1}{T} = \dfrac{\omega}{2\pi}$</li>
+            <li>Accelerazione centripeta: $a_c = \dfrac{v^2}{r} = r\omega^2$</li>
+          </ul>
+        </div>
+        <div class="info-box">
+          <h3>Cosa rimane costante e cosa varia</h3>
+          <p><strong>Costanti nel tempo:</strong> $\omega$, $|\vec{v}|$, $|a_c|$, $r$, $T$, $f$.</p>
+          <p style="margin:0;"><strong>Variabili nel tempo:</strong> la <em>direzione</em> del vettore velocità e del vettore accelerazione centripeta, che ruotano insieme al corpo compiendo un giro completo per ogni periodo $T$.</p>
+        </div>
+      </div>
+
+      <div class="cta-box">
+        <h3>Simulazione interattiva</h3>
+        <p>Esplora il moto circolare variando raggio e velocità angolare, e visualizza in tempo reale velocità tangenziale e accelerazione centripeta.</p>
+        <div class="button-row">
+          <a class="nav-link primary" href="../../meccanica/moto-circolare.html">Apri simulazione</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

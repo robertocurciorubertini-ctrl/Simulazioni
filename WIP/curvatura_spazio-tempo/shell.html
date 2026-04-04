@@ -145,17 +145,8 @@ canvas{border:1px solid var(--border);display:block;
         <input type="range" id="sA" min="0.001" max="0.998" step="0.001" value="0.600">
       </label>
       <label style="margin-top:8px">
-        <div class="lr">Zoom<span class="val" id="vZ">2.2</span>×</div>
-        <input type="range" id="sZ" min="1.5" max="6.0" step="0.05" value="2.2">
-      </label>
-    </div>
-
-
-    <div>
-      <div class="sec">Telecamera</div>
-      <label>
-        <div class="lr">Pitch<span class="val" id="vPitch">0.92</span> rad</div>
-        <input type="range" id="sPitch" min="0.20" max="1.45" step="0.01" value="0.92">
+        <div class="lr">Zoom<span class="val" id="vZ">1.0</span>×</div>
+        <input type="range" id="sZ" min="0.3" max="3.5" step="0.05" value="1.0">
       </label>
     </div>
 
@@ -200,7 +191,7 @@ canvas{border:1px solid var(--border);display:block;
   <!-- Canvas -->
   <div class="carea">
     <canvas id="kerr" width="900" height="700"></canvas>
-    <div class="clabel" id="clabel">Sezione equatoriale immersa — metrica di Kerr</div>
+    <div class="clabel" id="clabel">Embedding di Flamm — piano equatoriale θ=π/2</div>
     <div class="legend" id="legend">
       <div class="li"><div class="ld" style="background:#c0392b"></div>Orizzonte r<sub>+</sub></div>
       <div class="li"><div class="ld" style="background:#e67e22"></div>Ergosfera</div>
@@ -236,7 +227,7 @@ let u8view    = null;   /* vista sul buffer pixel WASM */
 let lastT     = 0, fps = 0;
 
 const modeLabels = [
-  'Sezione equatoriale immersa — metrica di Kerr',
+  'Embedding di Flamm — piano equatoriale θ=π/2',
   'Geodetiche nulle (RK4 adattivo) — Boyer-Lindquist',
   'Lente gravitazionale — deflection Kerr',
   'Redshift gravitazionale e dilatazione temporale',
@@ -256,9 +247,7 @@ Module.onFrameReady = function() {
     canvas.height = H;
   }
   /* Il buffer WASM è RGBA; ImageData è anche RGBA → copia diretta */
-  const heap = (typeof HEAPU8 !== 'undefined') ? HEAPU8 : Module.HEAPU8;
-  if (!heap) return;
-  const src = heap.subarray(ptr, ptr + W*H*4);
+  const src = new Uint8Array(Module.HEAPU8.buffer, ptr, W*H*4);
   imgData.data.set(src);
   ctx.putImageData(imgData, 0, 0);
 };
@@ -330,7 +319,6 @@ document.querySelectorAll('.tab').forEach(btn => {
     Module._set_mode(currentMode);
     document.getElementById('clabel').textContent  = modeLabels[currentMode];
     document.getElementById('stMode').textContent  = modeNames[currentMode];
-    if (animating && currentMode !== 1) stopAnim();
     requestRender();
   });
 });
@@ -353,7 +341,6 @@ bindSlider('sA','vA',3, v => {
   document.getElementById('stA').textContent = v.toFixed(3);
 });
 bindSlider('sZ','vZ',1, v => Module._set_zoom(v));
-bindSlider('sPitch','vPitch',2, v => Module._set_pitch(v));
 bindSlider('sN','vN',0, v => Module._set_nrays(v));
 bindSlider('sR','vR',0, v => Module._set_remit(v));
 

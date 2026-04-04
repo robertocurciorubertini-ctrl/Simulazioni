@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Curvatura dello spazio-tempo",
+  description: "Simulazione della metrica di Kerr attorno a un buco nero rotante, con visualizzazione di geodetiche nulle, lente gravitazionale, redshift gravitazionale e dilatazione temporale.",
+  category: "Relatività Generale",
+  icon: "⚫",
+  order: 1,
+  tags: ["buco nero rotante", "metrica di Kerr", "relatività generale", "geodetiche nulle", "frame dragging"],
+  level: "avanzato"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curvatura Spazio-Temporale — Metrica di Kerr</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]})"></script>
+<style>
+:root {
+  --bg:      #f4efe6;
+  --bg2:     #ece6d8;
+  --panel:   #faf7f1;
+  --border:  #c9b99a;
+  --accent:  #7a3b10;
+  --accent2: #b03020;
+  --gold:    #a07808;
+  --text:    #2a1808;
+  --text2:   #6a4830;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'IBM Plex Sans', sans-serif;
+  --serif:   'EB Garamond', serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);
+     min-height:100vh;display:flex;flex-direction:column;}
+
+/* ---- Header ---- */
+header{background:var(--bg2);border-bottom:1.5px solid var(--border);
+       padding:12px 24px 8px;display:flex;align-items:baseline;
+       gap:16px;flex-wrap:wrap;}
+header h1{font-family:var(--serif);font-size:1.5rem;font-weight:500;
+          color:var(--accent);letter-spacing:.01em;}
+header .sub{font-family:var(--mono);font-size:.68rem;color:var(--text2);
+            font-weight:300;}
+
+/* ---- Tabs ---- */
+.tabs{display:flex;background:var(--bg2);
+      border-bottom:1.5px solid var(--border);padding:0 18px;}
+.tab{font-family:var(--mono);font-size:.70rem;padding:7px 16px;
+     cursor:pointer;border:none;background:transparent;color:var(--text2);
+     border-bottom:2.5px solid transparent;transition:all .15s;
+     letter-spacing:.03em;}
+.tab:hover{color:var(--accent);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ---- Layout ---- */
+.main{display:flex;flex:1;overflow:hidden;}
+
+/* ---- Sidebar ---- */
+.sidebar{width:260px;min-width:220px;background:var(--panel);
+         border-right:1.5px solid var(--border);
+         padding:16px 14px;display:flex;flex-direction:column;
+         gap:12px;overflow-y:auto;}
+.sec{font-family:var(--mono);font-size:.62rem;color:var(--gold);
+     letter-spacing:.12em;text-transform:uppercase;
+     border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:2px;}
+label{font-family:var(--mono);font-size:.66rem;color:var(--text2);
+      display:flex;flex-direction:column;gap:3px;}
+.lr{display:flex;justify-content:space-between;align-items:center;}
+.val{font-weight:500;color:var(--accent);font-size:.68rem;}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;}
+.info{background:var(--bg2);border:1px solid var(--border);border-radius:2px;
+      padding:7px 9px;font-family:var(--mono);font-size:.62rem;
+      color:var(--text2);line-height:1.8;}
+.info .k{color:var(--text);font-weight:500;}
+.info .v{color:var(--accent);}
+.btn{font-family:var(--mono);font-size:.68rem;padding:6px 12px;
+     border:1.5px solid var(--accent);background:transparent;
+     color:var(--accent);cursor:pointer;border-radius:2px;
+     transition:all .15s;width:100%;margin-top:4px;}
+.btn:hover,.btn.on{background:var(--accent);color:#fff;}
+
+/* ---- Canvas area ---- */
+.carea{flex:1;display:flex;flex-direction:column;
+       align-items:center;justify-content:center;
+       background:var(--bg);padding:12px;overflow:hidden;}
+canvas{border:1px solid var(--border);display:block;
+       max-width:100%;max-height:calc(100vh - 180px);}
+.clabel{font-family:var(--mono);font-size:.60rem;color:var(--text2);
+        margin-top:5px;text-align:center;letter-spacing:.03em;}
+.legend{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;
+        justify-content:center;}
+.li{display:flex;align-items:center;gap:4px;
+    font-family:var(--mono);font-size:.60rem;color:var(--text2);}
+.ld{width:10px;height:3px;border-radius:1px;}
+
+/* ---- Loading overlay ---- */
+#loading{position:fixed;inset:0;background:var(--bg);
+         display:flex;flex-direction:column;
+         align-items:center;justify-content:center;
+         z-index:100;transition:opacity .4s;}
+#loading h2{font-family:var(--serif);font-size:1.8rem;color:var(--accent);
+            margin-bottom:12px;}
+#loading p{font-family:var(--mono);font-size:.75rem;color:var(--text2);}
+.spinner{width:36px;height:36px;border:3px solid var(--border);
+         border-top-color:var(--accent);border-radius:50%;
+         animation:spin .8s linear infinite;margin-bottom:16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ---- Status bar ---- */
+#status{background:var(--bg2);border-top:1px solid var(--border);
+        padding:3px 14px;font-family:var(--mono);font-size:.60rem;
+        color:var(--text2);display:flex;gap:18px;}
+#status span{color:var(--accent);}
+
+/* ---- Formula panel ---- */
+.formula{background:var(--bg2);border:1px solid var(--border);
+         border-radius:2px;padding:8px 10px;
+         font-family:var(--mono);font-size:.62rem;
+         color:var(--text2);line-height:2.0;}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="spinner"></div>
+  <h2>Caricamento modulo WASM</h2>
+  <p id="loadMsg">Inizializzazione motore fisico...</p>
+</div>
+
+<header>
+  <h1>Curvatura Spazio-Temporale</h1>
+  <div class="sub">Metrica di Kerr · C → WebAssembly · RK4 adattivo · Boyer-Lindquist</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-mode="0">Griglia / Embedding</button>
+  <button class="tab" data-mode="1">Geodetiche (Luce)</button>
+  <button class="tab" data-mode="2">Lente Gravitazionale</button>
+  <button class="tab" data-mode="3">Redshift / Dilatazione</button>
+</div>
+
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div>
+      <div class="sec">Parametri Kerr</div>
+      <label>
+        <div class="lr">Spin &nbsp;<i>a/M</i><span class="val" id="vA">0.600</span></div>
+        <input type="range" id="sA" min="0.001" max="0.998" step="0.001" value="0.600">
+      </label>
+      <label style="margin-top:8px">
+        <div class="lr">Zoom<span class="val" id="vZ">1.0</span>×</div>
+        <input type="range" id="sZ" min="0.3" max="3.5" step="0.05" value="1.0">
+      </label>
+    </div>
+
+    <div>
+      <div class="sec">Geodetiche</div>
+      <label>
+        <div class="lr">N. raggi<span class="val" id="vN">40</span></div>
+        <input type="range" id="sN" min="4" max="120" step="2" value="40">
+      </label>
+      <label style="margin-top:6px">
+        <div class="lr">Raggio emissione<span class="val" id="vR">18</span> r<sub>g</sub></div>
+        <input type="range" id="sR" min="5" max="38" step="1" value="18">
+      </label>
+      <button class="btn" id="btnAnim">▶ Anima</button>
+      <button class="btn" id="btnRender">↺ Ridisegna</button>
+    </div>
+
+    <div>
+      <div class="sec">Quantità fisiche</div>
+      <div class="info">
+        <div><span class="k">r<sub>+</sub></span> = <span class="v" id="irp">—</span> r<sub>g</sub></div>
+        <div><span class="k">r<sub>ergo</sub></span> = <span class="v" id="iergo">—</span> r<sub>g</sub></div>
+        <div><span class="k">r<sub>ISCO</sub></span> = <span class="v" id="iisco">—</span> r<sub>g</sub></div>
+        <div><span class="k">r<sub>ph</sub></span> = <span class="v" id="irph">—</span> r<sub>g</sub></div>
+        <div><span class="k">Ω<sub>H</sub></span> = <span class="v" id="iomH">—</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec">Formule</div>
+      <div class="formula">
+        \(\Delta = r^2 - 2r + a^2\)<br>
+        \(\Sigma = r^2 + a^2\cos^2\!\theta\)<br>
+        \(g_{tt} = -\!\left(1 - \tfrac{2r}{\Sigma}\right)\)<br>
+        \(g_{t\varphi} = \tfrac{2ar}{\Sigma}\)<br>
+        \(\frac{d\tau}{dt} = \sqrt{-g_{tt}}\)<br>
+        \(z_{\rm grav} = \frac{1}{\sqrt{-g_{tt}}} - 1\)
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <div class="carea">
+    <canvas id="kerr" width="900" height="700"></canvas>
+    <div class="clabel" id="clabel">Embedding di Flamm — piano equatoriale θ=π/2</div>
+    <div class="legend" id="legend">
+      <div class="li"><div class="ld" style="background:#c0392b"></div>Orizzonte r<sub>+</sub></div>
+      <div class="li"><div class="ld" style="background:#e67e22"></div>Ergosfera</div>
+      <div class="li"><div class="ld" style="background:#2980b9"></div>r<sub>ISCO</sub></div>
+      <div class="li"><div class="ld" style="background:#27ae60"></div>r<sub>fotosfera</sub></div>
+    </div>
+  </div>
+</div>
+
+<div id="status">
+  <div>Modalità: <span id="stMode">Griglia</span></div>
+  <div>a/M = <span id="stA">0.600</span></div>
+  <div>r<sub>+</sub> = <span id="stRp">—</span></div>
+  <div id="stFps">fps: —</div>
+</div>
+
+<!-- Emscripten glue (generato da emcc) -->
+<script src="kerr.js"></script>
+
+<script>
+/* ================================================================
+   INTERFACCIA JS ↔ WASM
+   ================================================================ */
+
+const canvas  = document.getElementById('kerr');
+const ctx     = canvas.getContext('2d');
+
+let wasmReady = false;
+let animating = false;
+let animId    = null;
+let imgData   = null;
+let u8view    = null;   /* vista sul buffer pixel WASM */
+let lastT     = 0, fps = 0;
+
+const modeLabels = [
+  'Embedding di Flamm — piano equatoriale θ=π/2',
+  'Geodetiche nulle (RK4 adattivo) — Boyer-Lindquist',
+  'Lente gravitazionale — deflection Kerr',
+  'Redshift gravitazionale e dilatazione temporale',
+];
+const modeNames = ['Griglia','Geodetiche','Lente','Redshift'];
+
+/* ---- Callback dal modulo WASM quando il frame è pronto ---- */
+Module.onFrameReady = function() {
+  if (!wasmReady) return;
+  /* Copia buffer WASM → ImageData canvas */
+  const ptr = Module._get_pixel_buffer();
+  const W   = Module._get_width();
+  const H   = Module._get_height();
+  if (!imgData || imgData.width !== W || imgData.height !== H) {
+    imgData = ctx.createImageData(W, H);
+    canvas.width  = W;
+    canvas.height = H;
+  }
+  /* Il buffer WASM è RGBA; ImageData è anche RGBA → copia diretta */
+  const src = new Uint8Array(Module.HEAPU8.buffer, ptr, W*H*4);
+  imgData.data.set(src);
+  ctx.putImageData(imgData, 0, 0);
+};
+
+/* ---- Inizializzazione dopo caricamento WASM ---- */
+Module.onRuntimeInitialized = function() {
+  wasmReady = true;
+  document.getElementById('loading').style.opacity = '0';
+  setTimeout(() => document.getElementById('loading').style.display='none', 400);
+
+  updatePhysicsInfo();
+  requestRender();
+};
+
+/* ---- Aggiorna UI con quantità fisiche ---- */
+function updatePhysicsInfo() {
+  if (!wasmReady) return;
+  const rp   = Module._get_rp();
+  const ergo = Module._get_rergo();
+  const isco = Module._get_risco();
+  const rph  = Module._get_rph();
+  const omH  = Module._get_omH();
+
+  document.getElementById('irp'  ).textContent = rp  .toFixed(4);
+  document.getElementById('iergo').textContent = ergo .toFixed(4);
+  document.getElementById('iisco').textContent = isco .toFixed(4);
+  document.getElementById('irph' ).textContent = rph  .toFixed(4);
+  document.getElementById('iomH' ).textContent = omH  .toFixed(5);
+  document.getElementById('stRp' ).textContent = rp.toFixed(4) + ' rg';
+}
+
+/* ---- Render singolo frame ---- */
+let renderPending = false;
+function requestRender() {
+  if (renderPending) return;
+  renderPending = true;
+  requestAnimationFrame(() => {
+    renderPending = false;
+    if (!wasmReady) return;
+    Module._render_frame();  /* chiama la funzione C */
+    /* onFrameReady verrà chiamato da dentro render_frame via EM_ASM */
+    /* FPS */
+    const now = performance.now();
+    if (lastT) fps = Math.round(1000/(now-lastT));
+    lastT = now;
+    document.getElementById('stFps').textContent = 'fps: ' + fps;
+  });
+}
+
+/* ---- Loop animazione ---- */
+function animLoop() {
+  if (!animating) return;
+  Module._step_anim();
+  Module._render_frame();
+  const now = performance.now();
+  if (lastT) fps = Math.round(1000/(now-lastT));
+  lastT = now;
+  document.getElementById('stFps').textContent = 'fps: ' + fps;
+  animId = requestAnimationFrame(animLoop);
+}
+
+/* ---- Tabs ---- */
+let currentMode = 0;
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = parseInt(btn.dataset.mode);
+    Module._set_mode(currentMode);
+    document.getElementById('clabel').textContent  = modeLabels[currentMode];
+    document.getElementById('stMode').textContent  = modeNames[currentMode];
+    if (animating && currentMode !== 1) stopAnim();
+    requestRender();
+  });
+});
+
+/* ---- Sliders ---- */
+function bindSlider(id, valId, dec, cb) {
+  const sl = document.getElementById(id);
+  const vl = document.getElementById(valId);
+  sl.addEventListener('input', () => {
+    const v = parseFloat(sl.value);
+    vl.textContent = v.toFixed(dec);
+    cb(v);
+    updatePhysicsInfo();
+    if (!animating) requestRender();
+  });
+}
+
+bindSlider('sA','vA',3, v => {
+  Module._set_spin(v);
+  document.getElementById('stA').textContent = v.toFixed(3);
+});
+bindSlider('sZ','vZ',1, v => Module._set_zoom(v));
+bindSlider('sN','vN',0, v => Module._set_nrays(v));
+bindSlider('sR','vR',0, v => Module._set_remit(v));
+
+/* ---- Animazione ---- */
+function stopAnim() {
+  animating = false;
+  if (animId) { cancelAnimationFrame(animId); animId=null; }
+  document.getElementById('btnAnim').textContent = '▶ Anima';
+  document.getElementById('btnAnim').classList.remove('on');
+}
+
+document.getElementById('btnAnim').addEventListener('click', () => {
+  if (currentMode !== 1) {
+    currentMode = 1;
+    Module._set_mode(1);
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    document.querySelector('[data-mode="1"]').classList.add('active');
+    document.getElementById('clabel').textContent = modeLabels[1];
+    document.getElementById('stMode').textContent = modeNames[1];
+  }
+  if (animating) {
+    stopAnim();
+  } else {
+    animating = true;
+    document.getElementById('btnAnim').textContent = '⏸ Pausa';
+    document.getElementById('btnAnim').classList.add('on');
+    animLoop();
+  }
+});
+
+document.getElementById('btnRender').addEventListener('click', () => {
+  stopAnim();
+  requestRender();
+});
+
+/* ---- Progress loading ---- */
+Module.setStatus = function(text) {
+  if (text) document.getElementById('loadMsg').textContent = text;
+};
+Module.monitorRunDependencies = function(left) {
+  if (left === 0)
+    document.getElementById('loadMsg').textContent = 'Modulo pronto.';
+};
+</script>
+
+</body>
+</html>

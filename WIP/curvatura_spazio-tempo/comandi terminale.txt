@@ -1,0 +1,11 @@
+Comandi per entrare nell'ambiente Emscripten:
+
+cd C:\Users\rober\emsdk
+emsdk_env.bat
+
+
+comandi per generare file :
+
+cd \Users\rober\OneDrive\Desktop\Simulazioni\WIP\curvatura_spazio-tempo
+
+emcc kerr.c -o kerr.js -O3 -msimd128 -s WASM=1 -s EXPORTED_FUNCTIONS=[\"_main\",\"_render_frame\",\"_set_spin\",\"_set_zoom\",\"_set_mode\",\"_set_nrays\",\"_set_remit\",\"_step_anim\",\"_get_rp\",\"_get_rergo\",\"_get_risco\",\"_get_rph\",\"_get_omH\",\"_get_width\",\"_get_height\",\"_get_pixel_buffer\"] -s EXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\"] -s ALLOW_MEMORY_GROWTH=1 -lm

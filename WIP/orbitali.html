@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Orbitali atomici",
+  description: "Visualizza la forma degli orbitali atomici e la distribuzione di probabilità elettronica, esplorando numeri quantici, simmetrie e dipendenza da Z_eff.",
+  category: "Meccanica Quantistica",
+  icon: "⚛️",
+  order: 1,
+  tags: ["orbitali atomici", "funzione d'onda", "atomo idrogenoide", "numeri quantici", "meccanica quantistica"],
+  level: "avanzato"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbitali Atomici — Meccanica Quantistica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+:root {
+  --bg: #faf7f2;
+  --bg2: #f2ede4;
+  --bg3: #e8e0d0;
+  --ink: #1a1510;
+  --ink2: #4a3f30;
+  --ink3: #7a6a55;
+  --accent: #8b3a1a;
+  --accent2: #2a5c8a;
+  --accent3: #1a6b3a;
+  --gold: #b8860b;
+  --border: #c8b89a;
+  --shadow: rgba(60,40,10,0.10);
+  --canvas-bg: #0d0a06;
+  --prob-color: #e8a040;
+  --prob-color2: #4090e8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 2rem 3rem;
+  display: flex;
+  align-items: baseline;
+  gap: 2rem;
+  border-bottom: 3px solid var(--accent);
+}
+
+header h1 {
+  font-family: 'EB Garamond', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+header span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--ink3);
+  opacity: 0.7;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: calc(100vh - 80px);
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.panel {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem 1.2rem;
+}
+
+.panel-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ATOM SELECTOR */
+.atom-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.atom-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.4rem 0.2rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  color: var(--ink2);
+}
+
+.atom-btn:hover { background: var(--bg3); border-color: var(--accent); }
+.atom-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.atom-btn small {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  opacity: 0.8;
+  margin-top: 1px;
+}
+
+/* ORBITAL SELECTOR */
+.orbital-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.shell-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.4rem;
+  margin-bottom: 2px;
+}
+
+.orbital-row {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.orb-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--ink2);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.orb-btn:hover { background: var(--bg3); border-color: var(--accent2); }
+.orb-btn.active {
+  background: var(--accent2);
+  color: white;
+  border-color: var(--accent2);
+}
+
+/* PARAMETERS */
+.param-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.param-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink2);
+}
+
+.param-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  min-width: 40px;
+  text-align: right;
+}
+
+input[type=range] {
+  width: 100%;
+  margin-top: 2px;
+  accent-color: var(--accent2);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink2);
+  cursor: pointer;
+}
+
+input[type=checkbox] { accent-color: var(--accent2); }
+
+/* QN DISPLAY */
+.qn-display {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  text-align: center;
+}
+
+.qn-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.4rem;
+}
+
+.qn-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--ink3);
+  display: block;
+}
+
+.qn-val {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.2rem;
+  color: var(--accent);
+  display: block;
+  line-height: 1.2;
+}
+
+/* MAIN CONTENT */
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-area {
+  background: var(--canvas-bg);
+  position: relative;
+  flex: 0 0 auto;
+}
+
+canvas {
+  display: block;
+}
+
+.canvas-overlay {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.overlay-badge {
+  background: rgba(13,10,6,0.7);
+  border: 1px solid rgba(200,180,150,0.2);
+  border-radius: 2px;
+  padding: 4px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  color: #c8b890;
+  pointer-events: none;
+}
+
+.orbital-name-badge {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.4rem;
+  color: #e8c870;
+  background: rgba(13,10,6,0.7);
+  border: 1px solid rgba(200,160,50,0.3);
+  border-radius: 2px;
+  padding: 4px 14px;
+}
+
+/* VIEW CONTROLS */
+.view-controls {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  display: flex;
+  gap: 6px;
+}
+
+.view-btn {
+  background: rgba(13,10,6,0.75);
+  border: 1px solid rgba(200,180,150,0.25);
+  border-radius: 2px;
+  padding: 4px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: #c8b890;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.view-btn:hover { border-color: rgba(232,160,64,0.6); color: #e8c870; }
+.view-btn.active { background: rgba(140,58,26,0.6); border-color: var(--accent); color: #e8a040; }
+
+/* PROBABILITY BAR */
+.prob-info {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  background: rgba(13,10,6,0.75);
+  border: 1px solid rgba(200,180,150,0.2);
+  border-radius: 2px;
+  padding: 5px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: #a09070;
+  pointer-events: none;
+}
+
+/* DESCRIPTION */
+.description-area {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  max-width: 860px;
+}
+
+.desc-header {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.desc-header .energy-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent2);
+}
+
+.desc-body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.93rem;
+  color: var(--ink2);
+  line-height: 1.8;
+  margin-bottom: 1.2rem;
+}
+
+.formula-box {
+  background: var(--bg2);
+  border-left: 3px solid var(--accent2);
+  border-radius: 0 2px 2px 0;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+  overflow-x: auto;
+}
+
+.wavefunction-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem 1.4rem;
+  margin: 1rem 0;
+}
+
+.wf-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 0.6rem;
+}
+
+.prop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.prop-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.7rem;
+}
+
+.prop-card-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.prop-card-val {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+/* RADIAL PLOT */
+.radial-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.radial-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 0.5rem;
+}
+
+#radialCanvas {
+  width: 100%;
+  max-width: 600px;
+  height: 140px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: block;
+}
+
+/* LOADING */
+#loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background: var(--canvas-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10;
+}
+
+.loading-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: #a09070;
+  letter-spacing: 0.1em;
+}
+
+.loading-bar-outer {
+  width: 200px;
+  height: 2px;
+  background: rgba(200,180,150,0.15);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.loading-bar-inner {
+  height: 100%;
+  background: var(--prob-color);
+  width: 0%;
+  transition: width 0.1s;
+}
+
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 1rem 2.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--ink3);
+  display: flex;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .main-layout { grid-template-columns: 1fr; }
+  .sidebar { order: 2; }
+  .content { order: 1; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Orbitali Atomici</h1>
+  <span>Visualizzazione delle funzioni d'onda dell'atomo idrogenoide</span>
+</header>
+
+<div class="main-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="panel">
+      <div class="panel-title">Atomo</div>
+      <div class="atom-grid" id="atomGrid"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Numeri Quantici</div>
+      <div class="qn-display">
+        <div class="qn-box">
+          <span class="qn-name">n (principale)</span>
+          <span class="qn-val" id="qnN">1</span>
+        </div>
+        <div class="qn-box">
+          <span class="qn-name">l (azimutale)</span>
+          <span class="qn-val" id="qnL">0</span>
+        </div>
+        <div class="qn-box">
+          <span class="qn-name">m<sub>l</sub> (magnetico)</span>
+          <span class="qn-val" id="qnM">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Orbitale</div>
+      <div class="orbital-tree" id="orbitalTree"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Visualizzazione</div>
+
+      <div class="param-row">
+        <span class="param-label">Soglia prob. (%)</span>
+        <span class="param-value" id="threshVal">90</span>
+      </div>
+      <input type="range" id="threshSlider" min="50" max="99" value="90" step="1">
+
+      <div class="param-row" style="margin-top:0.8rem;">
+        <span class="param-label">Risoluzione</span>
+        <span class="param-value" id="resVal">200</span>
+      </div>
+      <input type="range" id="resSlider" min="80" max="300" value="200" step="20">
+
+      <div class="param-row" style="margin-top:0.8rem;">
+        <span class="param-label">Luminosità</span>
+        <span class="param-value" id="brigVal">1.0</span>
+      </div>
+      <input type="range" id="brigSlider" min="0.3" max="2.5" value="1.0" step="0.1">
+
+      <div style="margin-top:0.8rem;">
+        <label class="checkbox-row">
+          <input type="checkbox" id="showNodes" checked> Mostra nodi
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="showAxes" checked> Assi di riferimento
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="colorSign" checked> Colora per segno (ψ)
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="showSlice"> Sezione XZ
+        </label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Zeff (Slater)</div>
+      <div class="param-row">
+        <span class="param-label">Z<sub>eff</sub></span>
+        <span class="param-value" id="zeffVal">1.00</span>
+      </div>
+      <input type="range" id="zeffSlider" min="0.5" max="12" value="1.0" step="0.05">
+      <div style="font-size:0.65rem; color:var(--ink3); font-family:'IBM Plex Mono',monospace; margin-top:6px; line-height:1.5;">
+        Aggiustato automaticamente con le regole di Slater. Modificabile manualmente.
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="canvas-area" id="canvasArea">
+      <canvas id="mainCanvas"></canvas>
+      <div class="canvas-overlay">
+        <div class="orbital-name-badge" id="orbNameBadge">1s</div>
+        <div class="overlay-badge" id="atomBadge">H  Z=1</div>
+        <div class="overlay-badge" id="zeffBadge">Z<sub>eff</sub> = 1.00</div>
+      </div>
+      <div class="view-controls">
+        <button class="view-btn active" id="btnXY">Piano XY</button>
+        <button class="view-btn" id="btnXZ">Piano XZ</button>
+        <button class="view-btn" id="btnXYZ">Vista 3D</button>
+      </div>
+      <div class="prob-info" id="probInfo">Clicca per vedere ψ² nel punto</div>
+      <div id="loadingOverlay">
+        <div class="loading-text">Calcolo in corso...</div>
+        <div class="loading-bar-outer"><div class="loading-bar-inner" id="loadBar"></div></div>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="description-area" id="descArea">
+      <!-- filled by JS -->
+    </div>
+  </main>
+</div>
+
+<footer>
+  <span>Approssimazione: funzioni d'onda idrogenoidi con Z<sub>eff</sub> di Slater</span>
+  <span>Unità atomiche: lunghezze in a₀ = 0.529 Å</span>
+  <span>Livello: liceo scientifico / primo anno università</span>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATI FISICI
+// ═══════════════════════════════════════════════════════
+
+const ATOMS = [
+  { sym:'H',  Z:1,  name:'Idrogeno',   color:'#e07040' },
+  { sym:'He', Z:2,  name:'Elio',        color:'#d0c0a0' },
+  { sym:'Li', Z:3,  name:'Litio',       color:'#50c080' },
+  { sym:'Be', Z:4,  name:'Berillio',    color:'#80a040' },
+  { sym:'B',  Z:5,  name:'Boro',        color:'#c06040' },
+  { sym:'C',  Z:6,  name:'Carbonio',    color:'#808080' },
+  { sym:'N',  Z:7,  name:'Azoto',       color:'#4060c0' },
+  { sym:'O',  Z:8,  name:'Ossigeno',    color:'#c04040' },
+  { sym:'F',  Z:9,  name:'Fluoro',      color:'#40c0a0' },
+  { sym:'Ne', Z:10, name:'Neon',        color:'#c0a0e0' },
+  { sym:'Na', Z:11, name:'Sodio',       color:'#e0a030' },
+  { sym:'Cl', Z:17, name:'Cloro',       color:'#90c030' },
+];
+
+// Regole di Slater per Z_eff
+// Ordine gruppi: [1s][2s2p][3s3p][3d][4s4p][4d][4f][5s5p]...
+// Schermatura σ per orbitale (n,l):
+function slaterZeff(Z, n, l) {
+  // Configurazione elettronica usando Aufbau
+  const config = buildConfig(Z);
+  const s = slaterScreen(config, n, l);
+  return Math.max(0.5, Z - s);
+}
+
+// Costruisce configurazione elettronica [n,l,count]
+function buildConfig(Z) {
+  const order = [
+    [1,0],[2,0],[2,1],[3,0],[3,1],[4,0],[3,2],
+    [4,1],[5,0],[4,2],[5,1],[6,0],[4,3],[5,2],
+    [6,1],[7,0]
+  ];
+  const maxEl = { 0:2, 1:6, 2:10, 3:14 };
+  let rem = Z;
+  const config = [];
+  for (const [n,l] of order) {
+    if (rem <= 0) break;
+    const fill = Math.min(rem, maxEl[l]);
+    if (fill > 0) config.push([n,l,fill]);
+    rem -= fill;
+  }
+  return config;
+}
+
+function slaterScreen(config, n_orb, l_orb) {
+  // Slater rules simplified
+  let sigma = 0;
+  for (const [n,l,cnt] of config) {
+    if (n === n_orb && l === l_orb) {
+      // same group: screen by 0.35 (each other electron), 0.30 for 1s
+      sigma += (cnt - 1) * (n === 1 ? 0.30 : 0.35);
+    } else {
+      const samePrincipal = (n === n_orb);
+      if (l_orb <= 1) { // s or p orbital
+        if (n < n_orb - 1) sigma += cnt * 1.00;
+        else if (n === n_orb - 1) sigma += cnt * 0.85;
+        // same n already handled
+      } else { // d or f orbital
+        if (n < n_orb || (n === n_orb && l < l_orb)) sigma += cnt * 1.00;
+      }
+    }
+  }
+  return sigma;
+}
+
+// ═══════════════════════════════════════════════════════
+//  FUNZIONI MATEMATICHE
+// ═══════════════════════════════════════════════════════
+
+// Fattoriale
+function factorial(n) {
+  if (n <= 1) return 1;
+  let r = 1;
+  for (let i=2;i<=n;i++) r*=i;
+  return r;
+}
+
+// Polinomi di Laguerre associati L_{n-l-1}^{2l+1}(x)
+// Usati nella funzione d'onda radiale
+function assocLaguerre(p, q, x) {
+  // L_p^q(x) tramite formula di Rodrigues/ricorrenza
+  if (p === 0) return 1;
+  if (p === 1) return 1 + q - x;
+  let L_prev2 = 1;
+  let L_prev1 = 1 + q - x;
+  let L_curr;
+  for (let k = 2; k <= p; k++) {
+    L_curr = ((2*k - 1 + q - x) * L_prev1 - (k-1+q) * L_prev2) / k;
+    L_prev2 = L_prev1;
+    L_prev1 = L_curr;
+  }
+  return L_prev1;
+}
+
+// Armoniche sferiche reali Y_l^m(theta, phi)
+// Versione normalizzata
+function realSH(l, m, theta, phi) {
+  const cosT = Math.cos(theta);
+  const sinT = Math.sin(theta);
+
+  if (l === 0) return Math.sqrt(1/(4*Math.PI));
+
+  if (l === 1) {
+    if (m === 0) return Math.sqrt(3/(4*Math.PI)) * cosT;
+    if (m === 1) return Math.sqrt(3/(4*Math.PI)) * sinT * Math.cos(phi);
+    if (m === -1) return Math.sqrt(3/(4*Math.PI)) * sinT * Math.sin(phi);
+  }
+
+  if (l === 2) {
+    if (m === 0) return Math.sqrt(5/(16*Math.PI)) * (3*cosT*cosT - 1);
+    if (m === 1) return Math.sqrt(15/(4*Math.PI)) * sinT * cosT * Math.cos(phi);
+    if (m === -1) return Math.sqrt(15/(4*Math.PI)) * sinT * cosT * Math.sin(phi);
+    if (m === 2) return Math.sqrt(15/(16*Math.PI)) * sinT*sinT * Math.cos(2*phi);
+    if (m === -2) return Math.sqrt(15/(16*Math.PI)) * sinT*sinT * Math.sin(2*phi);
+  }
+
+  if (l === 3) {
+    if (m === 0) return Math.sqrt(7/(16*Math.PI)) * cosT*(5*cosT*cosT - 3);
+    if (m === 1) return Math.sqrt(21/(32*Math.PI)) * sinT*(5*cosT*cosT - 1)*Math.cos(phi);
+    if (m === -1) return Math.sqrt(21/(32*Math.PI)) * sinT*(5*cosT*cosT - 1)*Math.sin(phi);
+    if (m === 2) return Math.sqrt(105/(16*Math.PI)) * sinT*sinT*cosT*Math.cos(2*phi);
+    if (m === -2) return Math.sqrt(105/(16*Math.PI)) * sinT*sinT*cosT*Math.sin(2*phi);
+    if (m === 3) return Math.sqrt(35/(32*Math.PI)) * sinT*sinT*sinT*Math.cos(3*phi);
+    if (m === -3) return Math.sqrt(35/(32*Math.PI)) * sinT*sinT*sinT*Math.sin(3*phi);
+  }
+
+  return 0;
+}
+
+// Funzione d'onda radiale R_{nl}(r) in unità atomiche con Z_eff
+// r in unità di a_0, Z_eff adimensionale
+function radialWF(n, l, r, Zeff) {
+  const rho = 2 * Zeff * r / n;
+  const norm = Math.sqrt(
+    Math.pow(2*Zeff/n, 3) *
+    factorial(n-l-1) / (2*n * Math.pow(factorial(n+l), 3))
+  );
+  // Nota: formula corretta per la normalizzazione:
+  // N = sqrt( (2Z/n)^3 * (n-l-1)! / (2n * [(n+l)!]^3) )  <- questo è sbagliato
+  // Usiamo la formula standard:
+  const N = normRadial(n, l, Zeff);
+  return N * Math.pow(rho, l) * Math.exp(-rho/2) * assocLaguerre(n-l-1, 2*l+1, rho);
+}
+
+function normRadial(n, l, Zeff) {
+  return Math.sqrt(
+    Math.pow(2*Zeff/n, 3) *
+    factorial(n-l-1) /
+    (2*n * factorial(n+l) * factorial(n+l) * factorial(n+l))
+    // Correzione: formula standard è (2n*((n+l)!)^3) – ma è costosa. Usiamo:
+  );
+}
+
+// Formula corretta (Griffiths 4.73):
+// R_nl(r) = -sqrt( (2Z/na_0)^3 * (n-l-1)! / (2n * [(n+l)!]^3) ) * exp(-Zr/na_0) * (2Zr/na_0)^l * L_{n-l-1}^{2l+1}(2Zr/na_0)
+// In unità atomiche (a_0=1):
+function wavefunction(n, l, m, x, y, z, Zeff) {
+  const r = Math.sqrt(x*x + y*y + z*z);
+  if (r < 1e-10) {
+    if (l === 0) return radialWF_correct(n, 0, 0, Zeff) * realSH(0, 0, 0, 0);
+    return 0;
+  }
+  const theta = Math.acos(Math.max(-1, Math.min(1, z/r)));
+  const phi = Math.atan2(y, x);
+  return radialWF_correct(n, l, r, Zeff) * realSH(l, m, theta, phi);
+}
+
+function radialWF_correct(n, l, r, Zeff) {
+  const rho = 2 * Zeff * r / n;
+  // Normalizzazione corretta Griffiths
+  const num = factorial(n-l-1);
+  const den = 2*n * Math.pow(factorial(n+l), 3);
+  const N = Math.sqrt(Math.pow(2*Zeff/n, 3) * num / den);
+  return N * Math.pow(rho, l) * Math.exp(-rho/2) * assocLaguerre(n-l-1, 2*l+1, rho);
+}
+
+// ψ²(r) per distribuzione radiale di probabilità r²|R|²
+function radialProbDensity(n, l, r, Zeff) {
+  const R = radialWF_correct(n, l, r, Zeff);
+  return r * r * R * R;
+}
+
+// ═══════════════════════════════════════════════════════
+//  DATI ORBITALI
+// ═══════════════════════════════════════════════════════
+
+const ORBITALS = [
+  // n=1
+  { n:1, l:0, m:0, name:'1s',    label:'1s' },
+  // n=2
+  { n:2, l:0, m:0, name:'2s',    label:'2s' },
+  { n:2, l:1, m:0, name:'2p_z',  label:'2p<sub>z</sub>' },
+  { n:2, l:1, m:1, name:'2p_x',  label:'2p<sub>x</sub>' },
+  { n:2, l:1, m:-1,name:'2p_y',  label:'2p<sub>y</sub>' },
+  // n=3
+  { n:3, l:0, m:0, name:'3s',    label:'3s' },
+  { n:3, l:1, m:0, name:'3p_z',  label:'3p<sub>z</sub>' },
+  { n:3, l:1, m:1, name:'3p_x',  label:'3p<sub>x</sub>' },
+  { n:3, l:1, m:-1,name:'3p_y',  label:'3p<sub>y</sub>' },
+  { n:3, l:2, m:0, name:'3d_z2', label:'3d<sub>z²</sub>' },
+  { n:3, l:2, m:1, name:'3d_xz', label:'3d<sub>xz</sub>' },
+  { n:3, l:2, m:-1,name:'3d_yz', label:'3d<sub>yz</sub>' },
+  { n:3, l:2, m:2, name:'3d_x2y2',label:'3d<sub>x²−y²</sub>' },
+  { n:3, l:2, m:-2,name:'3d_xy', label:'3d<sub>xy</sub>' },
+  // n=4
+  { n:4, l:0, m:0, name:'4s',    label:'4s' },
+  { n:4, l:1, m:0, name:'4p_z',  label:'4p<sub>z</sub>' },
+  { n:4, l:2, m:0, name:'4d_z2', label:'4d<sub>z²</sub>' },
+  { n:4, l:3, m:0, name:'4f_z3', label:'4f<sub>z³</sub>' },
+];
+
+// Descrizioni fisiche degli orbitali
+const ORBITAL_DESCRIPTIONS = {
+  '1s': {
+    intro: `L'orbitale 1s è il più semplice e il più basso in energia dell'atomo di idrogeno. La funzione d'onda ha simmetria sferica perfetta: la densità di probabilità dipende solo dalla distanza r dal nucleo, non dalle direzioni angolari. Questo orbitale ha un solo massimo nella distribuzione radiale di probabilità, che si trova esattamente al raggio di Bohr a₀ = 0.529 Å, un risultato notevole che connette la meccanica quantistica alla vecchia teoria semiclassica di Bohr.`,
+    nodes: `Non sono presenti nodi radiali (superfici sferiche dove ψ = 0), né nodi angolari. È l'unico orbitale privo di qualsiasi superficie nodale: la funzione d'onda è positiva ovunque nello spazio.`,
+    physics: `Dal punto di vista fisico, questo stato corrisponde all'energia fondamentale E₁ = −13.6 eV per l'idrogeno (E₁ = −Z²·13.6/n² eV in generale). Il principio di indeterminazione di Heisenberg spiega perché l'elettrone non può "cadere" sul nucleo: una localizzazione eccessiva richiederebbe un impulso infinito e quindi un'energia cinetica enorme.`,
+    formula: `\\psi_{1s} = \\frac{1}{\\sqrt{\\pi}} \\left(\\frac{Z_{\\rm eff}}{a_0}\\right)^{3/2} e^{-Z_{\\rm eff}\\,r/a_0}`,
+  },
+  '2s': {
+    intro: `L'orbitale 2s è il secondo orbitale di tipo s. Come tutti gli orbitali s ha simmetria sferica, ma presenta una struttura nodale più ricca: esiste un nodo radiale sferico, una superficie sferica su cui la funzione d'onda si annulla e cambia segno. La distribuzione di probabilità mostra quindi due massimi (un lobo interno e uno esterno separati dalla superficie nodale).`,
+    nodes: `Un nodo radiale (sfera) al raggio r = 2a₀/Z, nessun nodo angolare. Il cambio di segno della funzione d'onda attraverso questo nodo ha conseguenze fisiche importanti nella formazione di legami chimici (orbitali ibridi sp).`,
+    physics: `Energia E₂ = −Z²·13.6/4 eV. Per l'idrogeno è −3.4 eV, un quarto dell'energia fondamentale. L'orbitale 2s si estende mediamente molto più lontano dal nucleo rispetto all'1s, rendendo gli elettroni 2s più facilmente "spogliabili" dal nucleo (minore energia di ionizzazione).`,
+    formula: `\\psi_{2s} = \\frac{1}{4\\sqrt{2\\pi}} \\left(\\frac{Z_{\\rm eff}}{a_0}\\right)^{3/2} \\left(2 - \\frac{Z_{\\rm eff}\\,r}{a_0}\\right) e^{-Z_{\\rm eff}\\,r/(2a_0)}`,
+  },
+  '2p_z': {
+    intro: `L'orbitale 2p_z è uno dei tre orbitali 2p (insieme a 2p_x e 2p_y). Ha simmetria assiale attorno all'asse z e forma bilobata (a "manubrio"): due lobi di probabilità, uno nel semispazio z > 0 e uno nel semispazio z < 0. I due lobi hanno segno opposto della funzione d'onda ψ (non di ψ², che è sempre positiva), con un piano nodale (il piano xy) in mezzo.`,
+    nodes: `Un nodo angolare planare (il piano z=0). Nessun nodo radiale. Il piano nodale è fondamentale per la simmetria dei legami chimici: gli orbitali p non possono formare legami σ se l'asse di legame è perpendicolare al loro asse di simmetria.`,
+    physics: `Gli orbitali 2p sono degeneri con 2s nell'atomo di idrogeno (stessa n), ma la degenerazione viene rimossa per atomi polielettronici a causa della diversa penetrazione verso il nucleo. Gli elettroni p sono schermati più efficacemente dei corrispondenti s. Il numero quantico magnetico m=0 corrisponde alla proiezione del momento angolare orbitale sull'asse z che è nulla.`,
+    formula: `\\psi_{2p_z} = \\frac{1}{4\\sqrt{2\\pi}} \\left(\\frac{Z_{\\rm eff}}{a_0}\\right)^{5/2} r\\,e^{-Z_{\\rm eff}\\,r/(2a_0)} \\cos\\theta`,
+  },
+  '2p_x': {
+    intro: `L'orbitale 2p_x è la combinazione lineare reale degli stati m=+1 e m=−1, orientata lungo l'asse x. È fisicamente identico al 2p_z ma ruotato di 90°. Insieme a 2p_y e 2p_z forma un sistema di tre orbitali p mutuamente ortogonali, che possono combinarsi negli ibridi sp², sp³ caratteristici dei legami del carbonio.`,
+    nodes: `Un nodo angolare planare (il piano x=0, ossia il piano yz). Nessun nodo radiale.`,
+    physics: `Gli orbitali p reali (p_x, p_y, p_z) non sono autostati di L_z ma sono combinazioni lineari degli autostati m=±1, con valore di aspettazione ⟨L_z⟩=0. Tuttavia, descrivono meglio la geometria effettiva delle nuvole elettroniche nelle molecole, dove la simmetria cilindrica è spesso spezzata.`,
+    formula: `\\psi_{2p_x} = \\frac{1}{4\\sqrt{2\\pi}} \\left(\\frac{Z_{\\rm eff}}{a_0}\\right)^{5/2} r\\,e^{-Z_{\\rm eff}\\,r/(2a_0)} \\sin\\theta\\cos\\varphi`,
+  },
+  '2p_y': {
+    intro: `L'orbitale 2p_y è identico al 2p_x ma orientato lungo l'asse y. È la terza componente del tripletto p, corrispondente alla combinazione lineare degli stati m=±1 moltiplicata per il seno di φ invece che il coseno.`,
+    nodes: `Un nodo angolare planare (il piano y=0, ossia il piano xz). Nessun nodo radiale.`,
+    physics: `La degenerazione dei tre orbitali 2p riflette la simmetria sferica del potenziale coulombiano. Qualunque direzione è equivalente, quindi non vi è motivo fisico per cui un asse sia privilegiato. In un campo magnetico esterno questa degenerazione viene rimossa (effetto Zeeman).`,
+    formula: `\\psi_{2p_y} = \\frac{1}{4\\sqrt{2\\pi}} \\left(\\frac{Z_{\\rm eff}}{a_0}\\right)^{5/2} r\\,e^{-Z_{\\rm eff}\\,r/(2a_0)} \\sin\\theta\\sin\\varphi`,
+  },
+  '3s': {
+    intro: `L'orbitale 3s continua la serie degli orbitali s con simmetria sferica perfetta, ma ora con n−l−1 = 2 nodi radiali: due sfere concentriche su cui ψ si annulla. La distribuzione di probabilità mostra tre massimi, con il massimo esterno (più probabile) a circa 9a₀/Z. La funzione d'onda ha tre zone di segno alternante man mano che ci si allontana dal nucleo.`,
+    nodes: `Due nodi radiali sferici. Nessun nodo angolare.`,
+    physics: `Con n=3, l'energia è E₃ = −Z²·13.6/9 eV ≈ −1.51 eV per H. I nodi radiali hanno profonde implicazioni: un elettrone in 3s ha una probabilità non nulla di trovarsi molto vicino al nucleo (penetrazione), il che abbassa la sua energia rispetto a 3p e 3d negli atomi polielettronici, spezzando la degenerazione dell'idrogeno.`,
+    formula: `\\psi_{3s} \\propto \\left(27 - 18\\frac{Z_{\\rm eff}\\,r}{a_0} + 2\\left(\\frac{Z_{\\rm eff}\\,r}{a_0}\\right)^2\\right) e^{-Z_{\\rm eff}\\,r/(3a_0)}`,
+  },
+  '3p_z': {
+    intro: `L'orbitale 3p_z ha simmetria assiale attorno a z (come il 2p_z) ma con un nodo radiale sferico aggiuntivo. Presenta quindi tre lobi visibili: in z>0 si trova un lobo interno e uno esterno separati da una sfera nodale, e altrettanto in z<0, oltre al piano nodale equatoriale.`,
+    nodes: `Un nodo radiale sferico e un nodo angolare planare (piano xy). Due nodi totali, coerentemente con la regola n−l−1 + l = n−1 = 2.`,
+    physics: `La struttura nodale più ricca rende il 3p leggermente più esteso del 2p, con un raggio medio ⟨r⟩ ≈ 12.5 a₀/Z rispetto a ≈ 5a₀/Z. Negli atomi di terzo periodo (Na, Mg, Al...), gli elettroni 3p sono quelli di valenza coinvolti nei legami chimici.`,
+    formula: `\\psi_{3p_z} \\propto \\left(6 - \\frac{Z_{\\rm eff}\\,r}{a_0}\\right) \\frac{Z_{\\rm eff}\\,r}{a_0}\\, e^{-Z_{\\rm eff}\\,r/(3a_0)} \\cos\\theta`,
+  },
+  '3d_z2': {
+    intro: `L'orbitale 3d_z² (o 3d_{z²−r²/3}) ha una forma caratteristica: un lobo principale lungo l'asse z con un "toro" (ciambella) attorno all'equatore nel piano xy. È l'unico orbitale d con questa geometria, diversa dagli altri quattro 3d che hanno tutti forma a quattro lobi. La simmetria di rotazione attorno a z è mantenuta (m=0).`,
+    nodes: `Due nodi angolari conici, a θ = arccos(1/√3) ≈ 54.7° dal polo nord e sud. Nessun nodo radiale.`,
+    physics: `Gli orbitali d compaiono a partire da n=3. Nell'idrogeno sono degeneri con 3s e 3p, ma per atomi di transizione (Z da 21 a 30) vengono riempiti gli orbitali 3d e le loro proprietà determinano magnetismo, colore e reattività. La funzione angolare del 3d_z² è proporzionale a (3cos²θ−1), la stessa degli armonica sferica Y₂⁰.`,
+    formula: `\\psi_{3d_{z^2}} \\propto \\left(\\frac{Z_{\\rm eff}\\,r}{a_0}\\right)^2 e^{-Z_{\\rm eff}\\,r/(3a_0)} (3\\cos^2\\theta - 1)`,
+  },
+  '3d_xz': {
+    intro: `L'orbitale 3d_xz ha quattro lobi distribuiti nei quadranti che contengono sia l'asse x che z. I lobi occupano le zone dove x e z hanno lo stesso segno (primo e terzo ottante) o segno opposto. È ottenuto come combinazione reale di Y₂¹ e Y₂⁻¹.`,
+    nodes: `Due piani nodali: il piano yz (x=0) e il piano xy (z=0). Nessun nodo radiale.`,
+    physics: `Questo orbitale è particolarmente importante nella chimica di coordinazione: nei complessi ottaedrici, gli orbitali d_xz, d_yz e d_xy formano il set t₂g (a più bassa energia nello splitting del campo cristallino), mentre d_z² e d_x²-y² formano l'e_g ad energia più alta.`,
+    formula: `\\psi_{3d_{xz}} \\propto \\left(\\frac{Z_{\\rm eff}\\,r}{a_0}\\right)^2 e^{-Z_{\\rm eff}\\,r/(3a_0)} \\sin\\theta\\cos\\theta\\cos\\varphi`,
+  },
+  '3d_yz': {
+    intro: `L'orbitale 3d_yz è analogo al 3d_xz ma ruotato nel piano yz. Quattro lobi nei piani che contengono l'asse y e z. Insieme a d_xz e d_xy forma il tripletto t₂g.`,
+    nodes: `Due piani nodali: il piano xz (y=0) e il piano xy (z=0).`,
+    physics: `I cinque orbitali d sono degeneri nell'atomo libero. In un contesto molecolare questa degenerazione è tolta dal campo elettrico dei ligandi. La separazione energetica Δ (campo cristallino) determina il colore dei complessi di metalli di transizione.`,
+    formula: `\\psi_{3d_{yz}} \\propto \\left(\\frac{Z_{\\rm eff}\\,r}{a_0}\\right)^2 e^{-Z_{\\rm eff}\\,r/(3a_0)} \\sin\\theta\\cos\\theta\\sin\\varphi`,
+  },
+  '3d_x2y2': {
+    intro: `L'orbitale 3d_{x²−y²} ha quattro lobi disposti lungo gli assi x e y (0°, 90°, 180°, 270°), con i piani nodali diagonali a ±45°. È uno dei due orbitali e_g che puntano verso i ligandi in una geometria ottaedrica.`,
+    nodes: `Due piani nodali: i piani y=x e y=−x (diagonali nel piano xy). Nessun nodo radiale.`,
+    physics: `Nella teoria del campo cristallino, d_{x²−y²} e d_{z²} hanno un'energia più alta degli altri tre d perché puntano direttamente verso i ligandi (repulsione elettrostatica maggiore). La differenza Δ_oct tra i due livelli e₂ e t₂g governa la magnetochemica.`,
+    formula: `\\psi_{3d_{x^2-y^2}} \\propto \\left(\\frac{Z_{\\rm eff}\\,r}{a_0}\\right)^2 e^{-Z_{\\rm eff}\\,r/(3a_0)} \\sin^2\\theta\\cos(2\\varphi)`,
+  },
+  '3d_xy': {
+    intro: `L'orbitale 3d_xy è simile al 3d_{x²−y²} ma ruotato di 45° attorno all'asse z: i quattro lobi puntano tra gli assi x e y (direzioni diagonali). Fa parte del tripletto t₂g insieme a d_xz e d_yz.`,
+    nodes: `I piani nodali sono x=0 e y=0 (gli assi stessi). Nessun nodo radiale.`,
+    physics: `In geometria ottaedrica, d_xy non punta verso i ligandi (che si trovano sugli assi) quindi è stabilizzato rispetto a d_{z²} e d_{x²−y²}. Questa è la base fisica dello splitting Δ del campo cristallino.`,
+    formula: `\\psi_{3d_{xy}} \\propto \\left(\\frac{Z_{\\rm eff}\\,r}{a_0}\\right)^2 e^{-Z_{\\rm eff}\\,r/(3a_0)} \\sin^2\\theta\\sin(2\\varphi)`,
+  },
+  '4s': {
+    intro: `L'orbitale 4s estende la serie degli s con tre nodi radiali e nessun nodo angolare. Si estende molto lontano dal nucleo (raggio medio ≈ 24 a₀/Z). Notevole è il fatto che per atomi di transizione (K, Ca) l'orbitale 4s viene riempito prima del 3d, a causa della penetrazione verso il nucleo che abbassa la sua energia al di sotto del 3d.`,
+    nodes: `Tre nodi radiali sferici, nessun nodo angolare.`,
+    physics: `Il paradosso 4s < 3d nell'ordine di riempimento si spiega guardando alla densità di probabilità vicino al nucleo (r→0): gli orbitali s penetrano più di quelli d, vedono un Z_eff più alto vicino al nucleo, e questo abbassa sufficentemente la loro energia media. Tuttavia, una volta strappati gli elettroni nell'ionizzazione, il 3d torna sotto al 4s.`,
+    formula: `\\psi_{4s} \\propto \\left(192 - 144\\rho + 24\\rho^2 - \\rho^3\\right) e^{-\\rho/4},\\quad \\rho = Z_{\\rm eff}\\,r/a_0`,
+  },
+  '4p_z': {
+    intro: `L'orbitale 4p_z ha due nodi radiali e un nodo angolare, per un totale di tre nodi. La struttura bilobata lungo z è mantenuta, con i lobi ora articolati in tre sezioni radiali ciascuno.`,
+    nodes: `Due nodi radiali sferici, un nodo angolare planare (piano xy).`,
+    physics: `Gli orbitali 4p compaiono nel quarto periodo (Rb, Sr, ecc.) e sono distanti dal nucleo. La loro capacità di sovrapporre con orbitali di altri atomi (per formare legami) decresce con n a causa dell'estensione spaziale.`,
+    formula: `\\psi_{4p_z} \\propto \\rho\\left(20 - 10\\rho + \\rho^2\\right) e^{-\\rho/4}\\cos\\theta`,
+  },
+  '4d_z2': {
+    intro: `L'orbitale 4d_z² è la versione di livello 4 del 3d_z², con un nodo radiale sferico aggiuntivo. Il lobo principale lungo z e il toro equatoriale sono ora separati internamente da una sfera nodale.`,
+    nodes: `Un nodo radiale sferico, due nodi angolari conici.`,
+    physics: `Gli orbitali 4d si riempiono nel quinto periodo (Y-Cd). Hanno proprietà chimiche simili ai 3d ma con estensione spaziale maggiore, il che li rende importanti nei complessi di metalli pesanti come Mo, Tc, Ru, e nei catalizzatori industriali.`,
+    formula: `\\psi_{4d_{z^2}} \\propto \\rho^2\\left(6 - \\rho\\right) e^{-\\rho/4}(3\\cos^2\\theta - 1)`,
+  },
+  '4f_z3': {
+    intro: `L'orbitale 4f (qui la componente m=0, a simmetria assiale) fa la sua prima comparsa a n=4. Ha sei lobi disposti attorno all'asse z con tre piani nodali conici. Gli orbitali f hanno l=3 e quindi 2l+1=7 componenti degeneri.`,
+    nodes: `Nessun nodo radiale, tre nodi angolari conici.`,
+    physics: `Gli orbitali 4f si riempiono nelle terre rare (Ce-Lu, lantanidi). La loro funzione d'onda è quasi completamente schermata dai livelli 5s e 5p già occupati, rendendoli "interni" all'atomo. Per questo motivo, le proprietà chimiche dei lantanidi sono quasi identiche tra di loro: l'aggiunta progressiva di elettroni 4f non cambia significativamente il raggio atomico né la chimica esterna.`,
+    formula: `\\psi_{4f_{z^3}} \\propto \\rho^3 e^{-\\rho/4}\\cos\\theta(5\\cos^2\\theta - 3),\\quad \\rho = Z_{\\rm eff}\\,r/a_0`,
+  },
+};
+
+// Default per orbitali senza descrizione specifica
+function getDescription(orbName) {
+  return ORBITAL_DESCRIPTIONS[orbName] || {
+    intro: `Questo orbitale ha numero quantico principale n=${STATE.n}, numero quantico azimutale l=${STATE.l} (tipo ${['s','p','d','f'][STATE.l]}), e numero quantico magnetico m=${STATE.m}. La forma della nuvola elettronica è determinata dall'armonica sferica Y_l^m e dalla funzione radiale R_{nl}.`,
+    nodes: `Numero di nodi radiali: n−l−1 = ${STATE.n-STATE.l-1}. Numero di nodi angolari: l = ${STATE.l}. Nodi totali: n−1 = ${STATE.n-1}.`,
+    physics: `Energia: E_n = −Z²·13.6/n² eV. Con Z_eff = ${STATE.Zeff.toFixed(2)}, E ≈ ${(-STATE.Zeff*STATE.Zeff*13.6/(STATE.n*STATE.n)).toFixed(2)} eV.`,
+    formula: `\\psi_{nlm}(r,\\theta,\\varphi) = R_{nl}(r) \\cdot Y_l^m(\\theta,\\varphi)`,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATO APPLICAZIONE
+// ═══════════════════════════════════════════════════════
+const STATE = {
+  atom: ATOMS[0],
+  orbIdx: 0,
+  n: 1, l: 0, m: 0,
+  Zeff: 1.0,
+  threshold: 90,
+  resolution: 200,
+  brightness: 1.0,
+  showNodes: true,
+  showAxes: true,
+  colorSign: true,
+  showSlice: false,
+  viewMode: 'xy', // xy, xz, xyz
+  renderPending: false,
+  renderWorker: null,
+};
+
+// ═══════════════════════════════════════════════════════
+//  DOM SETUP
+// ═══════════════════════════════════════════════════════
+
+function buildAtomGrid() {
+  const grid = document.getElementById('atomGrid');
+  ATOMS.forEach((a, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'atom-btn' + (i===0?' active':'');
+    btn.innerHTML = `${a.sym}<small>Z=${a.Z}</small>`;
+    btn.onclick = () => selectAtom(i);
+    btn.id = `atomBtn_${i}`;
+    grid.appendChild(btn);
+  });
+}
+
+function buildOrbitalTree() {
+  const tree = document.getElementById('orbitalTree');
+  tree.innerHTML = '';
+  const shells = {};
+  ORBITALS.forEach((o,i) => {
+    if (!shells[o.n]) shells[o.n] = [];
+    shells[o.n].push({o,i});
+  });
+  for (const [n, items] of Object.entries(shells)) {
+    const lbl = document.createElement('div');
+    lbl.className = 'shell-label';
+    lbl.textContent = `n = ${n}`;
+    tree.appendChild(lbl);
+    const row = document.createElement('div');
+    row.className = 'orbital-row';
+    items.forEach(({o,i}) => {
+      const btn = document.createElement('button');
+      btn.className = 'orb-btn' + (i===0?' active':'');
+      btn.innerHTML = o.label;
+      btn.id = `orbBtn_${i}`;
+      btn.onclick = () => selectOrbital(i);
+      row.appendChild(btn);
+    });
+    tree.appendChild(row);
+  }
+}
+
+function selectAtom(idx) {
+  STATE.atom = ATOMS[idx];
+  document.querySelectorAll('.atom-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  // Aggiorna Zeff
+  const orb = ORBITALS[STATE.orbIdx];
+  STATE.Zeff = slaterZeff(STATE.atom.Z, orb.n, orb.l);
+  document.getElementById('zeffSlider').value = STATE.Zeff.toFixed(2);
+  updateZeffDisplay();
+  scheduleRender();
+  updateDescription();
+}
+
+function selectOrbital(idx) {
+  STATE.orbIdx = idx;
+  const orb = ORBITALS[idx];
+  STATE.n = orb.n; STATE.l = orb.l; STATE.m = orb.m;
+  document.querySelectorAll('.orb-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.getElementById('qnN').textContent = orb.n;
+  document.getElementById('qnL').textContent = orb.l;
+  document.getElementById('qnM').textContent = orb.m;
+  // Update Zeff for this atom/orbital
+  STATE.Zeff = slaterZeff(STATE.atom.Z, orb.n, orb.l);
+  document.getElementById('zeffSlider').value = STATE.Zeff.toFixed(2);
+  updateZeffDisplay();
+  document.getElementById('orbNameBadge').innerHTML = orb.label;
+  scheduleRender();
+  updateDescription();
+}
+
+function updateZeffDisplay() {
+  const v = parseFloat(document.getElementById('zeffSlider').value);
+  STATE.Zeff = v;
+  document.getElementById('zeffVal').textContent = v.toFixed(2);
+  document.getElementById('zeffBadge').innerHTML = `Z<sub>eff</sub> = ${v.toFixed(2)}`;
+}
+
+function setupControls() {
+  document.getElementById('threshSlider').oninput = e => {
+    STATE.threshold = parseInt(e.target.value);
+    document.getElementById('threshVal').textContent = STATE.threshold;
+    scheduleRender();
+  };
+  document.getElementById('resSlider').oninput = e => {
+    STATE.resolution = parseInt(e.target.value);
+    document.getElementById('resVal').textContent = STATE.resolution;
+    scheduleRender();
+  };
+  document.getElementById('brigSlider').oninput = e => {
+    STATE.brightness = parseFloat(e.target.value);
+    document.getElementById('brigVal').textContent = STATE.brightness.toFixed(1);
+    scheduleRender();
+  };
+  document.getElementById('showNodes').onchange = e => { STATE.showNodes = e.target.checked; scheduleRender(); };
+  document.getElementById('showAxes').onchange = e => { STATE.showAxes = e.target.checked; scheduleRender(); };
+  document.getElementById('colorSign').onchange = e => { STATE.colorSign = e.target.checked; scheduleRender(); };
+  document.getElementById('showSlice').onchange = e => { STATE.showSlice = e.target.checked; scheduleRender(); };
+
+  document.getElementById('zeffSlider').oninput = e => {
+    updateZeffDisplay();
+    scheduleRender();
+  };
+
+  // View buttons
+  ['xy','xz','xyz'].forEach(v => {
+    document.getElementById(`btn${v.toUpperCase()}`).onclick = () => {
+      STATE.viewMode = v;
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`btn${v.toUpperCase()}`).classList.add('active');
+      scheduleRender();
+    };
+  });
+
+  // Canvas mouse
+  document.getElementById('mainCanvas').onmousemove = handleMouseMove;
+  document.getElementById('mainCanvas').onmouseleave = () => {
+    document.getElementById('probInfo').textContent = 'Clicca per vedere ψ² nel punto';
+  };
+}
+
+function handleMouseMove(e) {
+  const canvas = document.getElementById('mainCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const cx = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const cy = (e.clientY - rect.top) * (canvas.height / rect.height);
+  const W = canvas.width, H = canvas.height;
+  const scale = getScale();
+  const ax = (cx - W/2) / (W/2) * scale;
+  const ay = -(cy - H/2) / (H/2) * scale;
+
+  let x, y, z;
+  if (STATE.viewMode === 'xy') { x=ax; y=ay; z=0; }
+  else if (STATE.viewMode === 'xz') { x=ax; y=0; z=ay; }
+  else { x=ax*0.7; y=ax*0.3; z=ay; } // approssimazione 3D
+
+  const psi = wavefunction(STATE.n, STATE.l, STATE.m, x, y, z, STATE.Zeff);
+  const psi2 = psi*psi;
+  document.getElementById('probInfo').textContent =
+    `x=${ax.toFixed(1)} y=${ay.toFixed(1)} a₀  |ψ|² = ${psi2.toExponential(2)}`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════════════════════
+
+function getScale() {
+  const {n, Zeff} = STATE;
+  // Raggio medio orbitale ~ n²*(1 + 0.5*(1 - l*(l+1)/n²)) / Zeff
+  // Usiamo una scala adattiva
+  const r_typical = n * n * 3 / Zeff;
+  return Math.max(4, r_typical * 1.4);
+}
+
+let renderTimer = null;
+function scheduleRender() {
+  if (renderTimer) clearTimeout(renderTimer);
+  renderTimer = setTimeout(doRender, 30);
+}
+
+function doRender() {
+  const canvas = document.getElementById('mainCanvas');
+  const area = document.getElementById('canvasArea');
+  const W = area.clientWidth;
+  const H = Math.min(500, Math.max(320, W * 0.55));
+  canvas.width = W;
+  canvas.height = H;
+
+  // Show loading
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.style.display = 'flex';
+  document.getElementById('loadBar').style.width = '0%';
+
+  // Update atom badge
+  document.getElementById('atomBadge').textContent = `${STATE.atom.sym}  Z=${STATE.atom.Z}`;
+
+  setTimeout(() => {
+    renderOrbital(canvas);
+    overlay.style.display = 'none';
+  }, 20);
+}
+
+function renderOrbital(canvas) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const RES = STATE.resolution;
+  const scale = getScale();
+
+  ctx.fillStyle = '#0d0a06';
+  ctx.fillRect(0,0,W,H);
+
+  // Prima passata: calcola tutto il campo ψ
+  const data = new Float32Array(RES * RES);
+  let maxPsi2 = 0;
+  const viewMode = STATE.viewMode;
+
+  for (let py = 0; py < RES; py++) {
+    for (let px = 0; px < RES; px++) {
+      const ax = (px / (RES-1) - 0.5) * 2 * scale;
+      const ay = -(py / (RES-1) - 0.5) * 2 * scale;
+      let x, y, z;
+      if (viewMode === 'xy') { x=ax; y=ay; z=0; }
+      else if (viewMode === 'xz') { x=ax; y=0; z=ay; }
+      else {
+        // Vista 3D: proiezione obliqua sul piano z=0
+        // asse x → destra, asse y → destra-alto con angolo 30°, asse z → alto
+        x = ax - ay*0.3;
+        y = ay*0.3;
+        z = ay*0.7;
+      }
+      const psi = wavefunction(STATE.n, STATE.l, STATE.m, x, y, z, STATE.Zeff);
+      data[py*RES+px] = psi;
+      if (psi*psi > maxPsi2) maxPsi2 = psi*psi;
+    }
+    // Progress bar
+    if (py % 20 === 0) {
+      document.getElementById('loadBar').style.width = `${(py/RES*100).toFixed(0)}%`;
+    }
+  }
+
+  // Soglia isosuperficie: calcola il valore di ψ² che contiene X% della probabilità
+  // (approssimazione per la sezione 2D)
+  const threshold_frac = 1.0 - STATE.threshold / 100.0;
+  const isoVal2 = maxPsi2 * threshold_frac * 0.15; // fattore empirico per iso adattiva
+
+  // Seconda passata: render
+  const imgData = ctx.createImageData(W, H);
+  const buf = imgData.data;
+
+  for (let py = 0; py < RES; py++) {
+    for (let px = 0; px < RES; px++) {
+      const psi = data[py*RES+px];
+      const psi2 = psi*psi;
+
+      // Colore basato su psi²
+      const t = Math.min(1, (psi2 / maxPsi2) * STATE.brightness * 3);
+      const sign = psi >= 0;
+
+      let r, g, b;
+      if (STATE.colorSign) {
+        if (sign) {
+          // Positivo: palette calda (ambra)
+          r = Math.min(255, 232*t + 50*t*t);
+          g = Math.min(255, 140*t*t);
+          b = Math.min(255, 30*t*t*t);
+        } else {
+          // Negativo: palette fredda (blu-ciano)
+          r = Math.min(255, 30*t*t*t);
+          g = Math.min(255, 130*t*t);
+          b = Math.min(255, 220*t + 60*t*t);
+        }
+      } else {
+        // Solo probabilità, nessun segno
+        r = Math.min(255, 255*t*t);
+        g = Math.min(255, 180*t);
+        b = Math.min(255, 60*t);
+      }
+
+      // Scala a pixel reali
+      const pw = W / RES;
+      const ph = H / RES;
+      const x0 = Math.floor(px * pw);
+      const y0 = Math.floor(py * ph);
+      const x1 = Math.floor((px+1) * pw);
+      const y1 = Math.floor((py+1) * ph);
+
+      for (let yy=y0; yy<y1; yy++) {
+        for (let xx=x0; xx<x1; xx++) {
+          const i = (yy*W+xx)*4;
+          buf[i]   = r;
+          buf[i+1] = g;
+          buf[i+2] = b;
+          buf[i+3] = 255;
+        }
+      }
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+
+  // Superficie nodale
+  if (STATE.showNodes) drawNodes(ctx, W, H, scale, RES, data, maxPsi2);
+
+  // Assi
+  if (STATE.showAxes) drawAxes(ctx, W, H, scale);
+
+  // Legenda segno
+  if (STATE.colorSign) drawLegend(ctx, W, H);
+}
+
+function drawNodes(ctx, W, H, scale, RES, data, maxPsi2) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 0.8;
+
+  const nodeThreshold = maxPsi2 * 0.001; // zona nodale
+
+  for (let py = 0; py < RES-1; py++) {
+    for (let px = 0; px < RES-1; px++) {
+      const v00 = data[py*RES+px];
+      const v10 = data[py*RES+px+1];
+      const v01 = data[(py+1)*RES+px];
+
+      // Cambio di segno = nodo
+      if ((v00 >= 0) !== (v10 >= 0) || (v00 >= 0) !== (v01 >= 0)) {
+        const sx = (px / (RES-1)) * W;
+        const sy = (py / (RES-1)) * H;
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillRect(sx, sy, W/RES, H/RES);
+      }
+    }
+  }
+  ctx.restore();
+}
+
+function drawAxes(ctx, W, H, scale) {
+  const cx = W/2, cy = H/2;
+  const viewMode = STATE.viewMode;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(200,180,150,0.25)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4,4]);
+
+  // Asse orizzontale
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  // Asse verticale
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(200,180,150,0.5)';
+  ctx.font = '11px IBM Plex Mono, monospace';
+
+  if (viewMode === 'xy') {
+    ctx.fillText('x', W-15, cy-6);
+    ctx.fillText('y', cx+6, 14);
+  } else if (viewMode === 'xz') {
+    ctx.fillText('x', W-15, cy-6);
+    ctx.fillText('z', cx+6, 14);
+  } else {
+    ctx.fillText('x', W-15, cy-6);
+    ctx.fillText('z', cx+6, 14);
+  }
+
+  // Segni a₀
+  const a0px = W/(2*scale); // pixel per a₀
+  const nTicks = Math.floor(scale / 2);
+  ctx.fillStyle = 'rgba(200,180,150,0.3)';
+  for (let i=-nTicks; i<=nTicks; i++) {
+    if (i === 0) continue;
+    const tx = cx + i*2*a0px;
+    const ty = cy + i*2*a0px;
+    if (tx > 5 && tx < W-5) {
+      ctx.fillRect(tx-0.5, cy-4, 1, 8);
+      if (i % 2 === 0) {
+        ctx.fillStyle = 'rgba(200,180,150,0.4)';
+        ctx.fillText(`${i*2}`, tx-8, cy+14);
+        ctx.fillStyle = 'rgba(200,180,150,0.3)';
+      }
+    }
+    if (ty > 5 && ty < H-5) ctx.fillRect(cx-4, ty-0.5, 8, 1);
+  }
+  ctx.restore();
+}
+
+function drawLegend(ctx, W, H) {
+  ctx.save();
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillStyle = 'rgba(232,160,64,0.8)';
+  ctx.fillRect(14, H-28, 12, 12);
+  ctx.fillStyle = 'rgba(200,180,150,0.6)';
+  ctx.fillText('ψ > 0', 30, H-18);
+
+  ctx.fillStyle = 'rgba(64,144,232,0.8)';
+  ctx.fillRect(80, H-28, 12, 12);
+  ctx.fillStyle = 'rgba(200,180,150,0.6)';
+  ctx.fillText('ψ < 0', 96, H-18);
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════════════════════
+//  DESCRIZIONE + GRAFICO RADIALE
+// ═══════════════════════════════════════════════════════
+
+function updateDescription() {
+  const orb = ORBITALS[STATE.orbIdx];
+  const desc = getDescription(orb.name);
+  const energy = -(STATE.Zeff * STATE.Zeff * 13.6 / (STATE.n * STATE.n));
+  const nNodes = STATE.n - STATE.l - 1;
+  const lNodes = STATE.l;
+  const lNames = ['s','p','d','f'];
+
+  const area = document.getElementById('descArea');
+  area.innerHTML = `
+    <div class="desc-header">
+      Orbitale ${orb.label} &mdash; ${STATE.atom.name}
+      <span class="energy-val">E = ${energy.toFixed(2)} eV</span>
+    </div>
+
+    <div class="wavefunction-box">
+      <div class="wf-title">Funzione d'onda</div>
+      <div id="wfFormula"></div>
+    </div>
+
+    <div class="prop-grid">
+      <div class="prop-card">
+        <span class="prop-card-label">Nodi radiali</span>
+        <span class="prop-card-val">${nNodes} (sferici)</span>
+      </div>
+      <div class="prop-card">
+        <span class="prop-card-label">Nodi angolari</span>
+        <span class="prop-card-val">${lNodes} (piani/conici)</span>
+      </div>
+      <div class="prop-card">
+        <span class="prop-card-label">Tipo sottoguscio</span>
+        <span class="prop-card-val">${lNames[STATE.l]} (l=${STATE.l})</span>
+      </div>
+      <div class="prop-card">
+        <span class="prop-card-label">Degenerazione</span>
+        <span class="prop-card-val">2n² = ${2*STATE.n*STATE.n}</span>
+      </div>
+      <div class="prop-card">
+        <span class="prop-card-label">⟨r⟩ / a₀</span>
+        <span class="prop-card-val">${(STATE.n*STATE.n*(1 + 0.5*(1 - STATE.l*(STATE.l+1)/(STATE.n*STATE.n)))/STATE.Zeff).toFixed(1)}</span>
+      </div>
+      <div class="prop-card">
+        <span class="prop-card-label">Z<sub>eff</sub> (Slater)</span>
+        <span class="prop-card-val">${STATE.Zeff.toFixed(2)}</span>
+      </div>
+    </div>
+
+    <p class="desc-body" style="margin-top:1.2rem;">${desc.intro}</p>
+    <p class="desc-body"><strong style="color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">NODI</strong><br>${desc.nodes}</p>
+    <p class="desc-body"><strong style="color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">FISICA</strong><br>${desc.physics}</p>
+
+    <div class="radial-section">
+      <div class="radial-title">Distribuzione radiale di probabilità: r²|R<sub>nl</sub>(r)|²</div>
+      <canvas id="radialCanvas" height="140"></canvas>
+      <div style="font-size:0.72rem;font-family:'IBM Plex Mono',monospace;color:var(--ink3);margin-top:4px;">
+        Ascissa in unità di a₀. Le frecce verticali indicano i nodi radiali.
+      </div>
+    </div>
+  `;
+
+  // KaTeX formula
+  try {
+    katex.render(desc.formula, document.getElementById('wfFormula'), {
+      throwOnError: false,
+      displayMode: true,
+      trust: true,
+    });
+  } catch(e) {}
+
+  // Radial plot
+  setTimeout(() => drawRadialPlot(), 50);
+}
+
+function drawRadialPlot() {
+  const canvas = document.getElementById('radialCanvas');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || 500;
+  canvas.width = W;
+  canvas.height = 140;
+  const ctx = canvas.getContext('2d');
+
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg2').trim() || '#f2ede4';
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, 140);
+
+  const {n, l, Zeff} = STATE;
+  const rMax = n*n*5/Zeff + 3;
+  const NP = 400;
+  const vals = [];
+  let maxVal = 0;
+  for (let i=0; i<NP; i++) {
+    const r = (i/(NP-1)) * rMax;
+    const v = radialProbDensity(n, l, r, Zeff);
+    vals.push(v);
+    if (v > maxVal) maxVal = v;
+  }
+
+  const pad = { l:35, r:10, t:10, b:22 };
+  const pw = W - pad.l - pad.r;
+  const ph = 140 - pad.t - pad.b;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(150,120,80,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t+ph); ctx.lineTo(pad.l+pw, pad.t+ph); ctx.stroke();
+
+  // Curve
+  ctx.beginPath();
+  ctx.strokeStyle = '#8b3a1a';
+  ctx.lineWidth = 1.8;
+  for (let i=0; i<NP; i++) {
+    const x = pad.l + (i/(NP-1)) * pw;
+    const y = pad.t + ph - (vals[i] / maxVal) * ph * 0.9;
+    if (i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Fill sotto curva
+  ctx.beginPath();
+  for (let i=0; i<NP; i++) {
+    const x = pad.l + (i/(NP-1)) * pw;
+    const y = pad.t + ph - (vals[i] / maxVal) * ph * 0.9;
+    if (i===0) ctx.moveTo(x, pad.t+ph);
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(pad.l+pw, pad.t+ph);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t+ph);
+  grad.addColorStop(0, 'rgba(139,58,26,0.3)');
+  grad.addColorStop(1, 'rgba(139,58,26,0.03)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Nodi: trovo gli zeri della funzione d'onda radiale
+  const Rvals = [];
+  for (let i=0; i<NP; i++) {
+    const r = (i/(NP-1)) * rMax;
+    Rvals.push(radialWF_correct(n, l, r, Zeff));
+  }
+  ctx.strokeStyle = 'rgba(42,92,138,0.7)';
+  ctx.setLineDash([3,3]);
+  ctx.lineWidth = 1;
+  for (let i=1; i<NP; i++) {
+    if (Rvals[i-1] * Rvals[i] < 0) {
+      const r_node = ((i-1)/(NP-1) + i/(NP-1)) * 0.5 * rMax;
+      const x = pad.l + (r_node/rMax) * pw;
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+ph); ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+
+  // Raggio di Bohr per questo orbitale n²/Z
+  const rBohr = n*n / Zeff;
+  const xBohr = pad.l + (rBohr/rMax) * pw;
+  if (xBohr > pad.l && xBohr < pad.l+pw) {
+    ctx.strokeStyle = 'rgba(180,134,11,0.6)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2,4]);
+    ctx.beginPath(); ctx.moveTo(xBohr, pad.t); ctx.lineTo(xBohr, pad.t+ph); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(180,134,11,0.7)';
+    ctx.font = '9px IBM Plex Mono';
+    ctx.fillText('a₀n²/Z', xBohr+3, pad.t+10);
+  }
+
+  // Etichetta asse x
+  ctx.fillStyle = 'rgba(80,60,40,0.7)';
+  ctx.font = '9px IBM Plex Mono';
+  ctx.fillText('0', pad.l-4, pad.t+ph+12);
+  ctx.fillText(`${rMax.toFixed(0)} a₀`, pad.l+pw-24, pad.t+ph+12);
+  ctx.fillText('r²|R|²', 2, pad.t+12);
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildAtomGrid();
+  buildOrbitalTree();
+  setupControls();
+
+  // Primo render
+  selectOrbital(0);
+  scheduleRender();
+  updateDescription();
+
+  // Ridimensionamento
+  window.addEventListener('resize', () => scheduleRender());
+});
+</script>
+</body>
+</html>

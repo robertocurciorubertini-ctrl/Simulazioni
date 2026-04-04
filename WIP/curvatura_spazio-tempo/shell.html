@@ -145,8 +145,8 @@ canvas{border:1px solid var(--border);display:block;
         <input type="range" id="sA" min="0.001" max="0.998" step="0.001" value="0.600">
       </label>
       <label style="margin-top:8px">
-        <div class="lr">Zoom<span class="val" id="vZ">1.0</span>×</div>
-        <input type="range" id="sZ" min="1.5" max="4.5" step="0.05" value="1.0">
+        <div class="lr">Zoom<span class="val" id="vZ">2.2</span>×</div>
+        <input type="range" id="sZ" min="1.5" max="4.5" step="0.05" value="2.2">
       </label>
       <label style="margin-top:8px">
         <div class="lr">Pitch camera<span class="val" id="vP">0.60</span> rad</div>
@@ -252,10 +252,7 @@ Module.onFrameReady = function() {
   }
   /* Il buffer WASM è RGBA; ImageData è anche RGBA → copia diretta */
   const heap = (typeof HEAPU8 !== 'undefined') ? HEAPU8 : Module.HEAPU8;
-  if (!heap) {
-    console.error('HEAPU8 non disponibile');
-    return;
-  }
+  if (!heap) { console.error('HEAPU8 non disponibile'); return; }
   const src = heap.subarray(ptr, ptr + W*H*4);
   imgData.data.set(src);
   ctx.putImageData(imgData, 0, 0);

@@ -336,6 +336,23 @@
       "isWip": false
     },
     {
+      "title": "Curvatura dello spazio-tempo",
+      "description": "Simulazione della metrica di Kerr attorno a un buco nero rotante, con visualizzazione di geodetiche nulle, lente gravitazionale, redshift gravitazionale e dilatazione temporale.",
+      "category": "WIP",
+      "icon": "⚫",
+      "order": 1,
+      "tags": [
+        "buco nero rotante",
+        "metrica di Kerr",
+        "relatività generale",
+        "geodetiche nulle",
+        "frame dragging"
+      ],
+      "level": "avanzato",
+      "file": "WIP/curvatura_spazio-tempo/shell.html",
+      "isWip": true
+    },
+    {
       "title": "Fluidodinamica",
       "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
       "category": "WIP",
@@ -366,6 +383,23 @@
       ],
       "level": "avanzato",
       "file": "WIP/meccanica_quantistica.html",
+      "isWip": true
+    },
+    {
+      "title": "Orbitali atomici",
+      "description": "Visualizza la forma degli orbitali atomici e la distribuzione di probabilità elettronica, esplorando numeri quantici, simmetrie e dipendenza da Z_eff.",
+      "category": "WIP",
+      "icon": "⚛️",
+      "order": 1,
+      "tags": [
+        "orbitali atomici",
+        "funzione d'onda",
+        "atomo idrogenoide",
+        "numeri quantici",
+        "meccanica quantistica"
+      ],
+      "level": "avanzato",
+      "file": "WIP/orbitali.html",
       "isWip": true
     },
     {

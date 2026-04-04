@@ -14,7 +14,7 @@
  *         -O3 -msimd128 \
  *         -s WASM=1 \
  *         -s USE_SDL=0 \
- *         -s EXPORTED_FUNCTIONS='["_main","_render_frame","_set_spin","_set_zoom","_set_mode","_set_nrays","_set_remit","_set_camera","_step_anim","_get_rp","_get_rergo","_get_risco","_get_rph","_get_omH","_get_width","_get_height","_get_pixel_buffer","_get_cam_yaw","_get_cam_pitch"]' \
+ *         -s EXPORTED_FUNCTIONS='["_main","_set_spin","_set_zoom","_set_mode","_set_nrays","_set_remit","_step_anim"]' \
  *         -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' \
  *         -s ALLOW_MEMORY_GROWTH=1 \
  *         --shell-file shell.html
@@ -80,8 +80,6 @@ static RenderMode g_mode  = MODE_GRID;
 static double   g_phi_off = 0.0;
 static int      g_animating = 0;
 static KerrProps g_kp;
-static double   g_cam_yaw   = 0.78;
-static double   g_cam_pitch = 0.92;
 
 /* ------------------------------------------------------------------ */
 /*  METRICA DI KERR (piano equatoriale θ=π/2, M=1)                    */
@@ -325,25 +323,38 @@ static void wavelength_rgb(double lam,
 /* ------------------------------------------------------------------ */
 static void render_grid(void)
 {
+    /* Sfondo */
     for(int i=0;i<WIDTH*HEIGHT*4;i+=4){
-        pixels[i]=12; pixels[i+1]=9; pixels[i+2]=6; pixels[i+3]=255;
+        pixels[i]   = 12;
+        pixels[i+1] = 9;
+        pixels[i+2] = 6;
+        pixels[i+3] = 255;
     }
 
     const double cx = WIDTH  / 2.0;
     const double cy = HEIGHT / 2.0;
-    const double a  = g_a;
 
+    const double a     = g_a;
     const double r_min = g_kp.rp * 1.01;
     const double r_max = 24.0 / fmax(g_zoom, 0.35);
 
-    const int Nr = 180;
-    const int Np = 96;
+    const int Nr = 180;   /* campionamento radiale per embedding */
+    const int Np = 96;    /* campionamento angolare */
 
+    /* Inclinazione della camera per vista pseudo-3D */
+    const double incl = 0.95;   /* rad */
+    const double ci   = cos(incl);
+    const double si   = sin(incl);
+
+    /* Array campionati su r */
     double rtab[Nr+1];
-    double rho [Nr+1];
-    double grr [Nr+1];
+    double rho[Nr+1];
+    double grr[Nr+1];
     double ztab[Nr+1];
 
+    /* --------------------------------------------------------------
+       1) Costruzione di rho(r) = sqrt(g_phiphi)
+       -------------------------------------------------------------- */
     for(int i=0;i<=Nr;i++){
         double r = r_min + (r_max-r_min) * (double)i / (double)Nr;
         KerrMetric m;
@@ -354,48 +365,69 @@ static void render_grid(void)
         rho[i]  = sqrt(fmax(m.gphiphi, 1e-12));
     }
 
+    /* --------------------------------------------------------------
+       2) Integrazione numerica di z(r) dalla relazione:
+          (dz/dr)^2 = g_rr - (d rho / dr)^2
+       -------------------------------------------------------------- */
     ztab[0] = 0.0;
     for(int i=1;i<=Nr;i++){
         double dr = rtab[i] - rtab[i-1];
-        double drho_dr;
 
-        if(i < Nr) drho_dr = (rho[i+1] - rho[i-1]) / (rtab[i+1] - rtab[i-1]);
-        else       drho_dr = (rho[i]   - rho[i-1]) / dr;
+        double drho_dr;
+        if(i < Nr){
+            drho_dr = (rho[i+1] - rho[i-1]) / (rtab[i+1] - rtab[i-1]);
+        } else {
+            drho_dr = (rho[i] - rho[i-1]) / dr;
+        }
 
         double arg = grr[i] - drho_dr * drho_dr;
         if(arg < 0.0) arg = 0.0;
 
         double dzdr = sqrt(arg);
+
+        /* clamp leggero per evitare cuspidi numeriche troppo violente */
         if(dzdr > 8.0) dzdr = 8.0;
 
         ztab[i] = ztab[i-1] + dzdr * dr;
     }
 
+    /* Normalizzazione verticale per tenerla visibile ma non eccessiva */
     double zmax = ztab[Nr];
     double zscale = (zmax > 1e-9) ? (0.42 / zmax) * rho[Nr] : 1.0;
 
-    double outer_extent = fmax(rho[Nr], 1.0);
-    double scale = 0.42 * fmin((double)WIDTH, (double)HEIGHT) / outer_extent;
+    /* Scala finale in pixel */
+    double outer_extent = rho[Nr];
+    double scale = 0.42 * fmin((double)WIDTH, (double)HEIGHT) / fmax(outer_extent, 1.0);
     scale *= pow(g_zoom, 0.92);
 
-    const double cyaw = cos(g_cam_yaw),   syaw = sin(g_cam_yaw);
-    const double cpit = cos(g_cam_pitch), spit = sin(g_cam_pitch);
+    /* --------------------------------------------------------------
+       Proiezione 3D -> 2D:
+       X = rho cos(phi)
+       Y = rho sin(phi)
+       Z = z(r)
 
-    #define PROJECT_POINT(RHO_, PHI_, Z_, SX_, SY_) do {                      \
-        double _X = (RHO_) * cos(PHI_);                                       \
-        double _Y = (RHO_) * sin(PHI_);                                       \
-        double _Z = (Z_) * zscale;                                            \
-        double _X1 = cyaw * _X - syaw * _Y;                                   \
-        double _Y1 = syaw * _X + cyaw * _Y;                                   \
-        double _Z1 = _Z;                                                      \
-        double _Y2 = cpit * _Y1 - spit * _Z1;                                 \
-        (SX_) = (int)(cx + scale * _X1);                                      \
-        (SY_) = (int)(cy - scale * _Y2);                                      \
+       Rotazione intorno all'asse x:
+       x_screen = X
+       y_screen = Y cos(i) - Z sin(i)
+       -------------------------------------------------------------- */
+    #define PROJECT_POINT(RHO_, PHI_, Z_, SX_, SY_) do {            \
+        double _X = (RHO_) * cos(PHI_);                             \
+        double _Y = (RHO_) * sin(PHI_);                             \
+        double _Z = -(Z_) * zscale;                                  \
+        double _xp = _X;                                            \
+        double _yp = _Y * ci - _Z * si;                             \
+        (SX_) = (int)(cx + scale * _xp);                            \
+        (SY_) = (int)(cy - scale * _yp);                            \
     } while(0)
 
+    /* --------------------------------------------------------------
+       3) Righe iso-phi
+       -------------------------------------------------------------- */
     for(int ip=0; ip<Np; ip++){
         double phi = TWO_PI * (double)ip / (double)Np;
-        int first = 1, px0 = 0, py0 = 0;
+
+        int first = 1;
+        int px0 = 0, py0 = 0;
 
         for(int ir=0; ir<=Nr; ir++){
             int sx, sy;
@@ -403,49 +435,119 @@ static void render_grid(void)
 
             if(!first){
                 double t = (double)ir / (double)Nr;
+
+                /* enfasi della regione interna */
                 double bright = 0.22 + 0.45 * (1.0 - t);
                 uint8_t R = (uint8_t)(180.0 * bright);
                 uint8_t G = (uint8_t)(125.0 * bright);
                 uint8_t B = (uint8_t)( 82.0 * bright);
+
                 draw_line(px0, py0, sx, sy, R, G, B);
             }
-            px0 = sx; py0 = sy; first = 0;
+
+            px0 = sx;
+            py0 = sy;
+            first = 0;
         }
     }
 
+    /* --------------------------------------------------------------
+       4) Righe iso-r
+       -------------------------------------------------------------- */
     for(int ir=0; ir<=Nr; ir += 6){
         double t = (double)ir / (double)Nr;
         double bright = 0.14 + 0.26 * (1.0 - t);
+
         uint8_t R = (uint8_t)(150.0 * bright);
         uint8_t G = (uint8_t)(115.0 * bright);
         uint8_t B = (uint8_t)( 95.0 * bright);
 
-        int first = 1, px0 = 0, py0 = 0;
+        int first = 1;
+        int px0 = 0, py0 = 0;
+
         for(int ip=0; ip<=Np; ip++){
             double phi = TWO_PI * (double)ip / (double)Np;
             int sx, sy;
             PROJECT_POINT(rho[ir], phi, ztab[ir], sx, sy);
-            if(!first) draw_line(px0, py0, sx, sy, R, G, B);
-            px0 = sx; py0 = sy; first = 0;
+
+            if(!first){
+                draw_line(px0, py0, sx, sy, R, G, B);
+            }
+
+            px0 = sx;
+            py0 = sy;
+            first = 0;
         }
     }
 
+    /* --------------------------------------------------------------
+       5) Curve caratteristiche proiettate sulla stessa superficie
+       -------------------------------------------------------------- */
     typedef struct {
         double r;
         uint8_t R, G, B;
+        int fill;
     } RingInfo;
 
     RingInfo rings[] = {
-        { g_kp.r_ergo, 230, 115,  20 },
-        { g_kp.r_isco,  41, 128, 185 },
-        { g_kp.r_ph,    39, 174,  96 },
-        { g_kp.rp,     192,  57,  43 }
+        { g_kp.r_ergo, 230, 115,  20, 0 },
+        { g_kp.r_isco,  41, 128, 185, 0 },
+        { g_kp.r_ph,    39, 174,  96, 0 },
+        { g_kp.rp,     192,  57,  43, 1 }
     };
 
-    for(int kidx=0; kidx<4; kidx++){
-        double rr = rings[kidx].r;
+    for(int k=0; k<4; k++){
+        double rr = rings[k].r;
         if(rr <= r_min || rr >= r_max) continue;
 
+        KerrMetric m;
+        kerr_metric(rr, a, &m);
+        double rho_r = sqrt(fmax(m.gphiphi, 1e-12));
+
+        /* z(rr) per interpolazione lineare su tabella */
+        double z_r = 0.0;
+        for(int i=1; i<=Nr; i++){
+            if(rr <= rtab[i]){
+                double u = (rr - rtab[i-1]) / (rtab[i] - rtab[i-1]);
+                z_r = ztab[i-1] * (1.0-u) + ztab[i] * u;
+                break;
+            }
+        }
+
+        int first = 1;
+        int px0 = 0, py0 = 0;
+        for(int ip=0; ip<=Np; ip++){
+            double phi = TWO_PI * (double)ip / (double)Np;
+            int sx, sy;
+            PROJECT_POINT(rho_r, phi, z_r, sx, sy);
+
+            if(!first){
+                draw_line(px0, py0, sx, sy, rings[k].R, rings[k].G, rings[k].B);
+            }
+            px0 = sx;
+            py0 = sy;
+            first = 0;
+        }
+    }
+
+    /* --------------------------------------------------------------
+       6) Disco interno nero per l'orizzonte, nella stessa proiezione
+       -------------------------------------------------------------- */
+    {
+        KerrMetric mh;
+        kerr_metric(g_kp.rp, a, &mh);
+        double rho_h = sqrt(fmax(mh.gphiphi, 1e-12));
+        int rad = (int)(rho_h * scale * 0.55);
+        if(rad > 2){
+            fill_circle((int)cx, (int)(cy + 0.02*HEIGHT), rad, 0, 0, 0);
+        }
+    }
+
+    /* --------------------------------------------------------------
+       7) Frecce di frame dragging, ancora come overlay qualitativo
+       -------------------------------------------------------------- */
+    if(a > 0.01){
+        double rr = g_kp.r_ergo * 1.22;
         KerrMetric m;
         kerr_metric(rr, a, &m);
         double rho_r = sqrt(fmax(m.gphiphi, 1e-12));
@@ -459,73 +561,28 @@ static void render_grid(void)
             }
         }
 
-        int first = 1, px0 = 0, py0 = 0;
-        for(int ip=0; ip<=Np; ip++){
-            double phi = TWO_PI * (double)ip / (double)Np;
-            int sx, sy;
-            PROJECT_POINT(rho_r, phi, z_r, sx, sy);
-            if(!first){
-                draw_line(px0, py0, sx, sy, rings[kidx].R, rings[kidx].G, rings[kidx].B);
-            }
-            px0 = sx; py0 = sy; first = 0;
-        }
-    }
+        for(int i=0; i<12; i++){
+            double phi = TWO_PI * (double)i / 12.0;
+            int ax, ay;
+            PROJECT_POINT(rho_r, phi, z_r, ax, ay);
 
-    KerrMetric mh;
-    kerr_metric(g_kp.rp, a, &mh);
-    double rho_h = sqrt(fmax(mh.gphiphi, 1e-12));
-    int rad = (int)(rho_h * scale * 0.55);
-    if(rad > 2) fill_circle((int)cx, (int)(cy + 0.02*HEIGHT), rad, 0, 0, 0);
+            double tang = phi + PI/2.0;
+            double al = 0.35 + a*0.55;
+            uint8_t fc = (uint8_t)(230*al);
+            uint8_t gc = (uint8_t)(110*al);
+            uint8_t bc = (uint8_t)( 15*al);
 
-    /* Indicatori dinamici del frame dragging */
-    if(a > 0.01){
-        const double phase = g_phi_off * 2.0;
-        const int nrings = 5;
-        const int nvec   = 14;
+            int ax2 = ax + (int)(10*cos(tang));
+            int ay2 = ay - (int)( 7*sin(tang)*ci);
 
-        for(int jr=0; jr<nrings; jr++){
-            double rr = g_kp.rp * (1.18 + 0.34*jr);
-            if(rr >= r_max) break;
-
-            KerrMetric m;
-            kerr_metric(rr, a, &m);
-
-            double omega = -m.gtphi / m.gphiphi; /* velocità angolare locale dei frame */
-            double rho_r = sqrt(fmax(m.gphiphi, 1e-12));
-
-            double z_r = 0.0;
-            for(int i=1; i<=Nr; i++){
-                if(rr <= rtab[i]){
-                    double u = (rr - rtab[i-1]) / (rtab[i] - rtab[i-1]);
-                    z_r = ztab[i-1] * (1.0-u) + ztab[i] * u;
-                    break;
-                }
-            }
-
-            for(int i=0; i<nvec; i++){
-                double phi = TWO_PI * (double)i / (double)nvec + phase * (0.55 + 24.0*omega);
-                int ax, ay;
-                PROJECT_POINT(rho_r, phi, z_r, ax, ay);
-
-                double tang = phi + PI/2.0;
-                double lenf = 7.0 + fmin(15.0, 220.0 * fabs(omega));
-                uint8_t fc = (uint8_t)fmin(255.0, 120.0 + 110.0 * a + 600.0 * fabs(omega));
-                uint8_t gc = (uint8_t)fmin(255.0,  55.0 +  70.0 * a + 260.0 * fabs(omega));
-                uint8_t bc = (uint8_t)20;
-
-                int ax2 = ax + (int)(lenf * cos(tang));
-                int ay2 = ay - (int)(lenf * sin(tang) * cpit);
-
-                draw_line(ax, ay, ax2, ay2, fc, gc, bc);
-                put_pixel(ax2 + (int)(4*cos(tang + 2.55)), ay2 - (int)(3*sin(tang + 2.55)*cpit), fc, gc, bc);
-                put_pixel(ax2 + (int)(4*cos(tang - 2.55)), ay2 - (int)(3*sin(tang - 2.55)*cpit), fc, gc, bc);
-            }
+            draw_line(ax, ay, ax2, ay2, fc, gc, bc);
+            put_pixel(ax2 + (int)(4*cos(tang + 2.5)), ay2 - (int)(3*sin(tang + 2.5)), fc, gc, bc);
+            put_pixel(ax2 + (int)(4*cos(tang - 2.5)), ay2 - (int)(3*sin(tang - 2.5)), fc, gc, bc);
         }
     }
 
     #undef PROJECT_POINT
 }
-
 /* ------------------------------------------------------------------ */
 /*  RENDER 1: GEODETICHE NULLE                                          */
 /* ------------------------------------------------------------------ */
@@ -831,15 +888,6 @@ EMSCRIPTEN_KEEPALIVE void set_nrays(int n)
 
 EMSCRIPTEN_KEEPALIVE void set_remit(double r)
 { g_remit=fmax(5.0,fmin(40.0,r)); }
-
-EMSCRIPTEN_KEEPALIVE void set_camera(double yaw, double pitch)
-{
-    g_cam_yaw = yaw;
-    g_cam_pitch = fmax(0.20, fmin(1.45, pitch));
-}
-
-EMSCRIPTEN_KEEPALIVE double get_cam_yaw(void)   { return g_cam_yaw; }
-EMSCRIPTEN_KEEPALIVE double get_cam_pitch(void) { return g_cam_pitch; }
 
 EMSCRIPTEN_KEEPALIVE void step_anim(void)
 { g_phi_off+=0.015; }

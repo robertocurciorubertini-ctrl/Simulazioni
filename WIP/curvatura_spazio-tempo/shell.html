@@ -258,7 +258,9 @@ Module.onFrameReady = function() {
     canvas.height = H;
   }
   /* Il buffer WASM è RGBA; ImageData è anche RGBA → copia diretta */
-  const src = new Uint8Array(Module.HEAPU8.buffer, ptr, W*H*4);
+  const heap = (typeof HEAPU8 !== 'undefined') ? HEAPU8 : Module.HEAPU8;
+if (!heap) return;
+const src = heap.subarray(ptr, ptr + W * H * 4);
   imgData.data.set(src);
   ctx.putImageData(imgData, 0, 0);
 };

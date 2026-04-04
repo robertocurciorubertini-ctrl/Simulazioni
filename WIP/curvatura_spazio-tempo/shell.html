@@ -145,22 +145,18 @@ canvas{border:1px solid var(--border);display:block;
         <input type="range" id="sA" min="0.001" max="0.998" step="0.001" value="0.600">
       </label>
       <label style="margin-top:8px">
-        <div class="lr">Zoom<span class="val" id="vZ">1.0</span>×</div>
-        <input type="range" id="sZ" min="1.5" max="3.5" step="0.05" value="1.0">
+        <div class="lr">Zoom<span class="val" id="vZ">2.2</span>×</div>
+        <input type="range" id="sZ" min="0.3" max="4.5" step="0.05" value="2.2">
       </label>
+    </div>
 
-      <div class="sec" style="margin-top:10px">Telecamera</div>
+
+    <div>
+      <div class="sec">Telecamera</div>
       <label>
-        <div class="lr">Yaw<span class="val" id="vYaw">0.78</span> rad</div>
-        <input type="range" id="sYaw" min="-3.14" max="3.14" step="0.01" value="0.78">
-      </label>
-      <label style="margin-top:6px">
         <div class="lr">Pitch<span class="val" id="vPitch">0.92</span> rad</div>
         <input type="range" id="sPitch" min="0.20" max="1.45" step="0.01" value="0.92">
       </label>
-      <div class="info" style="margin-top:6px">
-        Trascina il mouse sul canvas per ruotare la vista nella modalità griglia.
-      </div>
     </div>
 
     <div>
@@ -204,7 +200,7 @@ canvas{border:1px solid var(--border);display:block;
   <!-- Canvas -->
   <div class="carea">
     <canvas id="kerr" width="900" height="700"></canvas>
-    <div class="clabel" id="clabel">Sezione equatoriale immersa della metrica di Kerr</div>
+    <div class="clabel" id="clabel">Sezione equatoriale immersa — metrica di Kerr</div>
     <div class="legend" id="legend">
       <div class="li"><div class="ld" style="background:#c0392b"></div>Orizzonte r<sub>+</sub></div>
       <div class="li"><div class="ld" style="background:#e67e22"></div>Ergosfera</div>
@@ -238,13 +234,9 @@ let animId    = null;
 let imgData   = null;
 let u8view    = null;   /* vista sul buffer pixel WASM */
 let lastT     = 0, fps = 0;
-let camYaw    = 0.78;
-let camPitch  = 0.92;
-let draggingCam = false;
-let dragX = 0, dragY = 0;
 
 const modeLabels = [
-  'Sezione equatoriale immersa della metrica di Kerr',
+  'Sezione equatoriale immersa — metrica di Kerr',
   'Geodetiche nulle (RK4 adattivo) — Boyer-Lindquist',
   'Lente gravitazionale — deflection Kerr',
   'Redshift gravitazionale e dilatazione temporale',
@@ -263,9 +255,10 @@ Module.onFrameReady = function() {
     canvas.width  = W;
     canvas.height = H;
   }
+  /* Il buffer WASM è RGBA; ImageData è anche RGBA → copia diretta */
   const heap = (typeof HEAPU8 !== 'undefined') ? HEAPU8 : Module.HEAPU8;
   if (!heap) return;
-  const src = heap.subarray(ptr, ptr + W * H * 4);
+  const src = heap.subarray(ptr, ptr + W*H*4);
   imgData.data.set(src);
   ctx.putImageData(imgData, 0, 0);
 };
@@ -276,22 +269,9 @@ Module.onRuntimeInitialized = function() {
   document.getElementById('loading').style.opacity = '0';
   setTimeout(() => document.getElementById('loading').style.display='none', 400);
 
-  if (Module._set_camera) Module._set_camera(camYaw, camPitch);
   updatePhysicsInfo();
   requestRender();
 };
-
-function syncCameraUI() {
-  document.getElementById('vYaw').textContent = camYaw.toFixed(2);
-  document.getElementById('vPitch').textContent = camPitch.toFixed(2);
-  document.getElementById('sYaw').value = camYaw.toFixed(2);
-  document.getElementById('sPitch').value = camPitch.toFixed(2);
-}
-
-function applyCamera() {
-  if (!wasmReady || !Module._set_camera) return;
-  Module._set_camera(camYaw, camPitch);
-}
 
 /* ---- Aggiorna UI con quantità fisiche ---- */
 function updatePhysicsInfo() {
@@ -373,8 +353,7 @@ bindSlider('sA','vA',3, v => {
   document.getElementById('stA').textContent = v.toFixed(3);
 });
 bindSlider('sZ','vZ',1, v => Module._set_zoom(v));
-bindSlider('sYaw','vYaw',2, v => { camYaw = v; applyCamera(); });
-bindSlider('sPitch','vPitch',2, v => { camPitch = v; applyCamera(); });
+bindSlider('sPitch','vPitch',2, v => Module._set_pitch(v));
 bindSlider('sN','vN',0, v => Module._set_nrays(v));
 bindSlider('sR','vR',0, v => Module._set_remit(v));
 
@@ -387,6 +366,14 @@ function stopAnim() {
 }
 
 document.getElementById('btnAnim').addEventListener('click', () => {
+  if (currentMode !== 1) {
+    currentMode = 1;
+    Module._set_mode(1);
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    document.querySelector('[data-mode="1"]').classList.add('active');
+    document.getElementById('clabel').textContent = modeLabels[1];
+    document.getElementById('stMode').textContent = modeNames[1];
+  }
   if (animating) {
     stopAnim();
   } else {
@@ -401,43 +388,6 @@ document.getElementById('btnRender').addEventListener('click', () => {
   stopAnim();
   requestRender();
 });
-
-canvas.addEventListener('pointerdown', (e) => {
-  if (currentMode !== 0) return;
-  draggingCam = true;
-  dragX = e.clientX;
-  dragY = e.clientY;
-  canvas.setPointerCapture?.(e.pointerId);
-});
-
-canvas.addEventListener('pointermove', (e) => {
-  if (!draggingCam || currentMode !== 0) return;
-  const dx = e.clientX - dragX;
-  const dy = e.clientY - dragY;
-  dragX = e.clientX;
-  dragY = e.clientY;
-
-  camYaw   += dx * 0.010;
-  camPitch += dy * 0.006;
-  if (camPitch < 0.20) camPitch = 0.20;
-  if (camPitch > 1.45) camPitch = 1.45;
-
-  applyCamera();
-  syncCameraUI();
-  if (!animating) requestRender();
-});
-
-function endCameraDrag(e) {
-  draggingCam = false;
-  if (e && canvas.releasePointerCapture) {
-    try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
-  }
-}
-
-canvas.addEventListener('pointerup', endCameraDrag);
-canvas.addEventListener('pointerleave', endCameraDrag);
-
-syncCameraUI();
 
 /* ---- Progress loading ---- */
 Module.setStatus = function(text) {

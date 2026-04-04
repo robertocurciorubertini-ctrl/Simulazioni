@@ -342,7 +342,7 @@ static void render_grid(void)
     const int Np = 96;    /* campionamento angolare */
 
     /* Inclinazione della camera per vista pseudo-3D */
-    const double incl = 0.95;   /* rad */
+    const double incl = 0.6;   /* rad */
     const double ci   = cos(incl);
     const double si   = sin(incl);
 

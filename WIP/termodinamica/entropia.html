@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entropia — Simulazione Interattiva</title>
+<script>
+window.SIM_METADATA = {
+  title: "Entropia",
+  description: "Esplora l’entropia dal punto di vista microscopico attraverso espansione libera, miscelamento di gas, distribuzione di Maxwell-Boltzmann e modello a microstati.",
+  category: "Termodinamica",
+  icon: "🎲",
+  order: 30,
+  tags: [
+    "entropia",
+    "secondo principio",
+    "microstati",
+    "Boltzmann",
+    "Maxwell-Boltzmann",
+    "miscelamento",
+    "espansione libera",
+    "irreversibilità"
+  ],
+  level: "avanzato"
+};
+</script>
+<!-- Open Graph -->
+<meta property="og:title" content="Entropia — Simulazione Interattiva del Secondo Principio">
+<meta property="og:description" content="Visualizza l'entropia dal punto di vista microscopico: espansione libera, miscelamento, Maxwell-Boltzmann, microstati e inversione temporale.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="it_IT">
+
+<!-- Contenuto didattico -->
+<meta name="educational-level" content="Liceo Scientifico, Università — Fisica I e II">
+<meta name="learning-objectives" content="Definizione di Boltzmann S=k ln Omega; Secondo Principio della Termodinamica; Irreversibilità e freccia del tempo; Espansione libera di Joule; Entropia di miscelamento; Distribuzione di Maxwell-Boltzmann; Microstati e macrostati">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+:root {
+  --cream:#f5f0e8; --cream2:#ede7d9; --ink:#1a1612; --ink-soft:#3d3530;
+  --ink-muted:#7a6e65; --accent:#8b3a2a; --accent2:#2a5c8b; --accent3:#2a7a4f;
+  --gold:#c4973a; --border:#c8b99a; --panel-bg:#f0ead8; --panel-border:#d4c5a9;
+  --colA:#4a8fd4; --colB:#d4704a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-weight:300;min-height:100vh;}
+
+header{background:var(--ink);color:var(--cream);padding:16px 28px;display:flex;align-items:baseline;gap:16px;border-bottom:3px solid var(--gold);}
+header h1{font-family:'EB Garamond',serif;font-size:1.5rem;font-weight:500;}
+header span{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;}
+
+.mode-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--cream2);padding:0 24px;overflow-x:auto;}
+.mode-tab{padding:10px 18px;font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--ink-muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s;white-space:nowrap;}
+.mode-tab:hover{color:var(--ink);}
+.mode-tab.active{color:var(--ink);border-bottom-color:var(--accent);font-weight:500;}
+
+.app{display:grid;grid-template-columns:1fr 300px;gap:0;max-width:1240px;margin:0 auto;padding:20px 20px 0;}
+.left{display:flex;flex-direction:column;gap:14px;padding-right:16px;}
+.right{display:flex;flex-direction:column;gap:11px;}
+
+.panel{background:var(--panel-bg);border:1.5px solid var(--panel-border);border-radius:4px;padding:13px 15px;}
+.panel-title{font-family:'EB Garamond',serif;font-size:1rem;font-weight:500;border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:10px;}
+.sim-label{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px;}
+
+canvas{display:block;border:1.5px solid var(--border);border-radius:2px;}
+#gasCanvas{background:#111318;}
+#sCanvas{background:var(--cream);}
+#mbCanvas{background:var(--cream);}
+
+/* State */
+.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.kpi{background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:7px 9px;}
+.kpi .kl{font-family:'IBM Plex Mono',monospace;font-size:.59rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.06em;}
+.kpi .kv{font-family:'IBM Plex Mono',monospace;font-size:1rem;font-weight:500;margin-top:2px;}
+.kpi.cS .kv{color:var(--accent);}
+.kpi.cT .kv{color:var(--gold);}
+.kpi.cO .kv{color:var(--accent2);}
+.kpi.cM .kv{color:var(--accent3);}
+
+/* Entropy bar */
+.s-bar-wrap{margin-top:8px;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:8px 10px;}
+.s-bar-label{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--ink-muted);margin-bottom:4px;display:flex;justify-content:space-between;}
+.s-bar-track{height:10px;background:#ddd;border-radius:5px;overflow:hidden;position:relative;}
+.s-bar-fill{height:100%;border-radius:5px;transition:width .1s;background:linear-gradient(90deg,var(--accent2),var(--accent));}
+.s-bar-max{position:absolute;right:0;top:0;height:100%;width:2px;background:var(--accent3);opacity:.6;}
+
+/* Sliders */
+.slg{margin-bottom:9px;}
+.sl-label{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--ink-muted);margin-bottom:3px;}
+.sl-label span{color:var(--ink);font-weight:500;}
+input[type=range]{width:100%;accent-color:var(--accent);height:4px;cursor:pointer;}
+
+/* Buttons */
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
+.btn{padding:6px 12px;border:1.5px solid var(--border);border-radius:3px;background:var(--cream);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer;transition:.14s;letter-spacing:.03em;}
+.btn:hover{background:var(--ink);color:var(--cream);}
+.btn.primary{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent);}
+.btn.danger{border-color:#a03020;color:#a03020;}
+.btn.danger:hover{background:#a03020;color:#fff;}
+.btn.success{border-color:var(--accent3);color:var(--accent3);}
+.btn.success:hover{background:var(--accent3);color:#fff;}
+
+/* Separator wall */
+#wall-btn{width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:3px;background:transparent;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--ink-muted);cursor:pointer;transition:.14s;margin-bottom:6px;}
+#wall-btn:hover{background:var(--ink);color:var(--cream);border-style:solid;}
+#wall-btn.open{border-color:var(--accent);color:var(--accent);}
+
+/* Legend dots */
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px;}
+.li{display:flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--ink-soft);}
+.ld{width:9px;height:9px;border-radius:50%;}
+
+/* Status badge */
+.status-badge{display:inline-block;padding:3px 10px;border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:500;letter-spacing:.05em;}
+.sb-rev{background:#e0f0e8;color:var(--accent3);border:1px solid var(--accent3);}
+.sb-irr{background:#f0e0e0;color:var(--accent);border:1px solid var(--accent);}
+.sb-inv{background:#e8e0f0;color:#6030a0;border:1px solid #6030a0;}
+
+/* Microstate display */
+.micro-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin-top:6px;}
+.micro-cell{aspect-ratio:1;border-radius:2px;border:1px solid var(--border);background:var(--cream);transition:background .2s;}
+.micro-cell.occ{background:var(--accent2);}
+
+/* Proc desc */
+.proc-desc{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--ink-muted);line-height:1.55;margin-top:5px;padding:6px 8px;background:var(--cream);border-left:2px solid var(--gold);border-radius:0 3px 3px 0;}
+
+/* EXPLANATION */
+.explanation{max-width:1240px;margin:24px auto 0;padding:0 20px 48px;}
+.section-title{font-family:'EB Garamond',serif;font-size:1.55rem;font-weight:500;text-align:center;margin-bottom:6px;}
+.divider{width:50px;height:2px;background:var(--accent);margin:0 auto 22px;}
+.exp-intro{font-family:'EB Garamond',serif;font-size:1rem;line-height:1.8;color:var(--ink-soft);max-width:820px;margin:0 auto 24px;text-align:center;}
+.exp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;}
+.ec{background:var(--panel-bg);border:1.5px solid var(--panel-border);border-radius:4px;padding:18px 20px;}
+.ec h3{font-family:'EB Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.ec h3::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ec.c1 h3::before{background:var(--accent);}
+.ec.c2 h3::before{background:var(--accent2);}
+.ec.c3 h3::before{background:var(--accent3);}
+.ec.c4 h3::before{background:var(--gold);}
+.ec.c5 h3::before{background:#7050b0;}
+.ec p{font-size:.855rem;line-height:1.72;color:var(--ink-soft);margin-bottom:8px;}
+.formula-block{background:var(--cream);border-left:3px solid var(--border);border-radius:0 3px 3px 0;padding:8px 12px;margin:8px 0;font-size:.9rem;}
+
+@media(max-width:840px){.app{grid-template-columns:1fr;}.left{padding-right:0;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Entropia — Simulazione Interattiva</h1>
+  <span>Secondo Principio · Fisica Statistica</span>
+</header>
+
+<div class="mode-tabs">
+  <button class="mode-tab active" onclick="setMode('expansion')"  id="tab-expansion">↔ Espansione libera</button>
+  <button class="mode-tab"        onclick="setMode('mixing')"     id="tab-mixing">🔀 Miscelamento</button>
+  <button class="mode-tab"        onclick="setMode('maxwell')"    id="tab-maxwell">📊 Maxwell-Boltzmann</button>
+  <button class="mode-tab"        onclick="setMode('micro')"      id="tab-micro">🎲 Microstati</button>
+</div>
+
+<div class="app">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="panel">
+      <div class="sim-label" id="gas-label">Camera del gas</div>
+      <canvas id="gasCanvas" width="640" height="300"></canvas>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:6px;" id="legend-row">
+        <div class="legend" id="leg"></div>
+        <div style="margin-left:auto;" id="status-badge-wrap"></div>
+      </div>
+    </div>
+
+    <!-- S(t) plot — hidden in micro mode -->
+    <div class="panel" id="s-plot-panel">
+      <div class="sim-label">Entropia S(t) — evoluzione temporale</div>
+      <canvas id="sCanvas" width="640" height="160"></canvas>
+    </div>
+
+    <!-- MB histogram — shown only in maxwell mode -->
+    <div class="panel" id="mb-panel" style="display:none;">
+      <div class="sim-label">Distribuzione delle velocità — istogramma vs Maxwell-Boltzmann</div>
+      <canvas id="mbCanvas" width="640" height="180"></canvas>
+    </div>
+
+    <!-- Microstate grid — shown only in micro mode -->
+    <div class="panel" id="micro-panel" style="display:none;">
+      <div class="sim-label">Griglia microstati — distribuzione particelle (64 celle)</div>
+      <div class="micro-grid" id="micro-grid"></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--ink-muted);margin-top:7px;" id="micro-caption">
+        Celle occupate = microstato corrente &nbsp;|&nbsp; $\Omega$ = numero di configurazioni possibili
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+
+    <!-- State / entropy -->
+    <div class="panel">
+      <div class="panel-title">Variabili termodinamiche</div>
+      <div class="kpi-row">
+        <div class="kpi cS"><div class="kl">Entropia S</div><div class="kv" id="dS">0.000</div></div>
+        <div class="kpi cT"><div class="kl">Temperatura T</div><div class="kv" id="dT">—</div></div>
+        <div class="kpi cO"><div class="kl">Microstati Ω</div><div class="kv" id="dOmega">—</div></div>
+        <div class="kpi cM"><div class="kl">ΔS processo</div><div class="kv" id="dDS">0.000</div></div>
+      </div>
+      <div class="s-bar-wrap">
+        <div class="s-bar-label"><span>S / S<sub>max</sub></span><span id="s-pct">0%</span></div>
+        <div class="s-bar-track">
+          <div class="s-bar-fill" id="s-bar" style="width:0%"></div>
+          <div class="s-bar-max"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode controls -->
+    <div class="panel" id="ctrl-panel">
+      <!-- injected -->
+    </div>
+
+    <!-- Global controls -->
+    <div class="panel">
+      <div class="panel-title">Impostazioni</div>
+      <div class="slg">
+        <div class="sl-label">N particelle <span id="lbl-N">80</span></div>
+        <input type="range" id="sl-N" min="20" max="160" value="80" oninput="document.getElementById('lbl-N').textContent=this.value;onChangeN(this.value)">
+      </div>
+      <div class="slg">
+        <div class="sl-label">Velocità sim. <span id="lbl-sp">1×</span></div>
+        <input type="range" id="sl-sp" min="1" max="6" value="1" step="1" oninput="simSpeed=parseInt(this.value);document.getElementById('lbl-sp').textContent=this.value+'×'">
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="resetAll()">Reset</button>
+        <button class="btn" id="btn-pause" onclick="togglePause()">Pausa</button>
+        <button class="btn danger" onclick="reverseTime()" id="btn-rev" title="Inverte tutte le velocità">⟳ Inverti tempo</button>
+      </div>
+      <div class="proc-desc" id="mode-desc">
+        Espansione libera: il gas si espande nel vuoto. Q=0, W=0, ΔU=0 — ma ΔS > 0.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- EXPLANATION -->
+<div class="explanation">
+
+  <!-- ═══ DESCRIZIONE DELLA FISICA ═══ -->
+  <div class="section-title">Cos'è questa simulazione</div>
+  <div class="divider"></div>
+  <p class="exp-intro" style="margin-bottom:32px;">
+    Questa simulazione esplora l'<strong>entropia</strong> — la grandezza fisica più enigmatica della termodinamica —
+    attraverso quattro esperimenti interattivi distinti. L'entropia non è direttamente osservabile come la
+    temperatura o la pressione: emerge dalla <em>statistica dei microstati</em>, cioè dal numero di modi
+    in cui le molecole di un sistema possono essere arrangiate compatibilmente con lo stato macroscopico osservato.
+    Ogni modalità illumina un aspetto diverso di questa grandezza, dal suo legame con l'irreversibilità
+    alla sua interpretazione probabilistica profonda.
+  </p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:40px;">
+    <div style="background:var(--panel-bg);border:1.5px solid var(--panel-border);border-radius:4px;padding:18px 20px;">
+      <h3 style="font-family:'EB Garamond',serif;font-size:1.05rem;font-weight:500;margin-bottom:8px;">↔ Espansione libera</h3>
+      <p style="font-size:.855rem;line-height:1.72;color:var(--ink-soft);">
+        Il gas occupa inizialmente la metà sinistra della camera; la metà destra è vuoto.
+        Premi <strong>"Apri la parete"</strong> per rimuovere il setto.
+        Il gas si espande senza compiere lavoro ($W=0$) e senza scambiare calore ($Q=0$): la temperatura
+        non cambia. Eppure il grafico $S(t)$ mostra un aumento netto di entropia,
+        $\Delta S = Nk_B \ln(V_f/V_i)$. Questo dimostra che l'entropia non è semplicemente $Q/T$:
+        dipende dal <em>volume di fase accessibile</em> alle particelle.
+      </p>
+    </div>
+    <div style="background:var(--panel-bg);border:1.5px solid var(--panel-border);border-radius:4px;padding:18px 20px;">
+      <h3 style="font-family:'EB Garamond',serif;font-size:1.05rem;font-weight:500;margin-bottom:8px;">🔀 Miscelamento</h3>
+      <p style="font-size:.855rem;line-height:1.72;color:var(--ink-soft);">
+        Gas A (blu) e gas B (arancio) partono separati da un setto. Alla sua rimozione si mescolano
+        spontaneamente. Non c'è differenza di temperatura né di pressione tra i due compartimenti:
+        il motore del processo è puramente <em>entropico</em>. L'entropia di miscelamento aumenta
+        perché crescono le possibili configurazioni dei due tipi di molecole nello spazio comune.
+        Lo slider permette di variare la composizione e osservare come $\Delta S_{\text{mix}}$
+        raggiunga il massimo per frazioni uguali ($x_A = x_B = 0.5$).
+      </p>
+    </div>
+    <div style="background:var(--panel-bg);border:1.5px solid var(--panel-border);border-radius:4px;padding:18px 20px;">
+      <h3 style="font-family:'EB Garamond',serif;font-size:1.05rem;font-weight:500;margin-bottom:8px;">📊 Maxwell-Boltzmann</h3>
+      <p style="font-size:.855rem;line-height:1.72;color:var(--ink-soft);">
+        L'istogramma delle velocità scalari delle particelle converge automaticamente alla
+        distribuzione teorica di Maxwell-Boltzmann — il profilo che <em>massimizza l'entropia</em>
+        soggetta al vincolo di energia totale fissa. Varia la temperatura con lo slider e osserva
+        come la curva si allarghi: più alta è $T$, più è dispersa la distribuzione, più alta è l'entropia.
+        La velocità più probabile $v_p = \sqrt{k_BT/m}$ è marcata sul grafico.
+      </p>
+    </div>
+    <div style="background:var(--panel-bg);border:1.5px solid var(--panel-border);border-radius:4px;padding:18px 20px;">
+      <h3 style="font-family:'EB Garamond',serif;font-size:1.05rem;font-weight:500;margin-bottom:8px;">🎲 Microstati</h3>
+      <p style="font-size:.855rem;line-height:1.72;color:var(--ink-soft);">
+        Modello discreto: $N$ particelle saltano casualmente tra 64 celle di una griglia.
+        L'entropia è calcolata direttamente da $S = k_B \ln\Omega$, dove $\Omega$ è il numero di
+        configurazioni compatibili con la distribuzione osservata. Il sistema parte con tutte le
+        particelle concentrate in un angolo (bassa $\Omega$, bassa $S$) e diffonde spontaneamente
+        verso la distribuzione uniforme (massima $\Omega$, massima $S$). Il grafico mostra
+        $\ln\Omega(t)$ salire verso il valore teorico $\ln\binom{64}{N}$.
+      </p>
+    </div>
+  </div>
+
+  <div style="background:var(--panel-bg);border:1.5px solid var(--panel-border);border-radius:4px;padding:18px 22px;max-width:860px;margin:0 auto 40px;">
+    <h3 style="font-family:'EB Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:8px;">⟳ Il pulsante "Inverti tempo"</h3>
+    <p style="font-size:.875rem;line-height:1.72;color:var(--ink-soft);">
+      Il pulsante <strong>"Inverti tempo"</strong> inverte simultaneamente le velocità di tutte le particelle:
+      $\vec{v}_i \to -\vec{v}_i$. Poiché le equazioni del moto di Newton sono <em>time-reversal symmetric</em>,
+      il sistema dovrebbe ripercorrere esattamente il percorso al contrario — e per un breve istante lo fa,
+      con l'entropia che scende. Ma l'amplificazione caotica degli errori numerici fa sì che il sistema
+      diverga rapidamente dalla traiettoria inversa e torni verso l'equilibrio.
+      Questo mostra che l'irreversibilità non è una legge fondamentale microscopica, ma una conseguenza
+      statistica: gli stati ordinati sono incomparabilmente meno numerosi di quelli disordinati.
+    </p>
+  </div>
+
+  <div class="section-title">Fisica dell'entropia</div>
+  <div class="divider"></div>
+  <p class="exp-intro">
+    L'entropia è la misura del <em>disordine microscopico</em> di un sistema — o più precisamente, del <strong>numero di microstati compatibili con lo stato macroscopico osservato</strong>.
+    Il Secondo Principio della Termodinamica afferma che l'entropia totale di un sistema isolato non può diminuire: $\Delta S_{\text{tot}} \geq 0$,
+    con l'uguaglianza solo per processi reversibili.
+  </p>
+  <div class="exp-grid">
+
+    <div class="ec c1">
+      <h3>Definizione di Boltzmann</h3>
+      <p>Ludwig Boltzmann nel 1877 fornì la definizione microscopica fondamentale dell'entropia,
+         incisa sulla sua lapide a Vienna. Il numero $\Omega$ di microstati — cioè di configurazioni microscopiche
+         compatibili con lo stato macroscopico (T, P, V fissati) — determina l'entropia:</p>
+      <div class="formula-block">$$S = k_B \ln \Omega$$</div>
+      <p>Dove $k_B = 1.38\times10^{-23}$ J/K è la costante di Boltzmann.
+         Più microstati sono accessibili al sistema, più alta è l'entropia. Lo stato di equilibrio corrisponde
+         al macrostato con il maggior numero di microstati: il sistema vi "cade" semplicemente per ragioni statistiche,
+         non per una forza misteriosa.</p>
+    </div>
+
+    <div class="ec c2">
+      <h3>Espansione libera di Joule</h3>
+      <p>Un gas ideale si espande in un recipiente vuoto adiacente. Non compie lavoro ($W=0$, il vuoto non oppone resistenza),
+         e se la parete è adiabatica non c'è scambio di calore ($Q=0$). Il Primo Principio dà $\Delta U = 0$,
+         quindi la temperatura non cambia. Eppure l'entropia aumenta:</p>
+      <div class="formula-block">$$\Delta S = Nk_B \ln\!\frac{V_f}{V_i} > 0$$</div>
+      <p>Questo dimostra che l'entropia <em>non è funzione solo di T</em>: dipende dal volume accessibile alle particelle,
+         ovvero dal numero di posizioni che possono occupare — dal numero di microstati.
+         Il processo è irreversibile: non vedremo mai le particelle tornare spontaneamente nella metà sinistra.</p>
+    </div>
+
+    <div class="ec c3">
+      <h3>Entropia di miscelamento</h3>
+      <p>Due gas diversi (A e B) separati da un setto si mischiano spontaneamente alla rimozione del setto.
+         Anche se non ci sono interazioni tra i gas, l'entropia aumenta perché aumenta il numero di configurazioni accessibili.
+         Per $N_A$ particelle di A e $N_B$ di B a temperatura e pressione uguali:</p>
+      <div class="formula-block">$$\Delta S_{\text{mix}} = -Nk_B\bigl(x_A \ln x_A + x_B \ln x_B\bigr)$$</div>
+      <p>dove $x_A = N_A/N$ e $x_B = N_B/N$ sono le frazioni molari. Questa formula è sempre positiva
+         (poiché $\ln x < 0$ per $x<1$) e raggiunge il massimo per $x_A = x_B = 0.5$.
+         Il miscelamento è un processo spontaneo e irreversibile: la "smiscelazione" spontanea è
+         termodinamicamente proibita.</p>
+    </div>
+
+    <div class="ec c4">
+      <h3>Maxwell-Boltzmann e disordine</h3>
+      <p>All'equilibrio termico le velocità delle particelle di un gas seguono la distribuzione di Maxwell-Boltzmann.
+         In 2D la distribuzione delle velocità scalari è:</p>
+      <div class="formula-block">$$f(v) = \frac{m}{k_BT}\,v\,e^{-mv^2/2k_BT}$$</div>
+      <p>Questa distribuzione massimizza l'entropia soggetta ai vincoli di energia totale fissa e normalizzazione —
+         è lo stato di <em>massimo disordine compatibile con l'energia disponibile</em>.
+         Quando si scalda il gas la distribuzione si allarga verso velocità più alte: più disordine, più entropia.
+         L'istogramma della simulazione converge alla curva teorica in pochi secondi di simulazione.</p>
+    </div>
+
+    <div class="ec c5">
+      <h3>Freccia del tempo e irreversibilità</h3>
+      <p>Le leggi microscopiche della meccanica (Newton, Schrödinger) sono <em>time-reversal symmetric</em>:
+         se si invertono tutte le velocità, le equazioni del moto rimangono valide. Eppure i processi macroscopici
+         sono irreversibili. Perché? Il bottone <strong>"Inverti tempo"</strong> mostra la risposta:
+         immediatamente dopo l'inversione il sistema torna indietro (l'entropia scende momentaneamente),
+         ma il minimo perturbazione numerica amplifica il caos e il sistema torna rapidamente verso l'equilibrio.</p>
+      <p>L'irreversibilità non è una legge fondamentale: è statistica. Uno stato ordinato è compatibile
+         con un numero esponenzialmente piccolo di microstati rispetto allo stato disordinato. La probabilità
+         di una fluttuazione spontanea verso l'ordine è $\sim e^{-\Delta S/k_B}$ — di fatto zero per sistemi macroscopici.</p>
+    </div>
+
+    <div class="ec c1">
+      <h3>Secondo Principio e definizione di Clausius</h3>
+      <p>Rudolf Clausius nel 1865 definì l'entropia in termini macroscopici: per un processo <em>reversibile</em>
+         lo scambio di calore è proporzionale all'entropia scambiata. Per un processo <em>irreversibile</em>,
+         invece, l'entropia prodotta internamente è sempre positiva:</p>
+      <div class="formula-block">$$dS = \frac{\delta Q_{\text{rev}}}{T} \qquad \Delta S_{\text{tot}} = \Delta S_{\text{sistema}} + \Delta S_{\text{ambiente}} \geq 0$$</div>
+      <p>Il Secondo Principio stabilisce la <em>freccia del tempo</em> termodinamica: i processi spontanei
+         avvengono nel verso in cui l'entropia totale aumenta. L'equilibrio corrisponde al massimo dell'entropia:
+         da quel punto il sistema non evolve più spontaneamente.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  GLOBALS
+// ═══════════════════════════════════════════════════════════
+const GAMMA = 5/3;
+const R_part = 4;
+
+let gasCanvas, gasCtx, sCanvas, sCtx, mbCanvas, mbCtx;
+let BW, BH;
+let particles = [];     // {x,y,vx,vy,type:'A'|'B'}
+let simSpeed = 1;
+let paused = false;
+let mode = 'expansion';
+
+// Expansion mode
+let wallOpen = false;
+let wallX = 0;          // separator wall x position
+let S0 = 0;             // entropy at start of expansion
+
+// Mixing mode
+let septumOpen = false;
+let septumX = 0;
+
+// S(t) history
+let sHistory = [];
+const S_HIST_MAX = 500;
+
+// Entropy tracking
+let S_current = 0;
+let S_max = 0;
+let S_initial = 0;
+
+// Microstates mode
+let microN = 16;
+let microCells = 64;
+let microParticles = [];
+let microS_history = [];
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  gasCanvas = document.getElementById('gasCanvas');
+  gasCtx    = gasCanvas.getContext('2d');
+  sCanvas   = document.getElementById('sCanvas');
+  sCtx      = sCanvas.getContext('2d');
+  mbCanvas  = document.getElementById('mbCanvas');
+  mbCtx     = mbCanvas.getContext('2d');
+  BW = gasCanvas.width; BH = gasCanvas.height;
+
+  buildMicroGrid();
+  setMode('expansion');
+  requestAnimationFrame(loop);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  MODE MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+const modeDescs = {
+  expansion: 'Espansione libera nel vuoto: Q=0, W=0, ΔU=0 — ma ΔS > 0. Premi "Apri parete" per avviare.',
+  mixing:    'Miscelamento di due gas: rimuovi il setto per mescolare. ΔS_mix = −Nk[x·ln x + (1−x)·ln(1−x)].',
+  maxwell:   'Distribuzione di Maxwell-Boltzmann: istogramma live vs curva teorica f(v)∝v·exp(−mv²/2kT).',
+  micro:     'Modello a griglia: N particelle in 64 celle. S = k·ln Ω, Ω = C(64,N). Osserva l\'entropia salire.',
+};
+
+function setMode(m) {
+  mode = m;
+  wallOpen = false; septumOpen = false;
+  sHistory = []; microS_history = [];
+  S_current = 0; S_max = 0; S_initial = 0;
+
+  ['expansion','mixing','maxwell','micro'].forEach(id=>{
+    document.getElementById('tab-'+id).classList.toggle('active', id===m);
+  });
+
+  document.getElementById('s-plot-panel').style.display  = m==='micro' ? 'none' : 'block';
+  document.getElementById('mb-panel').style.display      = m==='maxwell' ? 'block' : 'none';
+  document.getElementById('micro-panel').style.display   = m==='micro' ? 'block' : 'none';
+  document.getElementById('mode-desc').textContent = modeDescs[m];
+
+  buildCtrlPanel();
+  resetAll();
+}
+
+function buildCtrlPanel() {
+  const el = document.getElementById('ctrl-panel');
+  const leg = document.getElementById('leg');
+  const sbw = document.getElementById('status-badge-wrap');
+  leg.innerHTML=''; sbw.innerHTML='';
+
+  if (mode==='expansion') {
+    el.innerHTML=`
+      <div class="panel-title">Controllo espansione</div>
+      <button id="wall-btn" onclick="openWall()">▶ Apri la parete divisoria</button>
+      <div class="slg">
+        <div class="sl-label">Temperatura iniziale T <span id="lbl-T0">1.0</span></div>
+        <input type="range" id="sl-T0" min="0.3" max="4" step="0.1" value="1.0"
+          oninput="document.getElementById('lbl-T0').textContent=parseFloat(this.value).toFixed(1)">
+      </div>
+      <div class="proc-desc">Il gas occupa inizialmente la metà sinistra. Quando apri la parete si espande nel vuoto a destra.</div>`;
+    leg.innerHTML=`<div class="li"><div class="ld" style="background:#5090e0"></div>Gas</div>
+                   <div class="li"><div class="ld" style="background:#555"></div>Vuoto</div>`;
+  } else if (mode==='mixing') {
+    el.innerHTML=`
+      <div class="panel-title">Controllo miscelamento</div>
+      <button id="wall-btn" onclick="openSeptum()">▶ Rimuovi il setto divisorio</button>
+      <div class="slg">
+        <div class="sl-label">Frazione gas A &nbsp;<span id="lbl-fA">50%</span></div>
+        <input type="range" id="sl-fA" min="10" max="90" step="5" value="50"
+          oninput="document.getElementById('lbl-fA').textContent=this.value+'%'">
+      </div>
+      <div class="proc-desc">Gas A (blu) a sinistra, gas B (arancio) a destra. I gas hanno la stessa T e P: il miscelamento avviene spontaneamente.</div>`;
+    leg.innerHTML=`<div class="li"><div class="ld" style="background:var(--colA)"></div>Gas A</div>
+                   <div class="li"><div class="ld" style="background:var(--colB)"></div>Gas B</div>`;
+  } else if (mode==='maxwell') {
+    el.innerHTML=`
+      <div class="panel-title">Distribuzione velocità</div>
+      <div class="slg">
+        <div class="sl-label">Temperatura T <span id="lbl-Tmb">1.0</span></div>
+        <input type="range" id="sl-Tmb" min="0.2" max="5" step="0.1" value="1.0"
+          oninput="onChangeTmb(this.value)">
+      </div>
+      <div class="slg">
+        <div class="sl-label">N particelle (MB) <span id="lbl-Nmb">120</span></div>
+        <input type="range" id="sl-Nmb" min="40" max="200" step="10" value="120"
+          oninput="document.getElementById('lbl-Nmb').textContent=this.value;onChangeNmb(this.value)">
+      </div>
+      <div class="proc-desc">Istogramma live delle velocità scalari. La curva rossa è la distribuzione teorica di Maxwell-Boltzmann in 2D: f(v)∝v·e^(−mv²/2kT).</div>`;
+    leg.innerHTML=`<div class="li"><div class="ld" style="background:#5090e0"></div>Particelle</div>
+                   <div class="li"><div class="ld" style="background:#c03020"></div>Maxwell-Boltzmann teorico</div>`;
+  } else if (mode==='micro') {
+    el.innerHTML=`
+      <div class="panel-title">Modello a microstati</div>
+      <div class="slg">
+        <div class="sl-label">N particelle <span id="lbl-Nm">16</span></div>
+        <input type="range" id="sl-Nm" min="1" max="32" step="1" value="16"
+          oninput="document.getElementById('lbl-Nm').textContent=this.value;microN=parseInt(this.value);resetMicro()">
+      </div>
+      <div class="slg">
+        <div class="sl-label">Vel. salto celle <span id="lbl-ms">Normale</span></div>
+        <input type="range" id="sl-ms" min="1" max="5" step="1" value="3"
+          oninput="const ls=['Lenta','Lenta','Normale','Veloce','Max'];document.getElementById('lbl-ms').textContent=ls[parseInt(this.value)-1];microStepRate=parseInt(this.value)">
+      </div>
+      <div class="proc-desc">Ogni particella occupa una delle 64 celle. Ω = C(64,N) è il numero di configurazioni. S = k_B·ln Ω. Il sistema tende spontaneamente verso il macrostato più probabile (N/64 particelle per cella).</div>`;
+    leg.innerHTML='';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PARTICLE PHYSICS
+// ═══════════════════════════════════════════════════════════
+function spawnParticles(N, xMin, xMax, type='A', T=1.0) {
+  const m = R_part+2;
+  let tries;
+  for (let i=0; i<N; i++) {
+    let p;
+    tries=0;
+    do {
+      p={x:xMin+m+Math.random()*(xMax-xMin-2*m),
+         y:m+Math.random()*(BH-2*m),
+         vx:(Math.random()-.5)*4, vy:(Math.random()-.5)*4, type};
+      tries++;
+    } while(tries<80 && particles.some(q=>d2(p,q)<(2*R_part+1)**2));
+    particles.push(p);
+  }
+  rescaleGroup(type, T);
+}
+
+function d2(a,b){const dx=a.x-b.x,dy=a.y-b.y;return dx*dx+dy*dy;}
+
+function rescaleGroup(type, T) {
+  const gr = particles.filter(p=>p.type===type||type===null);
+  if(!gr.length) return;
+  let s=0; for(let p of gr) s+=p.vx*p.vx+p.vy*p.vy;
+  const Tcur=s/(2*gr.length);
+  if(Tcur<1e-9) return;
+  const f=Math.sqrt(T/Tcur);
+  for(let p of gr){p.vx*=f;p.vy*=f;}
+}
+
+function stepParticles(dt) {
+  const N=particles.length;
+  const wallXeff = (!wallOpen && mode==='expansion') ? wallX : ((!septumOpen && mode==='mixing') ? septumX : -1);
+
+  for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;}
+
+  for(let p of particles){
+    if(p.x-R_part<0)   {p.x=R_part;    p.vx=Math.abs(p.vx);}
+    if(p.x+R_part>BW)  {p.x=BW-R_part; p.vx=-Math.abs(p.vx);}
+    if(p.y-R_part<0)   {p.y=R_part;    p.vy=Math.abs(p.vy);}
+    if(p.y+R_part>BH)  {p.y=BH-R_part; p.vy=-Math.abs(p.vy);}
+
+    // separator wall
+    if(wallXeff>0){
+      if(mode==='expansion'){
+        // gas only on left initially; wall is solid
+        if(p.x+R_part>wallXeff && p.vx>0){p.x=wallXeff-R_part;p.vx=-Math.abs(p.vx);}
+      } else if(mode==='mixing'){
+        if(p.type==='A' && p.x+R_part>wallXeff && p.vx>0){p.x=wallXeff-R_part;p.vx=-Math.abs(p.vx);}
+        if(p.type==='B' && p.x-R_part<wallXeff && p.vx<0){p.x=wallXeff+R_part;p.vx=Math.abs(p.vx);}
+      }
+    }
+  }
+
+  // Particle-particle collisions
+  for(let i=0;i<N;i++){
+    for(let j=i+1;j<N;j++){
+      const pi=particles[i],pj=particles[j];
+      const dx=pj.x-pi.x,dy=pj.y-pi.y;
+      const d2v=dx*dx+dy*dy;
+      const md=2*R_part;
+      if(d2v<md*md&&d2v>0.001){
+        const d=Math.sqrt(d2v);
+        const nx=dx/d,ny=dy/d;
+        const ov=md-d;
+        pi.x-=nx*ov/2;pi.y-=ny*ov/2;
+        pj.x+=nx*ov/2;pj.y+=ny*ov/2;
+        const dvx=pj.vx-pi.vx,dvy=pj.vy-pi.vy;
+        const dot=dvx*nx+dvy*ny;
+        if(dot<0){pi.vx+=dot*nx;pi.vy+=dot*ny;pj.vx-=dot*nx;pj.vy-=dot*ny;}
+      }
+    }
+  }
+}
+
+function getT() {
+  if(!particles.length) return 0;
+  let s=0; for(let p of particles) s+=p.vx*p.vx+p.vy*p.vy;
+  return s/(2*particles.length);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ENTROPY COMPUTATION
+// ═══════════════════════════════════════════════════════════
+function computeEntropy() {
+  const N = particles.length;
+  const T = getT();
+  if(!N||!T) return 0;
+
+  if(mode==='expansion') {
+    // S = N*k*ln(V) + N*k*ln(T) + const  →  ΔS = N*k*ln(V/V0)
+    // Approximate: count fraction of particles in right half
+    const nRight = particles.filter(p=>p.x>wallX).length;
+    const fRight = nRight/N;
+    if(fRight<=0||fRight>=1) return S_initial + N*Math.log(BW/wallX);
+    // Positional entropy contribution
+    const S_pos = -N*(fRight*Math.log(fRight)+(1-fRight)*Math.log(1-fRight));
+    return S_initial + S_pos*0.5 + N*Math.log(T/1+1)*0.1;
+  } else if(mode==='mixing') {
+    const nA = particles.filter(p=>p.type==='A').length;
+    const nB = particles.filter(p=>p.type==='B').length;
+    const Ntot = nA+nB;
+    // Segregation: measure how mixed they are
+    // Divide into 10 x-strips, compute local composition
+    const strips=10;
+    let S_mix=0;
+    for(let s=0;s<strips;s++){
+      const x0=s*BW/strips, x1=(s+1)*BW/strips;
+      const pA=particles.filter(p=>p.type==='A'&&p.x>=x0&&p.x<x1).length;
+      const pB=particles.filter(p=>p.type==='B'&&p.x>=x0&&p.x<x1).length;
+      const tot=pA+pB;
+      if(tot<1) continue;
+      const xA=pA/tot, xB=pB/tot;
+      if(xA>0) S_mix-=tot*(xA*Math.log(xA));
+      if(xB>0) S_mix-=tot*(xB*Math.log(xB));
+    }
+    return S_mix/strips;
+  } else if(mode==='maxwell') {
+    // Gibbs entropy: S = -k * N * <ln f(v)>  (approximate via T)
+    return N*(Math.log(T)+1);
+  }
+  return 0;
+}
+
+function computeSmax() {
+  const N = particles.length;
+  if(mode==='expansion') return S_initial + N*Math.log(2);
+  if(mode==='mixing') {
+    const nA=particles.filter(p=>p.type==='A').length;
+    const nB=particles.filter(p=>p.type==='B').length;
+    const Ntot=nA+nB;
+    return -Ntot*(0.5*Math.log(0.5)+0.5*Math.log(0.5));
+  }
+  if(mode==='maxwell') return particles.length*(Math.log(getT())+1)+particles.length*0.3;
+  return 1;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MICROSTATES MODEL (separate from particle sim)
+// ═══════════════════════════════════════════════════════════
+let microStepRate = 3;
+let microStepCounter = 0;
+let microOccupancy = new Array(64).fill(0); // count per cell
+let microPositions = []; // cell index per particle
+
+function resetMicro() {
+  microPositions = [];
+  microOccupancy = new Array(64).fill(0);
+  // Start: all particles in cells 0-7 (left 1/8)
+  for(let i=0;i<microN;i++){
+    const cell=Math.floor(Math.random()*8);
+    microPositions.push(cell);
+    microOccupancy[cell]++;
+  }
+  microS_history=[];
+}
+
+function stepMicro() {
+  // Each particle randomly moves to adjacent cell or stays
+  for(let i=0;i<microN;i++){
+    const old=microPositions[i];
+    // randomly pick new cell
+    let newCell;
+    const r=Math.random();
+    if(r<0.25&&old%8>0) newCell=old-1;
+    else if(r<0.5&&old%8<7) newCell=old+1;
+    else if(r<0.75&&old>=8) newCell=old-8;
+    else if(old<56) newCell=old+8;
+    else newCell=old;
+    microOccupancy[old]--;
+    microPositions[i]=newCell;
+    microOccupancy[newCell]++;
+  }
+}
+
+function logCombination(n,k) {
+  // ln C(n,k) via log-gamma (Stirling)
+  if(k===0||k===n) return 0;
+  let r=0;
+  for(let i=0;i<k;i++) r+=Math.log(n-i)-Math.log(i+1);
+  return r;
+}
+
+function microEntropy() {
+  // Ω = C(64, N) if uniform; actual: use occupancy
+  // More precise: multinomial  Ω = N! / prod(n_i!)
+  // ln Ω = ln N! - sum ln n_i!
+  let lnOmega = logFactorial(microN);
+  for(let c=0;c<64;c++){
+    if(microOccupancy[c]>0) lnOmega -= logFactorial(microOccupancy[c]);
+  }
+  return Math.max(0, lnOmega);
+}
+
+const _lf = [0];
+function logFactorial(n){
+  while(_lf.length<=n) _lf.push(_lf[_lf.length-1]+Math.log(_lf.length));
+  return _lf[n];
+}
+
+function drawMicroGrid() {
+  const grid=document.getElementById('micro-grid');
+  const cells=grid.querySelectorAll('.micro-cell');
+  cells.forEach((c,i)=>{
+    const occ=microOccupancy[i];
+    if(occ===0){c.style.background='';c.style.borderColor='';}
+    else {
+      const t=Math.min(occ/3,1);
+      const r=Math.round(42+t*180);
+      const g=Math.round(90+t*40);
+      const b=Math.round(200-t*160);
+      c.style.background=`rgb(${r},${g},${b})`;
+      c.style.borderColor='transparent';
+    }
+    c.title=`Cella ${i}: ${occ} particelle`;
+  });
+}
+
+function buildMicroGrid() {
+  const grid=document.getElementById('micro-grid');
+  grid.innerHTML='';
+  for(let i=0;i<64;i++){
+    const d=document.createElement('div');
+    d.className='micro-cell';
+    grid.appendChild(d);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DRAWING
+// ═══════════════════════════════════════════════════════════
+function drawGas() {
+  if(mode==='micro'){
+    // Draw microstate schematic
+    gasCtx.fillStyle='#111318';
+    gasCtx.fillRect(0,0,BW,BH);
+
+    // Draw particles as dots on an 8x8 grid overlay
+    const cellW=BW/8, cellH=BH/8;
+    gasCtx.strokeStyle='#222'; gasCtx.lineWidth=1;
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      gasCtx.strokeRect(c*cellW,r*cellH,cellW,cellH);
+    }
+
+    // Color cells
+    for(let i=0;i<64;i++){
+      const cx=(i%8)*cellW, cy=Math.floor(i/8)*cellH;
+      const occ=microOccupancy[i];
+      if(occ>0){
+        const t=Math.min(occ/4,1);
+        const r=Math.round(42+t*180);
+        const g=Math.round(90+t*40);
+        const b=Math.round(200-t*160);
+        gasCtx.fillStyle=`rgba(${r},${g},${b},0.35)`;
+        gasCtx.fillRect(cx+1,cy+1,cellW-2,cellH-2);
+        gasCtx.fillStyle=`rgb(${r},${g},${b})`;
+        gasCtx.font='bold '+(occ>9?11:13)+'px IBM Plex Mono';
+        gasCtx.textAlign='center'; gasCtx.textBaseline='middle';
+        gasCtx.fillText(occ, cx+cellW/2, cy+cellH/2);
+        gasCtx.textAlign='left'; gasCtx.textBaseline='alphabetic';
+      }
+    }
+
+    // Label
+    const S=microEntropy();
+    const lnOmax=logCombination(64,microN);
+    gasCtx.fillStyle='rgba(245,240,232,0.9)';
+    gasCtx.font='12px IBM Plex Mono';
+    gasCtx.fillText(`S/k = ln Ω = ${S.toFixed(2)}   |   S_max/k = ${lnOmax.toFixed(2)}`, 12, BH-12);
+    return;
+  }
+
+  gasCtx.clearRect(0,0,BW,BH);
+  gasCtx.fillStyle='#111318';
+  gasCtx.fillRect(0,0,BW,BH);
+
+  // Walls
+  gasCtx.fillStyle='#2a2520';
+  gasCtx.fillRect(0,0,3,BH); gasCtx.fillRect(BW-3,0,3,BH);
+  gasCtx.fillRect(0,0,BW,3); gasCtx.fillRect(0,BH-3,BW,3);
+
+  // Separator / vacuum zone
+  if(mode==='expansion'){
+    if(!wallOpen){
+      gasCtx.fillStyle='#444';
+      gasCtx.fillRect(wallX-3,0,6,BH);
+      // Vacuum label
+      gasCtx.fillStyle='rgba(100,100,100,0.3)';
+      gasCtx.fillRect(wallX,0,BW-wallX,BH);
+      gasCtx.fillStyle='#555';
+      gasCtx.font='13px IBM Plex Mono';
+      gasCtx.fillText('VUOTO', wallX+(BW-wallX)/2-25, BH/2);
+    }
+  } else if(mode==='mixing'){
+    if(!septumOpen){
+      gasCtx.fillStyle='#666';
+      gasCtx.fillRect(septumX-3,0,6,BH);
+    }
+  }
+
+  // Particles
+  const maxSpd=8;
+  for(let p of particles){
+    const spd=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+    const t=Math.min(spd/maxSpd,1);
+    let col;
+    if(mode==='mixing'){
+      col = p.type==='A' ? `rgba(74,143,212,${0.7+t*0.3})` : `rgba(212,112,74,${0.7+t*0.3})`;
+    } else {
+      const r=Math.round(40+t*215), g=Math.round(80+t*80), b=Math.round(200-t*180);
+      col=`rgb(${r},${g},${b})`;
+    }
+    gasCtx.beginPath();
+    gasCtx.arc(p.x,p.y,R_part,0,Math.PI*2);
+    gasCtx.fillStyle=col;
+    gasCtx.fill();
+  }
+
+  // Entropy overlay (top bar)
+  const S=computeEntropy();
+  const Sm=computeSmax();
+  const frac=Math.max(0,Math.min(1,S/Math.max(Sm,0.01)));
+  const barW=(BW-60)*frac;
+  gasCtx.fillStyle='rgba(0,0,0,0.5)';
+  gasCtx.fillRect(8,8,BW-60,16);
+  const g=gasCtx.createLinearGradient(8,0,8+barW,0);
+  g.addColorStop(0,'#2a5c8b'); g.addColorStop(1,'#c4973a');
+  gasCtx.fillStyle=g;
+  gasCtx.fillRect(8,8,barW,16);
+  gasCtx.fillStyle='rgba(255,255,255,0.85)';
+  gasCtx.font='10px IBM Plex Mono';
+  gasCtx.fillText('S / S_max = '+(frac*100).toFixed(0)+'%', BW-100, 20);
+}
+
+// ——— S(t) PLOT ———
+function drawSPlot() {
+  const W=sCanvas.width, H=sCanvas.height;
+  sCtx.fillStyle='#f5f0e8';
+  sCtx.fillRect(0,0,W,H);
+
+  const pad={l:46,r:16,t:12,b:30};
+  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+
+  const Smax=S_max*1.15||1;
+  function ty(s){return pad.t+ph-(s/Smax)*ph;}
+  function tx(i){return pad.l+(i/S_HIST_MAX)*pw;}
+
+  // Grid
+  sCtx.strokeStyle='#ddd';sCtx.lineWidth=0.7;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+i/4*ph;
+    sCtx.beginPath();sCtx.moveTo(pad.l,y);sCtx.lineTo(pad.l+pw,y);sCtx.stroke();
+    sCtx.fillStyle='#888';sCtx.font='9px IBM Plex Mono';
+    sCtx.fillText((Smax*(1-i/4)).toFixed(1),2,y+3);
+  }
+
+  // S_max reference line
+  sCtx.strokeStyle='rgba(42,122,79,0.5)';sCtx.lineWidth=1;sCtx.setLineDash([4,3]);
+  sCtx.beginPath();sCtx.moveTo(pad.l,ty(S_max));sCtx.lineTo(pad.l+pw,ty(S_max));sCtx.stroke();
+  sCtx.setLineDash([]);
+  sCtx.fillStyle='#2a7a4f';sCtx.font='9px IBM Plex Mono';
+  sCtx.fillText('S_max',pad.l+pw-38,ty(S_max)-3);
+
+  // S(t) curve
+  if(sHistory.length>1){
+    sCtx.beginPath();
+    sCtx.strokeStyle='#8b3a2a';sCtx.lineWidth=2;
+    sHistory.forEach((s,i)=>{
+      const x=tx(i),y=ty(s);
+      i===0?sCtx.moveTo(x,y):sCtx.lineTo(x,y);
+    });
+    sCtx.stroke();
+  }
+
+  // Axes
+  sCtx.strokeStyle='#888';sCtx.lineWidth=1.5;
+  sCtx.beginPath();sCtx.moveTo(pad.l,pad.t);sCtx.lineTo(pad.l,pad.t+ph);sCtx.lineTo(pad.l+pw,pad.t+ph);sCtx.stroke();
+  sCtx.fillStyle='#555';sCtx.font='10px IBM Plex Mono';
+  sCtx.fillText('S',pad.l-30,pad.t+ph/2+4);
+  sCtx.fillText('t →',pad.l+pw-20,pad.t+ph+22);
+}
+
+// ——— Maxwell-Boltzmann histogram ———
+function drawMB() {
+  const W=mbCanvas.width, H=mbCanvas.height;
+  mbCtx.fillStyle='#f5f0e8';
+  mbCtx.fillRect(0,0,W,H);
+
+  const pad={l:44,r:16,t:10,b:30};
+  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+
+  const vmax=10, bins=30;
+  const hist=new Array(bins).fill(0);
+  for(let p of particles){
+    const spd=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+    const b=Math.floor(spd/vmax*bins);
+    if(b<bins) hist[b]++;
+  }
+  const hmax=Math.max(...hist,1);
+  const T=getT();
+
+  // Bars
+  const barW=pw/bins;
+  mbCtx.fillStyle='rgba(74,143,212,0.65)';
+  for(let i=0;i<bins;i++){
+    const bh=(hist[i]/hmax)*ph;
+    mbCtx.fillRect(pad.l+i*barW, pad.t+ph-bh, barW-1, bh);
+  }
+
+  // Maxwell-Boltzmann curve (2D: f(v) = (m/kT)*v*exp(-mv²/2kT), m=1,k=1)
+  mbCtx.strokeStyle='#c03020';mbCtx.lineWidth=2.5;
+  mbCtx.beginPath();
+  let first=true;
+  const normFactor=particles.length*(vmax/bins);
+  for(let vi=0;vi<=vmax;vi+=0.1){
+    const fv=(vi/T)*Math.exp(-vi*vi/(2*T))*normFactor;
+    const x=pad.l+(vi/vmax)*pw;
+    const y=pad.t+ph-(fv/hmax)*ph;
+    first?(mbCtx.moveTo(x,y),first=false):mbCtx.lineTo(x,y);
+  }
+  mbCtx.stroke();
+
+  // v_peak marker
+  const v_peak=Math.sqrt(T);
+  const xp=pad.l+(v_peak/vmax)*pw;
+  mbCtx.strokeStyle='rgba(100,150,80,0.7)';mbCtx.lineWidth=1;mbCtx.setLineDash([3,3]);
+  mbCtx.beginPath();mbCtx.moveTo(xp,pad.t);mbCtx.lineTo(xp,pad.t+ph);mbCtx.stroke();
+  mbCtx.setLineDash([]);
+  mbCtx.fillStyle='#2a7a4f';mbCtx.font='9px IBM Plex Mono';
+  mbCtx.fillText('v_p='+v_peak.toFixed(1),xp+3,pad.t+10);
+
+  // Axes
+  mbCtx.strokeStyle='#888';mbCtx.lineWidth=1.5;
+  mbCtx.beginPath();mbCtx.moveTo(pad.l,pad.t);mbCtx.lineTo(pad.l,pad.t+ph);mbCtx.lineTo(pad.l+pw,pad.t+ph);mbCtx.stroke();
+  mbCtx.fillStyle='#555';mbCtx.font='9px IBM Plex Mono';
+  mbCtx.fillText('f(v)',2,pad.t+ph/2);
+  mbCtx.fillText('v →',pad.l+pw-18,pad.t+ph+22);
+  for(let i=0;i<=4;i++){
+    const v=i/4*vmax;
+    mbCtx.fillText(v.toFixed(0),pad.l+(v/vmax)*pw-4,pad.t+ph+18);
+  }
+}
+
+// microstate S(t) plot
+function drawMicroS() {
+  const W=sCanvas.width, H=sCanvas.height;
+  sCtx.fillStyle='#f5f0e8'; sCtx.fillRect(0,0,W,H);
+  // reuse sHistory for micro
+  const pad={l:46,r:16,t:12,b:30};
+  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+  const Smax_theory=logCombination(64,microN)||1;
+  const Sdisplay=Smax_theory*1.1;
+  function ty(s){return pad.t+ph-(s/Sdisplay)*ph;}
+  sCtx.strokeStyle='#ddd';sCtx.lineWidth=0.7;
+  for(let i=0;i<=4;i++){const y=pad.t+i/4*ph;sCtx.beginPath();sCtx.moveTo(pad.l,y);sCtx.lineTo(pad.l+pw,y);sCtx.stroke();sCtx.fillStyle='#888';sCtx.font='9px IBM Plex Mono';sCtx.fillText((Sdisplay*(1-i/4)).toFixed(1),2,y+3);}
+  sCtx.strokeStyle='rgba(42,122,79,0.5)';sCtx.lineWidth=1;sCtx.setLineDash([4,3]);
+  sCtx.beginPath();sCtx.moveTo(pad.l,ty(Smax_theory));sCtx.lineTo(pad.l+pw,ty(Smax_theory));sCtx.stroke();
+  sCtx.setLineDash([]);sCtx.fillStyle='#2a7a4f';sCtx.font='9px IBM Plex Mono';sCtx.fillText('S_max=ln C(64,'+microN+')',pad.l+pw-120,ty(Smax_theory)-3);
+  if(microS_history.length>1){
+    sCtx.strokeStyle='#2a5c8b';sCtx.lineWidth=2;sCtx.beginPath();
+    microS_history.forEach((s,i)=>{const x=pad.l+(i/Math.max(microS_history.length-1,1))*pw;const y=ty(s);i===0?sCtx.moveTo(x,y):sCtx.lineTo(x,y);});
+    sCtx.stroke();
+  }
+  sCtx.strokeStyle='#888';sCtx.lineWidth=1.5;sCtx.beginPath();sCtx.moveTo(pad.l,pad.t);sCtx.lineTo(pad.l,pad.t+ph);sCtx.lineTo(pad.l+pw,pad.t+ph);sCtx.stroke();
+  sCtx.fillStyle='#555';sCtx.font='10px IBM Plex Mono';sCtx.fillText('ln Ω',pad.l-36,pad.t+ph/2+4);sCtx.fillText('t →',pad.l+pw-20,pad.t+ph+22);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DISPLAY UPDATE
+// ═══════════════════════════════════════════════════════════
+function updateDisplays() {
+  let S, Sm, T, Omega;
+  if(mode==='micro'){
+    S=microEntropy();
+    Sm=logCombination(64,microN);
+    T=0; Omega=Math.round(Math.exp(Math.min(S,50)));
+    document.getElementById('dS').textContent=S.toFixed(3);
+    document.getElementById('dT').textContent='—';
+    document.getElementById('dOmega').textContent=S>30?'≫10⁶':Omega.toFixed(0);
+    document.getElementById('dDS').textContent='+'+(S-0).toFixed(3);
+  } else {
+    S=computeEntropy();
+    Sm=computeSmax();
+    T=getT();
+    const lnOmega=S;
+    document.getElementById('dS').textContent=S.toFixed(3);
+    document.getElementById('dT').textContent=T.toFixed(3);
+    document.getElementById('dOmega').textContent='e^'+S.toFixed(1);
+    document.getElementById('dDS').textContent=(S>=S_initial?'+':'')+(S-S_initial).toFixed(3);
+  }
+
+  S_max=Math.max(S_max,S);
+  const frac=Math.max(0,Math.min(1,S/Math.max(Sm,0.01)));
+  document.getElementById('s-bar').style.width=(frac*100).toFixed(1)+'%';
+  document.getElementById('s-pct').textContent=(frac*100).toFixed(0)+'%';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════════════════════════
+let frameCount=0;
+function loop() {
+  requestAnimationFrame(loop);
+  if(paused) return;
+
+  frameCount++;
+
+  if(mode==='micro'){
+    microStepCounter++;
+    if(microStepCounter>=6/microStepRate){
+      microStepCounter=0;
+      for(let s=0;s<simSpeed;s++) stepMicro();
+      const S=microEntropy();
+      microS_history.push(S);
+      if(microS_history.length>400) microS_history.shift();
+    }
+    drawGas();
+    drawMicroGrid();
+    drawMicroS();
+  } else {
+    for(let s=0;s<simSpeed;s++) stepParticles(0.5);
+    if(frameCount%3===0){
+      const S=computeEntropy();
+      sHistory.push(S);
+      if(sHistory.length>S_HIST_MAX) sHistory.shift();
+      S_max=Math.max(S_max,S);
+    }
+    drawGas();
+    drawSPlot();
+    if(mode==='maxwell') drawMB();
+  }
+
+  updateDisplays();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CONTROLS
+// ═══════════════════════════════════════════════════════════
+function resetAll() {
+  particles=[];
+  sHistory=[]; microS_history=[];
+  S_current=0; S_max=0;
+  wallOpen=false; septumOpen=false;
+
+  if(mode==='expansion'){
+    wallX=BW*0.45;
+    const T0=parseFloat(document.getElementById('sl-T0')?.value||1.0);
+    const N=parseInt(document.getElementById('sl-N').value);
+    // Spawn only in left half
+    spawnLeft(N, T0);
+    S_initial=computeEntropy();
+    S_max=S_initial;
+  } else if(mode==='mixing'){
+    septumX=BW*0.5;
+    const N=parseInt(document.getElementById('sl-N').value);
+    const fA=parseInt(document.getElementById('sl-fA')?.value||50)/100;
+    const NA=Math.round(N*fA), NB=N-NA;
+    spawnParticles(NA, 0, septumX, 'A', 1.0);
+    spawnParticles(NB, septumX, BW, 'B', 1.0);
+    S_initial=computeEntropy();
+    S_max=S_initial;
+  } else if(mode==='maxwell'){
+    const N=parseInt(document.getElementById('sl-Nmb')?.value||120);
+    const T=parseFloat(document.getElementById('sl-Tmb')?.value||1.0);
+    spawnParticles(N, 0, BW, 'A', T);
+    S_initial=computeEntropy();
+  } else if(mode==='micro'){
+    microN=parseInt(document.getElementById('sl-Nm')?.value||16);
+    resetMicro();
+  }
+}
+
+function spawnLeft(N, T) {
+  const m=R_part+2;
+  for(let i=0;i<N;i++){
+    let p, tries=0;
+    do{
+      p={x:m+Math.random()*(wallX-2*m-3), y:m+Math.random()*(BH-2*m), vx:(Math.random()-.5)*4, vy:(Math.random()-.5)*4, type:'A'};
+      tries++;
+    }while(tries<80&&particles.some(q=>d2(p,q)<(2*R_part+1)**2));
+    particles.push(p);
+  }
+  rescaleGroup('A', T);
+}
+
+function openWall() {
+  wallOpen=true;
+  const btn=document.getElementById('wall-btn');
+  if(btn){btn.textContent='⬜ Parete aperta — espansione in corso';btn.classList.add('open');}
+  S_initial=computeEntropy();
+  sHistory=[];
+}
+
+function openSeptum() {
+  septumOpen=true;
+  const btn=document.getElementById('wall-btn');
+  if(btn){btn.textContent='⬜ Setto rimosso — miscelamento in corso';btn.classList.add('open');}
+  S_initial=computeEntropy();
+  sHistory=[];
+}
+
+function reverseTime() {
+  for(let p of particles){p.vx=-p.vx;p.vy=-p.vy;}
+  // Add visual feedback
+  const badge=document.getElementById('status-badge-wrap');
+  badge.innerHTML='<span class="status-badge sb-inv">⟳ TEMPO INVERTITO</span>';
+  setTimeout(()=>badge.innerHTML='',3000);
+}
+
+function onChangeN(val) {
+  resetAll();
+}
+
+function onChangeTmb(val) {
+  document.getElementById('lbl-Tmb').textContent=parseFloat(val).toFixed(1);
+  rescaleGroup(null, parseFloat(val));
+}
+
+function onChangeNmb(val) {
+  particles=[];
+  const T=parseFloat(document.getElementById('sl-Tmb')?.value||1.0);
+  spawnParticles(parseInt(val), 0, BW, 'A', T);
+  sHistory=[];
+}
+
+function togglePause(){
+  paused=!paused;
+  document.getElementById('btn-pause').textContent=paused?'Riprendi':'Pausa';
+}
+</script>
+</body>
+</html>

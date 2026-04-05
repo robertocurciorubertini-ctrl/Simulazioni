@@ -2,67 +2,137 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<script>
-window.SIM_METADATA = {
-  title: "Rifrazione",
-  description: "Simulazione della rifrazione della luce tra mezzi diversi con visualizzazione degli angoli e del cambio di direzione.",
-  category: "Ottica",
-  icon: "↘",
-  order: 10,
-  tags: ["rifrazione", "luce", "indice di rifrazione", "legge di Snell", "ottica geometrica"],
-  level: "base"
-};
-</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulazione Rifrazione — Legge di Snell</title>
+<title>Ottica — Rifrazione, Fibra Ottica, Dispersione</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
-    options: { skipHtmlTags: ['script','noscript','style','textarea'] }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #2c2c2a; padding: 20px; max-width: 900px; margin: 0 auto; }
-  h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
-  .subtitle { font-size: 13px; color: #888780; margin-bottom: 16px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #2c2c2a;
+  padding: 20px;
+  max-width: 860px;
+  margin: 0 auto;
+}
 
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-  .ctrl-group { background: #f7f6f2; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 160px; }
-  .ctrl-label { font-size: 11px; color: #888780; margin-bottom: 3px; }
-  .ctrl-val { font-size: 20px; font-weight: 500; }
-  .ctrl-unit { font-size: 12px; color: #888780; }
-  input[type=range] { width: 100%; margin-top: 5px; accent-color: #378add; }
+/* ── TAB SYSTEM ── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1.5px solid #d3d1c7;
+  margin-bottom: 24px;
+}
+.tab-btn {
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1.5px;
+  cursor: pointer;
+  color: #888780;
+  transition: color .15s, border-color .15s;
+}
+.tab-btn:hover { color: #2c2c2a; }
+.tab-btn.active { color: #185fa5; border-bottom-color: #185fa5; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
 
-  .mat3-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-  .toggle-btn { font-size: 12px; padding: 6px 12px; border: 0.5px solid #d3d1c7; border-radius: 6px; background: white; cursor: pointer; color: #444441; }
-  .toggle-btn.active { background: #b5d4f4; border-color: #378add; color: #042c53; }
-  .mat3-inline { display: none; align-items: center; gap: 8px; font-size: 13px; color: #444441; }
-  .mat3-inline.show { display: flex; }
-  .n-input { width: 72px; border: 0.5px solid #d3d1c7; border-radius: 6px; padding: 5px 8px; font-size: 13px; background: white; color: #2c2c2a; }
+/* ── CONTROLS ── */
+h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #888780; margin-bottom: 16px; line-height: 1.5; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.ctrl-group {
+  background: #f7f6f2; border: 0.5px solid #d3d1c7;
+  border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 155px;
+}
+.ctrl-label { font-size: 11px; color: #888780; margin-bottom: 3px; }
+.ctrl-val { font-size: 20px; font-weight: 500; }
+.ctrl-unit { font-size: 12px; color: #888780; }
+input[type=range] { width: 100%; margin-top: 5px; accent-color: #378add; }
+.mat3-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.toggle-btn {
+  font-size: 12px; padding: 6px 12px;
+  border: 0.5px solid #d3d1c7; border-radius: 6px;
+  background: white; cursor: pointer; color: #444441;
+}
+.toggle-btn.active { background: #b5d4f4; border-color: #378add; color: #042c53; }
+.mat3-inline { display: none; align-items: center; gap: 8px; font-size: 13px; color: #444441; }
+.mat3-inline.show { display: flex; }
+.n-input {
+  width: 72px; border: 0.5px solid #d3d1c7; border-radius: 6px;
+  padding: 5px 8px; font-size: 13px; background: white; color: #2c2c2a;
+}
 
-  .canvas-wrap { border: 0.5px solid #d3d1c7; border-radius: 10px; overflow: hidden; }
-  canvas { display: block; width: 100%; height: auto; }
+/* ── CANVAS ── */
+.canvas-wrap { border: 0.5px solid #d3d1c7; border-radius: 10px; overflow: hidden; }
+canvas { display: block; width: 100%; height: auto; background: white; }
+.status-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; min-height: 28px; }
+.tir-badge {
+  background: #fcebeb; border: 0.5px solid #f09595;
+  border-radius: 6px; padding: 5px 12px; font-size: 13px;
+  color: #a32d2d; font-weight: 500; display: none;
+}
 
-  .status-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
-  .stat { background: #f7f6f2; border: 0.5px solid #d3d1c7; border-radius: 6px; padding: 5px 11px; font-size: 13px; }
-  .stat .val { color: #185fa5; font-weight: 500; }
-  .tir-badge { background: #fcebeb; border: 0.5px solid #f09595; border-radius: 6px; padding: 5px 12px; font-size: 13px; color: #a32d2d; font-weight: 500; display: none; }
+/* ── FORMULAS ── */
+.formulas { margin-top: 22px; border-top: 0.5px solid #d3d1c7; padding-top: 18px; }
+.formulas h2 { font-size: 14px; font-weight: 500; margin-bottom: 14px; }
+.formula-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.formula-card {
+  flex: 1; min-width: 190px; background: #f7f6f2;
+  border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 12px 16px;
+}
+.formula-title { font-size: 10px; color: #888780; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.formula-body { font-size: 15px; line-height: 2.4; color: #2c2c2a; }
+.formula-note { font-size: 11px; color: #888780; margin-top: 6px; line-height: 1.5; }
 
-  .formulas { margin-top: 22px; border-top: 0.5px solid #d3d1c7; padding-top: 18px; }
-  .formulas h2 { font-size: 14px; font-weight: 500; margin-bottom: 14px; }
-  .formula-row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .formula-card { flex: 1; min-width: 200px; background: #f7f6f2; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 12px 16px; }
-  .formula-title { font-size: 10px; color: #888780; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
-  .formula-body { font-size: 15px; line-height: 2.2; color: #2c2c2a; }
-  .formula-note { font-size: 11px; color: #888780; margin-top: 6px; line-height: 1.5; }
+/* ── THEORY ── */
+.theory { margin-top: 24px; }
+.theory h3 { font-size: 14px; font-weight: 500; margin-bottom: 8px; margin-top: 18px; }
+.theory p { font-size: 13px; color: #444441; line-height: 1.75; margin-bottom: 6px; }
+.example {
+  background: #f7f6f2; border-left: 3px solid #378add;
+  border-radius: 0 6px 6px 0; padding: 8px 12px;
+  font-size: 12px; color: #444441; line-height: 1.6; margin-top: 6px;
+}
+
+/* ── PRISMA CHECKBOXES ── */
+.mat-checks { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.mat-check-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: #444441; cursor: pointer;
+  background: #f7f6f2; border: 0.5px solid #d3d1c7;
+  border-radius: 6px; padding: 6px 12px;
+  user-select: none; transition: background .12s;
+}
+.mat-check-label:hover { background: #eeedfe; }
+.mat-check-label input { accent-color: #378add; width: 14px; height: 14px; cursor: pointer; }
+.mat-check-label.checked { background: #e6f1fb; border-color: #378add; color: #042c53; }
 </style>
 </head>
 <body>
 
-<h1>Simulazione Rifrazione — Legge di Snell</h1>
-<p class="subtitle">Il raggio di luce arriva dall'alto. Modifica i parametri per osservare la variazione dell'angolo di rifrazione e il fenomeno della riflessione interna totale.</p>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('snell')">Rifrazione e RIT</button>
+  <button class="tab-btn" onclick="switchTab('fiber')">Fibra ottica</button>
+  <button class="tab-btn" onclick="switchTab('prism')">Dispersione cromatica</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 1 — RIFRAZIONE E RIT
+     ══════════════════════════════════════════ -->
+<div id="tab-snell" class="tab-panel active">
+
+<h1>Rifrazione e Riflessione Interna Totale</h1>
+<p class="subtitle">Il raggio di luce arriva dall'alto. Con il terzo materiale attivo il percorso viene seguito anche alle interfacce successive.</p>
 
 <div class="controls">
   <div class="ctrl-group">
@@ -71,12 +141,12 @@ window.SIM_METADATA = {
     <input type="range" id="sl-theta" min="0" max="89" value="45" step="1">
   </div>
   <div class="ctrl-group">
-    <div class="ctrl-label">Indice di rifrazione n₁ (mezzo superiore)</div>
+    <div class="ctrl-label">n₁ — mezzo superiore</div>
     <div><span class="ctrl-val" id="val-n1">1.00</span></div>
     <input type="range" id="sl-n1" min="100" max="300" value="100" step="1">
   </div>
   <div class="ctrl-group">
-    <div class="ctrl-label">Indice di rifrazione n₂ (mezzo inferiore)</div>
+    <div class="ctrl-label">n₂ — mezzo inferiore</div>
     <div><span class="ctrl-val" id="val-n2">1.50</span></div>
     <input type="range" id="sl-n2" min="100" max="300" value="150" step="1">
   </div>
@@ -86,15 +156,14 @@ window.SIM_METADATA = {
   <button class="toggle-btn" id="btn-add3" onclick="toggleMat3()">+ Aggiungi terzo materiale</button>
   <div class="mat3-inline" id="mat3-controls">
     <span style="color:#888780;font-size:12px">n₃ =</span>
-    <input class="n-input" type="number" id="inp-n3" min="1.00" max="3.00" step="0.05" value="2.00" oninput="draw()">
-    <span style="font-size:11px;color:#888780">(terzo strato)</span>
+    <input class="n-input" type="number" id="inp-n3" min="1.00" max="3.00" step="0.05" value="2.00" oninput="drawSnell()">
+    <span style="font-size:11px;color:#888780">(mezzo inferiore)</span>
   </div>
 </div>
 
 <div class="canvas-wrap">
-  <canvas id="c" width="680" height="400"></canvas>
+  <canvas id="c-snell" width="680" height="400"></canvas>
 </div>
-
 <div class="status-bar">
   <div class="tir-badge" id="tir-badge">⚠ Riflessione interna totale</div>
 </div>
@@ -102,331 +171,681 @@ window.SIM_METADATA = {
 <div class="formulas">
   <h2>Relazioni fisiche fondamentali</h2>
   <div class="formula-row">
-
     <div class="formula-card">
       <div class="formula-title">Legge di Snell-Descartes</div>
       <div class="formula-body">$$n_1 \sin\theta_1 = n_2 \sin\theta_2$$</div>
-      <div class="formula-note">$\theta_1$ = angolo di incidenza, $\theta_2$ = angolo di rifrazione. Entrambi misurati rispetto alla normale alla superficie di separazione tra i due mezzi.</div>
+      <div class="formula-note">$\theta_1$, $\theta_2$ misurati rispetto alla normale alla superficie di separazione.</div>
     </div>
-
     <div class="formula-card">
       <div class="formula-title">Indice di rifrazione</div>
       <div class="formula-body">$$n = \frac{c}{v_m}$$</div>
-      <div class="formula-note">$c \approx 2{,}998 \times 10^8\ \text{m/s}$ è la velocità della luce nel vuoto; $v_m$ è la velocità nel mezzo. Per definizione $n \geq 1$.</div>
+      <div class="formula-note">$c \approx 2{,}998\times10^8\ \text{m/s}$ velocità nel vuoto; $v_m$ velocità nel mezzo. Per definizione $n\geq 1$.</div>
     </div>
-
     <div class="formula-card">
-      <div class="formula-title">Angolo critico (riflessione interna totale)</div>
-      <div class="formula-body">$$\sin\theta_c = \frac{n_2}{n_1} \quad (n_1 > n_2)$$</div>
-      <div class="formula-note">Esiste solo se $n_1 > n_2$. Per $\theta_1 \geq \theta_c$ il raggio non si rifrange: si ha riflessione interna totale (RIT) e il raggio rimane nel mezzo più denso.</div>
+      <div class="formula-title">Angolo critico</div>
+      <div class="formula-body">$$\sin\theta_c = \frac{n_2}{n_1},\quad n_1>n_2$$</div>
+      <div class="formula-note">Per $\theta_1\geq\theta_c$ si ha RIT: il raggio non attraversa l'interfaccia.</div>
     </div>
-
   </div>
 </div>
 
+<div class="theory">
+  <h3>Perché la luce cambia direzione?</h3>
+  <p>Quando un raggio di luce passa da un mezzo a un altro con indice di rifrazione diverso, la sua velocità di fase cambia. Poiché la componente del vettore d'onda parallela all'interfaccia deve restare continua, la direzione di propagazione ruota: è la <em>rifrazione</em>. La legge di Snell $n_1\sin\theta_1 = n_2\sin\theta_2$ esprime esattamente questa condizione al contorno. Se $n_2>n_1$ il raggio si avvicina alla normale ($\theta_2<\theta_1$); se $n_2<n_1$ si allontana.</p>
+  <div class="example">Esempi quotidiani: il cucchiaio che sembra spezzato in acqua; le piscine che sembrano più basse; le lenti degli occhiali; i miraggi nel deserto, causati da strati d'aria a temperatura (e densità) diverse.</div>
+  <h3>Riflessione interna totale</h3>
+  <p>Quando la luce si trova in un mezzo otticamente più denso ($n_1$) e raggiunge l'interfaccia con un mezzo meno denso ($n_2 < n_1$), l'equazione di Snell $\sin\theta_2 = (n_1/n_2)\sin\theta_1$ ammette soluzione reale solo se il membro destro non supera 1. L'angolo critico $\theta_c=\arcsin(n_2/n_1)$ è il limite: per $\theta_1\geq\theta_c$ non esiste raggio rifratto e tutta l'energia viene riflessa internamente. La simulazione mostra anche l'<em>onda evanescente</em>: un campo che penetra nel secondo mezzo per qualche lunghezza d'onda ma non trasporta energia in media.</p>
+  <div class="example">La tab "Fibra ottica" mostra come questo fenomeno possa intrappolare la luce in un nucleo ad alto indice di rifrazione.</div>
+</div>
+</div><!-- fine tab-snell -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 2 — FIBRA OTTICA
+     ══════════════════════════════════════════ -->
+<div id="tab-fiber" class="tab-panel">
+
+<h1>Fibra Ottica — Guida della luce per RIT</h1>
+<p class="subtitle">Un raggio entra lateralmente in un nucleo rettangolare ad alto indice di rifrazione circondato da un mantello a indice più basso. Varia l'angolo di ingresso per osservare la transizione tra propagazione con perdite e guida totale.</p>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <div class="ctrl-label">Angolo di ingresso α (rispetto all'asse della fibra)</div>
+    <div><span class="ctrl-val" id="fib-val-alpha">20</span><span class="ctrl-unit">°</span></div>
+    <input type="range" id="fib-sl-alpha" min="1" max="89" value="20" step="1">
+  </div>
+  <div class="ctrl-group">
+    <div class="ctrl-label">n_core — indice nucleo</div>
+    <div><span class="ctrl-val" id="fib-val-ncore">1.50</span></div>
+    <input type="range" id="fib-sl-ncore" min="120" max="250" value="150" step="1">
+  </div>
+  <div class="ctrl-group">
+    <div class="ctrl-label">n_clad — indice mantello</div>
+    <div><span class="ctrl-val" id="fib-val-nclad">1.20</span></div>
+    <input type="range" id="fib-sl-nclad" min="100" max="200" value="120" step="1">
+  </div>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="c-fiber" width="680" height="340"></canvas>
+</div>
+<div class="status-bar">
+  <div class="tir-badge" id="fib-tir-badge" style="display:none">⚠ Angolo troppo elevato: il raggio esce dal nucleo</div>
+  <div class="tir-badge" id="fib-guide-badge" style="display:none;background:#e1f5ee;border-color:#5dcaa5;color:#085041">✦ Luce guidata per riflessione interna totale</div>
+</div>
+
+<div class="formulas">
+  <h2>Apertura numerica e angolo di accettazione</h2>
+  <div class="formula-row">
+    <div class="formula-card">
+      <div class="formula-title">Angolo critico all'interfaccia nucleo-mantello</div>
+      <div class="formula-body">$$\sin\theta_c = \frac{n_\text{clad}}{n_\text{core}}$$</div>
+      <div class="formula-note">Il raggio all'interno del nucleo deve formare con la normale all'interfaccia laterale un angolo $\geq\theta_c$ affinché si abbia RIT e la luce resti guidata.</div>
+    </div>
+    <div class="formula-card">
+      <div class="formula-title">Apertura numerica (NA)</div>
+      <div class="formula-body">$$\text{NA} = \sqrt{n_\text{core}^2 - n_\text{clad}^2}$$</div>
+      <div class="formula-note">Esprime la capacità della fibra di raccogliere luce. Un cono di semiapertura $\alpha_\text{max}=\arcsin(\text{NA})$ è il massimo angolo di ingresso che permette la guida totale.</div>
+    </div>
+  </div>
+</div>
+
+<div class="theory">
+  <h3>Come funziona la fibra ottica?</h3>
+  <p>Una fibra ottica è composta da un nucleo (core) di vetro ad alto indice di rifrazione $n_\text{core}$ circondato da un mantello (cladding) con indice $n_\text{clad} < n_\text{core}$. La luce entra dall'<em>estremità</em> del nucleo, non lateralmente: si propaga quasi parallela all'asse e ad ogni rimbalzo sulla parete laterale forma un angolo con la normale all'interfaccia che supera l'angolo critico, garantendo la RIT. Nessuna energia sfugge nel mantello: la luce può percorrere chilometri con attenuazione minima.</p>
+  <p>In questa simulazione il raggio entra lateralmente per mostrare esplicitamente la geometria: l'angolo $\alpha$ che il raggio forma con l'asse orizzontale determina l'angolo di incidenza sulla parete superiore o inferiore del nucleo. Se tale angolo supera $\theta_c$, si ha RIT e il raggio rimbalza. Riducendo $\alpha$ (raggio più inclinato rispetto all'asse) l'angolo di incidenza sulla parete scende sotto $\theta_c$ e il raggio inizia a "trapelare" nel mantello.</p>
+  <div class="example">Applicazioni: fibre monomodali per telecomunicazioni intercontinentali (Internet); fibre multimodali negli endoscopi; sensori di deformazione strutturale nei ponti e negli aerei; connessioni ad alta velocità tra datacenter.</div>
+</div>
+</div><!-- fine tab-fiber -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 3 — DISPERSIONE CROMATICA
+     ══════════════════════════════════════════ -->
+<div id="tab-prism" class="tab-panel">
+
+<h1>Dispersione Cromatica — Effetto Prisma</h1>
+<p class="subtitle">Un raggio di luce bianca è composto da tutte le lunghezze d'onda dello spettro visibile. Poiché l'indice di rifrazione dipende dalla lunghezza d'onda, ogni colore viene rifratto con un angolo leggermente diverso. <strong>Nota:</strong> la separazione angolare tra i raggi colorati è esagerata visivamente per chiarezza; i valori numerici mostrati sono quelli fisicamente corretti.</p>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <div class="ctrl-label">Angolo di incidenza θ (raggio bianco)</div>
+    <div><span class="ctrl-val" id="p-val-theta">45</span><span class="ctrl-unit">°</span></div>
+    <input type="range" id="p-sl-theta" min="5" max="80" value="45" step="1">
+  </div>
+</div>
+
+<p style="font-size:12px;color:#888780;margin-bottom:10px;margin-top:-4px">Seleziona i materiali da confrontare:</p>
+<div class="mat-checks" id="mat-checks">
+  <label class="mat-check-label checked"><input type="checkbox" value="0" checked onchange="drawPrism()"> Vetro crown</label>
+  <label class="mat-check-label"><input type="checkbox" value="1" onchange="drawPrism()"> Vetro flint</label>
+  <label class="mat-check-label"><input type="checkbox" value="2" onchange="drawPrism()"> Acqua (20°C)</label>
+  <label class="mat-check-label"><input type="checkbox" value="3" onchange="drawPrism()"> Diamante</label>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="c-prism" width="680" height="380"></canvas>
+</div>
+
+<div class="formulas" style="margin-top:18px">
+  <h2>Relazioni fisiche</h2>
+  <div class="formula-row">
+    <div class="formula-card">
+      <div class="formula-title">Equazione di Cauchy (dispersione)</div>
+      <div class="formula-body">$$n(\lambda) \approx A + \frac{B}{\lambda^2}$$</div>
+      <div class="formula-note">$\lambda$ in micrometri. Il termine $B/\lambda^2$ cresce al diminuire di $\lambda$: la luce violetta ha indice di rifrazione maggiore della rossa e viene deviata di più.</div>
+    </div>
+    <div class="formula-card">
+      <div class="formula-title">Numero di Abbe</div>
+      <div class="formula-body">$$V = \frac{n_D - 1}{n_F - n_C}$$</div>
+      <div class="formula-note">$n_D$, $n_F$, $n_C$: indici alle righe spettrali di Na (589 nm), H-blu (486 nm), H-rosso (656 nm). Alto $V$ = poca dispersione (crown); basso $V$ = molta dispersione (flint).</div>
+    </div>
+  </div>
+</div>
+
+<div class="theory">
+  <h3>Perché la luce bianca si scompone?</h3>
+  <p>Nei mezzi reali, la risposta elettronica degli atomi alle onde elettromagnetiche dipende dalla frequenza. Alle frequenze più alte (luce violetta, ~400 nm) gli elettroni oscillano con maggiore ampiezza rispetto all'onda incidente, rallentando di più la luce: l'indice $n$ è maggiore. Alle frequenze più basse (rosso, ~700 nm) l'interazione è minore e $n$ è più piccolo. Il risultato è che ogni colore viene rifratto con un angolo diverso.</p>
+  <p>Una lastra a facce parallele produce una separazione laterale ma non angolare: i raggi emergono paralleli (anche se spostati). Un prisma — o una goccia di pioggia — ha facce non parallele: le separazioni angolari alle due superfici si sommano e lo spettro si "apre" visibilmente.</p>
+  <div class="example">Esempi: l'arcobaleno (gocce di pioggia come prismi sferici); i diamanti che disperdono la luce in ogni direzione; i reticoli di diffrazione degli spettroscopi; l'aberrazione cromatica degli obiettivi fotografici, corretta con doppietti acromatici che combinano vetro crown e flint.</div>
+  <h3>Crown vs Flint: il compromesso dispersione-rifrazione</h3>
+  <p>Il vetro <em>crown</em> ha bassa dispersione ($V\approx 60$) e indice moderato: ideale per lenti convergenti con poca aberrazione cromatica. Il vetro <em>flint</em> ha alta dispersione ($V\approx 36$) e indice alto: usato nei prismi spettroscopici e, abbinato al crown in un doppietto acromatico, per cancellare l'aberrazione cromatica sfruttando dispersioni di segno opposto.</p>
+</div>
+</div><!-- fine tab-prism -->
+
+
+<!-- ══════════════════════════════════════════
+     SCRIPT COMUNE
+     ══════════════════════════════════════════ -->
 <script>
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const W = 680, H = 400;
-const IY = 200, OX = 310;
-const LAYER2_H = 90;
-let mat3Active = false;
-
-function getParams() {
-  return {
-    theta1: parseFloat(document.getElementById('sl-theta').value),
-    n1: parseFloat(document.getElementById('sl-n1').value) / 100,
-    n2: parseFloat(document.getElementById('sl-n2').value) / 100
-  };
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+  // Ridisegna al primo accesso
+  if (name==='fiber') drawFiber();
+  if (name==='prism') drawPrism();
 }
 
-function snell(na, nb, taDeg) {
-  const s = (na / nb) * Math.sin(taDeg * Math.PI / 180);
-  if (Math.abs(s) > 1) return null;
-  return Math.asin(s) * 180 / Math.PI;
-}
+// Sincronizza stile checkbox
+document.querySelectorAll('.mat-check-label input').forEach(inp => {
+  inp.addEventListener('change', function() {
+    this.closest('.mat-check-label').classList.toggle('checked', this.checked);
+  });
+});
+</script>
 
-function critAngle(n1, n2) {
-  if (n1 <= n2) return null;
-  return Math.asin(n2 / n1) * 180 / Math.PI;
-}
+<!-- ══════════════════════════════════════════
+     SCRIPT TAB 1 — SNELL / RIT
+     ══════════════════════════════════════════ -->
+<script>
+(function(){
+  const canvas = document.getElementById('c-snell');
+  const ctx = canvas.getContext('2d');
+  const W=680, H=400, IY=200, OX=310;
+  const LAYER2_H=90;
+  let mat3Active=false;
 
-function seg(x1, y1, x2, y2, color, lw, dash) {
-  ctx.save();
-  ctx.strokeStyle = color; ctx.lineWidth = lw || 2.5;
-  ctx.setLineDash(dash || []);
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.restore();
-}
-
-function arrowHead(x1, y1, x2, y2, color, frac) {
-  frac = frac || 0.55;
-  const mx = x1+(x2-x1)*frac, my = y1+(y2-y1)*frac;
-  const a = Math.atan2(y2-y1, x2-x1), al=11, aw=Math.PI/6;
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(mx, my);
-  ctx.lineTo(mx - al*Math.cos(a-aw), my - al*Math.sin(a-aw));
-  ctx.lineTo(mx - al*Math.cos(a+aw), my - al*Math.sin(a+aw));
-  ctx.closePath(); ctx.fill();
-}
-
-function ray(x1, y1, x2, y2, color) {
-  seg(x1,y1,x2,y2,color,2.8);
-  arrowHead(x1,y1,x2,y2,color,0.55);
-}
-
-/*
-  drawArc: disegna l'arco MINORE tra i due vettori (vAx,vAy) e (vBx,vBy)
-  partenti dal punto (cx,cy), con raggio r.
-
-  Algoritmo:
-  1. Calcola aA = atan2(vAy,vAx) e aB = atan2(vBy,vBx)
-  2. Calcola diff = aB - aA, normalizzata in (-π, π]
-     → diff rappresenta la rotazione MINIMA da vA a vB
-  3. Se diff > 0: in canvas (y↓) "positivo" = senso orario → ccw = false
-     Se diff < 0: → ccw = true
-  4. Disegna ctx.arc(cx,cy,r, aA, aB, ccw)
-     L'arco percorso avrà ampiezza |diff| = angolo tra i due vettori.
-  5. Label posizionata al centro angolare: aA + diff/2
-*/
-function drawArc(cx, cy, r, vAx, vAy, vBx, vBy, color, label) {
-  const aA = Math.atan2(vAy, vAx);
-  const aB = Math.atan2(vBy, vBx);
-  let diff = aB - aA;
-  while (diff >  Math.PI) diff -= 2*Math.PI;
-  while (diff < -Math.PI) diff += 2*Math.PI;
-  const ccw = diff < 0;
-  ctx.save();
-  ctx.strokeStyle = color; ctx.lineWidth = 1.3; ctx.setLineDash([]);
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, aA, aB, ccw);
-  ctx.stroke();
-  ctx.restore();
-  if (label && Math.abs(diff) > 0.02) {
-    const midA = aA + diff/2;
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.font = '500 12px sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(label, cx+(r+18)*Math.cos(midA), cy+(r+18)*Math.sin(midA));
-    ctx.restore();
+  function getP() {
+    return {
+      theta1: +document.getElementById('sl-theta').value,
+      n1: +document.getElementById('sl-n1').value/100,
+      n2: +document.getElementById('sl-n2').value/100
+    };
   }
-}
-
-function draw() {
-  const { theta1, n1, n2 } = getParams();
-  ctx.clearRect(0, 0, W, H);
-
-  const iY2 = mat3Active ? IY + LAYER2_H : null;
-
-  // Sfondi
-  ctx.fillStyle = '#eaf3de'; ctx.fillRect(0, 0, W, IY);
-  if (mat3Active) {
-    ctx.fillStyle = '#e6f1fb'; ctx.fillRect(0, IY, W, LAYER2_H);
-    ctx.fillStyle = '#faeeda'; ctx.fillRect(0, iY2, W, H - iY2);
-  } else {
-    ctx.fillStyle = '#e6f1fb'; ctx.fillRect(0, IY, W, H - IY);
+  function snell(na,nb,td){ const s=(na/nb)*Math.sin(td*Math.PI/180); if(Math.abs(s)>1)return null; return Math.asin(s)*180/Math.PI; }
+  function critA(a,b){ if(a<=b)return null; return Math.asin(b/a)*180/Math.PI; }
+  function seg(x1,y1,x2,y2,col,lw,dash){ ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=lw||2.5; ctx.setLineDash(dash||[]); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore(); }
+  function ah(x1,y1,x2,y2,col,fr){ fr=fr||0.55; const mx=x1+(x2-x1)*fr,my=y1+(y2-y1)*fr,a=Math.atan2(y2-y1,x2-x1),al=11,aw=Math.PI/6; ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(mx,my); ctx.lineTo(mx-al*Math.cos(a-aw),my-al*Math.sin(a-aw)); ctx.lineTo(mx-al*Math.cos(a+aw),my-al*Math.sin(a+aw)); ctx.closePath(); ctx.fill(); }
+  function ray(x1,y1,x2,y2,col){ seg(x1,y1,x2,y2,col,2.8); ah(x1,y1,x2,y2,col,0.55); }
+  function arc(cx,cy,r,ax,ay,bx,by,col,lbl){
+    const aA=Math.atan2(ay,ax),aB=Math.atan2(by,bx);
+    let d=aB-aA; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI;
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=1.3; ctx.setLineDash([]); ctx.beginPath(); ctx.arc(cx,cy,r,aA,aB,d<0); ctx.stroke(); ctx.restore();
+    if(lbl&&Math.abs(d)>0.02){ const m=aA+d/2; ctx.save(); ctx.fillStyle=col; ctx.font='500 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(lbl,cx+(r+18)*Math.cos(m),cy+(r+18)*Math.sin(m)); ctx.restore(); }
+  }
+  function infoBox(x,y,w,h,bc,lbl,val,vc){
+    ctx.save(); ctx.fillStyle='rgba(255,255,255,0.88)'; ctx.beginPath(); ctx.roundRect(x,y,w,h,6); ctx.fill(); ctx.strokeStyle=bc; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.fillStyle='#888780'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic'; ctx.fillText(lbl,x+8,y+15);
+    ctx.fillStyle=vc||'#2c2c2a'; ctx.font='500 15px sans-serif'; ctx.fillText(val,x+8,y+34); ctx.restore();
   }
 
-  // Etichette mezzi
-  ctx.textBaseline = 'alphabetic'; ctx.font = '500 13px sans-serif'; ctx.textAlign = 'left';
-  ctx.fillStyle = '#3b6d11'; ctx.fillText('Mezzo 1  ·  n₁ = '+n1.toFixed(2), 14, 26);
-  ctx.fillStyle = '#185fa5'; ctx.fillText('Mezzo 2  ·  n₂ = '+n2.toFixed(2), 14, IY+22);
-  if (mat3Active) {
-    const n3v = parseFloat(document.getElementById('inp-n3').value);
-    ctx.fillStyle = '#854f0b';
-    ctx.fillText('Mezzo 3  ·  n₃ = '+n3v.toFixed(2), 14, iY2+22);
-  }
+  function drawSnell(){
+    const {theta1,n1,n2}=getP();
+    ctx.clearRect(0,0,W,H);
+    const iY2=mat3Active?IY+LAYER2_H:null;
 
-  // Interfacce
-  seg(0, IY, W, IY, '#73726c', 1.5);
-  if (mat3Active) seg(0, iY2, W, iY2, '#73726c', 1.5);
+    ctx.fillStyle='#eaf3de'; ctx.fillRect(0,0,W,IY);
+    if(mat3Active){ ctx.fillStyle='#e6f1fb'; ctx.fillRect(0,IY,W,LAYER2_H); ctx.fillStyle='#faeeda'; ctx.fillRect(0,iY2,W,H-iY2); }
+    else{ ctx.fillStyle='#e6f1fb'; ctx.fillRect(0,IY,W,H-IY); }
 
-  // Normale
-  const normTop = IY-120, normBot = mat3Active ? iY2+75 : IY+140;
-  seg(OX, normTop, OX, normBot, '#aaa', 1, [7,5]);
-  ctx.fillStyle='#999'; ctx.font='12px sans-serif';
-  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  ctx.fillText('Normale', OX+6, normTop+14);
+    ctx.textBaseline='alphabetic'; ctx.font='500 13px sans-serif'; ctx.textAlign='left';
+    ctx.fillStyle='#3b6d11'; ctx.fillText('Mezzo 1  ·  n₁ = '+n1.toFixed(2),14,26);
+    ctx.fillStyle='#185fa5'; ctx.fillText('Mezzo 2  ·  n₂ = '+n2.toFixed(2),14,IY+22);
+    if(mat3Active){ const n3v=+document.getElementById('inp-n3').value; ctx.fillStyle='#854f0b'; ctx.fillText('Mezzo 3  ·  n₃ = '+n3v.toFixed(2),14,iY2+22); }
 
-  // Calcoli
-  const t1r = theta1 * Math.PI / 180;
-  const theta2 = snell(n1, n2, theta1);
-  const tir = theta2 === null;
-  const thetaCrit = critAngle(n1, n2);
+    seg(0,IY,W,IY,'#73726c',1.5);
+    if(mat3Active) seg(0,iY2,W,iY2,'#73726c',1.5);
 
-  // UI
-  document.getElementById('tir-badge').style.display = tir ? '' : 'none';
+    const nTop=IY-120, nBot=mat3Active?iY2+75:IY+140;
+    seg(OX,nTop,OX,nBot,'#aaa',1,[7,5]);
+    ctx.fillStyle='#999'; ctx.font='12px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic'; ctx.fillText('Normale',OX+6,nTop+14);
 
-  const RAY = 130, ARC = 48;
+    const t1r=theta1*Math.PI/180;
+    const theta2=snell(n1,n2,theta1);
+    const tir=theta2===null;
+    const tc=critA(n1,n2);
+    document.getElementById('tir-badge').style.display=tir?'':'none';
+    const R=130,ARC=48;
+    const ix0=OX-Math.sin(t1r)*R, iy0=IY-Math.cos(t1r)*R;
+    ray(ix0,iy0,OX,IY,'#d85a30');
+    if(theta1>=1) arc(OX,IY,ARC,0,-1,-Math.sin(t1r),-Math.cos(t1r),'#d85a30','θ₁='+theta1+'°');
 
-  /*
-    RAGGIO INCIDENTE: arriva dall'alto, direzione di propagazione = (sin θ₁, cos θ₁).
-    Parte da: (OX - sin θ₁·RAY,  IY - cos θ₁·RAY)  → scende verso O=(OX,IY)
-  */
-  const incX0 = OX - Math.sin(t1r)*RAY;
-  const incY0 = IY - Math.cos(t1r)*RAY;
-  ray(incX0, incY0, OX, IY, '#d85a30');
-
-  /*
-    ARCO θ₁ — angolo tra la normale (verso l'alto) e il raggio incidente.
-    
-    Entrambi i vettori partono da O e puntano "verso fuori" (lontano dall'interfaccia):
-      • Normale UP:         (0, -1)
-      • Raggio verso sorgente: (-sin θ₁, -cos θ₁)   [opposto alla direzione di propagazione]
-    
-    Con drawArc questi due vettori definiscono esattamente l'angolo θ₁:
-      θ₁=0°  → entrambi i vettori = (0,-1)  → diff=0 → nessun arco  ✓
-      θ₁=45° → angolo tra (0,-1) e (-0.707,-0.707) = 45°            ✓
-      θ₁=90° → angolo tra (0,-1) e (-1,0) = 90°                     ✓
-  */
-  if (theta1 >= 1) {
-    drawArc(OX, IY, ARC,
-      0, -1,                           // normale UP
-      -Math.sin(t1r), -Math.cos(t1r),  // verso sorgente
-      '#d85a30', 'θ₁='+theta1.toFixed(0)+'°');
-  }
-
-  if (tir) {
-    // Raggio riflesso: direzione (sin θ₁, -cos θ₁) — verso l'alto a destra
-    const rflX = OX + Math.sin(t1r)*RAY;
-    const rflY = IY - Math.cos(t1r)*RAY;
-    ray(OX, IY, rflX, rflY, '#e24b4a');
-
-    // Arco θ_r: normale UP vs direzione del riflesso uscente (sin θ₁, -cos θ₁)
-    if (theta1 >= 1) {
-      drawArc(OX, IY, ARC,
-        0, -1,
-        Math.sin(t1r), -Math.cos(t1r),
-        '#e24b4a', 'θ_r='+theta1.toFixed(0)+'°');
-    }
-
-    seg(OX, IY, OX+100, IY+50, '#e24b4a', 1.5, [5,4]);
-    ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif';
-    ctx.textBaseline='alphabetic'; ctx.textAlign='left';
-    ctx.fillText('Onda evanescente', OX+105, IY+54);
-    ctx.font='500 12px sans-serif';
-    ctx.fillText('Raggio riflesso (RIT)', rflX+6, rflY-6);
-
-  } else {
-    const t2r = theta2 * Math.PI / 180;
-    let endX2, endY2;
-    if (mat3Active) {
-      const dist = LAYER2_H / Math.cos(t2r);
-      endX2 = OX + Math.sin(t2r)*dist; endY2 = iY2;
+    if(tir){
+      const rx=OX+Math.sin(t1r)*R,ry=IY-Math.cos(t1r)*R;
+      ray(OX,IY,rx,ry,'#e24b4a');
+      if(theta1>=1) arc(OX,IY,ARC,0,-1,Math.sin(t1r),-Math.cos(t1r),'#e24b4a','θ_r='+theta1+'°');
+      seg(OX,IY,OX+100,IY+50,'#e24b4a',1.5,[5,4]);
+      ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+      ctx.fillText('Onda evanescente',OX+104,IY+54);
+      ctx.font='500 11px sans-serif'; ctx.fillText('Raggio riflesso (RIT)',rx+6,ry-6);
     } else {
-      endX2 = OX + Math.sin(t2r)*RAY; endY2 = IY + Math.cos(t2r)*RAY;
-    }
-    ray(OX, IY, endX2, endY2, '#185fa5');
+      const t2r=theta2*Math.PI/180;
+      let ex2,ey2;
+      if(mat3Active){ const d=LAYER2_H/Math.cos(t2r); ex2=OX+Math.sin(t2r)*d; ey2=iY2; }
+      else{ ex2=OX+Math.sin(t2r)*R; ey2=IY+Math.cos(t2r)*R; }
+      ray(OX,IY,ex2,ey2,'#185fa5');
+      if(theta2>=1) arc(OX,IY,ARC,0,1,Math.sin(t2r),Math.cos(t2r),'#185fa5','θ₂='+theta2.toFixed(1)+'°');
+      const rpx=OX+Math.sin(t1r)*80,rpy=IY-Math.cos(t1r)*80;
+      seg(OX,IY,rpx,rpy,'#ccc',1.5,[4,4]); ah(OX,IY,rpx,rpy,'#ccc',0.55);
+      ctx.fillStyle='#b4b2a9'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left'; ctx.fillText('Riflesso parziale',rpx+5,rpy-4);
 
-    /*
-      ARCO θ₂ — angolo tra normale (verso il basso) e raggio rifratto.
-      
-      Vettori partendo da O:
-        • Normale DOWN:        (0, +1)
-        • Direzione rifratto:  (sin θ₂, cos θ₂)
-      
-      θ₂=0°  → rifratto = (0,1) = normale DOWN → diff=0   ✓
-      θ₂=30° → angolo = 30°                                ✓
-    */
-    if (theta2 >= 1) {
-      drawArc(OX, IY, ARC,
-        0, 1,
-        Math.sin(t2r), Math.cos(t2r),
-        '#185fa5', 'θ₂='+theta2.toFixed(1)+'°');
-    }
-
-    // Riflesso parziale (grigio)
-    const rpX = OX + Math.sin(t1r)*80, rpY = IY - Math.cos(t1r)*80;
-    seg(OX, IY, rpX, rpY, '#ccc', 1.5, [4,4]);
-    arrowHead(OX, IY, rpX, rpY, '#ccc', 0.55);
-    ctx.fillStyle='#b4b2a9'; ctx.font='11px sans-serif';
-    ctx.textBaseline='alphabetic'; ctx.textAlign='left';
-    ctx.fillText('Riflesso parziale', rpX+5, rpY-4);
-
-    // Terzo mezzo
-    if (mat3Active) {
-      const n3v = parseFloat(document.getElementById('inp-n3').value);
-      const theta3 = snell(n2, n3v, theta2);
-      const tirM3 = theta3 === null;
-      seg(endX2, iY2-65, endX2, iY2+75, '#bbb', 1, [6,4]);
-      if (tirM3) {
-        const r3x = endX2 - Math.sin(t2r)*80, r3y = iY2 - Math.cos(t2r)*80;
-        ray(endX2, iY2, r3x, r3y, '#e24b4a');
-        ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif';
-        ctx.textBaseline='alphabetic';
-        ctx.fillText('RIT (2ª interfaccia)', r3x-130, r3y-4);
-      } else {
-        const t3r = theta3 * Math.PI / 180;
-        const e3x = endX2 + Math.sin(t3r)*85, e3y = iY2 + Math.cos(t3r)*85;
-        ray(endX2, iY2, e3x, e3y, '#854f0b');
-        if (theta3 >= 1) {
-          drawArc(endX2, iY2, 36, 0, 1, Math.sin(t3r), Math.cos(t3r),
-            '#854f0b', 'θ₃='+theta3.toFixed(1)+'°');
+      if(mat3Active){
+        const n3v=+document.getElementById('inp-n3').value;
+        const theta3=snell(n2,n3v,theta2);
+        seg(ex2,iY2-65,ex2,iY2+75,'#bbb',1,[6,4]);
+        if(theta3===null){
+          // RIT speculare corretta
+          const t2rr=t2r;
+          // Il raggio nel mezzo 2 ha direzione (sin t2r, cos t2r). Riflessione su parete orizzontale: (sin t2r, -cos t2r)
+          const rx3=ex2+Math.sin(t2rr)*90, ry3=iY2-Math.cos(t2rr)*90;
+          ray(ex2,iY2,rx3,ry3,'#e24b4a');
+          if(theta2>=1) arc(ex2,iY2,36,0,-1,Math.sin(t2rr),-Math.cos(t2rr),'#e24b4a','θ_r='+theta2.toFixed(1)+'°');
+          ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+          ctx.fillText('RIT (2ª interfaccia)',rx3+5,ry3-5);
+          // Il raggio riflesso risale verso l'interfaccia 1-2
+          const dist12=LAYER2_H/Math.cos(t2rr);
+          const rx3b=rx3+Math.sin(t2rr)*dist12*0.85, ry3b=IY+(ry3<IY?0:0);
+          // Traccia fino a interfaccia 1-2 o bordo canvas
+          const steps=Math.ceil(LAYER2_H/Math.cos(t2rr));
+          const topX=rx3+Math.sin(t2rr)*(LAYER2_H/Math.cos(t2rr));
+          const topY=IY;
+          if(topX>0&&topX<W){
+            ray(rx3,ry3,topX,topY,'#e24b4a',2.2);
+            // All'interfaccia 1-2 dall'interno: n2->n1, angolo t2r con la normale
+            const tc21=critA(n2,n1);
+            const theta_at_top=theta2; // stesso angolo per simmetria
+            const exitTop=snell(n2,n1,theta_at_top);
+            seg(topX,IY-50,topX,IY+50,'#bbb',1,[6,4]);
+            if(exitTop===null){
+              // ancora RIT
+              const rx4=topX+Math.sin(t2rr)*80,ry4=IY+Math.cos(t2rr)*80;
+              ray(topX,IY,rx4,ry4,'#e24b4a',2);
+              ctx.fillStyle='#a32d2d'; ctx.font='10px sans-serif'; ctx.textBaseline='alphabetic';
+              ctx.fillText('RIT (1ª int.)',rx4+4,ry4-4);
+            } else {
+              const teR=exitTop*Math.PI/180;
+              const ex1=topX+Math.sin(teR)*80, ey1=IY-Math.cos(teR)*80;
+              ray(topX,IY,ex1,ey1,'#1d9e75',2.2);
+              ctx.fillStyle='#085041'; ctx.font='10px sans-serif'; ctx.textBaseline='alphabetic';
+              ctx.fillText('esce (mezzo 1)',ex1+4,ey1-4);
+            }
+          }
+        } else {
+          const t3r=theta3*Math.PI/180;
+          const e3x=ex2+Math.sin(t3r)*85, e3y=iY2+Math.cos(t3r)*85;
+          ray(ex2,iY2,e3x,e3y,'#854f0b');
+          if(theta3>=1) arc(ex2,iY2,36,0,1,Math.sin(t3r),Math.cos(t3r),'#854f0b','θ₃='+theta3.toFixed(1)+'°');
         }
       }
     }
+
+    ctx.beginPath(); ctx.arc(OX,IY,5,0,Math.PI*2); ctx.fillStyle='#2c2c2a'; ctx.fill();
+
+    const bx=450,by=14;
+    if(tc!==null) infoBox(bx,by,200,46,'#d05538','Angolo critico (n₁>n₂)','θ_c = '+tc.toFixed(1)+'°','#d05538');
+    else infoBox(bx,by,200,46,'#b4b2a9','Angolo critico','non esiste (n₁≤n₂)','#aaa');
+    if(mat3Active){
+      const n3v=+document.getElementById('inp-n3').value;
+      const tc23=critA(n2,n3v);
+      if(tc23!==null) infoBox(bx,by+54,200,46,'#854f0b','Angolo critico (n₂>n₃)','θ_c = '+tc23.toFixed(1)+'°','#854f0b');
+      else infoBox(bx,by+54,200,46,'#b4b2a9','Angolo critico (2-3)','non esiste (n₂≤n₃)','#aaa');
+    }
   }
+  window.drawSnell=drawSnell;
 
-  // Punto di incidenza
-  ctx.beginPath();
-  ctx.arc(OX, IY, 5, 0, Math.PI*2);
-  ctx.fillStyle='#2c2c2a'; ctx.fill();
-
-  // Angolo critico — mostrato in alto a destra nel canvas
-  const cx2 = 540, cy2 = 40;
-  if (thetaCrit !== null) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.beginPath();
-    ctx.roundRect(cx2 - 8, cy2 - 22, 168, 52, 7);
-    ctx.fill();
-    ctx.strokeStyle = '#d05538';
-    ctx.lineWidth = 0.8;
-    ctx.stroke();
-    ctx.fillStyle = '#888780';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    ctx.fillText('Angolo critico (n₁ > n₂)', cx2, cy2 - 6);
-    ctx.fillStyle = '#d05538';
-    ctx.font = '500 18px sans-serif';
-    ctx.fillText('θ_c = ' + thetaCrit.toFixed(1) + '°', cx2, cy2 + 18);
-    ctx.restore();
-  } else {
-    // Se n1 <= n2 non esiste angolo critico: mostra nota
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.beginPath();
-    ctx.roundRect(cx2 - 8, cy2 - 22, 168, 42, 7);
-    ctx.fill();
-    ctx.fillStyle = '#aaa';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    ctx.fillText('Angolo critico:', cx2, cy2 - 6);
-    ctx.fillText('non esiste (n₁ ≤ n₂)', cx2, cy2 + 10);
-    ctx.restore();
+  function toggleMat3(){
+    mat3Active=!mat3Active;
+    document.getElementById('btn-add3').classList.toggle('active',mat3Active);
+    document.getElementById('btn-add3').textContent=mat3Active?'− Rimuovi terzo materiale':'+ Aggiungi terzo materiale';
+    document.getElementById('mat3-controls').classList.toggle('show',mat3Active);
+    drawSnell();
   }
-}
+  window.toggleMat3=toggleMat3;
 
-function toggleMat3() {
-  mat3Active = !mat3Active;
-  document.getElementById('btn-add3').classList.toggle('active', mat3Active);
-  document.getElementById('btn-add3').textContent = mat3Active ? '− Rimuovi terzo materiale' : '+ Aggiungi terzo materiale';
-  document.getElementById('mat3-controls').classList.toggle('show', mat3Active);
-  draw();
-}
-
-['sl-theta','sl-n1','sl-n2'].forEach(id => {
-  document.getElementById(id).addEventListener('input', function() {
-    if (id==='sl-theta') document.getElementById('val-theta').textContent = this.value;
-    if (id==='sl-n1')    document.getElementById('val-n1').textContent = (this.value/100).toFixed(2);
-    if (id==='sl-n2')    document.getElementById('val-n2').textContent = (this.value/100).toFixed(2);
-    draw();
+  ['sl-theta','sl-n1','sl-n2'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',function(){
+      if(id==='sl-theta') document.getElementById('val-theta').textContent=this.value;
+      if(id==='sl-n1') document.getElementById('val-n1').textContent=(this.value/100).toFixed(2);
+      if(id==='sl-n2') document.getElementById('val-n2').textContent=(this.value/100).toFixed(2);
+      drawSnell();
+    });
   });
-});
-
-draw();
+  drawSnell();
+})();
 </script>
+
+<!-- ══════════════════════════════════════════
+     SCRIPT TAB 2 — FIBRA OTTICA
+     ══════════════════════════════════════════ -->
+<script>
+(function(){
+  const canvas=document.getElementById('c-fiber');
+  const ctx=canvas.getContext('2d');
+  const W=680,H=340;
+  // Nucleo: rettangolo orizzontale centrato
+  const CORE_X=60, CORE_W=560, CORE_Y=130, CORE_H=80;
+  const CORE_CY=CORE_Y+CORE_H/2;
+  const MAX_BOUNCES=10;
+
+  function getP(){ return { alpha:+document.getElementById('fib-sl-alpha').value, nc:+document.getElementById('fib-sl-ncore').value/100, nd:+document.getElementById('fib-sl-nclad').value/100 }; }
+  function snell(na,nb,td){ const s=(na/nb)*Math.sin(td*Math.PI/180); if(Math.abs(s)>1)return null; return Math.asin(s)*180/Math.PI; }
+  function critA(a,b){ if(a<=b)return null; return Math.asin(b/a)*180/Math.PI; }
+  function seg(x1,y1,x2,y2,col,lw,dash,al){ ctx.save(); if(al!==undefined)ctx.globalAlpha=al; ctx.strokeStyle=col; ctx.lineWidth=lw||2; ctx.setLineDash(dash||[]); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore(); }
+  function ah(x1,y1,x2,y2,col,fr){ fr=fr||0.55; const mx=x1+(x2-x1)*fr,my=y1+(y2-y1)*fr,a=Math.atan2(y2-y1,x2-x1),al=10,aw=Math.PI/6; ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(mx,my); ctx.lineTo(mx-al*Math.cos(a-aw),my-al*Math.sin(a-aw)); ctx.lineTo(mx-al*Math.cos(a+aw),my-al*Math.sin(a+aw)); ctx.closePath(); ctx.fill(); }
+  function ray(x1,y1,x2,y2,col,lw){ seg(x1,y1,x2,y2,col,lw||2.4); ah(x1,y1,x2,y2,col,0.55); }
+  function arc(cx,cy,r,ax,ay,bx,by,col,lbl){
+    const aA=Math.atan2(ay,ax),aB=Math.atan2(by,bx); let d=aB-aA; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI;
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=1.2; ctx.setLineDash([]); ctx.beginPath(); ctx.arc(cx,cy,r,aA,aB,d<0); ctx.stroke(); ctx.restore();
+    if(lbl&&Math.abs(d)>0.02){ const m=aA+d/2; ctx.save(); ctx.fillStyle=col; ctx.font='500 11px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(lbl,cx+(r+15)*Math.cos(m),cy+(r+15)*Math.sin(m)); ctx.restore(); }
+  }
+
+  function drawFiber(){
+    const {alpha,nc,nd}=getP();
+    ctx.clearRect(0,0,W,H);
+
+    // Forza nd < nc
+    const ncore=Math.max(nc,nd+0.01);
+    const nclad=Math.min(nd,nc-0.01);
+
+    document.getElementById('fib-val-alpha').textContent=alpha;
+    document.getElementById('fib-val-ncore').textContent=ncore.toFixed(2);
+    document.getElementById('fib-val-nclad').textContent=nclad.toFixed(2);
+
+    // Sfondi: mantello sopra e sotto, nucleo al centro
+    ctx.fillStyle='#dde8f5'; ctx.fillRect(0,0,W,H); // mantello
+    ctx.fillStyle='#e6f1fb';
+    ctx.fillRect(CORE_X,CORE_Y,CORE_W,CORE_H); // nucleo più chiaro
+
+    // Bordi nucleo
+    ctx.strokeStyle='#5585aa'; ctx.lineWidth=1.5; ctx.setLineDash([]);
+    ctx.strokeRect(CORE_X,CORE_Y,CORE_W,CORE_H);
+
+    // Etichette
+    ctx.font='500 12px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#5585aa'; ctx.fillText('Nucleo (core)  n_core = '+ncore.toFixed(2),CORE_X+8,CORE_CY+5);
+    ctx.fillStyle='#185fa5'; ctx.fillText('Mantello (cladding)  n_clad = '+nclad.toFixed(2),12,20);
+
+    // Angolo critico
+    const tc=critA(ncore,nclad);
+    const NA=Math.sqrt(ncore*ncore-nclad*nclad);
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.roundRect(460,8,200,52,6); ctx.fill();
+    ctx.strokeStyle='#5585aa'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.fillStyle='#888780'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillText('Angolo critico (core→clad):',468,22);
+    ctx.fillStyle='#d05538'; ctx.font='500 14px sans-serif';
+    ctx.fillText('θ_c = '+tc.toFixed(1)+'°   NA = '+NA.toFixed(3),468,42);
+    ctx.restore();
+
+    // Il raggio entra dal lato sinistro del nucleo con angolo alpha rispetto all'asse orizzontale
+    // alpha è l'angolo con l'asse del nucleo, quindi con la PARETE VERTICALE sinistra forma angolo (90-alpha)
+    // Però simuliamo il raggio già dentro il nucleo, che "scende" verso la parete superiore o inferiore.
+    // Geometria: il raggio si propaga all'interno del nucleo. Definiamo theta_wall = angolo con la normale alla parete orizzontale.
+    // Se il raggio forma angolo alpha con l'asse orizzontale, la normale alla parete è verticale,
+    // quindi theta_wall = 90° - alpha.
+    // Per RIT: theta_wall >= theta_c  →  90-alpha >= theta_c  →  alpha <= 90-theta_c
+    const alphaR=alpha*Math.PI/180;
+    const theta_wall=90-alpha; // angolo con la normale alla parete orizzontale (in gradi)
+    const tirOccurs = (tc!==null) && (theta_wall >= tc);
+
+    document.getElementById('fib-tir-badge').style.display = !tirOccurs ? '' : 'none';
+    document.getElementById('fib-guide-badge').style.display = tirOccurs ? '' : 'none';
+
+    // Raggio incidente esterno (entra dalla faccia sinistra del nucleo)
+    // Lo facciamo partire da sinistra, inclinato di alpha verso il basso
+    const entryX=CORE_X, entryY=CORE_CY-20;
+    const incomingLen=50;
+    const srcX=entryX-incomingLen, srcY=entryY-Math.tan(alphaR)*incomingLen;
+    ray(srcX,srcY,entryX,entryY,'#d85a30',2.2);
+    ctx.fillStyle='#d85a30'; ctx.font='11px sans-serif'; ctx.textBaseline='middle'; ctx.textAlign='right';
+    ctx.fillText('Raggio entrante',srcX-4,srcY);
+
+    // Propagazione nel nucleo: il raggio va verso destra con inclinazione alpha verso il basso
+    // Rimbalza sulle pareti superiore e inferiore
+    let cx=entryX, cy=entryY;
+    let vx=Math.cos(alphaR), vy=Math.sin(alphaR); // direzione unitaria
+    const rayCol=tirOccurs?'#185fa5':'#185fa5';
+    let guided=tirOccurs;
+    let firstBounce=true;
+
+    for(let b=0;b<MAX_BOUNCES;b++){
+      // Trova il prossimo impatto con parete sup (y=CORE_Y) o inf (y=CORE_Y+CORE_H) o destra (x=CORE_X+CORE_W)
+      let tTop=vy<0?(CORE_Y-cy)/vy:Infinity;
+      let tBot=vy>0?(CORE_Y+CORE_H-cy)/vy:Infinity;
+      let tRight=vx>0?(CORE_X+CORE_W-cx)/vx:Infinity;
+      const tWall=Math.min(tTop,tBot);
+      const t=Math.min(tWall,tRight);
+      const nx=cx+vx*t, ny=cy+vy*t;
+
+      // Disegna segmento
+      const col=tirOccurs?'#185fa5':'#60aadd';
+      seg(cx,cy,nx,ny,col,2.4);
+      ah(cx,cy,nx,ny,col,0.55);
+
+      // Check: siamo usciti dal lato destro?
+      if(t===tRight || nx>=CORE_X+CORE_W-1){
+        ctx.fillStyle='#085041'; ctx.font='11px sans-serif'; ctx.textBaseline='middle'; ctx.textAlign='left';
+        ctx.fillText('→ esce',nx+4,ny);
+        break;
+      }
+
+      // Siamo su una parete orizzontale: normale verticale
+      const wallY=ny;
+      const wallIsTop=(Math.abs(wallY-CORE_Y)<1);
+      const normalDirY=wallIsTop?1:-1; // normale punta verso l'interno del nucleo
+
+      // Angolo di incidenza sulla parete = angolo tra il raggio e la normale alla parete
+      // la normale è verticale (0, normalDirY), il raggio ha direzione (vx, vy)
+      // cos(theta_inc) = |dot(ray, normal)| = |vy*normalDirY + vx*0| = |vy|
+      const theta_inc_wall=Math.acos(Math.min(1,Math.abs(vy)))*180/Math.PI;
+
+      // Normale alla parete per visualizzazione
+      const normLen=30;
+      seg(nx,ny,nx,ny+normalDirY*normLen,'#aaa',1,[5,3]);
+
+      if(firstBounce){
+        // Mostra arco angolo di incidenza
+        arc(nx,ny,28, 0,normalDirY, vx,vy, '#d85a30','θ_w='+theta_inc_wall.toFixed(0)+'°');
+        firstBounce=false;
+      }
+
+      if(!tirOccurs){
+        // Il raggio esce parzialmente nel mantello
+        const theta_refr=snell(ncore,nclad,theta_inc_wall);
+        if(theta_refr!==null){
+          const trR=theta_refr*Math.PI/180;
+          const exitDy=wallIsTop?-1:1;
+          const ex=nx+Math.sin(trR)*60*(vx>0?1:-1);
+          const ey=ny+exitDy*Math.cos(trR)*60;
+          seg(nx,ny,ex,ey,'#e24b4a',1.5,[4,3]);
+          ah(nx,ny,ex,ey,'#e24b4a',0.6);
+          ctx.fillStyle='#a32d2d'; ctx.font='10px sans-serif'; ctx.textBaseline=wallIsTop?'bottom':'top'; ctx.textAlign='left';
+          ctx.fillText('fuga',ex+3,ey);
+        }
+      }
+
+      // Riflessione speculare: vy cambia segno
+      vy=-vy;
+      cx=nx; cy=ny;
+    }
+
+    // Punto di entrata
+    ctx.beginPath(); ctx.arc(entryX,entryY,4,0,Math.PI*2); ctx.fillStyle='#2c2c2a'; ctx.fill();
+
+    // Info angolo
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,0.88)'; ctx.beginPath(); ctx.roundRect(10,H-54,280,44,6); ctx.fill();
+    ctx.strokeStyle='#888'; ctx.lineWidth=0.7; ctx.stroke();
+    ctx.fillStyle='#444'; ctx.font='11px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillText('α = '+alpha+'°  →  θ sulla parete = '+(90-alpha).toFixed(0)+'°  (θ_c = '+(tc?tc.toFixed(1)+'°':'—')+')',18,H-36);
+    ctx.fillStyle=tirOccurs?'#085041':'#a32d2d'; ctx.font='500 12px sans-serif';
+    ctx.fillText(tirOccurs?'Condizione RIT soddisfatta: luce guidata':'Condizione RIT NON soddisfatta: luce perde energia',18,H-18);
+    ctx.restore();
+  }
+  window.drawFiber=drawFiber;
+
+  ['fib-sl-alpha','fib-sl-ncore','fib-sl-nclad'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',function(){
+      if(id==='fib-sl-alpha') document.getElementById('fib-val-alpha').textContent=this.value;
+      if(id==='fib-sl-ncore') document.getElementById('fib-val-ncore').textContent=(+this.value/100).toFixed(2);
+      if(id==='fib-sl-nclad') document.getElementById('fib-val-nclad').textContent=(+this.value/100).toFixed(2);
+      drawFiber();
+    });
+  });
+  // Non disegna subito: viene chiamata da switchTab
+})();
+</script>
+
+<!-- ══════════════════════════════════════════
+     SCRIPT TAB 3 — DISPERSIONE / PRISMA
+     ══════════════════════════════════════════ -->
+<script>
+(function(){
+  const canvas=document.getElementById('c-prism');
+  const ctx=canvas.getContext('2d');
+  const W=680,H=380,IY=155,OX=160;
+
+  const MATS=[
+    {name:'Vetro crown', A:1.5220,B:0.00459, col:'#185fa5'},
+    {name:'Vetro flint',  A:1.6100,B:0.00850, col:'#854f0b'},
+    {name:'Acqua',        A:1.3290,B:0.00314, col:'#0f6e56'},
+    {name:'Diamante',     A:2.3900,B:0.01000, col:'#533ab7'}
+  ];
+
+  // Colori spettro: 13 campioni da 380 a 700 nm
+  const SPEC=[
+    {l:0.380,c:'#8B00FF'},{l:0.410,c:'#6600EE'},{l:0.440,c:'#3300DD'},
+    {l:0.470,c:'#0000FF'},{l:0.500,c:'#0066FF'},{l:0.520,c:'#00AACC'},
+    {l:0.550,c:'#00BB00'},{l:0.570,c:'#88BB00'},{l:0.590,c:'#FFCC00'},
+    {l:0.610,c:'#FF8800'},{l:0.640,c:'#FF3300'},{l:0.670,c:'#DD0000'},{l:0.700,c:'#AA0000'}
+  ];
+
+  function nC(mat,l){return mat.A+mat.B/(l*l);}
+  function snell(na,nb,td){const s=(na/nb)*Math.sin(td*Math.PI/180);if(Math.abs(s)>1)return null;return Math.asin(s)*180/Math.PI;}
+  function seg(x1,y1,x2,y2,col,lw,al){ctx.save();if(al!==undefined)ctx.globalAlpha=al;ctx.strokeStyle=col;ctx.lineWidth=lw||2;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+  function ah(x1,y1,x2,y2,col,fr,al){fr=fr||0.6;const mx=x1+(x2-x1)*fr,my=y1+(y2-y1)*fr,a=Math.atan2(y2-y1,x2-x1),al2=9,aw=Math.PI/6;ctx.save();if(al!==undefined)ctx.globalAlpha=al;ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(mx-al2*Math.cos(a-aw),my-al2*Math.sin(a-aw));ctx.lineTo(mx-al2*Math.cos(a+aw),my-al2*Math.sin(a+aw));ctx.closePath();ctx.fill();ctx.restore();}
+  function arcD(cx,cy,r,ax,ay,bx,by,col,lbl){
+    const aA=Math.atan2(ay,ax),aB=Math.atan2(by,bx);let d=aB-aA;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;
+    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1.2;ctx.setLineDash([]);ctx.beginPath();ctx.arc(cx,cy,r,aA,aB,d<0);ctx.stroke();ctx.restore();
+    if(lbl&&Math.abs(d)>0.02){const m=aA+d/2;ctx.save();ctx.fillStyle=col;ctx.font='500 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lbl,cx+(r+14)*Math.cos(m),cy+(r+14)*Math.sin(m));ctx.restore();}
+  }
+
+  function getActiveMats(){
+    return Array.from(document.querySelectorAll('#mat-checks input:checked'))
+                .map(i=>MATS[+i.value]);
+  }
+
+  // Fattore di esagerazione dello spread visivo
+  const SPREAD_EXAG = 6;
+
+  function drawPrism(){
+    const theta=+document.getElementById('p-sl-theta').value;
+    const mats=getActiveMats();
+    document.getElementById('p-val-theta').textContent=theta;
+    ctx.clearRect(0,0,W,H);
+
+    const t1r=theta*Math.PI/180;
+    const n1=1.0;
+    const RAY_LEN=180;
+
+    // Per calcolare il centro visivo dei raggi rifratti usiamo la media degli angoli reali
+    // poi esageriamo la separazione attorno a questa media
+    // Raccogliamo prima tutti i dati reali per ogni materiale attivo
+    const matData=mats.map(mat=>{
+      const results=SPEC.map(({l,c})=>{
+        const n2=nC(mat,l);
+        const t2=snell(n1,n2,theta);
+        return {l,c,n2,t2};
+      }).filter(d=>d.t2!==null);
+      if(!results.length) return null;
+      const tMin=Math.min(...results.map(d=>d.t2)); // violetto (più rifratto)
+      const tMax=Math.max(...results.map(d=>d.t2)); // rosso
+      const tMid=(tMin+tMax)/2;
+      const disp=tMax-tMin;
+      return {mat,results,tMin,tMax,tMid,disp};
+    }).filter(Boolean);
+
+    if(!matData.length){
+      ctx.fillStyle='#aaa';ctx.font='14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('Seleziona almeno un materiale',W/2,H/2);
+      return;
+    }
+
+    // Per ogni materiale, calcola un offset orizzontale per non sovrapporre i fasci
+    const spacing=160;
+    const totalW=(matData.length-1)*spacing;
+    const startOX=OX;
+
+    matData.forEach((md,mi)=>{
+      const ox=startOX+mi*spacing;
+
+      // Sfondo
+      if(mi===0){
+        ctx.fillStyle='#f5f3ee'; ctx.fillRect(0,0,W,IY);
+        ctx.fillStyle='#dde8f5'; ctx.fillRect(0,IY,W,H-IY);
+        seg(0,IY,W,IY,'#73726c',1.5);
+      }
+
+      // Raggio incidente bianco
+      const ix0=ox-Math.sin(t1r)*90, iy0=IY-Math.cos(t1r)*90;
+      ctx.save(); ctx.strokeStyle='#fff'; ctx.lineWidth=7; ctx.globalAlpha=0.5; ctx.beginPath(); ctx.moveTo(ix0,iy0); ctx.lineTo(ox,IY); ctx.stroke(); ctx.restore();
+      seg(ix0,iy0,ox,IY,'#ccc',1.5);
+      ah(ix0,iy0,ox,IY,'#aaa',0.55);
+
+      // Normale
+      seg(ox,IY-80,ox,IY+80,'#ccc',1,[6,4]);
+
+      // Arco angolo incidenza (solo primo)
+      if(mi===0&&theta>=2) arcD(ox,IY,38,0,-1,-Math.sin(t1r),-Math.cos(t1r),'#888','θ='+theta+'°');
+
+      // Raggi rifratti con spread esagerato
+      const {results,tMid,disp}=md;
+      results.forEach(({l,c,t2})=>{
+        // angolo reale
+        const deltaReal=t2-tMid;
+        // angolo esagerato
+        const t2Exag=tMid+deltaReal*SPREAD_EXAG;
+        const t2ExagR=t2Exag*Math.PI/180;
+        const ex=ox+Math.sin(t2ExagR)*RAY_LEN;
+        const ey=IY+Math.cos(t2ExagR)*RAY_LEN;
+        seg(ox,IY,ex,ey,c,2,undefined,0.88);
+        ah(ox,IY,ex,ey,c,0.6,0.88);
+      });
+
+      // Label materiale
+      ctx.fillStyle=md.mat.col; ctx.font='500 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+      ctx.fillText(md.mat.name,ox,IY-86);
+
+      // Info box
+      const nRed=nC(md.mat,0.700), nVio=nC(md.mat,0.380);
+      const tR=snell(n1,nRed,theta), tV=snell(n1,nVio,theta);
+      const disp_real=tR&&tV?Math.abs(tV-tR):0;
+      const bx=ox-76, by=IY+RAY_LEN+10;
+      if(by+64<H){
+        ctx.save();
+        ctx.fillStyle='rgba(255,255,255,0.88)'; ctx.beginPath(); ctx.roundRect(bx,by,152,62,6); ctx.fill();
+        ctx.strokeStyle=md.mat.col; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.fillStyle='#888780'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+        ctx.fillText('n(rosso) = '+nRed.toFixed(4),bx+6,by+14);
+        ctx.fillText('n(violetto) = '+nVio.toFixed(4),bx+6,by+28);
+        ctx.fillStyle=md.mat.col; ctx.font='500 11px sans-serif';
+        ctx.fillText('Δθ reale = '+disp_real.toFixed(3)+'°',bx+6,by+46);
+        ctx.fillStyle='#888780'; ctx.font='10px sans-serif';
+        ctx.fillText('(spread × '+SPREAD_EXAG+' per visibilità)',bx+6,by+58);
+        ctx.restore();
+      }
+
+      // Punto di incidenza
+      ctx.beginPath(); ctx.arc(ox,IY,4,0,Math.PI*2); ctx.fillStyle='#2c2c2a'; ctx.fill();
+    });
+
+    // Etichetta mezzo
+    ctx.font='500 12px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#3b6d11'; ctx.fillText('Aria  n = 1.000',10,20);
+    if(matData.length>0) ctx.fillStyle='#185fa5', ctx.fillText('Secondo mezzo (vedi etichette)',10,IY+18);
+  }
+  window.drawPrism=drawPrism;
+
+  document.getElementById('p-sl-theta').addEventListener('input',function(){
+    document.getElementById('p-val-theta').textContent=this.value;
+    drawPrism();
+  });
+  // Non disegna subito: viene chiamata da switchTab al primo accesso
+  // ma disegniamo subito se la tab è attiva
+})();
+</script>
+
 </body>
 </html>

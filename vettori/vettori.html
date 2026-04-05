@@ -640,13 +640,15 @@ function draw() {
   }
 
   if(SA){
-    const tA=Math.atan2(ay,ax);
-    arcAngle(mctx,osx,osy,tA,24,'#c0392b');
+    const tAraw=Math.atan2(ay,ax);
+    const tA=normAngle(tAraw);
+    arcAngle(mctx,osx,osy,tAraw,24,'#c0392b');
     mctx.save();mctx.fillStyle='#c0392b';mctx.font='10px IBM Plex Mono';
     mctx.fillText(`${(tA*180/Math.PI).toFixed(0)}°`,osx+26,osy-4);mctx.restore();
     if(S.op!=='sum'&&S.op!=='diff'){
-      const tB=Math.atan2(by,bx);
-      arcAngle(mctx,osx,osy,tB,38,'#2980b9');
+      const tBraw=Math.atan2(by,bx);
+      const tB=normAngle(tBraw);
+      arcAngle(mctx,osx,osy,tBraw,38,'#2980b9');
       mctx.save();mctx.fillStyle='#2980b9';mctx.font='10px IBM Plex Mono';
       mctx.fillText(`${(tB*180/Math.PI).toFixed(0)}°`,osx+40,osy-4);mctx.restore();
     }
@@ -657,7 +659,7 @@ function draw() {
 function updateResults(){
   const {ax,ay,bx,by}=S;
   const mA=Math.hypot(ax,ay),mB=Math.hypot(bx,by);
-  const tA=Math.atan2(ay,ax)*180/Math.PI,tB=Math.atan2(by,bx)*180/Math.PI;
+  const tA=normAngle(Math.atan2(ay,ax))*180/Math.PI, tB=normAngle(Math.atan2(by,bx))*180/Math.PI;
   document.getElementById('vecInfo').innerHTML=
     `|A| = <span class="val">${mA.toFixed(3)}</span>  &theta;<sub>A</sub> = <span class="val">${tA.toFixed(1)}&deg;</span><br>`+
     `|B| = <span class="val">${mB.toFixed(3)}</span>  &theta;<sub>B</sub> = <span class="val">${tB.toFixed(1)}&deg;</span>`;

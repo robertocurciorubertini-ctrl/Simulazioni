@@ -341,86 +341,6 @@
       "isWip": false
     },
     {
-      "title": "Calore e capacità termica",
-      "description": "Simulazione interattiva del calore e della capacità termica specifica, con confronto tra materiali diversi e collegamento tra calorimetria, teoria cinetica e distribuzione di Maxwell-Boltzmann.",
-      "category": "Termodinamica",
-      "icon": "🔥",
-      "order": 10,
-      "tags": [
-        "calore",
-        "capacità termica",
-        "calore specifico",
-        "calorimetria",
-        "temperatura",
-        "teoria cinetica",
-        "Maxwell-Boltzmann",
-        "Q = mcΔT"
-      ],
-      "level": "intermedio",
-      "file": "termodinamica/calore.html",
-      "isWip": false
-    },
-    {
-      "title": "Gas ideale",
-      "description": "Simulazione interattiva di un gas ideale con pistone mobile, con visualizzazione delle trasformazioni isoterma, isobara, isocora e adiabatica nel diagramma pressione-volume.",
-      "category": "Termodinamica",
-      "icon": "🌡️",
-      "order": 10,
-      "tags": [
-        "gas ideale",
-        "trasformazioni termodinamiche",
-        "diagramma PV",
-        "isoterma",
-        "isobara",
-        "isocora",
-        "adiabatica",
-        "primo principio"
-      ],
-      "level": "intermedio",
-      "file": "termodinamica/termodinamica.html",
-      "isWip": false
-    },
-    {
-      "title": "Trasformazioni cicliche",
-      "description": "Simulazione dei principali cicli termodinamici, con animazione nel diagramma pressione-volume e calcolo di rendimento e coefficienti di prestazione.",
-      "category": "Termodinamica",
-      "icon": "♻️",
-      "order": 20,
-      "tags": [
-        "cicli termodinamici",
-        "ciclo di Carnot",
-        "ciclo Otto",
-        "ciclo Diesel",
-        "frigorifero",
-        "pompa di calore",
-        "rendimento",
-        "diagramma PV"
-      ],
-      "level": "avanzato",
-      "file": "termodinamica/trasformazioni cicliche.html",
-      "isWip": false
-    },
-    {
-      "title": "Entropia",
-      "description": "Esplora l’entropia dal punto di vista microscopico attraverso espansione libera, miscelamento di gas, distribuzione di Maxwell-Boltzmann e modello a microstati.",
-      "category": "Termodinamica",
-      "icon": "🎲",
-      "order": 30,
-      "tags": [
-        "entropia",
-        "secondo principio",
-        "microstati",
-        "Boltzmann",
-        "Maxwell-Boltzmann",
-        "miscelamento",
-        "espansione libera",
-        "irreversibilità"
-      ],
-      "level": "avanzato",
-      "file": "termodinamica/entropia.html",
-      "isWip": false
-    },
-    {
       "title": "Curvatura dello spazio-tempo",
       "description": "Simulazione della metrica di Kerr attorno a un buco nero rotante, con visualizzazione di geodetiche nulle, lente gravitazionale, redshift gravitazionale e dilatazione temporale.",
       "category": "WIP",
@@ -553,6 +473,26 @@
       "isWip": true
     },
     {
+      "title": "Calore e capacità termica",
+      "description": "Simulazione interattiva del calore e della capacità termica specifica, con confronto tra materiali diversi e collegamento tra calorimetria, teoria cinetica e distribuzione di Maxwell-Boltzmann.",
+      "category": "WIP",
+      "icon": "🔥",
+      "order": 10,
+      "tags": [
+        "calore",
+        "capacità termica",
+        "calore specifico",
+        "calorimetria",
+        "temperatura",
+        "teoria cinetica",
+        "Maxwell-Boltzmann",
+        "Q = mcΔT"
+      ],
+      "level": "intermedio",
+      "file": "WIP/termodinamica/calore.html",
+      "isWip": true
+    },
+    {
       "title": "Collasso stellare",
       "description": "Simulazione numerica del collasso gravitazionale di una nube stellare con evoluzione verso proto-stella, stella stabile, supernova e stella di neutroni.",
       "category": "WIP",
@@ -584,6 +524,46 @@
       ],
       "level": "intermedio",
       "file": "WIP/circuiti.html",
+      "isWip": true
+    },
+    {
+      "title": "Trasformazioni cicliche",
+      "description": "Simulazione dei principali cicli termodinamici, con animazione nel diagramma pressione-volume e calcolo di rendimento e coefficienti di prestazione.",
+      "category": "WIP",
+      "icon": "♻️",
+      "order": 20,
+      "tags": [
+        "cicli termodinamici",
+        "ciclo di Carnot",
+        "ciclo Otto",
+        "ciclo Diesel",
+        "frigorifero",
+        "pompa di calore",
+        "rendimento",
+        "diagramma PV"
+      ],
+      "level": "avanzato",
+      "file": "WIP/termodinamica/trasformazioni cicliche.html",
+      "isWip": true
+    },
+    {
+      "title": "Entropia",
+      "description": "Esplora l’entropia dal punto di vista microscopico attraverso espansione libera, miscelamento di gas, distribuzione di Maxwell-Boltzmann e modello a microstati.",
+      "category": "WIP",
+      "icon": "🎲",
+      "order": 30,
+      "tags": [
+        "entropia",
+        "secondo principio",
+        "microstati",
+        "Boltzmann",
+        "Maxwell-Boltzmann",
+        "miscelamento",
+        "espansione libera",
+        "irreversibilità"
+      ],
+      "level": "avanzato",
+      "file": "WIP/termodinamica/entropia.html",
       "isWip": true
     }
   ]

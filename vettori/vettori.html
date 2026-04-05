@@ -456,6 +456,29 @@ function arcAngle(c,ox,oy,ang,r,color){
   c.save();c.strokeStyle=color;c.lineWidth=1.2;c.globalAlpha=.7;
   c.beginPath();c.arc(ox,oy,r,-ang,0);c.stroke();c.restore();
 }
+function normAngle(theta){
+  const twopi=2*Math.PI;
+  return ((theta%twopi)+twopi)%twopi;
+}
+function drawMathArc(c,ox,oy,r,ang,color,lw=2.2,alpha=.75){
+  const a=normAngle(ang);
+  if(a<1e-6) return;
+  const steps=Math.max(24,Math.ceil(a/0.06));
+  c.save();
+  c.strokeStyle=color;
+  c.lineWidth=lw;
+  c.globalAlpha=alpha;
+  c.beginPath();
+  for(let i=0;i<=steps;i++){
+    const t=a*i/steps;
+    const x=ox+r*Math.cos(t);
+    const y=oy-r*Math.sin(t);
+    if(i===0) c.moveTo(x,y);
+    else c.lineTo(x,y);
+  }
+  c.stroke();
+  c.restore();
+}
 
 // ──────────────────────────────────────────
 // TAB: OPERATIONS
@@ -492,12 +515,33 @@ function draw() {
 
   } else if(S.op==='diff'){
     const [nbx2,nby2]=toC(ox,oy,z,-bx,-by);
-    arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',2,.3,true);
-    arrowOn(mctx,osx,osy,nbx2,nby2,'#2980b9',2.5,.8);
-    arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',3);
     const [rx2,ry2]=toC(ox,oy,z,ax-bx,ay-by);
+    const [axnbx,aynby]=toC(ox,oy,z,ax-bx,ay-by);
+    const [nbxax,nbxay]=toC(ox,oy,z,ax-bx,ay-by);
+
+    // B continuo, -B tratteggiato
+    arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',2.4,.9,false);
+    arrowOn(mctx,osx,osy,nbx2,nby2,'#2980b9',2.3,.85,true);
+
+    // Costruzione del parallelogramma per A + (-B)
+    mctx.save();
+    mctx.strokeStyle='#7f8c8d';
+    mctx.lineWidth=1.2;
+    mctx.setLineDash([6,4]);
+    mctx.globalAlpha=.55;
+    mctx.beginPath();
+    mctx.moveTo(ax2,ay2);
+    mctx.lineTo(rx2,ry2);
+    mctx.moveTo(nbx2,nby2);
+    mctx.lineTo(rx2,ry2);
+    mctx.stroke();
+    mctx.restore();
+
+    arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',3);
+    // traslazione di -B dalla punta di A
+    arrowOn(mctx,ax2,ay2,rx2,ry2,'#2980b9',2,.45,true);
     arrowOn(mctx,osx,osy,rx2,ry2,'#27ae60',3);
-    if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'-B',nbx2,nby2,'#2980b9',14,6,-6);lbl(mctx,'R=A-B',rx2,ry2,'#27ae60',14,6,-6);}
+    if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'B',bx2,by2,'#2980b9',14,6,-6);lbl(mctx,'-B',nbx2,nby2,'#2980b9',14,6,-6);lbl(mctx,'R=A-B',rx2,ry2,'#27ae60',14,6,-6);}
 
   } else if(S.op==='dot'){
     const modA=Math.hypot(ax,ay);
@@ -551,6 +595,37 @@ function draw() {
     arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',3);
     arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',3);
     if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'B',bx2,by2,'#2980b9',14,6,-6);}
+
+    // Indicazione 2D del verso del vettore risultante lungo z
+    const zx=Math.max(52, Math.min(W-52, osx+54));
+    const zy=Math.max(52, Math.min(H-52, osy-54));
+    mctx.save();
+    mctx.globalAlpha=.95;
+    mctx.strokeStyle=cross>=0?'#8e44ad':'#d35400';
+    mctx.fillStyle=cross>=0?'#8e44ad':'#d35400';
+    mctx.lineWidth=2.2;
+    mctx.beginPath();
+    mctx.arc(zx,zy,15,0,Math.PI*2);
+    mctx.stroke();
+    if(Math.abs(cross)>1e-6){
+      if(cross>0){
+        mctx.beginPath();
+        mctx.arc(zx,zy,4.2,0,Math.PI*2);
+        mctx.fill();
+      } else {
+        mctx.beginPath();
+        mctx.moveTo(zx-5,zy-5); mctx.lineTo(zx+5,zy+5);
+        mctx.moveTo(zx+5,zy-5); mctx.lineTo(zx-5,zy+5);
+        mctx.stroke();
+      }
+      mctx.font='11px IBM Plex Mono';
+      mctx.fillText(cross>0?'(A×B)z uscente':'(A×B)z entrante',zx+22,zy+4);
+    } else {
+      mctx.font='11px IBM Plex Mono';
+      mctx.fillText('(A×B)z = 0',zx+22,zy+4);
+    }
+    mctx.restore();
+
     drawCross3D();
   }
 
@@ -772,6 +847,7 @@ function drawPolar(){
   const W=pc.width,H=pc.height,{ppanX:ox,ppanY:oy,pzoom:z,pr:r,pth:theta}=S;
   pctx2.clearRect(0,0,W,H);pctx2.fillStyle='#f0ebe0';pctx2.fillRect(0,0,W,H);
 
+  const thetaDisplay=normAngle(theta);
   const [Ox,Oy]=toC(ox,oy,z,0,0);
   const px_u=r*Math.cos(theta),py_u=r*Math.sin(theta);
   const [Px,Py]=toC(ox,oy,z,px_u,py_u);
@@ -807,13 +883,24 @@ function drawPolar(){
 
   // Angle arc
   if(document.getElementById('polAngle').checked){
-    pctx2.save();pctx2.strokeStyle='#1a6b4a';pctx2.lineWidth=2.2;pctx2.globalAlpha=.75;
-    const startA=0,endA=-theta;
-    pctx2.beginPath();pctx2.arc(Ox,Oy,z*.85,startA,endA,theta<0);pctx2.stroke();
+    pctx2.save();
+    pctx2.translate(Ox,Oy);
+    pctx2.scale(1,-1);
+    pctx2.strokeStyle='#1a6b4a';
+    pctx2.lineWidth=1.8;
+    pctx2.globalAlpha=.72;
+    pctx2.beginPath();
+    pctx2.arc(0,0,z*.85,0,thetaDisplay,false);
+    pctx2.stroke();
+    pctx2.restore();
+
     // Label
-    const tmid=theta/2;
-    pctx2.fillStyle='#1a6b4a';pctx2.font='italic 14px EB Garamond';pctx2.globalAlpha=1;
-    pctx2.fillText('\u03b8',Ox+(z*1.25)*Math.cos(tmid),Oy-(z*1.25)*Math.sin(tmid));
+    const tmid=thetaDisplay/2;
+    pctx2.save();
+    pctx2.fillStyle='#1a6b4a';
+    pctx2.font='italic 13px EB Garamond';
+    pctx2.globalAlpha=.82;
+    pctx2.fillText('\u03b8',Ox+(z*1.18)*Math.cos(tmid),Oy-(z*1.18)*Math.sin(tmid));
     pctx2.restore();
   }
 
@@ -834,19 +921,31 @@ function drawPolar(){
 
   // Polar versors at P
   if(document.getElementById('polVers').checked){
-    const rLen=z*1.3;
+    const rLen=z*.82;
     const rhx=Px+rLen*Math.cos(theta),rhy=Py-rLen*Math.sin(theta);
-    arrowOn(pctx2,Px,Py,rhx,rhy,'#c0392b',2.5,.85);
-    lbl(pctx2,'r\u0302',rhx,rhy,'#c0392b',14,4,-4);
+    arrowOn(pctx2,Px,Py,rhx,rhy,'#c0392b',1.35,.38);
+    pctx2.save();
+    pctx2.fillStyle='#c0392b';
+    pctx2.font='italic 10px EB Garamond';
+    pctx2.globalAlpha=.46;
+    pctx2.fillText('r\u0302',rhx+3,rhy-2);
+    pctx2.restore();
+
     const thx=Px+rLen*Math.cos(theta+Math.PI/2),thy=Py-rLen*Math.sin(theta+Math.PI/2);
-    arrowOn(pctx2,Px,Py,thx,thy,'#1a6b4a',2.5,.85);
-    lbl(pctx2,'\u03b8\u0302',thx,thy,'#1a6b4a',14,4,-4);
+    arrowOn(pctx2,Px,Py,thx,thy,'#1a6b4a',1.35,.38);
+    pctx2.save();
+    pctx2.fillStyle='#1a6b4a';
+    pctx2.font='italic 10px EB Garamond';
+    pctx2.globalAlpha=.46;
+    pctx2.fillText('\u03b8\u0302',thx+3,thy-2);
+    pctx2.restore();
+
     // right-angle marker
-    const rm=7,ux=Math.cos(theta),uy=Math.sin(theta);
-    pctx2.save();pctx2.strokeStyle='#888';pctx2.lineWidth=1;pctx2.globalAlpha=.45;
+    const rm=5,ux=Math.cos(theta),uy=Math.sin(theta);
+    pctx2.save();pctx2.strokeStyle='#888';pctx2.lineWidth=.85;pctx2.globalAlpha=.22;
     pctx2.beginPath();
     pctx2.moveTo(Px+rm*ux,Py-rm*uy);
-    pctx2.lineTo(Px+rm*ux-rm*uy,Py-rm*uy-rm*ux);  // wrong: simplified square
+    pctx2.lineTo(Px+rm*ux-rm*uy,Py-rm*uy-rm*ux);
     pctx2.lineTo(Px-rm*uy,Py-rm*ux);
     pctx2.stroke();pctx2.restore();
   }
@@ -862,8 +961,8 @@ function drawPolar(){
     `y = <span class="rp">${py_u.toFixed(4)}</span><br><br>`+
     `<b style="color:var(--accent)">Polari</b><br>`+
     `r = <span class="rs">${r.toFixed(4)}</span><br>`+
-    `&theta; = <span class="rs">${(theta*180/Math.PI).toFixed(2)}&deg;</span><br>`+
-    `&theta; = <span class="rs">${theta.toFixed(4)} rad</span><br><br>`+
+    `&theta; = <span class="rs">${(thetaDisplay*180/Math.PI).toFixed(2)}&deg;</span><br>`+
+    `&theta; = <span class="rs">${thetaDisplay.toFixed(4)} rad</span><br><br>`+
     `<b style="color:var(--accent2)">Versori in P</b><br>`+
     `r&#770; = (${Math.cos(theta).toFixed(3)}, ${Math.sin(theta).toFixed(3)})<br>`+
     `&theta;&#770; = (${(-Math.sin(theta)).toFixed(3)}, ${Math.cos(theta).toFixed(3)})`;
@@ -916,7 +1015,7 @@ function initEvents(){
   const doPolarDrag=e=>{
     if(!S.pdrag) return;
     const [mx,my]=getPos(e,pc);const [ux,uy]=fromC(S.ppanX,S.ppanY,S.pzoom,mx,my);
-    S.pr=Math.max(.15,Math.hypot(ux,uy));S.pth=Math.atan2(uy,ux);drawPolar();
+    S.pr=Math.max(.15,Math.hypot(ux,uy));S.pth=normAngle(Math.atan2(uy,ux));drawPolar();
   };
   pc.addEventListener('mousemove',doPolarDrag);pc.addEventListener('touchmove',doPolarDrag,{passive:true});
   pc.addEventListener('mouseup',()=>S.pdrag=false);pc.addEventListener('touchend',()=>S.pdrag=false);

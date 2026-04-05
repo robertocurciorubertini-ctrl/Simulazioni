@@ -341,6 +341,26 @@
       "isWip": false
     },
     {
+      "title": "Calore e capacità termica",
+      "description": "Simulazione interattiva del calore e della capacità termica specifica, con confronto tra materiali diversi e collegamento tra calorimetria, teoria cinetica e distribuzione di Maxwell-Boltzmann.",
+      "category": "Termodinamica",
+      "icon": "🔥",
+      "order": 10,
+      "tags": [
+        "calore",
+        "capacità termica",
+        "calore specifico",
+        "calorimetria",
+        "temperatura",
+        "teoria cinetica",
+        "Maxwell-Boltzmann",
+        "Q = mcΔT"
+      ],
+      "level": "intermedio",
+      "file": "termodinamica/calore.html",
+      "isWip": false
+    },
+    {
       "title": "Gas ideale",
       "description": "Simulazione interattiva di un gas ideale con pistone mobile, con visualizzazione delle trasformazioni isoterma, isobara, isocora e adiabatica nel diagramma pressione-volume.",
       "category": "Termodinamica",

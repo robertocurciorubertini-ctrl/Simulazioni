@@ -596,33 +596,43 @@ function draw() {
     arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',3);
     if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'B',bx2,by2,'#2980b9',14,6,-6);}
 
-    // Indicazione 2D del verso del vettore risultante lungo z
-    const zx=Math.max(52, Math.min(W-52, osx+54));
-    const zy=Math.max(52, Math.min(H-52, osy-54));
+    // Indicazione 2D del verso del vettore risultante lungo z,
+    // collocata nell'origine comune dei vettori per coerenza geometrica.
+    const zx=osx;
+    const zy=osy;
     mctx.save();
-    mctx.globalAlpha=.95;
-    mctx.strokeStyle=cross>=0?'#8e44ad':'#d35400';
-    mctx.fillStyle=cross>=0?'#8e44ad':'#d35400';
-    mctx.lineWidth=2.2;
-    mctx.beginPath();
-    mctx.arc(zx,zy,15,0,Math.PI*2);
-    mctx.stroke();
+    mctx.lineWidth=2;
+    mctx.globalAlpha=.98;
     if(Math.abs(cross)>1e-6){
+      // piccolo disco chiaro per migliorare la leggibilità senza spostare il simbolo
+      mctx.fillStyle='rgba(245, 239, 230, .88)';
+      mctx.beginPath();
+      mctx.arc(zx,zy,11,0,Math.PI*2);
+      mctx.fill();
+      mctx.strokeStyle=cross>=0?'#8e44ad':'#d35400';
+      mctx.fillStyle=cross>=0?'#8e44ad':'#d35400';
+      mctx.beginPath();
+      mctx.arc(zx,zy,11,0,Math.PI*2);
+      mctx.stroke();
       if(cross>0){
         mctx.beginPath();
-        mctx.arc(zx,zy,4.2,0,Math.PI*2);
+        mctx.arc(zx,zy,3.2,0,Math.PI*2);
         mctx.fill();
       } else {
         mctx.beginPath();
-        mctx.moveTo(zx-5,zy-5); mctx.lineTo(zx+5,zy+5);
-        mctx.moveTo(zx+5,zy-5); mctx.lineTo(zx-5,zy+5);
+        mctx.moveTo(zx-4.2,zy-4.2); mctx.lineTo(zx+4.2,zy+4.2);
+        mctx.moveTo(zx+4.2,zy-4.2); mctx.lineTo(zx-4.2,zy+4.2);
         mctx.stroke();
       }
-      mctx.font='11px IBM Plex Mono';
-      mctx.fillText(cross>0?'(A×B)z uscente':'(A×B)z entrante',zx+22,zy+4);
+      // etichetta compatta leggermente decentrata per non coprire la costruzione vettoriale
+      mctx.font='10.5px IBM Plex Mono';
+      mctx.fillStyle='rgba(245, 239, 230, .92)';
+      const txt=cross>0?'+z':'−z';
+      mctx.fillText(txt,zx+14,zy-12);
     } else {
-      mctx.font='11px IBM Plex Mono';
-      mctx.fillText('(A×B)z = 0',zx+22,zy+4);
+      mctx.fillStyle='rgba(245, 239, 230, .92)';
+      mctx.font='10.5px IBM Plex Mono';
+      mctx.fillText('0',zx+12,zy-10);
     }
     mctx.restore();
 

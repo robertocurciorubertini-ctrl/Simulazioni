@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Grandezze vettoriali",
+  description: "Introduzione alle grandezze vettoriali e alle principali operazioni tra vettori nel piano.",
+  category: "Fondamenti",
+  icon: "↗️",
+  order: 1,
+  tags: ["vettori", "componenti", "somma vettoriale", "modulo", "direzione"],
+  level: "base"
+    
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vettori – Simulazione Interattiva</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.getElementById('theory'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+:root {
+  --bg:#f5f0e8; --bg2:#ede8dc; --bg3:#e2ddd0;
+  --ink:#2a2520; --ink2:#5a5248; --ink3:#8a8278;
+  --accent:#b5470f; --accent2:#1a6b4a; --accent3:#1e4d8c;
+  --border:#c8c0b0;
+  --font-serif:'EB Garamond',Georgia,serif;
+  --font-sans:'IBM Plex Sans',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-sans);font-size:16px;line-height:1.65}
+
+header{background:var(--ink);color:var(--bg);padding:2.2rem 3rem 2rem;border-bottom:3px solid var(--accent)}
+header h1{font-family:var(--font-serif);font-size:2.6rem;font-weight:500;letter-spacing:-0.01em;line-height:1.1}
+header p{font-size:.95rem;color:#b8b0a4;margin-top:.4rem;font-weight:300}
+
+.sim-wrapper{max-width:1200px;margin:0 auto;padding:2rem 2rem 0}
+
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.5rem;flex-wrap:wrap}
+.tab-btn{background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;padding:.6rem 1.4rem;
+  font-family:var(--font-sans);font-size:.88rem;font-weight:500;color:var(--ink2);cursor:pointer;
+  transition:all .18s;text-transform:uppercase;letter-spacing:.04em}
+.tab-btn:hover{color:var(--accent)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.sim-main{display:grid;grid-template-columns:1fr 300px;gap:1.5rem;align-items:start}
+.sim-main.two-col{grid-template-columns:1fr 1fr}
+
+.canvas-wrap{background:var(--bg2);border:1.5px solid var(--border);border-radius:4px;overflow:hidden;position:relative}
+canvas{display:block;cursor:crosshair;width:100%}
+.canvas-hint{position:absolute;bottom:8px;right:10px;font-size:.72rem;color:var(--ink3);font-family:var(--font-mono);pointer-events:none}
+
+#crossCanvas{display:block;width:100%;background:#1e1a14;border-radius:4px}
+
+.panel{display:flex;flex-direction:column;gap:1rem}
+.card{background:var(--bg2);border:1.5px solid var(--border);border-radius:4px;padding:1rem 1.1rem}
+.card-title{font-family:var(--font-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink3);margin-bottom:.8rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
+
+.vec-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:.4rem;align-items:center;margin-bottom:.5rem}
+.vec-label{font-family:var(--font-serif);font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.vec-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-a{background:#c0392b}.dot-b{background:#2980b9}.dot-r{background:#27ae60}
+
+input[type=number],input[type=range]{font-family:var(--font-mono);font-size:.85rem;background:var(--bg);
+  border:1px solid var(--border);border-radius:3px;padding:.25rem .4rem;color:var(--ink);width:100%}
+input[type=range]{padding:0;accent-color:var(--accent);cursor:pointer}
+input[type=number]:focus{outline:1px solid var(--accent)}
+label.small{font-size:.78rem;color:var(--ink2);font-family:var(--font-mono)}
+
+.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.op-btn{background:var(--bg3);border:1.5px solid var(--border);border-radius:3px;padding:.45rem .5rem;
+  font-family:var(--font-sans);font-size:.82rem;font-weight:500;color:var(--ink);cursor:pointer;transition:all .15s;text-align:center}
+.op-btn:hover{background:var(--bg);border-color:var(--accent);color:var(--accent)}
+.op-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+
+.result-block{font-family:var(--font-mono);font-size:.82rem;line-height:1.9;color:var(--ink2)}
+.result-block .val{color:var(--ink);font-weight:500}
+.result-block .rv{color:#27ae60;font-weight:600}
+.result-block .rs{color:var(--accent);font-weight:600}
+.result-block .rc{color:#8e44ad;font-weight:600}
+.result-block .rp{color:var(--accent3);font-weight:600}
+
+.check-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;font-size:.85rem;cursor:pointer;user-select:none}
+.check-row input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px}
+
+.polar-formula{background:var(--bg3);border-left:3px solid var(--accent3);padding:.6rem 1rem;margin:.6rem 0;
+  font-family:var(--font-mono);font-size:.82rem;line-height:1.7}
+.polar-formula.green{border-left-color:var(--accent2)}
+.polar-info{font-family:var(--font-mono);font-size:.83rem;line-height:2}
+
+/* Theory */
+#theory{max-width:900px;margin:3rem auto 0;padding:0 2rem 5rem}
+.theory-title{font-family:var(--font-serif);font-size:2.1rem;font-weight:500;border-bottom:2px solid var(--accent);padding-bottom:.5rem;margin-bottom:2.5rem}
+.theory-section{margin-bottom:3rem}
+.theory-section h2{font-family:var(--font-serif);font-size:1.5rem;font-weight:500;margin-bottom:1rem;margin-top:2rem}
+.theory-section h3{font-family:var(--font-serif);font-size:1.2rem;font-style:italic;color:var(--accent);margin-bottom:.7rem;margin-top:1.5rem}
+.theory-section p{font-family:var(--font-serif);font-size:1.08rem;line-height:1.8;margin-bottom:1rem;text-align:justify}
+.math-box{background:var(--bg2);border-left:3px solid var(--accent);border-radius:0 3px 3px 0;padding:1rem 1.4rem;margin:1.2rem 0;overflow-x:auto}
+.example-box{background:var(--bg2);border:1.5px solid var(--border);border-top:3px solid var(--accent2);border-radius:0 0 3px 3px;padding:1rem 1.4rem;margin:1.2rem 0}
+.example-box .ex-title{font-family:var(--font-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:.6rem}
+.example-box p{font-size:1rem;margin-bottom:.5rem}
+.phys-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin:1.2rem 0}
+.phys-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:4px;padding:.9rem 1.1rem}
+.phys-card .icon{font-size:1.5rem;margin-bottom:.4rem}
+.phys-card .name{font-family:var(--font-sans);font-weight:600;font-size:.9rem;color:var(--accent);margin-bottom:.3rem}
+.phys-card p{font-size:.9rem;line-height:1.5;margin-bottom:0}
+hr.thin{border:none;border-top:1px solid var(--border);margin:2rem 0}
+
+@media(max-width:780px){
+  .sim-main,.sim-main.two-col{grid-template-columns:1fr}
+  header{padding:1.5rem 1.2rem}
+  header h1{font-size:1.8rem}
+  .sim-wrapper{padding:1rem 1rem 0}
+  #theory{padding:0 1rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Grandezze Vettoriali</h1>
+  <p>Visualizzazione interattiva &middot; Operazioni &middot; Scomposizione &middot; Coordinate polari &middot; Teoria</p>
+</header>
+
+<div class="sim-wrapper">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setTab('ops')">Operazioni</button>
+    <button class="tab-btn" onclick="setTab('decomp')">Scomposizione</button>
+    <button class="tab-btn" onclick="setTab('polar')">Coordinate polari</button>
+  </div>
+
+  <!-- ===== TAB: OPERAZIONI ===== -->
+  <div id="tab-ops">
+    <div class="sim-main">
+      <div class="canvas-wrap">
+        <canvas id="mainCanvas"></canvas>
+        <div class="canvas-hint">trascina le punte &middot; scroll per zoom</div>
+      </div>
+      <div class="panel">
+        <div class="card">
+          <div class="card-title">Vettori</div>
+          <div class="vec-row">
+            <div class="vec-label"><span class="vec-dot dot-a"></span><b>A</b></div>
+            <div><label class="small">A<sub>x</sub></label><input type="number" id="ax" value="3" step="0.5" oninput="updateFromInputs()"></div>
+            <div><label class="small">A<sub>y</sub></label><input type="number" id="ay" value="2" step="0.5" oninput="updateFromInputs()"></div>
+          </div>
+          <div class="vec-row">
+            <div class="vec-label"><span class="vec-dot dot-b"></span><b>B</b></div>
+            <div><label class="small">B<sub>x</sub></label><input type="number" id="bx" value="1" step="0.5" oninput="updateFromInputs()"></div>
+            <div><label class="small">B<sub>y</sub></label><input type="number" id="by" value="-2" step="0.5" oninput="updateFromInputs()"></div>
+          </div>
+          <div class="result-block" id="vecInfo" style="margin-top:.5rem;border-top:1px solid var(--border);padding-top:.5rem"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Operazione</div>
+          <div class="op-grid">
+            <button class="op-btn active" id="btn-sum"  onclick="setOp('sum')">A + B</button>
+            <button class="op-btn"        id="btn-diff" onclick="setOp('diff')">A &minus; B</button>
+            <button class="op-btn"        id="btn-dot"  onclick="setOp('dot')">A &middot; B</button>
+            <button class="op-btn"        id="btn-cross"onclick="setOp('cross')">A &times; B</button>
+          </div>
+          <div class="result-block" id="opResult" style="margin-top:.8rem"></div>
+        </div>
+        <!-- 3D cross product panel, shown only when cross is active -->
+        <div class="card" id="card-cross3d" style="display:none">
+          <div class="card-title">Vista quasi-3D &mdash; A &times; B</div>
+          <canvas id="crossCanvas" height="210"></canvas>
+          <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--ink3);text-align:center;margin-top:.4rem">
+            prospettiva isometrica &middot; A (rosso) B (blu) A&times;B (viola uscente dal piano)
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Visualizzazione</div>
+          <label class="check-row"><input type="checkbox" id="showGrid" checked onchange="draw()"> Griglia</label>
+          <label class="check-row"><input type="checkbox" id="showComponents" checked onchange="draw()"> Componenti (tratteggiato)</label>
+          <label class="check-row"><input type="checkbox" id="showAngles" checked onchange="draw()"> Angoli</label>
+          <label class="check-row"><input type="checkbox" id="showLabels" checked onchange="draw()"> Etichette</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: SCOMPOSIZIONE ===== -->
+  <div id="tab-decomp" style="display:none">
+    <div class="sim-main">
+      <div class="canvas-wrap">
+        <canvas id="decompCanvas"></canvas>
+        <div class="canvas-hint">trascina la punta di A &middot; scroll per zoom</div>
+      </div>
+      <div class="panel">
+        <div class="card">
+          <div class="card-title">Vettore A</div>
+          <div class="vec-row">
+            <div class="vec-label"><span class="vec-dot dot-a"></span><b>A</b></div>
+            <div><label class="small">A<sub>x</sub></label><input type="number" id="dax" value="3" step="0.5" oninput="updateDecomp()"></div>
+            <div><label class="small">A<sub>y</sub></label><input type="number" id="day" value="2" step="0.5" oninput="updateDecomp()"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Scomposizione</div>
+          <label class="check-row"><input type="checkbox" id="showXY" checked onchange="drawDecomp()"> Assi cartesiani (x, y)</label>
+          <label class="check-row"><input type="checkbox" id="showGen" onchange="drawDecomp()"> Asse generico u</label>
+          <div style="margin-top:.6rem">
+            <label class="small">Angolo asse u: <span id="axisAngleVal">30&deg;</span></label>
+            <input type="range" id="axisAngle" min="0" max="179" value="30"
+              oninput="drawDecomp();document.getElementById('axisAngleVal').textContent=this.value+'°'">
+          </div>
+          <div class="result-block" id="decompResult" style="margin-top:.8rem;border-top:1px solid var(--border);padding-top:.6rem"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Visualizzazione</div>
+          <label class="check-row"><input type="checkbox" id="dGrid" checked onchange="drawDecomp()"> Griglia</label>
+          <label class="check-row"><input type="checkbox" id="dAngles" checked onchange="drawDecomp()"> Angoli</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: COORDINATE POLARI ===== -->
+  <div id="tab-polar" style="display:none">
+    <div class="sim-main two-col">
+      <div class="canvas-wrap">
+        <canvas id="polarCanvas"></canvas>
+        <div class="canvas-hint">trascina il punto P &middot; scroll per zoom</div>
+      </div>
+      <div class="panel">
+        <div class="card">
+          <div class="card-title">Coordinate del punto P</div>
+          <div class="polar-info" id="polarInfo">—</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Trasformazioni</div>
+          <div class="polar-formula"><b>Cartesiane &rarr; Polari</b><br>r = &radic;(x&sup2;+y&sup2;)<br>&theta; = atan2(y, x)</div>
+          <div class="polar-formula"><b>Polari &rarr; Cartesiane</b><br>x = r cos&theta;<br>y = r sin&theta;</div>
+          <div class="polar-formula green"><b>Versori polari in P</b><br>r&#770; = (cos&theta;, sin&theta;)<br>&theta;&#770; = (&minus;sin&theta;, cos&theta;)<br><span style="color:var(--ink3);font-size:.75rem">r&#770;&middot;&theta;&#770; = 0 &nbsp;(sempre ortogonali)</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Visualizza</div>
+          <label class="check-row"><input type="checkbox" id="polCart" checked onchange="drawPolar()"> Componenti cartesiane x, y</label>
+          <label class="check-row"><input type="checkbox" id="polVers" checked onchange="drawPolar()"> Versori r&#770; e &theta;&#770;</label>
+          <label class="check-row"><input type="checkbox" id="polCircle" checked onchange="drawPolar()"> Cerchio di raggio r</label>
+          <label class="check-row"><input type="checkbox" id="polAngle" checked onchange="drawPolar()"> Arco angolo &theta;</label>
+          <label class="check-row"><input type="checkbox" id="polPolarGrid" checked onchange="drawPolar()"> Griglia polare</label>
+        </div>
+        <div class="card" style="background:var(--bg3)">
+          <div class="card-title">Perche le polari?</div>
+          <div style="font-family:var(--font-serif);font-size:.95rem;line-height:1.7;color:var(--ink2)">
+            Nel <i>moto circolare</i> r rimane costante e &theta; varia: le equazioni del moto diventano immediate.
+            Nell&rsquo;<i>elettromagnetismo</i>, le simmetrie cilindriche e sferiche rendono naturale l&rsquo;uso di coordinate curvilinee.
+            L&rsquo;accelerazione centripeta &minus;r&omega;&sup2;r&#770; emerge direttamente dalla derivata di r&#770;.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /sim-wrapper -->
+
+
+<!-- ════════════════════════════════════════
+     TEORIA
+     ════════════════════════════════════════ -->
+<div id="theory">
+  <div class="theory-title">Fondamenti della Teoria Vettoriale</div>
+
+  <div class="theory-section">
+    <h2>1. Grandezze scalari e grandezze vettoriali</h2>
+    <p>In fisica non tutte le grandezze si descrivono allo stesso modo. Alcune sono completamente caratterizzate da un solo numero accompagnato dalla sua unità di misura: la <em>temperatura</em> di un corpo, la sua <em>massa</em>, la sua <em>energia cinetica</em>, il <em>volume</em> che occupa. Queste grandezze si dicono <strong>scalari</strong>, perché è sufficiente uno scalare — un numero reale — per descriverle.</p>
+    <p>Esistono però molte grandezze fisiche per le quali un singolo numero non basta. Se diciamo che un treno viaggia a 200 km/h, abbiamo dato un'informazione parziale: non sappiamo in quale direzione si muove né verso dove. La velocità è una grandezza che possiede modulo, direzione e verso: è una grandezza <strong>vettoriale</strong>. Matematicamente un vettore è un elemento di uno spazio vettoriale — ma concretamente, in fisica classica, lo pensiamo come una freccia nello spazio dotata di tre caratteristiche fondamentali.</p>
+    <div class="math-box">
+      Un vettore $\vec{v}$ in $\mathbb{R}^2$ si scrive come coppia ordinata $\vec{v} = (v_x,\, v_y)$, o con la notazione delle basi ortonormali:
+      $$\vec{v} = v_x\,\hat{i} + v_y\,\hat{j}$$
+      In tre dimensioni: $\;\vec{v} = v_x\,\hat{i} + v_y\,\hat{j} + v_z\,\hat{k}$
+    </div>
+    <p>Le tre caratteristiche di un vettore sono: il <strong>modulo</strong> (intensità), denotato $|\vec{v}|$; la <strong>direzione</strong>, cioè la retta lungo cui giace; il <strong>verso</strong>, cioè quale dei due sensi della direzione è quello del vettore. Due vettori sono uguali se e solo se condividono tutte e tre queste caratteristiche, indipendentemente dal punto di applicazione: è la proprietà di <em>libera applicazione</em>, che ci permette di traslare i vettori per compiere le operazioni geometricamente.</p>
+    <div class="math-box">
+      $$|\vec{v}| = \sqrt{v_x^2 + v_y^2} \qquad \theta = \arctan\!\left(\frac{v_y}{v_x}\right)$$
+      (usando atan2 per tenere conto del quadrante corretto)
+    </div>
+  </div>
+
+  <hr class="thin">
+
+  <div class="theory-section">
+    <h2>2. Somma e differenza di vettori</h2>
+    <p>La <strong>somma vettoriale</strong> si esegue componente per componente. Se $\vec{A}=(A_x,A_y)$ e $\vec{B}=(B_x,B_y)$:</p>
+    <div class="math-box">$$\vec{A} + \vec{B} = (A_x + B_x,\; A_y + B_y)$$</div>
+    <p>Geometricamente si visualizza con la <strong>regola del parallelogramma</strong> (i due vettori dall'origine, la somma è la diagonale) o con la <strong>regola testa-coda</strong>: si porta la coda di $\vec{B}$ sulla punta di $\vec{A}$; la freccia che chiude il triangolo è la somma. La somma è commutativa e associativa. La <strong>differenza</strong> $\vec{A}-\vec{B} = \vec{A}+(-\vec{B})$, dove $-\vec{B}$ ha stesso modulo e direzione di $\vec{B}$ ma verso invertito.</p>
+    <div class="example-box">
+      <div class="ex-title">Esempio fisico — Forze in equilibrio</div>
+      <p>Un oggetto è appeso a due corde. Prima esercita $\vec{F}_1 = (3,\, 5)\,\text{N}$ e la seconda $\vec{F}_2 = (-3,\, 2)\,\text{N}$. La risultante è $(0,\,7)\,\text{N}$, verticale, che bilancia il peso $\vec{P}=(0,-7)\,\text{N}$: equilibrio.</p>
+    </div>
+  </div>
+
+  <hr class="thin">
+
+  <div class="theory-section">
+    <h2>3. Prodotto scalare (prodotto interno)</h2>
+    <p>Il <strong>prodotto scalare</strong> di $\vec{A}$ e $\vec{B}$ è un numero reale, definito in due modi equivalenti:</p>
+    <div class="math-box">$$\vec{A} \cdot \vec{B} = A_x B_x + A_y B_y = |\vec{A}|\,|\vec{B}|\,\cos\theta$$</div>
+    <p>dove $\theta$ è l'angolo tra i due vettori. Se $\vec{A}\cdot\vec{B}=0$ e nessuno dei due è nullo, i vettori sono <strong>ortogonali</strong>. Il prodotto scalare è commutativo. La formula ci permette di ricavare l'angolo tra due vettori conoscendone solo le componenti:</p>
+    <div class="math-box">$$\theta = \arccos\!\left(\frac{\vec{A}\cdot\vec{B}}{|\vec{A}|\,|\vec{B}|}\right)$$</div>
+    <p>In fisica il <strong>lavoro</strong> compiuto da una forza è $W = \vec{F}\cdot\vec{s}$: solo la componente di forza parallela allo spostamento contribuisce. Una forza perpendicolare allo spostamento non compie lavoro, come la forza centripeta sul moto circolare uniforme.</p>
+    <div class="example-box">
+      <div class="ex-title">Esempio fisico — Lavoro</div>
+      <p>Una forza $\vec{F} = (4,\, 3)\,\text{N}$ agisce su un oggetto con spostamento $\vec{s} = (5,\, 0)\,\text{m}$. Allora $W = 4\cdot5+3\cdot0 = 20\,\text{J}$. Equivalentemente, $|\vec{F}|=5\,\text{N}$, $\theta\approx36{,}9°$, e $W=5\cdot5\cdot\cos36{,}9°=20\,\text{J}$.</p>
+    </div>
+  </div>
+
+  <hr class="thin">
+
+  <div class="theory-section">
+    <h2>4. Prodotto vettoriale (prodotto esterno)</h2>
+    <p>Il <strong>prodotto vettoriale</strong> $\vec{A}\times\vec{B}$ è un vettore, definito solo in tre dimensioni. La sua direzione è perpendicolare al piano contenente $\vec{A}$ e $\vec{B}$, il suo verso è dato dalla <strong>regola della mano destra</strong>, e il suo modulo è:</p>
+    <div class="math-box">
+      $$|\vec{A}\times\vec{B}| = |\vec{A}|\,|\vec{B}|\,\sin\theta$$
+      $$\vec{A}\times\vec{B} = \begin{vmatrix}\hat{i}&\hat{j}&\hat{k}\\A_x&A_y&A_z\\B_x&B_y&B_z\end{vmatrix}$$
+    </div>
+    <p>Il modulo $|\vec{A}||\vec{B}|\sin\theta$ è l'<strong>area del parallelogramma</strong> costruito sui due vettori — geometria e algebra si fondono elegantemente. Il prodotto vettoriale è <em>anticommutativo</em>: $\vec{A}\times\vec{B} = -\vec{B}\times\vec{A}$. In 2D con $A_z=B_z=0$ il risultato è puramente lungo $\hat{k}$: $\vec{A}\times\vec{B}=(A_xB_y-A_yB_x)\,\hat{k}$.</p>
+    <div class="example-box">
+      <div class="ex-title">Esempi fisici — Momento torcente e Forza di Lorentz</div>
+      <p>Il momento torcente: $\vec{\tau} = \vec{r}\times\vec{F}$. Con $\vec{r}=(0{,}5,0,0)\,\text{m}$ e $\vec{F}=(0,10,0)\,\text{N}$, si ha $\vec{\tau}=(0,0,5)\,\text{N·m}$ lungo $+\hat{k}$, cioè rotazione antioraria.</p>
+      <p>La forza di Lorentz: $\vec{F}=q\,\vec{v}\times\vec{B}$. Il prodotto vettoriale spiega perché la forza è perpendicolare sia a $\vec{v}$ che a $\vec{B}$, e perché una carica in campo magnetico uniforme descrive un moto circolare uniforme senza che la forza compia lavoro ($\vec{F}\cdot\vec{v}=0$).</p>
+    </div>
+  </div>
+
+  <hr class="thin">
+
+  <div class="theory-section">
+    <h2>5. Scomposizione di un vettore e coordinate polari</h2>
+    <h3>Scomposizione lungo assi cartesiani</h3>
+    <p>Dato $\vec{A}$ di modulo $A$ e angolo $\theta$ con l'asse $x$:</p>
+    <div class="math-box">$$A_x = A\cos\theta \qquad A_y = A\sin\theta \qquad \vec{A} = A\cos\theta\,\hat{i} + A\sin\theta\,\hat{j}$$</div>
+    <h3>Proiezione su un asse generico</h3>
+    <p>Dato un asse col versore $\hat{u}=(\cos\alpha,\sin\alpha)$, la componente scalare di $\vec{A}$ lungo $\hat{u}$ è $A_u = \vec{A}\cdot\hat{u}$, e quella perpendicolare è $A_\perp = -A_x\sin\alpha + A_y\cos\alpha$. Vale sempre $A_u^2+A_\perp^2=|\vec{A}|^2$, verificabile con il teorema di Pitagora nel sistema ruotato.</p>
+    <h3>Coordinate polari piane</h3>
+    <p>In molti problemi — moto circolare, gravitazione, elettrostatica con simmetria radiale — è più naturale descrivere la posizione con le <strong>coordinate polari</strong> $(r,\theta)$. La trasformazione è biunivoca (esclusa l'origine):</p>
+    <div class="math-box">
+      $$x = r\cos\theta \qquad y = r\sin\theta \qquad r = \sqrt{x^2+y^2} \qquad \theta = \text{atan2}(y,\,x)$$
+    </div>
+    <p>La vera potenza del sistema polare sta nei suoi <strong>versori locali</strong>. Invece di $\hat{i}$ e $\hat{j}$ (fissi), si definiscono due versori che dipendono dalla posizione del punto:</p>
+    <div class="math-box">
+      $$\hat{r} = \begin{pmatrix}\cos\theta\\\sin\theta\end{pmatrix} \qquad \hat{\theta} = \begin{pmatrix}-\sin\theta\\\cos\theta\end{pmatrix} \qquad \hat{r}\cdot\hat{\theta}=0$$
+    </div>
+    <p>Il versore $\hat{r}$ punta radialmente verso l'esterno; $\hat{\theta}$ è perpendicolare a $\hat{r}$ nel verso di $\theta$ crescente (antiorario). Questi versori <strong>non sono costanti</strong>: variano al variare di $\theta$. Le loro derivate temporali sono fondamentali:</p>
+    <div class="math-box">
+      $$\dot{\hat{r}} = \dot\theta\,\hat{\theta} \qquad \dot{\hat{\theta}} = -\dot\theta\,\hat{r}$$
+    </div>
+    <p>Da queste relazioni discende l'espressione dell'accelerazione in coordinate polari. Nel moto circolare uniforme ($r=$ costante, $\dot{r}=0$, $\dot\theta=\omega$) si ottiene $\vec{a} = -r\omega^2\,\hat{r}$: l'accelerazione centripeta diretta verso il centro, senza bisogno di alcun calcolo trigonometrico esplicito.</p>
+    <div class="example-box">
+      <div class="ex-title">Esempio — Moto circolare uniforme in coordinate polari</div>
+      <p>Un punto su una circonferenza di raggio $r$ con velocità angolare $\omega$ costante. In polari: $\vec{r}=r\hat{r}$, $\vec{v}=\dot{\vec{r}}=r\dot\theta\hat\theta=r\omega\hat\theta$ (tangenziale), $\vec{a}=\dot{\vec{v}}=r\dot\omega\hat\theta+r\omega\dot{\hat\theta}=r\omega(-\omega\hat{r})=-r\omega^2\hat{r}$ (centripeta). In cartesiane la stessa derivazione richiede $x=r\cos(\omega t)$, $y=r\sin(\omega t)$, calcolo di $\ddot x$ e $\ddot y$ e riassemblaggio: le polari rendono la struttura del problema trasparente.</p>
+    </div>
+  </div>
+
+  <hr class="thin">
+
+  <div class="theory-section">
+    <h2>6. Vettori nella fisica e nel mondo reale</h2>
+    <p>I vettori sono lo strumento naturale per descrivere il mondo fisico. Ecco le principali grandezze vettoriali che incontriamo in fisica e nella vita quotidiana.</p>
+    <div class="phys-grid">
+      <div class="phys-card"><div class="icon">🏃</div><div class="name">Spostamento s</div><p>Cambiamento di posizione. Non dipende dal percorso, solo dai punti iniziale e finale. Unità: m.</p></div>
+      <div class="phys-card"><div class="icon">🚗</div><div class="name">Velocità v</div><p>Tasso di variazione dello spostamento nel tempo: $\vec{v}=d\vec{r}/dt$. Unità: m/s.</p></div>
+      <div class="phys-card"><div class="icon">🚀</div><div class="name">Accelerazione a</div><p>Tasso di variazione della velocità: $\vec{a}=d\vec{v}/dt$. Può cambiare modulo, direzione o entrambi. Unità: m/s².</p></div>
+      <div class="phys-card"><div class="icon">⚡</div><div class="name">Forza F</div><p>Seconda legge di Newton: $\vec{F}=m\vec{a}$. La stessa forza in direzione diversa produce effetti completamente diversi. Unità: N.</p></div>
+      <div class="phys-card"><div class="icon">🌀</div><div class="name">Momento angolare L</div><p>$\vec{L}=\vec{r}\times\vec{p}$. Si conserva in assenza di momenti torcenti. Spiega perché i pattinatori accelerano piegando le braccia.</p></div>
+      <div class="phys-card"><div class="icon">🧲</div><div class="name">Campo magnetico B</div><p>$\vec{F}=q\vec{v}\times\vec{B}$: la forza su una carica è il prodotto vettoriale di velocità e campo, sempre perpendicolare a entrambi.</p></div>
+      <div class="phys-card"><div class="icon">⚡</div><div class="name">Campo elettrico E</div><p>In ogni punto indica la forza per unità di carica: $\vec{F}=q\vec{E}$. Unità: N/C = V/m.</p></div>
+      <div class="phys-card"><div class="icon">💧</div><div class="name">Quantità di moto p</div><p>$\vec{p}=m\vec{v}$. Il suo tasso di variazione è la forza totale. Si conserva nei sistemi isolati: base degli urti.</p></div>
+      <div class="phys-card"><div class="icon">🔄</div><div class="name">Momento torcente &tau;</div><p>$\vec{\tau}=\vec{r}\times\vec{F}$. Dipende dalla forza, dalla distanza e dalla direzione di applicazione rispetto all'asse.</p></div>
+    </div>
+    <h3>Il gradiente: un vettore nato da uno scalare</h3>
+    <p>Dato un campo scalare $f(x,y,z)$ (temperatura, pressione, energia potenziale), il gradiente $\vec{\nabla}f = (\partial f/\partial x,\,\partial f/\partial y,\,\partial f/\partial z)$ è un vettore che indica la direzione di massima crescita. La forza gravitazionale è $\vec{F} = -\vec{\nabla}U$: il segno meno indica che la forza punta verso valori decrescenti di energia, come l'acqua che scorre verso valle.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     JAVASCRIPT
+     ════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────
+const S = {
+  // ops
+  ax:3, ay:2, bx:1, by:-2,
+  op:'sum', tab:'ops',
+  zoom:60, panX:0, panY:0, dragging:null,
+  // decomp
+  dax:3, day:2, dzoom:60, dpanX:0, dpanY:0, ddrag:false,
+  // polar
+  pr:3, pth:0.6, pzoom:60, ppanX:0, ppanY:0, pdrag:false,
+};
+
+// ──────────────────────────────────────────
+// UTILITY
+// ──────────────────────────────────────────
+const toC  = (px,py,z,ux,uy) => [px+ux*z, py-uy*z];
+const fromC= (px,py,z,cx,cy) => [(cx-px)/z, -(cy-py)/z];
+const snap = v => Math.round(v*4)/4;
+
+function getPos(e, canvas) {
+  const r=canvas.getBoundingClientRect(), sx=canvas.width/r.width, sy=canvas.height/r.height;
+  const cx=e.touches?e.touches[0].clientX:e.clientX, cy=e.touches?e.touches[0].clientY:e.clientY;
+  return [(cx-r.left)*sx,(cy-r.top)*sy];
+}
+function hit(mx,my,px,py,z,ux,uy,tol=18){
+  const [cx,cy]=toC(px,py,z,ux,uy); return Math.hypot(mx-cx,my-cy)<tol;
+}
+
+// ──────────────────────────────────────────
+// SHARED DRAW PRIMITIVES
+// ──────────────────────────────────────────
+function arrowOn(c, x1,y1,x2,y2, color, lw, alpha=1, dash=false) {
+  const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);
+  if(len<1) return;
+  c.save(); c.globalAlpha=alpha; c.strokeStyle=color; c.fillStyle=color; c.lineWidth=lw;
+  c.setLineDash(dash?[6,4]:[]); c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
+  const hl=Math.min(13,len*.28), a=Math.atan2(dy,dx);
+  c.setLineDash([]);
+  c.beginPath(); c.moveTo(x2,y2);
+  c.lineTo(x2-hl*Math.cos(a-.4),y2-hl*Math.sin(a-.4));
+  c.lineTo(x2-hl*Math.cos(a+.4),y2-hl*Math.sin(a+.4));
+  c.closePath(); c.fill(); c.restore();
+}
+function lbl(c, text,cx,cy,color,size=14,ox=10,oy=-10) {
+  c.save(); c.font=`italic ${size}px EB Garamond,Georgia,serif`; c.fillStyle=color;
+  c.fillText(text,cx+ox,cy+oy); c.restore();
+}
+function grid(c,px,py,z,W,H) {
+  c.save(); c.strokeStyle='#cfc8b8'; c.lineWidth=.8;
+  for(let x=((px%z)+W)%z;x<W;x+=z){c.globalAlpha=.5;c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=((py%z)+H)%H;y<H;y+=z){c.globalAlpha=.5;c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  c.restore();
+}
+function axes(c,px,py,z,W,H) {
+  c.save(); c.strokeStyle='#9a9080'; c.lineWidth=1.5; c.globalAlpha=1;
+  c.beginPath();c.moveTo(0,py);c.lineTo(W,py);c.stroke();
+  c.beginPath();c.moveTo(px,0);c.lineTo(px,H);c.stroke();
+  c.fillStyle='#9a9080'; c.font='13px IBM Plex Mono';
+  c.fillText('x',W-18,py-6); c.fillText('y',px+6,16);
+  c.font='10px IBM Plex Mono'; c.fillStyle='#b0a898';
+  for(let i=-20;i<=20;i++){
+    if(!i) continue;
+    const cx=px+i*z, cy=py-i*z;
+    if(cx>0&&cx<W){c.beginPath();c.moveTo(cx,py-3);c.lineTo(cx,py+3);c.stroke();if(Math.abs(i)<=10)c.fillText(i,cx-4,py+14);}
+    if(cy>0&&cy<H){c.beginPath();c.moveTo(px-3,cy);c.lineTo(px+3,cy);c.stroke();if(Math.abs(i)<=10)c.fillText(i,px+6,cy+4);}
+  }
+  c.restore();
+}
+function arcAngle(c,ox,oy,ang,r,color){
+  c.save();c.strokeStyle=color;c.lineWidth=1.2;c.globalAlpha=.7;
+  c.beginPath();c.arc(ox,oy,r,-ang,0);c.stroke();c.restore();
+}
+
+// ──────────────────────────────────────────
+// TAB: OPERATIONS
+// ──────────────────────────────────────────
+let mc, mctx;
+function draw() {
+  if(!mc) return;
+  const W=mc.width,H=mc.height,{panX:ox,panY:oy,zoom:z,ax,ay,bx,by}=S;
+  mctx.clearRect(0,0,W,H); mctx.fillStyle='#f0ebe0'; mctx.fillRect(0,0,W,H);
+  if(document.getElementById('showGrid').checked) grid(mctx,ox,oy,z,W,H);
+  axes(mctx,ox,oy,z,W,H);
+
+  const [osx,osy]=toC(ox,oy,z,0,0);
+  const [ax2,ay2]=toC(ox,oy,z,ax,ay);
+  const [bx2,by2]=toC(ox,oy,z,bx,by);
+  const SL=document.getElementById('showLabels').checked;
+  const SC=document.getElementById('showComponents').checked;
+  const SA=document.getElementById('showAngles').checked;
+
+  if(S.op==='sum'){
+    if(SC){
+      const [cax]=toC(ox,oy,z,ax,0),[,cay]=toC(ox,oy,z,0,ay);
+      arrowOn(mctx,osx,osy,cax,osy,'#c0392b',1.2,.28,true);
+      arrowOn(mctx,cax,osy,ax2,ay2,'#c0392b',1.2,.28,true);
+      const [rx2,ry2]=toC(ox,oy,z,ax+bx,ay+by),[bcx]=toC(ox,oy,z,ax+bx,ay);
+      arrowOn(mctx,ax2,ay2,bcx,ay2,'#2980b9',1.2,.28,true);
+      arrowOn(mctx,bcx,ay2,rx2,ry2,'#2980b9',1.2,.28,true);
+    }
+    arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',3);
+    const [rx2,ry2]=toC(ox,oy,z,ax+bx,ay+by);
+    arrowOn(mctx,ax2,ay2,rx2,ry2,'#2980b9',2.8,.85);
+    arrowOn(mctx,osx,osy,rx2,ry2,'#27ae60',3);
+    if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'B',(ax2+rx2)/2,(ay2+ry2)/2,'#2980b9',14,-20,0);lbl(mctx,'R=A+B',rx2,ry2,'#27ae60',14,6,-6);}
+
+  } else if(S.op==='diff'){
+    const [nbx2,nby2]=toC(ox,oy,z,-bx,-by);
+    arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',2,.3,true);
+    arrowOn(mctx,osx,osy,nbx2,nby2,'#2980b9',2.5,.8);
+    arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',3);
+    const [rx2,ry2]=toC(ox,oy,z,ax-bx,ay-by);
+    arrowOn(mctx,osx,osy,rx2,ry2,'#27ae60',3);
+    if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'-B',nbx2,nby2,'#2980b9',14,6,-6);lbl(mctx,'R=A-B',rx2,ry2,'#27ae60',14,6,-6);}
+
+  } else if(S.op==='dot'){
+    const modA=Math.hypot(ax,ay);
+    // Extended line through A (dashed) – ensures projection foot is always visually on A's line
+    if(modA>.01){
+      const ux=ax/modA,uy=ay/modA,ext=8;
+      const [ex0,ey0]=toC(ox,oy,z,-ext*ux,-ext*uy);
+      const [ex1,ey1]=toC(ox,oy,z,(ax+ext*ux),(ay+ext*uy));
+      mctx.save();mctx.strokeStyle='#c0392b';mctx.lineWidth=1;mctx.setLineDash([8,5]);mctx.globalAlpha=.28;
+      mctx.beginPath();mctx.moveTo(ex0,ey0);mctx.lineTo(ex1,ey1);mctx.stroke();mctx.restore();
+    }
+    arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',3);
+    arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',3);
+    // Projection of B onto A
+    if(modA>.01){
+      const ux=ax/modA,uy=ay/modA;
+      const proj=(ax*bx+ay*by)/modA;
+      const [px,py]=toC(ox,oy,z,proj*ux,proj*uy);
+      // Perpendicular drop line
+      mctx.save();mctx.strokeStyle='#8e44ad';mctx.lineWidth=1.8;mctx.setLineDash([5,3]);mctx.globalAlpha=.75;
+      mctx.beginPath();mctx.moveTo(bx2,by2);mctx.lineTo(px,py);mctx.stroke();mctx.restore();
+      // Right-angle mark
+      const rm=8;
+      mctx.save();mctx.strokeStyle='#8e44ad';mctx.lineWidth=1;mctx.globalAlpha=.55;
+      mctx.beginPath();
+      mctx.moveTo(px+rm*ux+rm*(-uy), py-rm*uy+rm*ux);
+      mctx.lineTo(px+rm*(-uy), py+rm*ux);
+      mctx.lineTo(px-rm*ux+rm*(-uy), py+rm*uy+rm*ux);
+      mctx.stroke();mctx.restore();
+      // Dot at foot
+      mctx.save();mctx.fillStyle='#8e44ad';mctx.globalAlpha=.9;
+      mctx.beginPath();mctx.arc(px,py,4.5,0,Math.PI*2);mctx.fill();mctx.restore();
+      // Projection arrow
+      arrowOn(mctx,osx,osy,px,py,'#8e44ad',2.5,.85);
+      if(SL) lbl(mctx,`A·B=${(ax*bx+ay*by).toFixed(2)}`,px,py,'#8e44ad',12,8,14);
+    }
+    if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'B',bx2,by2,'#2980b9',14,6,-6);}
+
+  } else if(S.op==='cross'){
+    const cross=ax*by-ay*bx;
+    if(SC){
+      arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',1.2,.25,true);
+      arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',1.2,.25,true);
+    }
+    // Parallelogram fill
+    mctx.save();
+    mctx.fillStyle=cross>=0?'rgba(39,174,96,.13)':'rgba(231,76,60,.13)';
+    mctx.beginPath();mctx.moveTo(osx,osy);mctx.lineTo(ax2,ay2);
+    const [abx,aby]=toC(ox,oy,z,ax+bx,ay+by);
+    mctx.lineTo(abx,aby);mctx.lineTo(bx2,by2);mctx.closePath();mctx.fill();mctx.restore();
+    arrowOn(mctx,osx,osy,ax2,ay2,'#c0392b',3);
+    arrowOn(mctx,osx,osy,bx2,by2,'#2980b9',3);
+    if(SL){lbl(mctx,'A',ax2,ay2,'#c0392b',15,8,-8);lbl(mctx,'B',bx2,by2,'#2980b9',14,6,-6);}
+    drawCross3D();
+  }
+
+  if(SA){
+    const tA=Math.atan2(ay,ax);
+    arcAngle(mctx,osx,osy,tA,24,'#c0392b');
+    mctx.save();mctx.fillStyle='#c0392b';mctx.font='10px IBM Plex Mono';
+    mctx.fillText(`${(tA*180/Math.PI).toFixed(0)}°`,osx+26,osy-4);mctx.restore();
+    if(S.op!=='sum'&&S.op!=='diff'){
+      const tB=Math.atan2(by,bx);
+      arcAngle(mctx,osx,osy,tB,38,'#2980b9');
+      mctx.save();mctx.fillStyle='#2980b9';mctx.font='10px IBM Plex Mono';
+      mctx.fillText(`${(tB*180/Math.PI).toFixed(0)}°`,osx+40,osy-4);mctx.restore();
+    }
+  }
+  updateResults();
+}
+
+function updateResults(){
+  const {ax,ay,bx,by}=S;
+  const mA=Math.hypot(ax,ay),mB=Math.hypot(bx,by);
+  const tA=Math.atan2(ay,ax)*180/Math.PI,tB=Math.atan2(by,bx)*180/Math.PI;
+  document.getElementById('vecInfo').innerHTML=
+    `|A| = <span class="val">${mA.toFixed(3)}</span>  &theta;<sub>A</sub> = <span class="val">${tA.toFixed(1)}&deg;</span><br>`+
+    `|B| = <span class="val">${mB.toFixed(3)}</span>  &theta;<sub>B</sub> = <span class="val">${tB.toFixed(1)}&deg;</span>`;
+  let html='';
+  if(S.op==='sum'){const rx=ax+bx,ry=ay+by;html=`R = A + B<br>R<sub>x</sub>=<span class="rv">${rx.toFixed(3)}</span><br>R<sub>y</sub>=<span class="rv">${ry.toFixed(3)}</span><br>|R|=<span class="rv">${Math.hypot(rx,ry).toFixed(3)}</span>`;}
+  else if(S.op==='diff'){const rx=ax-bx,ry=ay-by;html=`R = A &minus; B<br>R<sub>x</sub>=<span class="rv">${rx.toFixed(3)}</span><br>R<sub>y</sub>=<span class="rv">${ry.toFixed(3)}</span><br>|R|=<span class="rv">${Math.hypot(rx,ry).toFixed(3)}</span>`;}
+  else if(S.op==='dot'){
+    const dot=ax*bx+ay*by;
+    const ang=(mA>0&&mB>0)?Math.acos(Math.max(-1,Math.min(1,dot/(mA*mB))))*180/Math.PI:0;
+    html=`A &middot; B = <span class="rs">${dot.toFixed(4)}</span><br>= |A||B|cos&theta;<br>&theta; = <span class="rs">${ang.toFixed(2)}&deg;</span><br>`+
+         `<span style="color:var(--ink3);font-size:.76rem">${dot>0?'&theta;&lt;90&deg; &rarr; concordante':dot<0?'&theta;&gt;90&deg; &rarr; discorde':'&theta;=90&deg; &rarr; perpendicolari!'}</span>`;
+  } else {
+    const cr=ax*by-ay*bx;
+    html=`A &times; B = <span class="rc">${cr.toFixed(4)}</span> k&#770;<br>= |A||B|sin&theta;<br>Area = <span class="rc">${Math.abs(cr).toFixed(4)}</span> u&sup2;<br>`+
+         `<span style="color:var(--ink3);font-size:.76rem">${cr>0?'&uarr; verso +Z (antiorario)':cr<0?'&darr; verso &minus;Z (orario)':'vettori paralleli!'}</span>`;
+  }
+  document.getElementById('opResult').innerHTML=html;
+}
+
+// ──────────────────────────────────────────
+// QUASI-3D CROSS PRODUCT
+// ──────────────────────────────────────────
+let cc, cctx2;
+function drawCross3D(){
+  if(!cc) return;
+  const W=cc.width,H=cc.height;
+  cctx2.clearRect(0,0,W,H);
+  cctx2.fillStyle='#1e1a14';cctx2.fillRect(0,0,W,H);
+
+  const scale=Math.min(W,H)*.135, cx=W*.5, cy=H*.6;
+  // Isometric basis (world X,Y,Z → screen)
+  const bX=[Math.cos(Math.PI/6),-Math.sin(Math.PI/6)*.5];
+  const bY=[0,-1];
+  const bZ=[-Math.cos(Math.PI/6),-Math.sin(Math.PI/6)*.5];
+  const proj=(wx,wy,wz)=>[cx+(wx*bX[0]+wy*bY[0]+wz*bZ[0])*scale, cy+(wx*bX[1]+wy*bY[1]+wz*bZ[1])*scale];
+
+  // XZ floor grid
+  cctx2.save();cctx2.strokeStyle='#3a3530';cctx2.lineWidth=.8;cctx2.globalAlpha=.8;
+  for(let i=-4;i<=4;i++){
+    const[x1,y1]=proj(i,0,-4),[x2,y2]=proj(i,0,4);cctx2.beginPath();cctx2.moveTo(x1,y1);cctx2.lineTo(x2,y2);cctx2.stroke();
+    const[x3,y3]=proj(-4,0,i),[x4,y4]=proj(4,0,i);cctx2.beginPath();cctx2.moveTo(x3,y3);cctx2.lineTo(x4,y4);cctx2.stroke();
+  }
+  cctx2.restore();
+
+  // World axes (dashed)
+  const axCol='#555048';
+  [[1,0,0,'X'],[0,1,0,'Y'],[0,0,1,'Z']].forEach(([dx,dy,dz,n])=>{
+    const[x0,y0]=proj(0,0,0),[x1,y1]=proj(dx*3.5,dy*3.5,dz*3.5);
+    cctx2.save();cctx2.strokeStyle=axCol;cctx2.lineWidth=1;cctx2.globalAlpha=.45;cctx2.setLineDash([4,3]);
+    cctx2.beginPath();cctx2.moveTo(x0,y0);cctx2.lineTo(x1,y1);cctx2.stroke();
+    cctx2.setLineDash([]);cctx2.fillStyle=axCol;cctx2.font='11px IBM Plex Mono';cctx2.fillText(n,x1+3,y1+3);
+    cctx2.restore();
+  });
+
+  // Scale vectors to fit nicely
+  const {ax,ay,bx,by}=S;
+  const maxM=Math.max(Math.hypot(ax,ay),Math.hypot(bx,by),.5);
+  const sc=3/maxM;
+  // A lives in XZ plane (X=ax, Z=ay, Y=0)
+  const [AX,AZ,AY]=[ax*sc,ay*sc,0];
+  // B lives in XZ plane
+  const [BX,BZ,BY]=[bx*sc,by*sc,0];
+  // A×B (in 2D: ax*by-ay*bx) goes along world Y
+  const crossVal=ax*by-ay*bx;
+  const CY=crossVal*sc;
+
+  // Parallelogram face
+  const[p0x,p0y]=proj(0,0,0),[p1x,p1y]=proj(AX,0,AZ),[p2x,p2y]=proj(AX+BX,0,AZ+BZ),[p3x,p3y]=proj(BX,0,BZ);
+  cctx2.save();
+  cctx2.fillStyle='rgba(142,68,173,.15)';
+  cctx2.beginPath();cctx2.moveTo(p0x,p0y);cctx2.lineTo(p1x,p1y);cctx2.lineTo(p2x,p2y);cctx2.lineTo(p3x,p3y);cctx2.closePath();cctx2.fill();
+  cctx2.restore();
+
+  // Draw A
+  function vec3(wx,wy,wz, col, tag){
+    const[x0,y0]=proj(0,0,0),[x1,y1]=proj(wx,wy,wz);
+    const dx=x1-x0,dy=y1-y0,len=Math.hypot(dx,dy);
+    if(len<2) return;
+    cctx2.save();cctx2.strokeStyle=col;cctx2.fillStyle=col;cctx2.lineWidth=2.8;cctx2.globalAlpha=.95;
+    cctx2.beginPath();cctx2.moveTo(x0,y0);cctx2.lineTo(x1,y1);cctx2.stroke();
+    const hl=11,a=Math.atan2(dy,dx);
+    cctx2.beginPath();cctx2.moveTo(x1,y1);
+    cctx2.lineTo(x1-hl*Math.cos(a-.4),y1-hl*Math.sin(a-.4));
+    cctx2.lineTo(x1-hl*Math.cos(a+.4),y1-hl*Math.sin(a+.4));
+    cctx2.closePath();cctx2.fill();
+    cctx2.font='bold 12px IBM Plex Mono';cctx2.fillText(tag,x1+5,y1-5);
+    cctx2.restore();
+  }
+  vec3(AX,0,AZ,'#e74c3c','A');
+  vec3(BX,0,BZ,'#3498db','B');
+
+  // AxB with glow
+  if(Math.abs(crossVal)>.05){
+    const[cx2,cy2]=proj(0,CY,0);
+    const dx=cx2-p0x,dy=cy2-p0y,len=Math.hypot(dx,dy);
+    if(len>2){
+      // glow
+      cctx2.save();cctx2.shadowColor='#a855f7';cctx2.shadowBlur=18;
+      cctx2.strokeStyle='#a855f7';cctx2.fillStyle='#a855f7';cctx2.lineWidth=3;cctx2.globalAlpha=.95;
+      cctx2.beginPath();cctx2.moveTo(p0x,p0y);cctx2.lineTo(cx2,cy2);cctx2.stroke();
+      const hl=12,a=Math.atan2(dy,dx);
+      cctx2.beginPath();cctx2.moveTo(cx2,cy2);
+      cctx2.lineTo(cx2-hl*Math.cos(a-.4),cy2-hl*Math.sin(a-.4));
+      cctx2.lineTo(cx2-hl*Math.cos(a+.4),cy2-hl*Math.sin(a+.4));
+      cctx2.closePath();cctx2.fill();
+      cctx2.font='bold 12px IBM Plex Mono';cctx2.fillStyle='#c084fc';cctx2.fillText('A\u00d7B',cx2+5,cy2-5);
+      cctx2.restore();
+      // dashed vertical from origin to AxB tip
+      cctx2.save();cctx2.strokeStyle='#a855f7';cctx2.lineWidth=1;cctx2.setLineDash([4,3]);cctx2.globalAlpha=.25;
+      cctx2.beginPath();cctx2.moveTo(p0x,p0y);cctx2.lineTo(cx2,cy2);cctx2.stroke();cctx2.restore();
+    }
+    // Rotation indicator ellipse
+    cctx2.save();cctx2.strokeStyle=crossVal>0?'#a855f7':'#f97316';
+    cctx2.lineWidth=1.4;cctx2.globalAlpha=.45;cctx2.setLineDash([3,3]);
+    cctx2.beginPath();cctx2.ellipse(p0x,p0y,24,8,0,0,Math.PI*2);cctx2.stroke();cctx2.restore();
+  }
+
+  // Bottom info
+  cctx2.save();cctx2.fillStyle='#8a8278';cctx2.font='10px IBM Plex Mono';cctx2.globalAlpha=.85;
+  cctx2.fillText(`|A\u00d7B| = ${Math.abs(crossVal).toFixed(3)}`,10,H-20);
+  cctx2.fillText(crossVal>0?'verso +Y (antiorario)':crossVal<0?'verso \u2212Y (orario)':'vettori paralleli',10,H-8);
+  cctx2.restore();
+}
+
+// ──────────────────────────────────────────
+// TAB: DECOMPOSITION
+// ──────────────────────────────────────────
+let dc, dctx;
+function updateDecomp(){
+  S.dax=parseFloat(document.getElementById('dax').value)||0;
+  S.day=parseFloat(document.getElementById('day').value)||0;
+  drawDecomp();
+}
+function drawDecomp(){
+  if(!dc) return;
+  const W=dc.width,H=dc.height,{dpanX:ox,dpanY:oy,dzoom:z,dax:ax,day:ay}=S;
+  dctx.clearRect(0,0,W,H);dctx.fillStyle='#f0ebe0';dctx.fillRect(0,0,W,H);
+  if(document.getElementById('dGrid').checked) grid(dctx,ox,oy,z,W,H);
+  axes(dctx,ox,oy,z,W,H);
+
+  const [osx,osy]=toC(ox,oy,z,0,0),[ax2,ay2]=toC(ox,oy,z,ax,ay);
+  const sXY=document.getElementById('showXY').checked, sGen=document.getElementById('showGen').checked;
+
+  if(sXY){
+    const [cax]=toC(ox,oy,z,ax,0),[,cay]=toC(ox,oy,z,0,ay);
+    arrowOn(dctx,osx,osy,cax,osy,'#b5470f',2.2,.75,true);
+    arrowOn(dctx,cax,osy,ax2,ay2,'#1e4d8c',2.2,.75,true);
+    lbl(dctx,`Ax=${ax.toFixed(2)}`,(osx+cax)/2,osy,'#b5470f',12,0,-10);
+    lbl(dctx,`Ay=${ay.toFixed(2)}`,cax,(osy+ay2)/2,'#1e4d8c',12,7,0);
+  }
+
+  if(sGen){
+    const alpha=parseFloat(document.getElementById('axisAngle').value)*Math.PI/180;
+    const ux=Math.cos(alpha),uy=Math.sin(alpha);
+    const proj=ax*ux+ay*uy, perp=-ax*uy+ay*ux;
+    const ext=10;
+    const [x0,y0]=toC(ox,oy,z,-ext*ux,-ext*uy),[x1,y1]=toC(ox,oy,z,ext*ux,ext*uy);
+    dctx.save();dctx.strokeStyle='#d4880a';dctx.lineWidth=1.5;dctx.setLineDash([8,4]);dctx.globalAlpha=.7;
+    dctx.beginPath();dctx.moveTo(x0,y0);dctx.lineTo(x1,y1);dctx.stroke();dctx.restore();
+    lbl(dctx,'u',x1,y1,'#d4880a',14,4,-4);
+    const [px,py]=toC(ox,oy,z,proj*ux,proj*uy);
+    arrowOn(dctx,osx,osy,px,py,'#8e44ad',2.5,.9);
+    lbl(dctx,`A\u2225=${proj.toFixed(2)}`,(osx+px)/2,(osy+py)/2,'#8e44ad',12,6,0);
+    // Drop line (perp) from projection foot to A tip
+    dctx.save();dctx.strokeStyle='#777';dctx.lineWidth=1;dctx.setLineDash([4,3]);dctx.globalAlpha=.5;
+    dctx.beginPath();dctx.moveTo(px,py);dctx.lineTo(ax2,ay2);dctx.stroke();dctx.restore();
+    document.getElementById('decompResult').innerHTML=
+      `Asse u: ${(alpha*180/Math.PI).toFixed(0)}&deg;<br>`+
+      `A<sub>&parallel;</sub> = <span class="rs">${proj.toFixed(4)}</span><br>`+
+      `A<sub>&perp;</sub> = <span class="rs">${perp.toFixed(4)}</span><br>`+
+      `<span style="color:var(--ink3);font-size:.78rem">A\u00b2 = A\u2225\u00b2+A\u22a5\u00b2 = ${(proj*proj+perp*perp).toFixed(3)}</span>`;
+  } else {
+    const modA=Math.hypot(ax,ay),tA=Math.atan2(ay,ax)*180/Math.PI;
+    document.getElementById('decompResult').innerHTML=
+      `|A| = <span class="val">${modA.toFixed(4)}</span><br>`+
+      `&theta; = <span class="val">${tA.toFixed(2)}&deg;</span><br>`+
+      `A<sub>x</sub> = <span class="rs">${ax.toFixed(4)}</span><br>`+
+      `A<sub>y</sub> = <span class="rs">${ay.toFixed(4)}</span>`;
+  }
+
+  arrowOn(dctx,osx,osy,ax2,ay2,'#c0392b',3.5);
+  lbl(dctx,'A',ax2,ay2,'#c0392b',16,8,-8);
+  if(document.getElementById('dAngles').checked){
+    const th=Math.atan2(ay,ax);
+    arcAngle(dctx,osx,osy,th,28,'#c0392b');
+    dctx.save();dctx.fillStyle='#c0392b';dctx.font='11px IBM Plex Mono';
+    dctx.fillText(`${(th*180/Math.PI).toFixed(1)}\u00b0`,osx+30,osy-8);dctx.restore();
+  }
+}
+
+// ──────────────────────────────────────────
+// TAB: POLAR
+// ──────────────────────────────────────────
+let pc, pctx2;
+function drawPolar(){
+  if(!pc) return;
+  const W=pc.width,H=pc.height,{ppanX:ox,ppanY:oy,pzoom:z,pr:r,pth:theta}=S;
+  pctx2.clearRect(0,0,W,H);pctx2.fillStyle='#f0ebe0';pctx2.fillRect(0,0,W,H);
+
+  const [Ox,Oy]=toC(ox,oy,z,0,0);
+  const px_u=r*Math.cos(theta),py_u=r*Math.sin(theta);
+  const [Px,Py]=toC(ox,oy,z,px_u,py_u);
+
+  // Polar grid
+  if(document.getElementById('polPolarGrid').checked){
+    pctx2.save();
+    for(let ri=1;ri<=8;ri++){
+      pctx2.strokeStyle='#c8c0b0';pctx2.lineWidth=.8;pctx2.globalAlpha=.55;
+      pctx2.beginPath();pctx2.arc(Ox,Oy,ri*z,0,Math.PI*2);pctx2.stroke();
+      pctx2.fillStyle='#b8b0a4';pctx2.font='9px IBM Plex Mono';pctx2.globalAlpha=.7;
+      pctx2.fillText(ri,Ox+ri*z+2,Oy-3);
+    }
+    for(let deg=0;deg<360;deg+=30){
+      const rad=deg*Math.PI/180;
+      pctx2.strokeStyle='#c8c0b0';pctx2.lineWidth=.6;pctx2.globalAlpha=.35;
+      pctx2.beginPath();pctx2.moveTo(Ox,Oy);pctx2.lineTo(Ox+8*z*Math.cos(rad),Oy-8*z*Math.sin(rad));pctx2.stroke();
+    }
+    pctx2.fillStyle='#b0a898';pctx2.font='10px IBM Plex Mono';pctx2.globalAlpha=.85;
+    [{d:0,t:'0°'},{d:90,t:'90°'},{d:180,t:'180°'},{d:270,t:'270°'}].forEach(({d,t})=>{
+      const rad=d*Math.PI/180;
+      pctx2.fillText(t,Ox+(5.8*z+14)*Math.cos(rad)-10,Oy-(5.8*z+14)*Math.sin(rad)+4);
+    });
+    pctx2.restore();
+  }
+  axes(pctx2,ox,oy,z,W,H);
+
+  // Circle r
+  if(document.getElementById('polCircle').checked){
+    pctx2.save();pctx2.strokeStyle='#b5470f';pctx2.lineWidth=1.2;pctx2.setLineDash([6,4]);pctx2.globalAlpha=.32;
+    pctx2.beginPath();pctx2.arc(Ox,Oy,r*z,0,Math.PI*2);pctx2.stroke();pctx2.restore();
+  }
+
+  // Angle arc
+  if(document.getElementById('polAngle').checked){
+    pctx2.save();pctx2.strokeStyle='#1a6b4a';pctx2.lineWidth=2.2;pctx2.globalAlpha=.75;
+    const startA=0,endA=-theta;
+    pctx2.beginPath();pctx2.arc(Ox,Oy,z*.85,startA,endA,theta<0);pctx2.stroke();
+    // Label
+    const tmid=theta/2;
+    pctx2.fillStyle='#1a6b4a';pctx2.font='italic 14px EB Garamond';pctx2.globalAlpha=1;
+    pctx2.fillText('\u03b8',Ox+(z*1.25)*Math.cos(tmid),Oy-(z*1.25)*Math.sin(tmid));
+    pctx2.restore();
+  }
+
+  // Cartesian components (dashed)
+  if(document.getElementById('polCart').checked){
+    const [cx1]=toC(ox,oy,z,px_u,0);
+    arrowOn(pctx2,Ox,Oy,cx1,Oy,'#b5470f',2,.65,true);
+    arrowOn(pctx2,cx1,Oy,Px,Py,'#1e4d8c',2,.65,true);
+    pctx2.save();pctx2.font='italic 12px EB Garamond';pctx2.globalAlpha=.9;
+    pctx2.fillStyle='#b5470f';pctx2.fillText(`x=${px_u.toFixed(2)}`,(Ox+cx1)/2,Oy+18);
+    pctx2.fillStyle='#1e4d8c';pctx2.fillText(`y=${py_u.toFixed(2)}`,cx1+6,(Oy+Py)/2);
+    pctx2.restore();
+  }
+
+  // r vector
+  arrowOn(pctx2,Ox,Oy,Px,Py,'#c0392b',3);
+  lbl(pctx2,`r=${r.toFixed(2)}`,Px,Py,'#c0392b',13,8,-8);
+
+  // Polar versors at P
+  if(document.getElementById('polVers').checked){
+    const rLen=z*1.3;
+    const rhx=Px+rLen*Math.cos(theta),rhy=Py-rLen*Math.sin(theta);
+    arrowOn(pctx2,Px,Py,rhx,rhy,'#c0392b',2.5,.85);
+    lbl(pctx2,'r\u0302',rhx,rhy,'#c0392b',14,4,-4);
+    const thx=Px+rLen*Math.cos(theta+Math.PI/2),thy=Py-rLen*Math.sin(theta+Math.PI/2);
+    arrowOn(pctx2,Px,Py,thx,thy,'#1a6b4a',2.5,.85);
+    lbl(pctx2,'\u03b8\u0302',thx,thy,'#1a6b4a',14,4,-4);
+    // right-angle marker
+    const rm=7,ux=Math.cos(theta),uy=Math.sin(theta);
+    pctx2.save();pctx2.strokeStyle='#888';pctx2.lineWidth=1;pctx2.globalAlpha=.45;
+    pctx2.beginPath();
+    pctx2.moveTo(Px+rm*ux,Py-rm*uy);
+    pctx2.lineTo(Px+rm*ux-rm*uy,Py-rm*uy-rm*ux);  // wrong: simplified square
+    pctx2.lineTo(Px-rm*uy,Py-rm*ux);
+    pctx2.stroke();pctx2.restore();
+  }
+
+  // Point P
+  pctx2.save();pctx2.fillStyle='#2a2520';pctx2.globalAlpha=.9;
+  pctx2.beginPath();pctx2.arc(Px,Py,5.5,0,Math.PI*2);pctx2.fill();pctx2.restore();
+
+  // Update info panel
+  document.getElementById('polarInfo').innerHTML=
+    `<b style="color:var(--accent3)">Cartesiane</b><br>`+
+    `x = <span class="rp">${px_u.toFixed(4)}</span><br>`+
+    `y = <span class="rp">${py_u.toFixed(4)}</span><br><br>`+
+    `<b style="color:var(--accent)">Polari</b><br>`+
+    `r = <span class="rs">${r.toFixed(4)}</span><br>`+
+    `&theta; = <span class="rs">${(theta*180/Math.PI).toFixed(2)}&deg;</span><br>`+
+    `&theta; = <span class="rs">${theta.toFixed(4)} rad</span><br><br>`+
+    `<b style="color:var(--accent2)">Versori in P</b><br>`+
+    `r&#770; = (${Math.cos(theta).toFixed(3)}, ${Math.sin(theta).toFixed(3)})<br>`+
+    `&theta;&#770; = (${(-Math.sin(theta)).toFixed(3)}, ${Math.cos(theta).toFixed(3)})`;
+}
+
+// ──────────────────────────────────────────
+// EVENTS
+// ──────────────────────────────────────────
+function initEvents(){
+  // Main canvas
+  mc.addEventListener('mousedown',e=>{
+    const [mx,my]=getPos(e,mc);
+    if(hit(mx,my,S.panX,S.panY,S.zoom,S.ax,S.ay)) S.dragging='A';
+    else if(hit(mx,my,S.panX,S.panY,S.zoom,S.bx,S.by)) S.dragging='B';
+    else if(S.op==='sum'&&hit(mx,my,S.panX,S.panY,S.zoom,S.ax+S.bx,S.ay+S.by)) S.dragging='R';
+  });
+  mc.addEventListener('touchstart',e=>{
+    const [mx,my]=getPos(e,mc);
+    if(hit(mx,my,S.panX,S.panY,S.zoom,S.ax,S.ay)) S.dragging='A';
+    else if(hit(mx,my,S.panX,S.panY,S.zoom,S.bx,S.by)) S.dragging='B';
+  },{passive:true});
+  const doMainDrag=e=>{
+    if(!S.dragging) return;
+    const [mx,my]=getPos(e,mc);const [ux,uy]=fromC(S.panX,S.panY,S.zoom,mx,my);
+    if(S.dragging==='A'){S.ax=snap(ux);S.ay=snap(uy);document.getElementById('ax').value=S.ax;document.getElementById('ay').value=S.ay;}
+    else if(S.dragging==='B'){S.bx=snap(ux);S.by=snap(uy);document.getElementById('bx').value=S.bx;document.getElementById('by').value=S.by;}
+    else if(S.dragging==='R'){S.ax=snap(ux-S.bx);S.ay=snap(uy-S.by);document.getElementById('ax').value=S.ax;document.getElementById('ay').value=S.ay;}
+    draw();
+  };
+  mc.addEventListener('mousemove',doMainDrag);mc.addEventListener('touchmove',doMainDrag,{passive:true});
+  mc.addEventListener('mouseup',()=>S.dragging=null);mc.addEventListener('touchend',()=>S.dragging=null);
+  mc.addEventListener('wheel',e=>{e.preventDefault();S.zoom=Math.max(25,Math.min(150,S.zoom-e.deltaY*.3));draw();},{passive:false});
+
+  // Decomp canvas
+  dc.addEventListener('mousedown',e=>{const [mx,my]=getPos(e,dc);if(hit(mx,my,S.dpanX,S.dpanY,S.dzoom,S.dax,S.day))S.ddrag=true;});
+  dc.addEventListener('touchstart',e=>{const [mx,my]=getPos(e,dc);if(hit(mx,my,S.dpanX,S.dpanY,S.dzoom,S.dax,S.day))S.ddrag=true;},{passive:true});
+  const doDecompDrag=e=>{
+    if(!S.ddrag) return;
+    const [mx,my]=getPos(e,dc);const [ux,uy]=fromC(S.dpanX,S.dpanY,S.dzoom,mx,my);
+    S.dax=snap(ux);S.day=snap(uy);document.getElementById('dax').value=S.dax;document.getElementById('day').value=S.day;
+    drawDecomp();
+  };
+  dc.addEventListener('mousemove',doDecompDrag);dc.addEventListener('touchmove',doDecompDrag,{passive:true});
+  dc.addEventListener('mouseup',()=>S.ddrag=false);dc.addEventListener('touchend',()=>S.ddrag=false);
+  dc.addEventListener('wheel',e=>{e.preventDefault();S.dzoom=Math.max(25,Math.min(150,S.dzoom-e.deltaY*.3));drawDecomp();},{passive:false});
+
+  // Polar canvas
+  pc.addEventListener('mousedown',()=>S.pdrag=true);
+  pc.addEventListener('touchstart',()=>S.pdrag=true,{passive:true});
+  const doPolarDrag=e=>{
+    if(!S.pdrag) return;
+    const [mx,my]=getPos(e,pc);const [ux,uy]=fromC(S.ppanX,S.ppanY,S.pzoom,mx,my);
+    S.pr=Math.max(.15,Math.hypot(ux,uy));S.pth=Math.atan2(uy,ux);drawPolar();
+  };
+  pc.addEventListener('mousemove',doPolarDrag);pc.addEventListener('touchmove',doPolarDrag,{passive:true});
+  pc.addEventListener('mouseup',()=>S.pdrag=false);pc.addEventListener('touchend',()=>S.pdrag=false);
+  pc.addEventListener('wheel',e=>{e.preventDefault();S.pzoom=Math.max(30,Math.min(130,S.pzoom-e.deltaY*.3));drawPolar();},{passive:false});
+}
+
+// ──────────────────────────────────────────
+// TAB / OP SWITCHING
+// ──────────────────────────────────────────
+function fitCanvas(canvas, ratio){
+  const w=canvas.parentElement.clientWidth;
+  const h=Math.min(w*ratio,520);
+  canvas.width=w;canvas.height=h;
+  return [w/2,h/2];
+}
+
+function setTab(tab){
+  S.tab=tab;
+  ['ops','decomp','polar'].forEach((t,i)=>{
+    document.getElementById('tab-'+t).style.display=t===tab?'':'none';
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active',t===tab);
+  });
+  setTimeout(()=>{
+    if(tab==='ops'){const [px,py]=fitCanvas(mc,.62);S.panX=px;S.panY=py;draw();}
+    else if(tab==='decomp'){const [px,py]=fitCanvas(dc,.62);S.dpanX=px;S.dpanY=py;drawDecomp();}
+    else if(tab==='polar'){const [px,py]=fitCanvas(pc,.75);S.ppanX=px;S.ppanY=py;drawPolar();}
+  },10);
+}
+
+function setOp(op){
+  S.op=op;
+  ['sum','diff','dot','cross'].forEach(o=>document.getElementById('btn-'+o).classList.toggle('active',o===op));
+  const c3d=document.getElementById('card-cross3d');
+  c3d.style.display=op==='cross'?'':'none';
+  if(op==='cross'){
+    const cw=cc.parentElement.clientWidth;cc.width=Math.max(200,cw-3);
+  }
+  draw();
+}
+
+function updateFromInputs(){
+  S.ax=parseFloat(document.getElementById('ax').value)||0;
+  S.ay=parseFloat(document.getElementById('ay').value)||0;
+  S.bx=parseFloat(document.getElementById('bx').value)||0;
+  S.by=parseFloat(document.getElementById('by').value)||0;
+  draw();
+}
+
+// ──────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────
+window.addEventListener('load',()=>{
+  mc =document.getElementById('mainCanvas');   mctx=mc.getContext('2d');
+  dc =document.getElementById('decompCanvas'); dctx=dc.getContext('2d');
+  pc =document.getElementById('polarCanvas');  pctx2=pc.getContext('2d');
+  cc =document.getElementById('crossCanvas');  cctx2=cc.getContext('2d');
+  initEvents();
+  setTab('ops');
+  window.addEventListener('resize',()=>setTab(S.tab));
+});
+</script>
+</body>
+</html>

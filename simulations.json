@@ -1,53 +1,58 @@
 {
   "categories": [
     {
-      "name": "Meccanica",
+      "name": "Fondamenti",
       "order": 1,
+      "description": "Branca introduttiva della fisica che raccoglie i concetti di base necessari per comprendere i fenomeni fisici, come grandezze, misure, vettori, unità di misura e strumenti matematici essenziali."
+    },
+    {
+      "name": "Meccanica",
+      "order": 10,
       "description": "Branca della fisica che studia il moto dei corpi e le cause che lo producono, come forze, energia e quantità di moto."
     },
     {
       "name": "Gravitazione",
-      "order": 2,
+      "order": 20,
       "description": "Studio dell’interazione gravitazionale tra masse e delle leggi che governano il moto dei corpi celesti."
     },
     {
       "name": "Fluidodinamica",
-      "order": 3,
+      "order": 30,
       "description": "Studio del moto dei fluidi e delle leggi che governano flusso, pressione ed energia nei mezzi continui."
     },
     {
       "name": "Termodinamica",
-      "order": 4,
+      "order": 40,
       "description": "Branca della fisica che studia il calore, la temperatura, l’energia e le trasformazioni tra diverse forme energetiche nei sistemi macroscopici."
     },
     {
       "name": "Onde",
-      "order": 5,
+      "order": 50,
       "description": "Studio dei fenomeni ondulatori e della propagazione delle perturbazioni nello spazio e nei mezzi materiali."
     },
     {
       "name": "Ottica",
-      "order": 6,
+      "order": 60,
       "description": "Branca della fisica che studia la luce, la sua propagazione e l’interazione con i materiali."
     },
     {
       "name": "Elettromagnetismo",
-      "order": 7,
+      "order": 70,
       "description": "Studio dei campi elettrici e magnetici e delle interazioni tra cariche elettriche."
     },
     {
       "name": "Relatività",
-      "order": 8,
+      "order": 80,
       "description": "Branca della fisica che studia la struttura dello spazio-tempo e il moto dei corpi in condizioni di alte velocità o in presenza di campi gravitazionali intensi."
     },
     {
       "name": "Meccanica Quantistica",
-      "order": 9,
+      "order": 90,
       "description": "Branca della fisica che studia il comportamento della materia e della radiazione su scala microscopica."
     },
     {
       "name": "Astrofisica",
-      "order": 10,
+      "order": 100,
       "description": "Branca della fisica che studia i fenomeni e le leggi che governano l’Universo, dalle stelle e galassie fino agli oggetti più compatti e agli eventi più energetici."
     },
     {
@@ -71,6 +76,23 @@
       ],
       "level": "intermedio",
       "file": "elettro-magnetismo/elettrostatica.html",
+      "isWip": false
+    },
+    {
+      "title": "Grandezze vettoriali",
+      "description": "Introduzione alle grandezze vettoriali e alle principali operazioni tra vettori nel piano.",
+      "category": "Fondamenti",
+      "icon": "↗️",
+      "order": 1,
+      "tags": [
+        "vettori",
+        "componenti",
+        "somma vettoriale",
+        "modulo",
+        "direzione"
+      ],
+      "level": "base",
+      "file": "vettori/vettori.html",
       "isWip": false
     },
     {

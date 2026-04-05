@@ -381,6 +381,26 @@
       "isWip": false
     },
     {
+      "title": "Entropia",
+      "description": "Esplora l’entropia dal punto di vista microscopico attraverso espansione libera, miscelamento di gas, distribuzione di Maxwell-Boltzmann e modello a microstati.",
+      "category": "Termodinamica",
+      "icon": "🎲",
+      "order": 30,
+      "tags": [
+        "entropia",
+        "secondo principio",
+        "microstati",
+        "Boltzmann",
+        "Maxwell-Boltzmann",
+        "miscelamento",
+        "espansione libera",
+        "irreversibilità"
+      ],
+      "level": "avanzato",
+      "file": "termodinamica/entropia.html",
+      "isWip": false
+    },
+    {
       "title": "Curvatura dello spazio-tempo",
       "description": "Simulazione della metrica di Kerr attorno a un buco nero rotante, con visualizzazione di geodetiche nulle, lente gravitazionale, redshift gravitazionale e dilatazione temporale.",
       "category": "WIP",

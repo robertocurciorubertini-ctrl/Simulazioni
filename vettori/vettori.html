@@ -814,6 +814,7 @@ function drawDecomp(){
   if(sGen){
     const alpha=parseFloat(document.getElementById('axisAngle').value)*Math.PI/180;
     const ux=Math.cos(alpha),uy=Math.sin(alpha);
+    const modA=Math.hypot(ax,ay);
     const proj=ax*ux+ay*uy, perp=-ax*uy+ay*ux;
     const ext=10;
     const [x0,y0]=toC(ox,oy,z,-ext*ux,-ext*uy),[x1,y1]=toC(ox,oy,z,ext*ux,ext*uy);
@@ -822,15 +823,51 @@ function drawDecomp(){
     lbl(dctx,'u',x1,y1,'#d4880a',14,4,-4);
     const [px,py]=toC(ox,oy,z,proj*ux,proj*uy);
     arrowOn(dctx,osx,osy,px,py,'#8e44ad',2.5,.9);
-    lbl(dctx,`A\u2225=${proj.toFixed(2)}`,(osx+px)/2,(osy+py)/2,'#8e44ad',12,6,0);
+    lbl(dctx,`A∥=${proj.toFixed(2)}`,(osx+px)/2,(osy+py)/2,'#8e44ad',12,6,0);
     // Drop line (perp) from projection foot to A tip
     dctx.save();dctx.strokeStyle='#777';dctx.lineWidth=1;dctx.setLineDash([4,3]);dctx.globalAlpha=.5;
     dctx.beginPath();dctx.moveTo(px,py);dctx.lineTo(ax2,ay2);dctx.stroke();dctx.restore();
+
+    const thetaA=Math.atan2(ay,ax);
+    const deltaRaw=normAngle(thetaA-alpha);
+    const delta=deltaRaw>Math.PI ? deltaRaw-2*Math.PI : deltaRaw;
+    const angleDeg=Math.abs(delta)*180/Math.PI;
+
+    if(document.getElementById('dAngles').checked && modA>1e-9){
+      const rArc=Math.max(26, Math.min(42, 0.42*z));
+      const startScr=-alpha;
+      let sweepScr=(-thetaA)-startScr;
+      while(sweepScr<=-Math.PI) sweepScr+=2*Math.PI;
+      while(sweepScr>Math.PI) sweepScr-=2*Math.PI;
+      const endScr=startScr+sweepScr;
+      const midScr=startScr+sweepScr/2;
+
+      dctx.save();
+      dctx.strokeStyle='#d4880a';
+      dctx.lineWidth=2;
+      dctx.globalAlpha=.8;
+      dctx.beginPath();
+      dctx.arc(osx, osy, rArc, startScr, endScr, sweepScr < 0);
+      dctx.stroke();
+      dctx.restore();
+
+      dctx.save();
+      dctx.fillStyle='#d4880a';
+      dctx.font='italic 14px EB Garamond, Georgia, serif';
+      dctx.fillText('φ', osx + (rArc+12)*Math.cos(midScr), osy + (rArc+12)*Math.sin(midScr));
+      dctx.font='10px IBM Plex Mono';
+      dctx.globalAlpha=.9;
+      dctx.fillText(`${angleDeg.toFixed(1)}°`, osx + (rArc+26)*Math.cos(midScr)-10, osy + (rArc+26)*Math.sin(midScr)+4);
+      dctx.restore();
+    }
+
     document.getElementById('decompResult').innerHTML=
       `Asse u: ${(alpha*180/Math.PI).toFixed(0)}&deg;<br>`+
+      `&phi;(A,u) = <span class="val">${angleDeg.toFixed(2)}&deg;</span><br>`+
       `A<sub>&parallel;</sub> = <span class="rs">${proj.toFixed(4)}</span><br>`+
       `A<sub>&perp;</sub> = <span class="rs">${perp.toFixed(4)}</span><br>`+
-      `<span style="color:var(--ink3);font-size:.78rem">A\u00b2 = A\u2225\u00b2+A\u22a5\u00b2 = ${(proj*proj+perp*perp).toFixed(3)}</span>`;
+      `<span style="color:var(--ink3);font-size:.78rem">A<sub>&parallel;</sub> = |A| cos&phi; = ${(modA*Math.cos(Math.abs(delta))).toFixed(4)}</span><br>`+
+      `<span style="color:var(--ink3);font-size:.78rem">A² = A∥²+A⊥² = ${(proj*proj+perp*perp).toFixed(3)}</span>`;
   } else {
     const modA=Math.hypot(ax,ay),tA=Math.atan2(ay,ax)*180/Math.PI;
     document.getElementById('decompResult').innerHTML=

@@ -426,41 +426,49 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
         const theta3=snell(n2,n3v,theta2);
         seg(ex2,iY2-65,ex2,iY2+75,'#bbb',1,[6,4]);
         if(theta3===null){
-          // RIT speculare corretta
+          // RIT alla seconda interfaccia: il raggio resta sempre rettilineo nel mezzo 2
+          // e cambia direzione solo nel punto di riflessione ex2,iY2.
+          // Direzione incidente nel mezzo 2: (sin t2r, +cos t2r)
+          // Dopo riflessione su interfaccia orizzontale: (sin t2r, -cos t2r)
           const t2rr=t2r;
-          // Il raggio nel mezzo 2 ha direzione (sin t2r, cos t2r). Riflessione su parete orizzontale: (sin t2r, -cos t2r)
-          const rx3=ex2+Math.sin(t2rr)*90, ry3=iY2-Math.cos(t2rr)*90;
-          ray(ex2,iY2,rx3,ry3,'#e24b4a');
-          if(theta2>=1) arc(ex2,iY2,36,0,-1,Math.sin(t2rr),-Math.cos(t2rr),'#e24b4a','θ_r='+theta2.toFixed(1)+'°');
-          ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
-          ctx.fillText('RIT (2ª interfaccia)',rx3+5,ry3-5);
-          // Il raggio riflesso risale verso l'interfaccia 1-2
-          const dist12=LAYER2_H/Math.cos(t2rr);
-          const rx3b=rx3+Math.sin(t2rr)*dist12*0.85, ry3b=IY+(ry3<IY?0:0);
-          // Traccia fino a interfaccia 1-2 o bordo canvas
-          const steps=Math.ceil(LAYER2_H/Math.cos(t2rr));
-          const topX=rx3+Math.sin(t2rr)*(LAYER2_H/Math.cos(t2rr));
+          const dxRef=Math.sin(t2rr), dyRef=-Math.cos(t2rr);
+
+          // Tratto riflesso fino alla prima interfaccia (n2-n1)
+          const distToTop=LAYER2_H/Math.cos(t2rr);
+          const topX=ex2 + dxRef*distToTop;
           const topY=IY;
-          if(topX>0&&topX<W){
-            ray(rx3,ry3,topX,topY,'#e24b4a',2.2);
-            // All'interfaccia 1-2 dall'interno: n2->n1, angolo t2r con la normale
-            const tc21=critA(n2,n1);
-            const theta_at_top=theta2; // stesso angolo per simmetria
+
+          if(topX>0 && topX<W){
+            ray(ex2,iY2,topX,topY,'#e24b4a');
+            if(theta2>=1) arc(ex2,iY2,36,0,-1,dxRef,dyRef,'#e24b4a','θ_r='+theta2.toFixed(1)+'°');
+            ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+            ctx.fillText('RIT (2ª interfaccia)',ex2+8,iY2-8);
+
+            // All'interfaccia 1-2 dall'interno: n2 -> n1, stesso angolo rispetto alla normale
+            const theta_at_top=theta2;
             const exitTop=snell(n2,n1,theta_at_top);
             seg(topX,IY-50,topX,IY+50,'#bbb',1,[6,4]);
+
             if(exitTop===null){
-              // ancora RIT
-              const rx4=topX+Math.sin(t2rr)*80,ry4=IY+Math.cos(t2rr)*80;
-              ray(topX,IY,rx4,ry4,'#e24b4a',2);
+              // Nuova RIT all'interfaccia superiore: riflessione verso il basso
+              const rx4=topX+Math.sin(t2rr)*80, ry4=IY+Math.cos(t2rr)*80;
+              ray(topX,IY,rx4,ry4,'#e24b4a');
               ctx.fillStyle='#a32d2d'; ctx.font='10px sans-serif'; ctx.textBaseline='alphabetic';
-              ctx.fillText('RIT (1ª int.)',rx4+4,ry4-4);
+              ctx.fillText('RIT (1ª interfaccia)',rx4+4,ry4-4);
             } else {
               const teR=exitTop*Math.PI/180;
               const ex1=topX+Math.sin(teR)*80, ey1=IY-Math.cos(teR)*80;
-              ray(topX,IY,ex1,ey1,'#1d9e75',2.2);
+              ray(topX,IY,ex1,ey1,'#1d9e75');
               ctx.fillStyle='#085041'; ctx.font='10px sans-serif'; ctx.textBaseline='alphabetic';
-              ctx.fillText('esce (mezzo 1)',ex1+4,ey1-4);
+              ctx.fillText('Esce nel mezzo 1',ex1+4,ey1-4);
             }
+          } else {
+            // Se il punto d'urto successivo cade fuori dal canvas, mostra comunque il tratto riflesso coerente.
+            const edgeT = dxRef > 0 ? (W-ex2)/dxRef : -ex2/dxRef;
+            const edgeX = ex2 + dxRef*edgeT;
+            const edgeY = iY2 + dyRef*edgeT;
+            ray(ex2,iY2,edgeX,edgeY,'#e24b4a');
+            if(theta2>=1) arc(ex2,iY2,36,0,-1,dxRef,dyRef,'#e24b4a','θ_r='+theta2.toFixed(1)+'°');
           }
         } else {
           const t3r=theta3*Math.PI/180;
@@ -636,8 +644,13 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
       seg(nx,ny,nx,ny+normalDirY*normLen,'#aaa',1,[5,3]);
 
       if(firstBounce){
-        // Mostra arco angolo di incidenza
-        arc(nx,ny,28, 0,normalDirY, vx,vy, '#d85a30','θ_w='+theta_inc_wall.toFixed(0)+'°');
+        // Mostra θ_w a partire dalla normale alla parete e, ruotando in senso orario,
+        // fino alla direzione del raggio riflesso nel nucleo.
+        const normalX = 0;
+        const normalY = normalDirY;
+        const reflX = vx;
+        const reflY = -vy;
+        arc(nx,ny,28, normalX,normalY, reflX,reflY, '#d85a30','θ_w='+theta_inc_wall.toFixed(0)+'°');
         firstBounce=false;
       }
 

@@ -299,6 +299,24 @@
       "isWip": false
     },
     {
+      "title": "Figure di Chladni",
+      "description": "Visualizza la formazione dei pattern nodali su una piastra vibrante e l'accumulo della sabbia lungo le linee nodali, esplorando il legame tra modi normali, onde stazionarie e dissipazione.",
+      "category": "Onde",
+      "icon": "〰️",
+      "order": 6,
+      "tags": [
+        "figure di Chladni",
+        "onde stazionarie",
+        "modi normali",
+        "risonanza",
+        "piastre vibranti",
+        "linee nodali"
+      ],
+      "level": "intermedio",
+      "file": "onde/chladni.html",
+      "isWip": false
+    },
+    {
       "title": "Interferenza",
       "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
       "category": "Onde",

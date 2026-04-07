@@ -20,13 +20,14 @@ Scansiona ricorsivamente una cartella di file HTML, cerca un blocco statico del 
 e aggiorna la sezione "simulations" di un file JSON esistente,
 preservando "categories" e qualsiasi altra chiave già presente.
 
-Caratteristiche principali:
-- supporta sottocartelle;
-- deduce la categoria dalla prima cartella del percorso, se il campo "category"
-  non è presente nei metadati oppure se si usa --category-source folder;
-- evita duplicati sia per "file" sia per "title";
-- conserva chiavi extra già presenti nel JSON quando possibile;
-- include i file nella cartella WIP come simulazioni marcate con isWip=true.
+Inoltre può aggiornare un file di configurazione testuale, sostituendo solo
+la sezione finale che parte dal marcatore "Simulazioni:", senza toccare
+il contenuto precedente. In quella sezione viene scritto un indice gerarchico
+per categorie del tipo:
+
+Meccanica:
+- Moto rettilineo uniforme
+- Moto uniformemente accelerato
 """
 
 from __future__ import annotations
@@ -44,10 +45,12 @@ METADATA_REGEX = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 
+CONFIG_SECTION_MARKER = "Simulazioni:"
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Aggiorna la sezione 'simulations' di simulations.json leggendo i metadati dai file HTML."
+        description="Aggiorna simulations.json leggendo i metadati dai file HTML e, opzionalmente, aggiorna un file di configurazione testuale."
     )
     parser.add_argument(
         "--input",
@@ -58,6 +61,19 @@ def parse_args() -> argparse.Namespace:
         "--json",
         default="simulations.json",
         help="File JSON da aggiornare. Default: simulations.json",
+    )
+    parser.add_argument(
+        "--config",
+        default="configurazione.txt",
+        help=(
+            "File di configurazione testuale da aggiornare sostituendo solo la sezione finale "
+            "che parte da 'Simulazioni:'. Default: configurazione.txt"
+        ),
+    )
+    parser.add_argument(
+        "--no-config",
+        action="store_true",
+        help="Non aggiorna il file di configurazione testuale.",
     )
     parser.add_argument(
         "--category-source",
@@ -76,6 +92,7 @@ def parse_args() -> argparse.Namespace:
         help="Interrompe l'esecuzione al primo file con metadati invalidi.",
     )
     return parser.parse_args()
+
 
 
 def find_html_files(root: Path) -> list[Path]:
@@ -98,11 +115,13 @@ def find_html_files(root: Path) -> list[Path]:
     return sorted(html_files)
 
 
+
 def extract_metadata_block(text: str) -> str | None:
     match = METADATA_REGEX.search(text)
     if not match:
         return None
     return "{" + match.group("body") + "}"
+
 
 
 def js_object_to_json(js_text: str) -> str:
@@ -117,6 +136,7 @@ def js_object_to_json(js_text: str) -> str:
 
     js_text = re.sub(r",(\s*[}\]])", r"\1", js_text)
     return js_text
+
 
 
 def normalize_order(value: Any, path: Path) -> int | float:
@@ -135,9 +155,11 @@ def normalize_order(value: Any, path: Path) -> int | float:
         raise ValueError(f"Il campo 'order' deve essere numerico in '{path}'.") from exc
 
 
+
 def title_case_from_slug(value: str) -> str:
     text = value.replace("-", " ").replace("_", " ").strip()
     return " ".join(word[:1].upper() + word[1:] for word in text.split())
+
 
 
 def infer_category_from_path(relative_path: Path) -> str:
@@ -147,9 +169,11 @@ def infer_category_from_path(relative_path: Path) -> str:
     return title_case_from_slug(parts[0])
 
 
+
 def is_wip_path(relative_path: Path) -> bool:
     parts = [part.casefold() for part in relative_path.parts]
     return len(parts) > 1 and parts[0] == "wip"
+
 
 
 def choose_category(raw: dict[str, Any], relative_path: Path, mode: str) -> str:
@@ -164,6 +188,7 @@ def choose_category(raw: dict[str, Any], relative_path: Path, mode: str) -> str:
     if mode == "metadata":
         return from_metadata or from_folder
     return from_metadata or from_folder
+
 
 
 def load_metadata_from_html(path: Path, root: Path, category_source: str) -> dict[str, Any] | None:
@@ -205,6 +230,7 @@ def load_metadata_from_html(path: Path, root: Path, category_source: str) -> dic
     return result
 
 
+
 def load_existing_json(json_path: Path) -> dict[str, Any]:
     if not json_path.exists():
         return {"categories": [], "simulations": []}
@@ -233,8 +259,10 @@ def load_existing_json(json_path: Path) -> dict[str, Any]:
     )
 
 
+
 def _norm_title(value: Any) -> str:
     return str(value).strip().casefold()
+
 
 
 def merge_simulations(existing: list[dict[str, Any]], extracted: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -294,6 +322,7 @@ def merge_simulations(existing: list[dict[str, Any]], extracted: list[dict[str, 
     return sorted(dedup_by_title.values(), key=sort_key)
 
 
+
 def ensure_wip_category(data: dict[str, Any]) -> None:
     categories = data.get("categories", [])
     if not isinstance(categories, list):
@@ -306,11 +335,12 @@ def ensure_wip_category(data: dict[str, Any]) -> None:
     )
 
     if not has_wip:
-      categories.append({
-          "name": "WIP",
-          "description": "Simulazioni in sviluppo o in fase di test.",
-          "order": 999999
-      })
+        categories.append({
+            "name": "WIP",
+            "description": "Simulazioni in sviluppo o in fase di test.",
+            "order": 999999
+        })
+
 
 
 def write_json(data: dict[str, Any], path: Path) -> None:
@@ -320,10 +350,98 @@ def write_json(data: dict[str, Any], path: Path) -> None:
         f.write("\n")
 
 
+
+def category_order_map(data: dict[str, Any]) -> dict[str, tuple[int | float, str]]:
+    mapping: dict[str, tuple[int | float, str]] = {}
+    categories = data.get("categories", [])
+    if not isinstance(categories, list):
+        return mapping
+
+    for idx, category in enumerate(categories):
+        if not isinstance(category, dict):
+            continue
+        name = str(category.get("name", "")).strip()
+        if not name:
+            continue
+        raw_order = category.get("order", 10**9 + idx)
+        try:
+            order = float(raw_order)
+        except (TypeError, ValueError):
+            order = float(10**9 + idx)
+        mapping[name.casefold()] = (order, name)
+
+    return mapping
+
+
+def build_config_index_text(simulations: list[dict[str, Any]], data: dict[str, Any]) -> str:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for sim in simulations:
+        if not isinstance(sim, dict):
+            continue
+        category = str(sim.get("category", "Senza categoria")).strip() or "Senza categoria"
+        grouped.setdefault(category, []).append(sim)
+
+    order_map = category_order_map(data)
+
+    def category_sort_key(name: str) -> tuple[float, str]:
+        if name.casefold() in order_map:
+            return (order_map[name.casefold()][0], name.casefold())
+        return (float(10**12), name.casefold())
+
+    lines = ["Simulazioni:", ""]
+    for category in sorted(grouped, key=category_sort_key):
+        lines.append(f"{category}:")
+        sims = grouped[category]
+
+        def sim_sort_key(item: dict[str, Any]) -> tuple[float, str]:
+            raw_order = item.get("order", 10**9)
+            try:
+                order = float(raw_order)
+            except (TypeError, ValueError):
+                order = float(10**9)
+            title = str(item.get("title", "")).casefold()
+            return (order, title)
+
+        for sim in sorted(sims, key=sim_sort_key):
+            title = str(sim.get("title", "")).strip()
+            if title:
+                lines.append(f"- {title}")
+        lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def update_config_file(config_path: Path, simulations: list[dict[str, Any]], data: dict[str, Any]) -> None:
+    marker = "Simulazioni:"
+    new_section = build_config_index_text(simulations, data)
+
+    if config_path.exists():
+        original = config_path.read_text(encoding="utf-8")
+    else:
+        original = ""
+
+    if marker in original:
+        prefix = original.split(marker, 1)[0].rstrip()
+        if prefix:
+            updated = prefix + "\n\n" + new_section
+        else:
+            updated = new_section
+    else:
+        base = original.rstrip()
+        if base:
+            updated = base + "\n\n" + new_section
+        else:
+            updated = new_section
+
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text(updated, encoding="utf-8", newline="\n")
+
 def main() -> int:
     args = parse_args()
     input_dir = Path(args.input).resolve()
     json_path = Path(args.json).resolve()
+    config_path = Path(args.config).resolve()
+    config_path = Path(args.config).resolve()
 
     if not input_dir.exists() or not input_dir.is_dir():
         print(f"Errore: la cartella di input non esiste o non è una directory: {input_dir}", file=sys.stderr)
@@ -349,6 +467,13 @@ def main() -> int:
         for w in warnings:
             print(f" - {w}", file=sys.stderr)
 
+    if extracted:
+        print("Simulazioni trovate:")
+        for item in extracted:
+            print(f" - {item.get('title', '<senza titolo>')}  [{item.get('file', '<percorso sconosciuto>')}]")
+    else:
+        print("Simulazioni trovate: nessuna")
+
     try:
         data = load_existing_json(json_path)
     except Exception as exc:
@@ -368,6 +493,14 @@ def main() -> int:
     except Exception as exc:
         print(f"Errore durante la scrittura del JSON: {exc}", file=sys.stderr)
         return 1
+
+    if not args.no_config:
+        try:
+            update_config_file(config_path, data["simulations"], data)
+            print(f"Aggiornata anche la sezione finale di '{config_path.name}'.")
+        except Exception as exc:
+            print(f"Errore durante l'aggiornamento del file di configurazione: {exc}", file=sys.stderr)
+            return 1
 
     print(f"Aggiornato '{json_path.name}' con {len(extracted)} simulazioni lette dai file HTML.")
     return 0

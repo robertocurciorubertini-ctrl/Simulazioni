@@ -1,0 +1,79 @@
+DA FARE:
+-Radiazione corpo nero/bremsstrahlung/sincrotrone/ciclotrnone/altro
+-Tipi di elettrizzazione
+-Traiettorie orbitali (effetto fionda e simili)
+-Oscillatore armonico (smaorzato e forzato, con risonanza)
+
+
+SISTEMARE:
+-Turbolena-instabilita:
+	per ora rimanda ad un odice fato in html dentro la cartella old, da rimuovere quando sara pronto il file c
+	ancora da compilare e la build non la vede
+-Vettori:
+	nella scomposizione mettere che il vettore tratteggiato a_y e sull'asse y
+-Trasporto particelle:
+	ancora da compilare e la build non la vede
+	per ora va quella vecchia in cui la fisica e sdoppiata nell'html
+	il file c mi sa che fa solo trasporto neutroni e elettroni(mancano fotoni)
+-Interefernza 2d onde per dppia fendditura o ostacolo, possibilemnte n c
+-Decadimento radioattivo:
+	non funiona la tab delle catene del decadimento
+-Meccanica quantistica:
+	pannello tunnelling serve riscalare il grafico dinamicamente
+-Circuiti:
+	verso della corrente e comportamtne fisico generale
+-Onde Gravitazionali:
+	togliere griglia spazio-tempo
+	sistemare la grafica
+
+Simulazioni:
+
+Fondamenti:
+- Grandezze vettoriali
+
+Meccanica:
+- Moto rettilineo uniforme
+- Moto uniformemente accelerato
+- Indipendenza dei moti
+- Moto Parabolico
+- Moto Circolare
+- Moto Armonico
+- Principi della Dinamica
+- Piano inclinato
+- Momento di una forza
+- Conservazione dell'energia
+
+Gravitazione:
+- Gravità
+
+Onde:
+- Suono
+- Figure di Chladni
+- Interferenza
+- Effetto Doppler
+
+Ottica:
+- Rifrazione
+- Specchi e Lenti
+
+Elettromagnetismo:
+- Elettrostatica
+
+WIP:
+- Curvatura dello spazio-tempo
+- Decadimento radioattivo
+- Fluidodinamica
+- Meccanica quantistica
+- Orbitali atomici
+- Relatività ristretta
+- Turbolenza e instabilità nei fluidi
+- Relatività generale
+- Urti
+- Tensione di una fune
+- Calore e capacità termica
+- Collasso stellare
+- Trasporto di particelle
+- Circuiti
+- Trasformazioni cicliche
+- Entropia
+- Onde gravitazionali

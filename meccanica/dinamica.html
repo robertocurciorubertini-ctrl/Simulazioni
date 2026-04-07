@@ -183,13 +183,18 @@ button.action:active { transform: scale(0.98); }
   <div class="panel" id="panel1">
     <div class="law-label">Seconda legge di Newton</div>
     <div class="law-title">Legge fondamentale della dinamica</div>
-    <div class="law-formula">F = m &middot; a &nbsp;&rarr;&nbsp; a = F / m</div>
+    <div class="law-formula">&Sigma;F = F<sub>1</sub> + F<sub>2</sub> &nbsp;&rarr;&nbsp; a = &Sigma;F / m</div>
     <canvas id="c2" height="220"></canvas>
     <div class="controls">
       <div class="control-row">
-        <label>Forza applicata (N)</label>
-        <input type="range" min="10" max="200" step="1" value="80" id="force" oninput="updateForce()">
-        <span class="val" id="forceVal">80 N</span>
+        <label>Forza F<sub>1</sub> verso destra (N)</label>
+        <input type="range" min="10" max="200" step="1" value="80" id="force1" oninput="updateForce1()">
+        <span class="val" id="force1Val">80 N</span>
+      </div>
+      <div class="control-row">
+        <label>Forza F<sub>2</sub> verso sinistra (N)</label>
+        <input type="range" min="0" max="200" step="1" value="30" id="force2" oninput="updateForce2()">
+        <span class="val" id="force2Val">30 N</span>
       </div>
       <div class="control-row">
         <label>Massa (kg)</label>
@@ -202,7 +207,7 @@ button.action:active { transform: scale(0.98); }
       </div>
     </div>
     <div class="info-box">
-      Accelerazione calcolata: <strong id="accDisplay">10.0 m/s²</strong>. Aumenta la massa a forza costante: l'accelerazione cala. Raddoppia la forza a massa costante: l'accelerazione raddoppia.
+      Forza risultante: <strong id="netForceDisplay">50 N verso destra</strong>. Accelerazione calcolata: <strong id="accDisplay">6.3 m/s² verso destra</strong>. Quando F<sub>1</sub> = F<sub>2</sub>, la risultante è nulla e quindi anche l'accelerazione si annulla. Se F<sub>2</sub> supera F<sub>1</sub>, il corpo accelera verso sinistra.
     </div>
   </div>
 
@@ -486,10 +491,38 @@ function stopPanel1(){if(p1RAF){cancelAnimationFrame(p1RAF);p1RAF=null;}lastTs=n
 //  PANEL 2 — F = ma
 // ═══════════════════════════════════════════════════════════════════
 let l2={x:50,vx:0,running:false,raf:null};
-let forceN=80,massKg=8;
-function updateForce(){forceN=parseFloat(document.getElementById('force').value);document.getElementById('forceVal').textContent=forceN+' N';updateAccDisplay();}
-function updateMass(){massKg=parseFloat(document.getElementById('mass').value);document.getElementById('massVal').textContent=massKg+' kg';updateAccDisplay();}
-function updateAccDisplay(){document.getElementById('accDisplay').textContent=(forceN/massKg).toFixed(1)+' m/s²';}
+let force1N=80, force2N=30, massKg=8;
+
+function law2NetForce(){ return force1N - force2N; }
+
+function law2DirectionText(value){
+  if(Math.abs(value)<1e-9) return 'nullo';
+  return value>0 ? 'verso destra' : 'verso sinistra';
+}
+
+function updateForce1(){
+  force1N=parseFloat(document.getElementById('force1').value);
+  document.getElementById('force1Val').textContent=force1N+' N';
+  updateAccDisplay();
+}
+function updateForce2(){
+  force2N=parseFloat(document.getElementById('force2').value);
+  document.getElementById('force2Val').textContent=force2N+' N';
+  updateAccDisplay();
+}
+function updateMass(){
+  massKg=parseFloat(document.getElementById('mass').value);
+  document.getElementById('massVal').textContent=massKg+' kg';
+  updateAccDisplay();
+}
+function updateAccDisplay(){
+  const fNet=law2NetForce();
+  const a=fNet/massKg;
+  document.getElementById('netForceDisplay').textContent=
+    Math.abs(fNet).toFixed(1)+' N '+law2DirectionText(fNet);
+  document.getElementById('accDisplay').textContent=
+    Math.abs(a).toFixed(1)+' m/s² '+law2DirectionText(a);
+}
 function getCtx2(id){const c=document.getElementById(id);c.width=c.offsetWidth||700;return c.getContext('2d');}
 function startLaw2(){l2.x=50;l2.vx=0;l2.running=true;if(l2.raf)cancelAnimationFrame(l2.raf);animateLaw2();}
 function resetLaw2(){l2.x=50;l2.vx=0;l2.running=false;if(l2.raf)cancelAnimationFrame(l2.raf);drawLaw2();}
@@ -499,26 +532,51 @@ function drawLaw2(){
   ctx.strokeStyle='#f0f0f0';ctx.lineWidth=1;
   for(let x=0;x<W;x+=55){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=0;y<H;y+=55){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  const R=Math.max(10,Math.min(30,massKg*1.5)),a=forceN/massKg;
+
+  const R=Math.max(10,Math.min(30,massKg*1.5));
+  const fNet=law2NetForce();
+  const a=fNet/massKg;
+  const cx=l2.x+R;
+  const cy=H-30-R;
+
   ctx.strokeStyle='#ccc';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(0,H-30);ctx.lineTo(W,H-30);ctx.stroke();
-  const fLen=Math.min(forceN*0.5,120),bx=l2.x+R;
-  ctx.strokeStyle='#D85A30';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(bx+R+2,H-30-R);ctx.lineTo(bx+R+2+fLen,H-30-R);ctx.stroke();
-  ctx.fillStyle='#D85A30';
-  ctx.beginPath();ctx.moveTo(bx+R+2+fLen,H-30-R-5);ctx.lineTo(bx+R+2+fLen+8,H-30-R);ctx.lineTo(bx+R+2+fLen,H-30-R+5);ctx.fill();
-  ctx.font='12px sans-serif';ctx.fillStyle='#D85A30';ctx.fillText('F='+forceN+' N',bx+R+4,H-30-R-10);
-  ctx.beginPath();ctx.arc(l2.x+R,H-30-R,R,0,Math.PI*2);ctx.fillStyle='#7F77DD';ctx.fill();
+
+  const f1Len=Math.min(force1N*0.5,120);
+  const f2Len=Math.min(force2N*0.5,120);
+  const fNetLen=Math.min(Math.abs(fNet)*0.5,130);
+
+  if(force1N>0){
+    drawArrow(ctx, cx+R+2, cy, cx+R+2+f1Len, cy, '#D85A30', 2.5, 'F₁ = '+force1N+' N', 4, -10);
+  }
+  if(force2N>0){
+    drawArrow(ctx, cx-R-2, cy, cx-R-2-f2Len, cy, '#1D9E75', 2.5, 'F₂ = '+force2N+' N', -70, -10);
+  }
+
+  if(Math.abs(fNet)>0.01){
+    const x1=cx, x2=cx + Math.sign(fNet)*fNetLen;
+    drawArrow(ctx, x1, cy-34, x2, cy-34, '#185FA5', 3, 'ΣF = '+Math.abs(fNet).toFixed(1)+' N', Math.sign(fNet)>0?4:-78, -8);
+  } else {
+    ctx.font='12px sans-serif';
+    ctx.fillStyle='#185FA5';
+    ctx.fillText('ΣF = 0 N', cx-24, cy-40);
+  }
+
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fillStyle='#7F77DD';ctx.fill();
   ctx.font='bold '+Math.min(R,13)+'px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';
-  ctx.fillText(massKg+'kg',l2.x+R,H-30-R+4);ctx.textAlign='left';
+  ctx.fillText(massKg+'kg',cx,cy+4);ctx.textAlign='left';
+
   ctx.font='12px sans-serif';ctx.fillStyle='#888';
-  ctx.fillText('a='+a.toFixed(1)+' m/s²  |  v='+l2.vx.toFixed(1)+' m/s',12,18);
+  ctx.fillText('a='+a.toFixed(1)+' m/s²  |  v='+l2.vx.toFixed(1)+' m/s  |  ΣF='+(fNet>=0?'+':'')+fNet.toFixed(1)+' N',12,18);
 }
 function animateLaw2(){
   if(!l2.running)return;
   const canvas=document.getElementById('c2'),W=canvas.width;
-  l2.vx+=(forceN/massKg)*0.016*1.5;l2.x+=l2.vx;
+  const a=law2NetForce()/massKg;
+  l2.vx+=a*0.016*1.5;
+  l2.x+=l2.vx;
   const R=Math.max(10,Math.min(30,massKg*1.5));
+  if(l2.x<8){l2.x=8;l2.running=false;}
   if(l2.x+R*2>W-8){l2.x=W-R*2-8;l2.running=false;}
   drawLaw2();if(l2.running)l2.raf=requestAnimationFrame(animateLaw2);
 }

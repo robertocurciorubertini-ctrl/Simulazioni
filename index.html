@@ -573,7 +573,7 @@
       return normalize(name);
     }
 
-    const expandedCategories = new Set();
+    let expandedCategoryKey = null;
 
     function getCategoryMap(categories) {
       const map = new Map();
@@ -781,7 +781,7 @@
           if (sims.length === 0) return "";
 
           const categoryKey = getCategoryKey(category.name);
-          const isExpanded = autoExpand || expandedCategories.has(categoryKey);
+          const isExpanded = autoExpand || expandedCategoryKey === categoryKey;
 
           return `
             <section class="category-block">
@@ -865,11 +865,7 @@
       const categoryName = toggle.dataset.category || "";
       const categoryKey = getCategoryKey(categoryName);
 
-      if (expandedCategories.has(categoryKey)) {
-        expandedCategories.delete(categoryKey);
-      } else {
-        expandedCategories.add(categoryKey);
-      }
+      expandedCategoryKey = expandedCategoryKey === categoryKey ? null : categoryKey;
 
       render();
     });

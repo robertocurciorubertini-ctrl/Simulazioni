@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Decadimento radioattivo",
+  description: "Visualizza il decadimento statistico di un campione radioattivo, l’andamento esponenziale del numero di nuclei non decaduti e l’evoluzione temporale dell’attività.",
+  category: "Fisica nucleare",
+  icon: "☢️",
+  order: 1,
+  tags: ["decadimento radioattivo", "fisica nucleare", "attività", "tempo di dimezzamento", "legge esponenziale", "nuclei instabili"],
+  level: "base"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decadimento Radioattivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+  :root {
+    --bg: #f7f4ee;
+    --bg2: #efe9dc;
+    --panel: #faf8f3;
+    --border: #c8bfa8;
+    --accent: #c0392b;
+    --accent2: #e67e22;
+    --accent3: #2980b9;
+    --text: #1a1410;
+    --text2: #5a4e3a;
+    --text3: #8a7a62;
+    --stable: #27ae60;
+    --alpha-color: #e74c3c;
+    --beta-color: #3498db;
+    --gamma-color: #9b59b6;
+    --chain-color: #e67e22;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--text);
+    color: var(--bg);
+    padding: 28px 48px 22px;
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    border-bottom: 3px solid var(--accent);
+  }
+  header h1 {
+    font-family: 'EB Garamond', serif;
+    font-size: 2.1rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  header .subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    background: var(--text);
+    padding: 0 48px;
+    gap: 2px;
+  }
+  .tab-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--bg); }
+  .tab-btn.active {
+    color: var(--bg);
+    border-bottom: 2px solid var(--accent);
+  }
+
+  /* ── LAYOUT ── */
+  .main-wrap { max-width: 1300px; margin: 0 auto; padding: 32px 48px; }
+  .sim-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── PANELS ── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+  }
+  .panel-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── CONTROLS ── */
+  .control-group { margin-bottom: 18px; }
+  .control-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text2);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .control-label span {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  select {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  button.btn {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all 0.15s;
+  }
+  button.btn:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+  button.btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  button.btn.primary:hover { background: #a93226; border-color: #a93226; }
+
+  /* ── STATS ── */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 12px;
+  }
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .stat-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .stat-val.green { color: var(--stable); }
+  .stat-val.red { color: var(--accent); }
+
+  /* ── CANVAS AREA ── */
+  .canvas-col { display: flex; flex-direction: column; gap: 20px; }
+  canvas { display: block; width: 100%; border-radius: 3px; }
+  #atomCanvas { background: #0d0e12; border: 1px solid #2a2a35; }
+  #graphCanvas { background: var(--panel); border: 1px solid var(--border); }
+
+  /* ── DECAY TYPE BADGE ── */
+  .decay-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .badge-alpha { background: #fde8e6; color: #c0392b; border: 1px solid #e74c3c; }
+  .badge-beta  { background: #e8f0fd; color: #1a5276; border: 1px solid #3498db; }
+  .badge-gamma { background: #f2e8fd; color: #6c3483; border: 1px solid #9b59b6; }
+  .badge-chain { background: #fef3e2; color: #784212; border: 1px solid #e67e22; }
+
+  /* ── CHAIN VIS ── */
+  .chain-row {
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap; margin-top: 8px;
+  }
+  .chain-el {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+  }
+  .chain-el .sym { font-size: 1rem; font-weight: 500; }
+  .chain-el .hl { font-size: 0.6rem; color: var(--text3); }
+  .chain-el.active { border-color: var(--accent); background: #fde8e6; }
+  .chain-arrow { color: var(--text3); font-size: 0.9rem; }
+
+  /* ── SECTION THEORY ── */
+  .theory-section { margin-top: 40px; }
+  .theory-section h2 {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.7rem;
+    font-weight: 500;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
+  .theory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .theory-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 22px 24px;
+  }
+  .theory-card h3 {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .theory-card p, .theory-card li {
+    font-size: 0.88rem;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 6px;
+  }
+  .theory-card .formula-box {
+    background: var(--bg2);
+    border-left: 3px solid var(--accent);
+    padding: 10px 16px;
+    margin: 12px 0;
+    border-radius: 0 3px 3px 0;
+  }
+  .dot-alpha { width: 10px; height: 10px; border-radius: 50%; background: var(--alpha-color); display: inline-block; }
+  .dot-beta  { width: 10px; height: 10px; border-radius: 50%; background: var(--beta-color); display: inline-block; }
+  .dot-gamma { width: 10px; height: 10px; border-radius: 50%; background: var(--gamma-color); display: inline-block; }
+
+  .info-badge {
+    display: inline-block;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text2);
+    margin: 2px 2px;
+  }
+
+  /* ── TAB PAGES ── */
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+
+  /* Emission particles legend */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+  .legend-item {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem; color: var(--text3);
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  @media (max-width: 900px) {
+    .sim-grid { grid-template-columns: 1fr; }
+    .theory-grid { grid-template-columns: 1fr; }
+    header { padding: 20px 24px; flex-direction: column; gap: 6px; }
+    .main-wrap { padding: 20px 16px; }
+    .tabs { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Decadimento Radioattivo</h1>
+  <span class="subtitle">Simulazione interattiva · Fisica Nucleare</span>
+</header>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('sim')">Simulazione</button>
+  <button class="tab-btn" onclick="switchTab('chain')">Catena di Decadimento</button>
+  <button class="tab-btn" onclick="switchTab('theory')">Teoria</button>
+</div>
+
+<!-- ══════════════════════ TAB: SIMULAZIONE ══════════════════════ -->
+<div id="tab-sim" class="tab-page active">
+<div class="main-wrap">
+<div class="sim-grid">
+
+  <!-- LEFT PANEL -->
+  <div>
+    <div class="panel">
+      <div class="panel-title">Parametri</div>
+
+      <div class="control-group">
+        <div class="control-label">Tipo di decadimento</div>
+        <select id="decayType" onchange="changeDecay()">
+          <option value="alpha">α — Decadimento alfa</option>
+          <option value="beta-">β⁻ — Decadimento beta meno</option>
+          <option value="beta+">β⁺ — Decadimento beta più</option>
+          <option value="gamma">γ — Decadimento gamma</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">Isotopo di partenza</div>
+        <select id="isotopeSelect" onchange="changeIsotope()"></select>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">N₀ — Nuclei iniziali <span id="n0Val">500</span></div>
+        <input type="range" id="n0Slider" min="50" max="2000" step="50" value="500" oninput="updateN0()">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">Velocità simulazione <span id="speedVal">1×</span></div>
+        <input type="range" id="speedSlider" min="1" max="20" step="1" value="5" oninput="updateSpeed()">
+      </div>
+
+      <div class="btn-group">
+        <button class="btn primary" id="playBtn" onclick="togglePlay()">▶ Avvia</button>
+        <button class="btn" onclick="resetSim()">↺ Reset</button>
+        <button class="btn" onclick="stepSim()">→ Step</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <div class="panel-title">Stato Attuale</div>
+      <div id="decayBadge" class="decay-badge badge-alpha">α Decadimento Alfa</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-label">Nuclei radioattivi</div>
+          <div class="stat-val red" id="statN">500</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Nuclei stabili</div>
+          <div class="stat-val green" id="statD">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Tempo (s)</div>
+          <div class="stat-val" id="statT">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Emivita T½</div>
+          <div class="stat-val" id="statHL">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Attività (Bq)</div>
+          <div class="stat-val" id="statA">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">t / T½</div>
+          <div class="stat-val" id="statRatio">0.00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT CANVAS AREA -->
+  <div class="canvas-col">
+    <div class="panel" style="padding:14px">
+      <div class="panel-title">Nuclei — Visualizzazione Monte Carlo</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4a9eff"></div> Radioattivo</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Decaduto (stabile)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ff6b35"></div> In decadimento</div>
+      </div>
+      <canvas id="atomCanvas" height="320"></canvas>
+    </div>
+    <div class="panel" style="padding:14px">
+      <div class="panel-title">Grafico N(t) — Curva di Decadimento</div>
+      <canvas id="graphCanvas" height="240"></canvas>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════ TAB: CATENA ══════════════════════ -->
+<div id="tab-chain" class="tab-page">
+<div class="main-wrap">
+  <div class="sim-grid">
+    <div>
+      <div class="panel">
+        <div class="panel-title">Selezione Catena</div>
+        <div class="control-group">
+          <div class="control-label">Serie di decadimento</div>
+          <select id="chainSelect" onchange="loadChain()">
+            <option value="uranium">Serie dell'Uranio-238</option>
+            <option value="thorium">Serie del Torio-232</option>
+            <option value="actinium">Serie dell'Attinio (U-235)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <div class="control-label">N₀ iniziale <span id="chainN0Val">1000</span></div>
+          <input type="range" id="chainN0Slider" min="100" max="5000" step="100" value="1000" oninput="document.getElementById('chainN0Val').textContent=this.value">
+        </div>
+        <div class="btn-group">
+          <button class="btn primary" id="chainPlayBtn" onclick="toggleChainPlay()">▶ Avvia</button>
+          <button class="btn" onclick="resetChain()">↺ Reset</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <div class="panel-title">Abbondanze attuali</div>
+        <div id="chainStats" style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--text2);line-height:2"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="panel-title">Schema della Catena</div>
+        <div id="chainDisplay"></div>
+      </div>
+      <div class="panel" style="margin-top:16px;padding:14px">
+        <div class="panel-title">Evoluzione Abbondanze</div>
+        <canvas id="chainGraphCanvas" height="280" style="background:var(--panel);border:1px solid var(--border);border-radius:3px;display:block;width:100%"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════ TAB: TEORIA ══════════════════════ -->
+<div id="tab-theory" class="tab-page">
+<div class="main-wrap theory-section">
+  <h2>Fondamenti del Decadimento Radioattivo</h2>
+  <div class="theory-grid">
+
+    <div class="theory-card">
+      <h3>⚛ La Legge del Decadimento Radioattivo</h3>
+      <p>Il decadimento radioattivo è un processo <em>stocastico</em> che segue una legge statistica rigorosa: la probabilità che un singolo nucleo instabile decada nell'intervallo di tempo $dt$ è costante e uguale a $\lambda\,dt$, dove $\lambda$ è la <strong>costante di decadimento</strong> (misurata in s⁻¹). Questo implica che il processo è senza memoria (processo di Poisson), cioè la "storia" del nucleo è irrilevante.</p>
+      <div class="formula-box">
+        $$\frac{dN}{dt} = -\lambda N$$
+      </div>
+      <p>Integrando si ottiene la legge esponenziale:</p>
+      <div class="formula-box">
+        $$N(t) = N_0\, e^{-\lambda t}$$
+      </div>
+      <p>dove $N_0$ è il numero di nuclei radioattivi all'istante $t=0$. L'andamento esponenziale emerge dal carattere stocastico e dall'indipendenza degli eventi di decadimento.</p>
+    </div>
+
+    <div class="theory-card">
+      <h3>⏱ Emivita e Vita Media</h3>
+      <p>L'<strong>emivita</strong> $T_{1/2}$ è il tempo dopo il quale metà dei nuclei presenti si è trasformata. Si ricava ponendo $N(T_{1/2}) = N_0/2$:</p>
+      <div class="formula-box">
+        $$T_{1/2} = \frac{\ln 2}{\lambda} \approx \frac{0{,}6931}{\lambda}$$
+      </div>
+      <p>La <strong>vita media</strong> $\tau$ (o $\bar{t}$) è il valor medio del tempo di sopravvivenza di un singolo nucleo:</p>
+      <div class="formula-box">
+        $$\tau = \frac{1}{\lambda} = \frac{T_{1/2}}{\ln 2}$$
+      </div>
+      <p>Si noti che $\tau > T_{1/2}$: la vita media è circa $44\%$ più lunga dell'emivita, perché i nuclei che sopravvivono a lungo "alzano" la media. Dopo un tempo $\tau$, restano $N_0/e \approx 36{,}8\%$ dei nuclei iniziali.</p>
+    </div>
+
+    <div class="theory-card">
+      <h3><span class="dot-alpha"></span> Decadimento Alfa (α)</h3>
+      <p>Nel decadimento alfa, il nucleo padre emette un <strong>nucleo di elio-4</strong> ($^4_2\text{He}$, la particella α), composto da 2 protoni e 2 neutroni. La reazione generale è:</p>
+      <div class="formula-box">
+        $$^A_Z X \;\longrightarrow\; ^{A-4}_{Z-2} Y \;+\; ^4_2\text{He}$$
+      </div>
+      <p>Avviene principalmente in nuclei pesanti ($Z > 83$) dove la repulsione coulombiana supera la coesione nucleare. Le particelle α sono emesse con energia discreta (tipicamente 4–9 MeV) e attraversano la barriera coulombiana per <strong>effetto tunnel quantistico</strong>. La relazione di Geiger-Nuttall lega empiricamente $\lambda$ all'energia di emissione: nuclei con $E_\alpha$ maggiore decadono molto più velocemente.</p>
+      <p><span class="info-badge">Range in aria: ~3–10 cm</span> <span class="info-badge">Arrestate dalla carta</span></p>
+    </div>
+
+    <div class="theory-card">
+      <h3><span class="dot-beta"></span> Decadimento Beta (β)</h3>
+      <p>Esistono due varianti. Nel <strong>decadimento β⁻</strong>, un neutrone si converte in protone emettendo un elettrone e un antineutrino elettronico:</p>
+      <div class="formula-box">
+        $$n \;\to\; p^+ + e^- + \bar{\nu}_e$$
+        $$^A_Z X \;\to\; ^A_{Z+1}Y + e^- + \bar{\nu}_e$$
+      </div>
+      <p>Nel <strong>decadimento β⁺</strong>, un protone si converte in neutrone emettendo un positrone e un neutrino:</p>
+      <div class="formula-box">
+        $$p^+ \;\to\; n + e^+ + \nu_e$$
+      </div>
+      <p>A differenza dell'α, lo spettro energetico del β è <em>continuo</em> (da 0 al valore massimo $Q$): l'energia è condivisa tra elettrone/positrone e (anti)neutrino. Questo fatto storico fu la prima evidenza sperimentale dell'esistenza dei neutrini (ipotesi di Pauli, 1930).</p>
+      <p><span class="info-badge">Range in aria: ~1–10 m</span> <span class="info-badge">Fermate da alluminio ~mm</span></p>
+    </div>
+
+    <div class="theory-card">
+      <h3><span class="dot-gamma"></span> Decadimento Gamma (γ)</h3>
+      <p>Il decadimento gamma non modifica $A$ né $Z$: il nucleo figlio, lasciato in uno <strong>stato eccitato</strong> dopo un decadimento α o β, si diseccita emettendo un fotone γ ad alta energia:</p>
+      <div class="formula-box">
+        $$^A_Z X^* \;\longrightarrow\; ^A_Z X + \gamma$$
+      </div>
+      <p>L'energia del fotone corrisponde esattamente alla differenza di energia tra il livello nucleare eccitato e quello fondamentale: è quindi <em>discreta</em> e caratteristica di ogni isotopo. Questo consente l'identificazione spettroscopica dei radionuclidi. Nei casi in cui l'emissione γ è ritardata, si parla di <strong>isomeri nucleari</strong> (es. $^{99\text{m}}$Tc, usato in medicina nucleare, $T_{1/2} = 6{,}0$ h).</p>
+      <p><span class="info-badge">Penetrazione: centimetri di piombo</span></p>
+    </div>
+
+    <div class="theory-card">
+      <h3>⛓ Catene di Decadimento e Equazioni di Bateman</h3>
+      <p>Un isotopo instabile produce spesso un figlio anch'esso instabile, dando origine a una <strong>catena di decadimento</strong>. Per una catena $N_1 \to N_2 \to \cdots \to N_n$ (stabile), le equazioni di Bateman descrivono l'evoluzione temporale:</p>
+      <div class="formula-box">
+        $$\frac{dN_i}{dt} = \lambda_{i-1} N_{i-1} - \lambda_i N_i \quad (i \geq 2)$$
+      </div>
+      <p>Un caso importante è l'<strong>equilibrio secolare</strong>: se $T_{1/2}^{(\text{padre})} \gg T_{1/2}^{(\text{figlio})}$, dopo un tempo sufficientemente lungo le attività si eguagliano, $\lambda_1 N_1 = \lambda_2 N_2$. In tal caso il figlio è prodotto e distrugge esattamente alla stessa velocità del padre. Le grandi serie naturali dell'uranio e del torio sono esempi di catene con equilibrio secolare.</p>
+    </div>
+
+    <div class="theory-card">
+      <h3>📊 Attività e Unità di Misura</h3>
+      <p>L'<strong>attività</strong> $A$ di un campione è il numero di decadimenti al secondo:</p>
+      <div class="formula-box">
+        $$A(t) = \lambda N(t) = \lambda N_0 e^{-\lambda t} = A_0 e^{-\lambda t}$$
+      </div>
+      <p>L'unità SI (Sistema Internazionale) è il <strong>Becquerel</strong> (Bq): 1 Bq = 1 decadimento/s. Storicamente si usava il <strong>Curie</strong> (Ci), definito come l'attività di 1 grammo di $^{226}$Ra: $1\;\text{Ci} = 3{,}7 \times 10^{10}\;\text{Bq}$.</p>
+      <p>Si noti che $A_0 = \lambda N_0$: per la stessa quantità di nuclei, un isotopo con emivita breve ha attività molto più alta. $^{238}$U ($T_{1/2} = 4{,}47 \times 10^9$ a) ha attività specifica di soli $1{,}24 \times 10^4$ Bq/g, mentre $^{131}$I ($T_{1/2} = 8{,}02$ g) raggiunge $4{,}6 \times 10^{15}$ Bq/g.</p>
+    </div>
+
+    <div class="theory-card">
+      <h3>🎲 Natura Statistica: la Simulazione Monte Carlo</h3>
+      <p>Poiché il decadimento è un processo quantistico stocastico, la simulazione più fedele è quella <strong>Monte Carlo</strong>: ad ogni passo temporale $\Delta t$, ogni nucleo radioattivo ha probabilità $p = \lambda \Delta t$ di decadere, estratta da una distribuzione uniforme. Per $N$ nuclei, il numero atteso di decadimenti in $\Delta t$ è $\langle \Delta N \rangle = \lambda N \Delta t$, ma il valore effettivo fluttua con deviazione standard $\sigma = \sqrt{\lambda N \Delta t(1-\lambda \Delta t)} \approx \sqrt{\lambda N \Delta t}$ (distribuzione binomiale, approssimabile a Poisson per $p \ll 1$).</p>
+      <p>Le fluttuazioni relative $\sigma/\langle\Delta N\rangle \sim 1/\sqrt{N}$ sono visibili nella simulazione con $N$ piccoli e scompaiono per grandi popolazioni, dove la curva converge all'esponenziale teorico.</p>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+const ISOTOPES = {
+  alpha: [
+    { name: "²³⁸U  (Uranio-238)",    Z:92, A:238, hl: 1.41e17,  daughterZ:90, daughterA:234, daughterName:"Th-234" },
+    { name: "²²⁶Ra (Radio-226)",      Z:88, A:226, hl: 5.05e10,  daughterZ:86, daughterA:222, daughterName:"Rn-222" },
+    { name: "²¹⁰Po (Polonio-210)",    Z:84, A:210, hl: 1.197e7,  daughterZ:82, daughterA:206, daughterName:"Pb-206" },
+    { name: "²²²Rn (Radon-222)",      Z:86, A:222, hl: 3.30e5,   daughterZ:84, daughterA:218, daughterName:"Po-218" },
+    { name: "²⁴¹Am (Americio-241)",   Z:95, A:241, hl: 1.364e10, daughterZ:93, daughterA:237, daughterName:"Np-237" },
+  ],
+  "beta-": [
+    { name: "¹⁴C  (Carbonio-14)",    Z:6,  A:14,  hl: 1.806e11, daughterZ:7,  daughterA:14,  daughterName:"¹⁴N" },
+    { name: "³H   (Trizio)",          Z:1,  A:3,   hl: 3.888e8,  daughterZ:2,  daughterA:3,   daughterName:"³He" },
+    { name: "⁹⁰Sr (Stronzio-90)",    Z:38, A:90,  hl: 9.09e8,   daughterZ:39, daughterA:90,  daughterName:"⁹⁰Y" },
+    { name: "¹³¹I  (Iodio-131)",      Z:53, A:131, hl: 6.93e5,   daughterZ:54, daughterA:131, daughterName:"¹³¹Xe" },
+    { name: "⁶⁰Co (Cobalto-60)",     Z:27, A:60,  hl: 1.663e8,  daughterZ:28, daughterA:60,  daughterName:"⁶⁰Ni*" },
+  ],
+  "beta+": [
+    { name: "¹¹C  (Carbonio-11)",    Z:6,  A:11,  hl: 1224,     daughterZ:5,  daughterA:11,  daughterName:"¹¹B" },
+    { name: "¹⁸F  (Fluoro-18)",      Z:9,  A:18,  hl: 6584,     daughterZ:8,  daughterA:18,  daughterName:"¹⁸O" },
+    { name: "²²Na (Sodio-22)",       Z:11, A:22,  hl: 8.21e7,   daughterZ:10, daughterA:22,  daughterName:"²²Ne" },
+    { name: "⁶⁸Ga (Gallio-68)",     Z:31, A:68,  hl: 4079,     daughterZ:30, daughterA:68,  daughterName:"⁶⁸Zn" },
+  ],
+  gamma: [
+    { name: "⁹⁹ᵐTc (Tecnezio-99m)",  Z:43, A:99,  hl: 21600,    daughterZ:43, daughterA:99,  daughterName:"⁹⁹Tc" },
+    { name: "¹³⁷ᵐBa (Bario-137m)",   Z:56, A:137, hl: 153,      daughterZ:56, daughterA:137, daughterName:"¹³⁷Ba" },
+    { name: "⁶⁰ᵐCo (Cobalto-60m)",   Z:27, A:60,  hl: 6228,     daughterZ:27, daughterA:60,  daughterName:"⁶⁰Co" },
+  ],
+};
+
+const CHAINS = {
+  uranium: {
+    name: "Serie Uranio-238",
+    elements: [
+      { sym:"²³⁸U",  hl:1.41e17,  type:"α",  color:"#e74c3c" },
+      { sym:"²³⁴Th", hl:2.08e6,   type:"β⁻", color:"#3498db" },
+      { sym:"²³⁴Pa", hl:72720,    type:"β⁻", color:"#3498db" },
+      { sym:"²³⁴U",  hl:7.74e12,  type:"α",  color:"#e74c3c" },
+      { sym:"²³⁰Th", hl:2.38e12,  type:"α",  color:"#e74c3c" },
+      { sym:"²²⁶Ra", hl:5.05e10,  type:"α",  color:"#e74c3c" },
+      { sym:"²²²Rn", hl:3.30e5,   type:"α",  color:"#e74c3c" },
+      { sym:"²¹⁸Po", hl:186,      type:"α",  color:"#e74c3c" },
+      { sym:"²¹⁴Pb", hl:1608,     type:"β⁻", color:"#3498db" },
+      { sym:"²¹⁴Bi", hl:1194,     type:"β⁻", color:"#3498db" },
+      { sym:"²¹⁴Po", hl:1.64e-4,  type:"α",  color:"#e74c3c" },
+      { sym:"²¹⁰Pb", hl:7.01e8,   type:"β⁻", color:"#3498db" },
+      { sym:"²¹⁰Bi", hl:4.33e5,   type:"β⁻", color:"#3498db" },
+      { sym:"²¹⁰Po", hl:1.197e7,  type:"α",  color:"#e74c3c" },
+      { sym:"²⁰⁶Pb", hl:Infinity, type:"—",  color:"#27ae60" },
+    ]
+  },
+  thorium: {
+    name: "Serie Torio-232",
+    elements: [
+      { sym:"²³²Th", hl:4.42e17,  type:"α",  color:"#e74c3c" },
+      { sym:"²²⁸Ra", hl:1.81e8,   type:"β⁻", color:"#3498db" },
+      { sym:"²²⁸Ac", hl:22140,    type:"β⁻", color:"#3498db" },
+      { sym:"²²⁸Th", hl:6.03e7,   type:"α",  color:"#e74c3c" },
+      { sym:"²²⁴Ra", hl:3.14e5,   type:"α",  color:"#e74c3c" },
+      { sym:"²²⁰Rn", hl:55.6,     type:"α",  color:"#e74c3c" },
+      { sym:"²¹⁶Po", hl:0.145,    type:"α",  color:"#e74c3c" },
+      { sym:"²¹²Pb", hl:38304,    type:"β⁻", color:"#3498db" },
+      { sym:"²¹²Bi", hl:3636,     type:"α/β⁻",color:"#9b59b6"},
+      { sym:"²⁰⁸Pb", hl:Infinity, type:"—",  color:"#27ae60" },
+    ]
+  },
+  actinium: {
+    name: "Serie Attinio (U-235)",
+    elements: [
+      { sym:"²³⁵U",  hl:2.22e16,  type:"α",  color:"#e74c3c" },
+      { sym:"²³¹Th", hl:90720,    type:"β⁻", color:"#3498db" },
+      { sym:"²³¹Pa", hl:1.03e12,  type:"α",  color:"#e74c3c" },
+      { sym:"²²⁷Ac", hl:6.86e8,   type:"β⁻", color:"#3498db" },
+      { sym:"²²⁷Th", hl:1.60e6,   type:"α",  color:"#e74c3c" },
+      { sym:"²²³Ra", hl:986457,   type:"α",  color:"#e74c3c" },
+      { sym:"²¹⁹Rn", hl:3.96,     type:"α",  color:"#e74c3c" },
+      { sym:"²¹⁵Po", hl:1.78e-3,  type:"α",  color:"#e74c3c" },
+      { sym:"²¹¹Pb", hl:2166,     type:"β⁻", color:"#3498db" },
+      { sym:"²¹¹Bi", hl:128,      type:"α",  color:"#e74c3c" },
+      { sym:"²⁰⁷Pb", hl:Infinity, type:"—",  color:"#27ae60" },
+    ]
+  }
+};
+
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+let decayType = "alpha";
+let isotopeIdx = 0;
+let N0 = 500;
+let speed = 5;
+let simRunning = false;
+let simTime = 0;
+let simN = 500;
+let simLambda = 0;
+let simHL = 1;
+let simDt = 0.0;
+let simAnim = null;
+let graphData = [];  // {t, N}
+
+// Atom positions for Monte Carlo vis
+let atoms = [];
+const MAX_ATOMS_VIS = 600;
+let emissionParticles = [];
+
+// ── Chain state ──
+let chainKey = "uranium";
+let chainRunning = false;
+let chainAnim = null;
+let chainCounts = [];
+let chainTime = 0;
+let chainN0 = 1000;
+let chainHistory = [];  // [{t, counts}]
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+function init() {
+  populateIsotopes();
+  changeIsotope();
+  loadChain();
+  resetSim();
+  // set canvas sizes after layout
+  setTimeout(() => {
+    resizeCanvases();
+    drawGraph();
+    drawChainGraph();
+  }, 50);
+}
+
+function resizeCanvases() {
+  const atomC = document.getElementById('atomCanvas');
+  const graphC = document.getElementById('graphCanvas');
+  const chainG = document.getElementById('chainGraphCanvas');
+  const w = atomC.parentElement.clientWidth - 28;
+  atomC.width = w; atomC.height = 320;
+  graphC.width = w; graphC.height = 240;
+  if (chainG) { chainG.width = chainG.parentElement.clientWidth - 28; chainG.height = 280; }
+}
+
+function populateIsotopes() {
+  const sel = document.getElementById('isotopeSelect');
+  sel.innerHTML = '';
+  ISOTOPES[decayType].forEach((iso, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = iso.name;
+    sel.appendChild(opt);
+  });
+}
+
+function changeDecay() {
+  decayType = document.getElementById('decayType').value;
+  isotopeIdx = 0;
+  populateIsotopes();
+  changeIsotope();
+  resetSim();
+}
+
+function changeIsotope() {
+  isotopeIdx = parseInt(document.getElementById('isotopeSelect').value)||0;
+  const iso = ISOTOPES[decayType][isotopeIdx];
+  simHL = iso.hl;
+  simLambda = Math.LN2 / simHL;
+  updateDecayBadge();
+  updateStats();
+}
+
+function updateDecayBadge() {
+  const badge = document.getElementById('decayBadge');
+  const labels = { alpha:"α — Decadimento Alfa", "beta-":"β⁻ — Decadimento Beta⁻", "beta+":"β⁺ — Decadimento Beta⁺", gamma:"γ — Decadimento Gamma" };
+  const classes = { alpha:"badge-alpha", "beta-":"badge-beta", "beta+":"badge-beta", gamma:"badge-gamma" };
+  badge.className = "decay-badge " + classes[decayType];
+  badge.textContent = labels[decayType];
+}
+
+function updateN0() {
+  N0 = parseInt(document.getElementById('n0Slider').value);
+  document.getElementById('n0Val').textContent = N0;
+}
+
+function updateSpeed() {
+  speed = parseInt(document.getElementById('speedSlider').value);
+  document.getElementById('speedVal').textContent = speed + "×";
+  simDt = simHL * 0.001 * speed;
+}
+
+// ══════════════════════════════════════════════════
+//  SIMULATION CONTROL
+// ══════════════════════════════════════════════════
+function resetSim() {
+  if (simAnim) { cancelAnimationFrame(simAnim); simAnim = null; }
+  simRunning = false;
+  document.getElementById('playBtn').textContent = "▶ Avvia";
+  simTime = 0;
+  simN = N0;
+  graphData = [{t:0, N:N0}];
+  emissionParticles = [];
+  const iso = ISOTOPES[decayType][isotopeIdx];
+  simHL = iso.hl;
+  simLambda = Math.LN2 / simHL;
+  simDt = simHL * 0.001 * speed;
+  initAtoms();
+  updateStats();
+  drawAtoms();
+  drawGraph();
+}
+
+function initAtoms() {
+  atoms = [];
+  const c = document.getElementById('atomCanvas');
+  const vis = Math.min(N0, MAX_ATOMS_VIS);
+  const cols = Math.ceil(Math.sqrt(vis * (c.width / c.height)));
+  const rows = Math.ceil(vis / cols);
+  const cellW = c.width / (cols + 1);
+  const cellH = c.height / (rows + 1);
+  for (let i = 0; i < vis; i++) {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    atoms.push({
+      x: (col + 0.5 + (Math.random()-0.5)*0.4) * cellW + cellW*0.5,
+      y: (row + 0.5 + (Math.random()-0.5)*0.4) * cellH + cellH*0.5,
+      decayed: false,
+      blinking: false,
+      blinkTimer: 0,
+      r: 4 + Math.random()*1.5,
+    });
+  }
+}
+
+function togglePlay() {
+  if (simRunning) {
+    simRunning = false;
+    cancelAnimationFrame(simAnim);
+    document.getElementById('playBtn').textContent = "▶ Avvia";
+  } else {
+    if (simN <= 0) resetSim();
+    simRunning = true;
+    document.getElementById('playBtn').textContent = "⏸ Pausa";
+    simDt = simHL * 0.001 * speed;
+    simLoop();
+  }
+}
+
+function stepSim() {
+  simDt = simHL * 0.001 * speed;
+  doSimStep();
+  drawAtoms();
+  drawGraph();
+}
+
+function simLoop() {
+  if (!simRunning) return;
+  doSimStep();
+  drawAtoms();
+  drawGraph();
+  simAnim = requestAnimationFrame(simLoop);
+}
+
+function doSimStep() {
+  if (simN <= 0) { simRunning = false; document.getElementById('playBtn').textContent = "▶ Avvia"; return; }
+  simDt = simHL * 0.001 * speed;
+  const p = 1 - Math.exp(-simLambda * simDt);
+  let decays = 0;
+  for (let i = 0; i < atoms.length; i++) {
+    if (!atoms[i].decayed && Math.random() < p) {
+      atoms[i].decayed = true;
+      atoms[i].blinking = true;
+      atoms[i].blinkTimer = 8;
+      decays++;
+      spawnParticle(atoms[i].x, atoms[i].y);
+    }
+  }
+  // for atoms not shown, count by binomial
+  const hiddenActive = simN - atoms.filter(a=>!a.decayed).length;
+  if (hiddenActive > 0) {
+    let hiddenDecays = 0;
+    for (let i = 0; i < hiddenActive; i++) if (Math.random() < p) hiddenDecays++;
+    decays += hiddenDecays;
+  }
+  simN = Math.max(0, simN - decays);
+  simTime += simDt;
+  graphData.push({t: simTime, N: simN});
+  if (graphData.length > 800) graphData.splice(0, graphData.length - 800);
+  updateStats();
+  // blink timers
+  for (let a of atoms) if (a.blinkTimer > 0) a.blinkTimer--;
+  // emission particles
+  for (let i = emissionParticles.length-1; i>=0; i--) {
+    const ep = emissionParticles[i];
+    ep.x += ep.vx; ep.y += ep.vy;
+    ep.life--;
+    if (ep.life <= 0) emissionParticles.splice(i,1);
+  }
+}
+
+function spawnParticle(x, y) {
+  const angle = Math.random() * Math.PI * 2;
+  const colors = { alpha:"#ff4444", "beta-":"#44aaff", "beta+":"#ff44aa", gamma:"#cc88ff" };
+  emissionParticles.push({
+    x, y,
+    vx: Math.cos(angle) * (2 + Math.random()*3),
+    vy: Math.sin(angle) * (2 + Math.random()*3),
+    life: 20 + Math.floor(Math.random()*20),
+    color: colors[decayType]
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  DRAW ATOMS
+// ══════════════════════════════════════════════════
+function drawAtoms() {
+  const c = document.getElementById('atomCanvas');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+
+  // bg grid subtle
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  ctx.lineWidth = 1;
+  for (let x=0;x<c.width;x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,c.height); ctx.stroke(); }
+  for (let y=0;y<c.height;y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(c.width,y); ctx.stroke(); }
+
+  for (const a of atoms) {
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, a.r, 0, Math.PI*2);
+    if (a.blinkTimer > 0) {
+      ctx.fillStyle = '#ff6b35';
+      ctx.shadowColor = '#ff6b35';
+      ctx.shadowBlur = 12;
+    } else if (a.decayed) {
+      ctx.fillStyle = '#2ecc71';
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+    } else {
+      ctx.fillStyle = '#4a9eff';
+      ctx.shadowColor = '#4a9eff';
+      ctx.shadowBlur = 6;
+    }
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // emission particles
+  for (const ep of emissionParticles) {
+    const alpha = ep.life / 40;
+    ctx.beginPath();
+    ctx.arc(ep.x, ep.y, 2, 0, Math.PI*2);
+    ctx.fillStyle = ep.color + Math.floor(alpha*255).toString(16).padStart(2,'0');
+    ctx.fill();
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  DRAW GRAPH
+// ══════════════════════════════════════════════════
+function drawGraph() {
+  const c = document.getElementById('graphCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const PAD = {l:56, r:24, t:18, b:42};
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim()||'#faf8f3';
+  ctx.fillRect(0,0,W,H);
+
+  const pw = W - PAD.l - PAD.r;
+  const ph = H - PAD.t - PAD.b;
+
+  // theoretical curve
+  const maxT = Math.max(simTime * 1.1, simHL * 3);
+  const steps = 200;
+  const theoryPts = [];
+  for (let i=0; i<=steps; i++) {
+    const t = (i/steps)*maxT;
+    const n = N0 * Math.exp(-simLambda * t);
+    theoryPts.push({t, n});
+  }
+
+  // grid
+  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+  const nTicks = 5;
+  for (let i=0; i<=nTicks; i++) {
+    const y = PAD.t + ph * (1 - i/nTicks);
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l+pw, y); ctx.stroke();
+    ctx.fillStyle = '#888'; ctx.font = "10px 'IBM Plex Mono'"; ctx.textAlign='right';
+    ctx.fillText(Math.round(N0 * i/nTicks), PAD.l-6, y+3);
+  }
+  for (let i=0; i<=5; i++) {
+    const x = PAD.l + pw * i/5;
+    ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, PAD.t+ph); ctx.stroke();
+    ctx.fillStyle = '#888'; ctx.font = "10px 'IBM Plex Mono'"; ctx.textAlign='center';
+    const tLabel = ((maxT*i/5));
+    ctx.fillText(formatTime(tLabel), x, PAD.t+ph+18);
+  }
+
+  // T½ line
+  const x_half = PAD.l + pw * (simHL / maxT);
+  if (x_half < PAD.l+pw) {
+    ctx.strokeStyle = '#e67e22'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(x_half, PAD.t); ctx.lineTo(x_half, PAD.t+ph); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#e67e22'; ctx.font="9px 'IBM Plex Mono'"; ctx.textAlign='center';
+    ctx.fillText("T½", x_half, PAD.t-4);
+  }
+
+  // theoretical curve
+  ctx.strokeStyle = '#c8bfa8'; ctx.lineWidth = 1.5; ctx.setLineDash([6,4]);
+  ctx.beginPath();
+  for (let i=0; i<theoryPts.length; i++) {
+    const x = PAD.l + pw * (theoryPts[i].t / maxT);
+    const y = PAD.t + ph * (1 - theoryPts[i].n / N0);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // actual data
+  if (graphData.length > 1) {
+    ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i=0; i<graphData.length; i++) {
+      const d = graphData[i];
+      const x = PAD.l + pw * (d.t / maxT);
+      const y = PAD.t + ph * (1 - d.N / N0);
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  // legend
+  ctx.font = "9px 'IBM Plex Mono'"; ctx.textAlign='left';
+  ctx.fillStyle='#c8bfa8'; ctx.fillText("— Teoria", PAD.l+8, PAD.t+16);
+  ctx.fillStyle='#c0392b'; ctx.fillText("— Simulazione", PAD.l+70, PAD.t+16);
+  ctx.fillStyle='#e67e22'; ctx.fillText("· · T½", PAD.l+175, PAD.t+16);
+
+  // axes labels
+  ctx.fillStyle='#555'; ctx.font="10px 'IBM Plex Mono'"; ctx.textAlign='center';
+  ctx.fillText("Tempo", PAD.l + pw/2, H-4);
+  ctx.save(); ctx.translate(14, PAD.t+ph/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText("N(t)", 0, 0); ctx.restore();
+}
+
+function formatTime(s) {
+  if (s < 60) return s.toFixed(0)+"s";
+  if (s < 3600) return (s/60).toFixed(1)+"m";
+  if (s < 86400) return (s/3600).toFixed(1)+"h";
+  if (s < 3.15e7) return (s/86400).toFixed(1)+"d";
+  return (s/3.15e7).toFixed(2)+"a";
+}
+
+// ══════════════════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════════════════
+function updateStats() {
+  const iso = ISOTOPES[decayType][isotopeIdx];
+  document.getElementById('statN').textContent = simN;
+  document.getElementById('statD').textContent = N0 - simN;
+  document.getElementById('statT').textContent = formatTime(simTime);
+  document.getElementById('statHL').textContent = formatTime(simHL);
+  const act = simLambda * simN;
+  document.getElementById('statA').textContent = act > 1e6 ? (act/1e6).toExponential(2)+" MBq" : act > 1000 ? (act/1000).toFixed(1)+" kBq" : act.toFixed(0)+" Bq";
+  document.getElementById('statRatio').textContent = (simTime / simHL).toFixed(2);
+}
+
+// ══════════════════════════════════════════════════
+//  CHAIN SIM
+// ══════════════════════════════════════════════════
+function loadChain() {
+  chainKey = document.getElementById('chainSelect').value;
+  resetChain();
+}
+
+function resetChain() {
+  if (chainAnim) { cancelAnimationFrame(chainAnim); chainAnim = null; }
+  chainRunning = false;
+  document.getElementById('chainPlayBtn').textContent = "▶ Avvia";
+  chainN0 = parseInt(document.getElementById('chainN0Slider').value)||1000;
+  const chain = CHAINS[chainKey];
+  chainCounts = chain.elements.map((e,i) => i===0 ? chainN0 : 0);
+  chainTime = 0;
+  chainHistory = [{t:0, counts:[...chainCounts]}];
+  renderChainDisplay();
+  updateChainStats();
+  drawChainGraph();
+}
+
+function toggleChainPlay() {
+  if (chainRunning) {
+    chainRunning = false;
+    cancelAnimationFrame(chainAnim);
+    document.getElementById('chainPlayBtn').textContent = "▶ Avvia";
+  } else {
+    chainRunning = true;
+    document.getElementById('chainPlayBtn').textContent = "⏸ Pausa";
+    chainLoop();
+  }
+}
+
+function chainLoop() {
+  if (!chainRunning) return;
+  const chain = CHAINS[chainKey];
+  const n = chain.elements.length;
+  // Use smallest finite half-life to set dt
+  let minHL = Infinity;
+  for (let i=0; i<n-1; i++) if (isFinite(chain.elements[i].hl)) minHL = Math.min(minHL, chain.elements[i].hl);
+  const dt = minHL * 0.02 * speed;
+  // Bateman-like Monte Carlo
+  const newCounts = [...chainCounts];
+  for (let i=0; i<n-1; i++) {
+    if (!isFinite(chain.elements[i].hl) || chainCounts[i]<=0) continue;
+    const lam = Math.LN2 / chain.elements[i].hl;
+    const p = 1 - Math.exp(-lam * dt);
+    let dec = 0;
+    for (let k=0; k<Math.round(chainCounts[i]); k++) if (Math.random()<p) dec++;
+    newCounts[i] = Math.max(0, newCounts[i] - dec);
+    newCounts[i+1] = newCounts[i+1] + dec;
+  }
+  chainCounts = newCounts;
+  chainTime += dt;
+  chainHistory.push({t:chainTime, counts:[...chainCounts]});
+  if (chainHistory.length > 600) chainHistory.splice(0, chainHistory.length-600);
+  updateChainStats();
+  renderChainDisplay();
+  drawChainGraph();
+  chainAnim = requestAnimationFrame(chainLoop);
+}
+
+function renderChainDisplay() {
+  const chain = CHAINS[chainKey];
+  const cont = document.getElementById('chainDisplay');
+  let html = `<div class="chain-row">`;
+  chain.elements.forEach((el, i) => {
+    const isActive = chainCounts[i] > 0;
+    const isStable = !isFinite(el.hl);
+    html += `<div class="chain-el ${isActive && !isStable ? 'active' : ''}">
+      <span class="sym" style="color:${el.color}">${el.sym}</span>
+      <span class="hl">${isStable ? 'stabile' : formatTime(el.hl)}</span>
+      <span class="hl">${Math.round(chainCounts[i])}</span>
+    </div>`;
+    if (i < chain.elements.length-1) {
+      html += `<span class="chain-arrow" style="color:${el.color}">${el.type}→</span>`;
+    }
+  });
+  html += `</div>`;
+  cont.innerHTML = html;
+}
+
+function updateChainStats() {
+  const chain = CHAINS[chainKey];
+  let html = '';
+  chain.elements.forEach((el, i) => {
+    const pct = chainN0 > 0 ? (chainCounts[i]/chainN0*100).toFixed(1) : '0.0';
+    html += `<div style="display:flex;align-items:center;gap:8px">
+      <span style="color:${el.color};min-width:60px">${el.sym}</span>
+      <div style="flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${el.color};transition:width 0.1s"></div>
+      </div>
+      <span style="min-width:40px;text-align:right">${Math.round(chainCounts[i])}</span>
+    </div>`;
+  });
+  html += `<div style="margin-top:6px;color:var(--text3)">t = ${formatTime(chainTime)}</div>`;
+  document.getElementById('chainStats').innerHTML = html;
+}
+
+function drawChainGraph() {
+  const c = document.getElementById('chainGraphCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const PAD = {l:50, r:20, t:18, b:38};
+  const pw = W-PAD.l-PAD.r, ph = H-PAD.t-PAD.b;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#faf8f3'; ctx.fillRect(0,0,W,H);
+
+  if (chainHistory.length < 2) return;
+  const chain = CHAINS[chainKey];
+  const n = chain.elements.length;
+  const maxT = chainHistory[chainHistory.length-1].t || 1;
+  const maxN = chainN0;
+
+  // grid
+  ctx.strokeStyle='#ddd'; ctx.lineWidth=1;
+  for (let i=0;i<=4;i++) {
+    const y=PAD.t+ph*(1-i/4);
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+pw,y); ctx.stroke();
+    ctx.fillStyle='#888'; ctx.font="9px 'IBM Plex Mono'"; ctx.textAlign='right';
+    ctx.fillText(Math.round(maxN*i/4), PAD.l-4, y+3);
+  }
+  for (let i=0;i<=5;i++) {
+    const x=PAD.l+pw*i/5;
+    ctx.beginPath(); ctx.moveTo(x,PAD.t); ctx.lineTo(x,PAD.t+ph); ctx.stroke();
+    ctx.fillStyle='#888'; ctx.font="9px 'IBM Plex Mono'"; ctx.textAlign='center';
+    ctx.fillText(formatTime(maxT*i/5), x, PAD.t+ph+16);
+  }
+
+  // one line per isotope
+  for (let ei=0; ei<n; ei++) {
+    ctx.strokeStyle = chain.elements[ei].color; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    let first=true;
+    for (const frame of chainHistory) {
+      const x = PAD.l + pw * (frame.t / maxT);
+      const y = PAD.t + ph * (1 - frame.counts[ei] / maxN);
+      if (first) { ctx.moveTo(x,y); first=false; } else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // label at end
+    const last = chainHistory[chainHistory.length-1];
+    const lx = PAD.l + pw;
+    const ly = PAD.t + ph * (1 - last.counts[ei] / maxN);
+    if (last.counts[ei] > maxN * 0.01) {
+      ctx.fillStyle = chain.elements[ei].color;
+      ctx.font = "8px 'IBM Plex Mono'"; ctx.textAlign='left';
+      ctx.fillText(chain.elements[ei].sym, lx+2, ly+3);
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+  setTimeout(()=>{
+    resizeCanvases();
+    drawAtoms();
+    drawGraph();
+    drawChainGraph();
+    if(name==='theory') renderMath();
+  },50);
+}
+
+function renderMath() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
+    });
+  }
+}
+
+window.addEventListener('resize', ()=>{ resizeCanvases(); drawAtoms(); drawGraph(); drawChainGraph(); });
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

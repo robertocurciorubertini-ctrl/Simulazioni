@@ -56,6 +56,11 @@
       "description": "Branca della fisica che studia i fenomeni e le leggi che governano l’Universo, dalle stelle e galassie fino agli oggetti più compatti e agli eventi più energetici."
     },
     {
+      "name": "Fisicaa nucleare",
+      "order": 110,
+      "description": "Branca della fisica che studia la struttura del nucleo atomico, le sue trasformazioni, le reazioni nucleari e l’interazione tra radiazione e materia."
+    },
+    {
       "name": "WIP",
       "description": "Simulazioni in sviluppo o in fase di test.",
       "order": 999999
@@ -532,6 +537,26 @@
       "isWip": true
     },
     {
+      "title": "Trasporto di particelle",
+      "description": "Simulazione Monte Carlo del trasporto di neutroni, fotoni ed elettroni in materiali diversi, con visualizzazione di tracce, fluenza, dose e principali processi di interazione.",
+      "category": "WIP",
+      "icon": "☢️",
+      "order": 10,
+      "tags": [
+        "trasporto di particelle",
+        "monte carlo",
+        "neutroni",
+        "fotoni",
+        "elettroni",
+        "dose",
+        "fluenza",
+        "interazioni radiazione-materia"
+      ],
+      "level": "avanzato",
+      "file": "WIP/trasporto-particelle/transport_sim.html",
+      "isWip": true
+    },
+    {
       "title": "Circuiti",
       "description": "Simulatore interattivo di circuiti RC, RL, RLC con corrente continua e alternata.",
       "category": "WIP",
@@ -586,6 +611,26 @@
       ],
       "level": "avanzato",
       "file": "WIP/termodinamica/entropia.html",
+      "isWip": true
+    },
+    {
+      "title": "Onde gravitazionali",
+      "description": "Simulazione avanzata di sistemi binari compatti con inspiral, merger e ringdown, deformazione qualitativa dello spaziotempo, segnale di strain in stile LIGO, polarizzazioni e pannello tempo-frequenza.",
+      "category": "WIP",
+      "icon": "〰️",
+      "order": 111,
+      "tags": [
+        "onde gravitazionali",
+        "relatività generale",
+        "LIGO",
+        "Virgo",
+        "buchi neri",
+        "stelle di neutroni",
+        "ringdown",
+        "chirp"
+      ],
+      "level": "avanzato",
+      "file": "WIP/onde_gravitazionali.html",
       "isWip": true
     }
   ]

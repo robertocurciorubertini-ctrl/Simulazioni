@@ -299,21 +299,20 @@
       "isWip": false
     },
     {
-      "title": "Figure di Chladni",
-      "description": "Visualizza la formazione dei pattern nodali su una piastra vibrante e l'accumulo della sabbia lungo le linee nodali, esplorando il legame tra modi normali, onde stazionarie e dissipazione.",
+      "title": "Effetto Doppler",
+      "description": "Esplora come la frequenza osservata di un’onda cambia quando la sorgente e/o l’osservatore sono in movimento.",
       "category": "Onde",
-      "icon": "〰️",
-      "order": 6,
+      "icon": "🚑",
+      "order": 10,
       "tags": [
-        "figure di Chladni",
-        "onde stazionarie",
-        "modi normali",
-        "risonanza",
-        "piastre vibranti",
-        "linee nodali"
+        "onde",
+        "frequenza",
+        "sorgente in moto",
+        "osservatore in moto",
+        "suono"
       ],
       "level": "intermedio",
-      "file": "onde/chladni.html",
+      "file": "onde/effetto-doppler.html",
       "isWip": false
     },
     {
@@ -321,7 +320,7 @@
       "description": "Visualizzazione della sovrapposizione di onde con interferenza costruttiva e distruttiva su corda (1D) e nello spazio (2D), con fenomeni di diffrazione.",
       "category": "Onde",
       "icon": "≈",
-      "order": 10,
+      "order": 20,
       "tags": [
         "interferenza",
         "diffrazione",
@@ -335,20 +334,21 @@
       "isWip": false
     },
     {
-      "title": "Effetto Doppler",
-      "description": "Esplora come la frequenza osservata di un’onda cambia quando la sorgente e/o l’osservatore sono in movimento.",
+      "title": "Figure di Chladni",
+      "description": "Visualizza la formazione dei pattern nodali su una piastra vibrante e l'accumulo della sabbia lungo le linee nodali, esplorando il legame tra modi normali, onde stazionarie e dissipazione.",
       "category": "Onde",
-      "icon": "🚑",
-      "order": 20,
+      "icon": "〰️",
+      "order": 30,
       "tags": [
-        "onde",
-        "frequenza",
-        "sorgente in moto",
-        "osservatore in moto",
-        "suono"
+        "figure di Chladni",
+        "onde stazionarie",
+        "modi normali",
+        "risonanza",
+        "piastre vibranti",
+        "linee nodali"
       ],
       "level": "intermedio",
-      "file": "onde/effetto-doppler.html",
+      "file": "onde/chladni.html",
       "isWip": false
     },
     {

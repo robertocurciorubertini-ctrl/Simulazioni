@@ -468,7 +468,7 @@ def main() -> int:
             print(f" - {w}", file=sys.stderr)
 
     if extracted:
-        print("Simulazioni trovate:")
+        print(f"Simulazioni trovate: {len(extracted)}")
         for item in extracted:
             print(f" - {item.get('title', '<senza titolo>')}  [{item.get('file', '<percorso sconosciuto>')}]")
     else:
@@ -497,12 +497,12 @@ def main() -> int:
     if not args.no_config:
         try:
             update_config_file(config_path, data["simulations"], data)
-            print(f"Aggiornata anche la sezione finale di '{config_path.name}'.")
+            print(f"Aggiornato il file '{config_path.name}'.")
         except Exception as exc:
             print(f"Errore durante l'aggiornamento del file di configurazione: {exc}", file=sys.stderr)
             return 1
 
-    print(f"Aggiornato '{json_path.name}' con {len(extracted)} simulazioni lette dai file HTML.")
+    print(f"Aggiornato il file '{json_path.name}'")
     return 0
 
 

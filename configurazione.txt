@@ -3,6 +3,7 @@ DA FARE:
 -Tipi di elettrizzazione
 -Traiettorie orbitali (effetto fionda e simili)
 -Oscillatore armonico (smaorzato e forzato, con risonanza)
+-Diffrazione da reticolo cristallino
 
 
 SISTEMARE:
@@ -11,6 +12,7 @@ SISTEMARE:
 	ancora da compilare e la build non la vede
 -Vettori:
 	nella scomposizione mettere che il vettore tratteggiato a_y e sull'asse y
+	nella scomposizione, l'angolo e positivo fino a 180 gradi poi diventa negativo
 -Trasporto particelle:
 	ancora da compilare e la build non la vede
 	per ora va quella vecchia in cui la fisica e sdoppiata nell'html
@@ -48,9 +50,9 @@ Gravitazione:
 
 Onde:
 - Suono
-- Figure di Chladni
-- Interferenza
 - Effetto Doppler
+- Interferenza
+- Figure di Chladni
 
 Ottica:
 - Rifrazione

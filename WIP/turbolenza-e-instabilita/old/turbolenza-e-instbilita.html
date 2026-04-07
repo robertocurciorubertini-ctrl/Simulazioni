@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Turbolenza e instabilità nei fluidi",
+  description: "Esplora il passaggio da regimi laminari a regimi instabili e turbolenti, visualizzando l’evoluzione del flusso, la formazione di vortici e la crescita delle perturbazioni fluidodinamiche.",
+  category: "Fluidodinamica",
+  icon: "🌀",
+  order: 1,
+  tags: ["fluidodinamica", "turbolenza", "instabilità", "vortici", "numero di Reynolds", "flussi"],
+  level: "avanzato"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluidodinamica — Flussi Laminari e Turbolenti</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --panel: #10101a;
+    --border: #1e1e30;
+    --accent: #4fc3f7;
+    --accent2: #ff6b6b;
+    --text: #c8c8d8;
+    --text-dim: #5a5a7a;
+    --label: #8888aa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #e0e0f0;
+    letter-spacing: 0.02em;
+  }
+
+  header .subtitle {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .section-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.7rem;
+    color: var(--label);
+  }
+
+  .control-label .val {
+    color: var(--accent);
+    font-size: 0.75rem;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(79,195,247,0.5);
+  }
+
+  .re-display {
+    background: #0d0d1a;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .re-number {
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .re-label {
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+
+  .regime-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    margin-top: 6px;
+    text-transform: uppercase;
+    font-weight: 400;
+    transition: all 0.3s;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    padding: 7px 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+
+  button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(79,195,247,0.05);
+  }
+
+  button.active {
+    border-color: var(--accent);
+    background: rgba(79,195,247,0.1);
+    color: var(--accent);
+  }
+
+  button.danger {
+    border-color: #2a1515;
+    color: var(--accent2);
+  }
+  button.danger:hover {
+    border-color: var(--accent2);
+    background: rgba(255,107,107,0.08);
+  }
+
+  .info-box {
+    background: #0d0d1a;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .info-box strong {
+    color: var(--label);
+  }
+
+  .canvas-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #050508;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  .overlay-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .hud {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    text-align: right;
+    line-height: 2;
+  }
+
+  .colorbar {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .colorbar-gradient {
+    width: 16px;
+    height: 120px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+
+  .colorbar-labels {
+    position: absolute;
+    right: 22px;
+    top: 0;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  .colorbar-title {
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    position: absolute;
+    right: 38px;
+    top: 0;
+    height: 120px;
+    display: flex;
+    align-items: center;
+  }
+
+  .legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    line-height: 2;
+  }
+
+  .legend span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Simulazione di Fluidodinamica 2D</h1>
+  <span class="subtitle">Navier–Stokes · Metodo di Stam · Transizione Laminare / Turbolento</span>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+
+    <div>
+      <div class="section-title">Numero di Reynolds</div>
+      <div class="re-display">
+        <div class="re-number" id="reDisplay">200</div>
+        <div class="re-label">Re = ρ u L / μ</div>
+        <div id="regimeBadge" class="regime-badge">Laminare</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Parametri di Flusso</div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Velocità ingresso</span>
+          <span class="val" id="velVal">0.15</span>
+        </div>
+        <input type="range" id="velSlider" min="0.02" max="0.35" step="0.01" value="0.15">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Viscosità cinematica ν</span>
+          <span class="val" id="viscVal">0.0008</span>
+        </div>
+        <input type="range" id="viscSlider" min="0.0001" max="0.005" step="0.0001" value="0.0008">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Dimensione ostacolo</span>
+          <span class="val" id="obsVal">12</span>
+        </div>
+        <input type="range" id="obsSlider" min="5" max="30" step="1" value="12">
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Visualizzazione</div>
+      <div class="btn-group">
+        <button id="btnVort" class="active" onclick="setVis('vorticity')">Vorticità ω</button>
+        <button id="btnVel" onclick="setVis('velocity')">Velocità |u|</button>
+        <button id="btnPres" onclick="setVis('pressure')">Pressione p</button>
+        <button id="btnStream" onclick="setVis('stream')">Linee di flusso</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Scenario</div>
+      <div class="btn-group">
+        <button onclick="setScenario('cylinder')">Cilindro singolo</button>
+        <button onclick="setScenario('two')">Due cilindri</button>
+        <button onclick="setScenario('slit')">Fessura / Venturi</button>
+        <button onclick="setScenario('row')">Fila di ostacoli</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Azioni</div>
+      <div class="btn-group">
+        <button onclick="resetSim()">↺ Reset simulazione</button>
+        <button onclick="togglePause()" id="btnPause">⏸ Pausa</button>
+        <button class="danger" onclick="addTurbulence()">⚡ Perturba flusso</button>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Vortici di Kármán</strong><br>
+      Re &lt; 5: flusso rettilineo<br>
+      5–40: coppia di vortici stabili<br>
+      40–200: scia vorticosa periodica<br>
+      &gt;200: turbolenza irregolare<br><br>
+      <strong>Interazione mouse:</strong><br>
+      Trascina per creare correnti e perturbazioni nel dominio.
+    </div>
+
+  </div>
+
+  <div class="canvas-area">
+    <canvas id="simCanvas"></canvas>
+    <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+
+    <div class="hud">
+      <div id="fpsDisplay">— fps</div>
+      <div id="stepDisplay">step —</div>
+    </div>
+
+    <div class="legend">
+      <div><span style="background:#4fc3f7"></span> Rotazione antioraria (ω &gt; 0)</div>
+      <div><span style="background:#ff6b6b"></span> Rotazione oraria (ω &lt; 0)</div>
+      <div><span style="background:#888"></span> Ostacolo solido</div>
+    </div>
+
+    <div class="colorbar">
+      <canvas id="colorbarCanvas" class="colorbar-gradient" width="16" height="120"></canvas>
+      <div class="colorbar-labels">
+        <span id="cbMax">+ω</span>
+        <span>0</span>
+        <span id="cbMin">−ω</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// PARAMETRI GRIGLIA
+// ─────────────────────────────────────────────────────────────────────────────
+const NX = 300, NY = 160;
+const N  = NX * NY;
+
+// Campi di velocità, pressione, densità "colore" per visualizzazione
+let ux    = new Float32Array(N);
+let uy    = new Float32Array(N);
+let ux0   = new Float32Array(N);
+let uy0   = new Float32Array(N);
+let p     = new Float32Array(N);
+let p0    = new Float32Array(N);
+let div_  = new Float32Array(N);
+let obstacle = new Uint8Array(N);   // 1 = solido
+let smoke = new Float32Array(N);    // tracciante passivo per linee di flusso
+let smoke0= new Float32Array(N);
+
+// Parametri fisici
+let inletVel  = 0.15;
+let viscosity = 0.0008;
+let obstSize  = 12;
+let dt        = 1.0;
+const DIFF_ITER = 4;
+const PROJ_ITER = 20;
+
+let visualization = 'vorticity';
+let paused        = false;
+let stepCount     = 0;
+let currentScenario = 'cylinder';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INDICE e CLAMP
+// ─────────────────────────────────────────────────────────────────────────────
+const IX = (x, y) => {
+  x = Math.max(0, Math.min(NX-1, x|0));
+  y = Math.max(0, Math.min(NY-1, y|0));
+  return x + y * NX;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCENARI (ostacoli)
+// ─────────────────────────────────────────────────────────────────────────────
+function buildObstacles() {
+  obstacle.fill(0);
+  const cx = (NX * 0.28)|0;
+  const cy = (NY * 0.5)|0;
+  const r  = obstSize;
+
+  if (currentScenario === 'cylinder') {
+    for (let j=0; j<NY; j++)
+      for (let i=0; i<NX; i++) {
+        const dx = i-cx, dy = j-cy;
+        if (dx*dx+dy*dy < r*r) obstacle[IX(i,j)] = 1;
+      }
+  } else if (currentScenario === 'two') {
+    const r2 = (r*0.8)|0;
+    for (let j=0; j<NY; j++)
+      for (let i=0; i<NX; i++) {
+        const dx=i-cx, dy1=j-(cy-r*2), dy2=j-(cy+r*2);
+        if (dx*dx+dy1*dy1 < r2*r2) obstacle[IX(i,j)]=1;
+        if (dx*dx+dy2*dy2 < r2*r2) obstacle[IX(i,j)]=1;
+      }
+  } else if (currentScenario === 'slit') {
+    const wx = (NX*0.28)|0;
+    const gap = (NY*0.25)|0;
+    for (let j=0; j<NY; j++) {
+      const inGap = (j > NY/2-gap/2 && j < NY/2+gap/2);
+      if (!inGap) {
+        for (let i=wx-2; i<=wx+2; i++) obstacle[IX(i,j)]=1;
+      }
+    }
+  } else if (currentScenario === 'row') {
+    const r2 = (r*0.6)|0;
+    const positions = [0.28, 0.45, 0.62];
+    const ypos = [NY*0.25, NY*0.5, NY*0.75];
+    for (let j=0; j<NY; j++)
+      for (let i=0; i<NX; i++)
+        for (let pi=0; pi<positions.length; pi++)
+          for (let yi=0; yi<ypos.length; yi++) {
+            const dx=i-(NX*positions[pi])|0, dy=j-ypos[yi];
+            if (dx*dx+dy*dy < r2*r2) obstacle[IX(i,j)]=1;
+          }
+  }
+
+  // Pareti superiore e inferiore
+  for (let i=0; i<NX; i++) {
+    obstacle[IX(i,0)]=1;
+    obstacle[IX(i,NY-1)]=1;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONDIZIONI AL CONTORNO — inlet a sinistra, outlet a destra
+// ─────────────────────────────────────────────────────────────────────────────
+function applyBoundary() {
+  // Inlet (parete sinistra): flusso uniforme con piccola perturbazione
+  for (let j=1; j<NY-1; j++) {
+    const idx = IX(0,j);
+    ux[idx] = inletVel;
+    uy[idx] = 0;
+    smoke[idx] = (j % 20 < 10) ? 1.0 : 0.0; // strisce alternate
+  }
+  // Outlet (parete destra): Neumann
+  for (let j=0; j<NY; j++) {
+    ux[IX(NX-1,j)] = ux[IX(NX-2,j)];
+    uy[IX(NX-1,j)] = uy[IX(NX-2,j)];
+  }
+  // Parete superiore/inferiore: no-slip
+  for (let i=0; i<NX; i++) {
+    ux[IX(i,0)]    = 0; uy[IX(i,0)]    = 0;
+    ux[IX(i,NY-1)] = 0; uy[IX(i,NY-1)] = 0;
+  }
+  // Ostacoli: no-slip
+  for (let k=0; k<N; k++) {
+    if (obstacle[k]) { ux[k]=0; uy[k]=0; }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADVECTION semi-lagrangiana (backtracing)
+// ─────────────────────────────────────────────────────────────────────────────
+function advect(dst, src, uxf, uyf, dt_) {
+  for (let j=1; j<NY-1; j++) {
+    for (let i=1; i<NX-1; i++) {
+      if (obstacle[IX(i,j)]) { dst[IX(i,j)]=0; continue; }
+      // Tracciamo a ritroso
+      let xi = i - dt_ * uxf[IX(i,j)];
+      let yi = j - dt_ * uyf[IX(i,j)];
+      xi = Math.max(0.5, Math.min(NX-1.5, xi));
+      yi = Math.max(0.5, Math.min(NY-1.5, yi));
+      const i0=xi|0, i1=i0+1;
+      const j0=yi|0, j1=j0+1;
+      const sx=xi-i0, sy=yi-j0;
+      dst[IX(i,j)] =
+        (1-sx)*((1-sy)*src[IX(i0,j0)] + sy*src[IX(i0,j1)]) +
+           sx *((1-sy)*src[IX(i1,j0)] + sy*src[IX(i1,j1)]);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DIFFUSIONE implicita (Gauss-Seidel)
+// ─────────────────────────────────────────────────────────────────────────────
+function diffuse(dst, src, nu, dt_) {
+  const a = dt_ * nu;
+  const c = 1 + 4*a;
+  dst.set(src);
+  for (let iter=0; iter<DIFF_ITER; iter++) {
+    for (let j=1; j<NY-1; j++) {
+      for (let i=1; i<NX-1; i++) {
+        if (obstacle[IX(i,j)]) continue;
+        dst[IX(i,j)] = (src[IX(i,j)] + a*(
+          dst[IX(i-1,j)]+dst[IX(i+1,j)]+
+          dst[IX(i,j-1)]+dst[IX(i,j+1)]
+        )) / c;
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROIEZIONE (Helmholtz-Hodge): rimuove la componente divergente
+// ─────────────────────────────────────────────────────────────────────────────
+function project() {
+  // Calcola divergenza
+  for (let j=1; j<NY-1; j++) {
+    for (let i=1; i<NX-1; i++) {
+      if (obstacle[IX(i,j)]) { div_[IX(i,j)]=0; p[IX(i,j)]=0; continue; }
+      div_[IX(i,j)] = -0.5*(
+        ux[IX(i+1,j)]-ux[IX(i-1,j)]+
+        uy[IX(i,j+1)]-uy[IX(i,j-1)]
+      );
+      p[IX(i,j)] = 0;
+    }
+  }
+  // Risolvi equazione di Poisson per p: ∇²p = div
+  for (let iter=0; iter<PROJ_ITER; iter++) {
+    for (let j=1; j<NY-1; j++) {
+      for (let i=1; i<NX-1; i++) {
+        if (obstacle[IX(i,j)]) continue;
+        p[IX(i,j)] = (div_[IX(i,j)] +
+          p[IX(i-1,j)]+p[IX(i+1,j)]+
+          p[IX(i,j-1)]+p[IX(i,j+1)]
+        ) * 0.25;
+      }
+    }
+  }
+  // Sottrai gradiente di pressione da u
+  for (let j=1; j<NY-1; j++) {
+    for (let i=1; i<NX-1; i++) {
+      if (obstacle[IX(i,j)]) continue;
+      ux[IX(i,j)] -= 0.5*(p[IX(i+1,j)]-p[IX(i-1,j)]);
+      uy[IX(i,j)] -= 0.5*(p[IX(i,j+1)]-p[IX(i,j-1)]);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STEP PRINCIPALE
+// ─────────────────────────────────────────────────────────────────────────────
+function step() {
+  // Diffusione velocità
+  diffuse(ux0, ux, viscosity, dt);
+  diffuse(uy0, uy, viscosity, dt);
+  applyBoundary();
+
+  // Advection velocità (self-advection)
+  advect(ux, ux0, ux0, uy0, dt);
+  advect(uy, uy0, ux0, uy0, dt);
+  applyBoundary();
+
+  // Proiezione (incomprimibilità)
+  project();
+  applyBoundary();
+
+  // Advection smoke (tracciante passivo)
+  advect(smoke0, smoke, ux, uy, dt);
+  // Piccola sorgente continua all'inlet
+  for (let j=1; j<NY-1; j++) {
+    smoke0[IX(0,j)] = smoke[IX(0,j)] = (j % 20 < 10) ? 1.0 : 0.0;
+  }
+  // Decay leggero
+  for (let k=0; k<N; k++) smoke0[k] *= 0.998;
+  [smoke, smoke0] = [smoke0, smoke];
+
+  stepCount++;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VORTICITÀ ω = ∂uy/∂x - ∂ux/∂y
+// ─────────────────────────────────────────────────────────────────────────────
+function computeVorticity(out) {
+  for (let j=1; j<NY-1; j++) {
+    for (let i=1; i<NX-1; i++) {
+      out[IX(i,j)] =
+        (uy[IX(i+1,j)]-uy[IX(i-1,j)])*0.5 -
+        (ux[IX(i,j+1)]-ux[IX(i,j-1)])*0.5;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COLORMAP
+// ─────────────────────────────────────────────────────────────────────────────
+// Colormap "inferno-divergente" bipolare: blu→nero→rosso per vorticità
+function vortColor(v, maxV) {
+  // v in [-1,1] normalizzato
+  const t = Math.max(-1, Math.min(1, v/maxV));
+  let r,g,b;
+  if (t > 0) {
+    // positivo: nero→ciano→bianco
+    r = t*0.5;
+    g = t*0.9;
+    b = t;
+    // aggiungi magenta per picchi
+    if (t > 0.6) { r += (t-0.6)*2.5; g *= 0.7; }
+  } else {
+    const s = -t;
+    r = s;
+    g = s*0.3;
+    b = s*0.1;
+    if (s > 0.6) { b += (s-0.6)*1.5; r *= 0.8; }
+  }
+  return [
+    Math.min(255, r*255*1.4)|0,
+    Math.min(255, g*255*1.2)|0,
+    Math.min(255, b*255*1.2)|0
+  ];
+}
+
+function velColor(v, maxV) {
+  const t = Math.min(1, v/maxV);
+  // Inferno colormap approximation
+  const r = Math.min(255, (t < 0.5 ? t*2*180 : 180+(t-0.5)*2*75))|0;
+  const g = Math.min(255, (t < 0.3 ? 0 : (t-0.3)/0.7*230))|0;
+  const b = Math.min(255, (t < 0.2 ? t*5*180 : Math.max(0,180-(t-0.2)/0.8*180)))|0;
+  return [r,g,b];
+}
+
+function presColor(v, maxV) {
+  const t = Math.max(-1, Math.min(1, v/Math.max(0.001,maxV)));
+  const r = t>0 ? (t*220)|0 : 0;
+  const g = 0;
+  const b = t<0 ? ((-t)*220)|0 : 0;
+  return [r,g,b];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDERING
+// ─────────────────────────────────────────────────────────────────────────────
+const canvas  = document.getElementById('simCanvas');
+const ctx     = canvas.getContext('2d');
+const oCanvas = document.getElementById('overlayCanvas');
+const oCtx    = oCanvas.getContext('2d');
+let imgData, pixData;
+
+function initCanvas() {
+  canvas.width  = NX;
+  canvas.height = NY;
+  imgData = ctx.createImageData(NX, NY);
+  pixData = imgData.data;
+  drawColorbar();
+}
+
+const vort = new Float32Array(N);
+
+function render() {
+  computeVorticity(vort);
+
+  // Trova max per normalizzazione adattiva
+  let maxV=0.001, maxVel=0.001, maxP=0.001;
+  for (let k=0; k<N; k++) {
+    if (!obstacle[k]) {
+      const av = Math.abs(vort[k]);
+      if (av>maxV) maxV=av;
+      const vel = Math.sqrt(ux[k]*ux[k]+uy[k]*uy[k]);
+      if (vel>maxVel) maxVel=vel;
+      const ap = Math.abs(p[k]);
+      if (ap>maxP) maxP=ap;
+    }
+  }
+  maxV = Math.max(maxV, 0.01);
+
+  for (let j=0; j<NY; j++) {
+    for (let i=0; i<NX; i++) {
+      const k  = IX(i,j);
+      const pi = (j*NX+i)*4;
+      if (obstacle[k]) {
+        pixData[pi]=60; pixData[pi+1]=60; pixData[pi+2]=70; pixData[pi+3]=255;
+        continue;
+      }
+      let r,g,b;
+      if (visualization==='vorticity') {
+        [r,g,b] = vortColor(vort[k], maxV*0.5);
+        // overlay smoke come lucentezza
+        const s = smoke[k]*30;
+        r=Math.min(255,r+s|0); g=Math.min(255,g+s|0); b=Math.min(255,b+s|0);
+      } else if (visualization==='velocity') {
+        const vel = Math.sqrt(ux[k]*ux[k]+uy[k]*uy[k]);
+        [r,g,b] = velColor(vel, maxVel*0.8);
+      } else if (visualization==='pressure') {
+        [r,g,b] = presColor(p[k], maxP*0.5);
+      } else {
+        // stream: colora per smoke
+        const s = smoke[k];
+        r=(s*180)|0; g=(s*230)|0; b=(s*255)|0;
+        // sfumatura leggera per velocità
+        const vel = Math.sqrt(ux[k]*ux[k]+uy[k]*uy[k])/maxVel;
+        r=Math.min(255,r+(vel*40)|0);
+      }
+      pixData[pi]=r; pixData[pi+1]=g; pixData[pi+2]=b; pixData[pi+3]=255;
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  // Aggiorna Reynolds
+  updateReynolds();
+}
+
+function updateReynolds() {
+  const Re = (inletVel * obstSize * 2 / viscosity)|0;
+  document.getElementById('reDisplay').textContent = Re;
+  const badge = document.getElementById('regimeBadge');
+  const reEl  = document.getElementById('reDisplay');
+  if (Re < 40) {
+    badge.textContent='Laminare stabile';
+    badge.style.background='rgba(79,195,247,0.15)';
+    badge.style.color='#4fc3f7';
+    reEl.style.color='#4fc3f7';
+  } else if (Re < 150) {
+    badge.textContent='Vortici di Kármán';
+    badge.style.background='rgba(255,200,80,0.15)';
+    badge.style.color='#ffc850';
+    reEl.style.color='#ffc850';
+  } else if (Re < 500) {
+    badge.textContent='Turbolenza incipiente';
+    badge.style.background='rgba(255,140,80,0.15)';
+    badge.style.color='#ff8c50';
+    reEl.style.color='#ff8c50';
+  } else {
+    badge.textContent='Turbolenza sviluppata';
+    badge.style.background='rgba(255,107,107,0.15)';
+    badge.style.color='#ff6b6b';
+    reEl.style.color='#ff6b6b';
+  }
+}
+
+function drawColorbar() {
+  const cbCanvas = document.getElementById('colorbarCanvas');
+  const cbCtx    = cbCanvas.getContext('2d');
+  const h = cbCanvas.height;
+  for (let y=0; y<h; y++) {
+    const t = 1 - y/h; // top=+, bottom=-
+    const v = (t*2-1);
+    const [r,g,b] = vortColor(v, 1);
+    cbCtx.fillStyle = `rgb(${r},${g},${b})`;
+    cbCtx.fillRect(0, y, 16, 1);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTERAZIONE MOUSE
+// ─────────────────────────────────────────────────────────────────────────────
+let mouseDown=false, lastMX=0, lastMY=0;
+
+oCanvas.addEventListener('mousedown', e=>{mouseDown=true; [lastMX,lastMY]=getSimPos(e);});
+oCanvas.addEventListener('mouseup',   ()=>mouseDown=false);
+oCanvas.addEventListener('mousemove', e=>{
+  if (!mouseDown) return;
+  const [mx,my] = getSimPos(e);
+  const dx = mx-lastMX, dy = my-lastMY;
+  const r=6;
+  for (let dj=-r; dj<=r; dj++)
+    for (let di=-r; di<=r; di++)
+      if (di*di+dj*dj<r*r && !obstacle[IX(mx+di,my+dj)]) {
+        ux[IX(mx+di,my+dj)] += dx*0.3;
+        uy[IX(mx+di,my+dj)] += dy*0.3;
+      }
+  [lastMX,lastMY]=[mx,my];
+});
+oCanvas.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  const t=e.touches[0];
+  const [mx,my]=getSimPos(t);
+  const dx=mx-lastMX,dy=my-lastMY;
+  const r=8;
+  for (let dj=-r; dj<=r; dj++)
+    for (let di=-r; di<=r; di++)
+      if (di*di+dj*dj<r*r && !obstacle[IX(mx+di,my+dj)]) {
+        ux[IX(mx+di,my+dj)]+=dx*0.4;
+        uy[IX(mx+di,my+dj)]+=dy*0.4;
+      }
+  [lastMX,lastMY]=[mx,my];
+},{passive:false});
+
+function getSimPos(e) {
+  const rect=oCanvas.getBoundingClientRect();
+  return [
+    ((e.clientX-rect.left)/rect.width *NX)|0,
+    ((e.clientY-rect.top )/rect.height*NY)|0
+  ];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTROLLI
+// ─────────────────────────────────────────────────────────────────────────────
+function setupSliders() {
+  const vel  = document.getElementById('velSlider');
+  const visc = document.getElementById('viscSlider');
+  const obs  = document.getElementById('obsSlider');
+
+  vel.oninput  = ()=>{ inletVel=parseFloat(vel.value);  document.getElementById('velVal').textContent=inletVel.toFixed(2); };
+  visc.oninput = ()=>{ viscosity=parseFloat(visc.value); document.getElementById('viscVal').textContent=viscosity.toFixed(4); };
+  obs.oninput  = ()=>{ obstSize=parseInt(obs.value); document.getElementById('obsVal').textContent=obstSize; buildObstacles(); };
+}
+
+function setVis(v) {
+  visualization=v;
+  ['Vort','Vel','Pres','Stream'].forEach(n=>{
+    document.getElementById('btn'+n).classList.toggle('active', 'btn'+n==='btn'+v.charAt(0).toUpperCase()+v.slice(1).replace('icity','').replace('ocity','').replace('sure','').replace('eam',''));
+  });
+  // Semplifica il toggle
+  document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function setScenario(s) {
+  currentScenario=s;
+  buildObstacles();
+  resetFields();
+}
+
+function resetFields() {
+  ux.fill(0); uy.fill(0); p.fill(0); smoke.fill(0); smoke0.fill(0);
+  for (let j=1; j<NY-1; j++) {
+    for (let i=0; i<NX; i++) {
+      if (!obstacle[IX(i,j)]) ux[IX(i,j)] = inletVel * (1-i/NX*0.1);
+    }
+  }
+}
+
+function resetSim() { resetFields(); stepCount=0; }
+
+function togglePause() {
+  paused=!paused;
+  document.getElementById('btnPause').textContent = paused ? '▶ Riprendi' : '⏸ Pausa';
+}
+
+function addTurbulence() {
+  for (let j=NY*0.1|0; j<NY*0.9|0; j++) {
+    for (let i=NX*0.1|0; i<NX*0.9|0; i++) {
+      if (!obstacle[IX(i,j)]) {
+        ux[IX(i,j)] += (Math.random()-0.5)*0.3;
+        uy[IX(i,j)] += (Math.random()-0.5)*0.3;
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOOP PRINCIPALE
+// ─────────────────────────────────────────────────────────────────────────────
+let lastTime=0, fps=0, fpsAlpha=0.05;
+
+function loop(ts) {
+  requestAnimationFrame(loop);
+  const dt_ = (ts-lastTime)/1000;
+  lastTime=ts;
+  fps = fps*(1-fpsAlpha) + (1/Math.max(0.001,dt_))*fpsAlpha;
+  document.getElementById('fpsDisplay').textContent = fps.toFixed(0)+' fps';
+  document.getElementById('stepDisplay').textContent = 'step '+stepCount;
+
+  if (!paused) {
+    step();
+    step(); // 2 passi per frame per maggiore velocità di evoluzione
+  }
+  render();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+function init() {
+  // Ridimensiona overlay canvas
+  const area = document.querySelector('.canvas-area');
+  oCanvas.width  = oCanvas.offsetWidth;
+  oCanvas.height = oCanvas.offsetHeight;
+
+  buildObstacles();
+  setupSliders();
+  initCanvas();
+  resetFields();
+
+  // Aggiungi piccola perturbazione iniziale per stimolare turbolenza
+  for (let j=1; j<NY-1; j++)
+    for (let i=1; i<NX-1; i++)
+      if (!obstacle[IX(i,j)]) {
+        uy[IX(i,j)] += (Math.random()-0.5)*0.02;
+      }
+
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener('resize', ()=>{
+  oCanvas.width=oCanvas.offsetWidth;
+  oCanvas.height=oCanvas.offsetHeight;
+});
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluidodinamica 2D — Navier–Stokes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+
+<style>
+:root {
+  --bg:      #f7f4ee;
+  --bg2:     #eeebe3;
+  --bg3:     #e4dfd4;
+  --panel:   #faf8f4;
+  --border:  #cdc5b4;
+  --border2: #b5aa96;
+  --text:    #26211c;
+  --text2:   #534a40;
+  --text3:   #8a7e6e;
+  --red:     #b83232;
+  --blue:    #1e5f8a;
+  --green:   #2a7a50;
+  --shadow:  rgba(60,45,30,0.10);
+  --mono:    'IBM Plex Mono', monospace;
+  --serif:   'EB Garamond', Georgia, serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 17px;
+}
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+header {
+  background: var(--panel);
+  border-bottom: 1.5px solid var(--border2);
+  padding: 12px 24px 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 6px var(--shadow);
+}
+
+header h1 {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+header .sub {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  color: var(--text3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.nav {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.nav a {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  text-decoration: none;
+  border-radius: 2px;
+  transition: all 0.12s;
+}
+
+.nav a:hover, .nav a.on {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+/* ── SIMULAZIONE ─────────────────────────────────────────────── */
+#sim {
+  display: flex;
+  height: calc(100vh - 49px);
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+.sidebar {
+  width: 248px;
+  flex-shrink: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.blk {
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.blk-title {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+/* Reynolds */
+.re-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+#reNum {
+  font-family: var(--serif);
+  font-size: 2.6rem;
+  font-weight: 400;
+  line-height: 1;
+  transition: color 0.35s;
+}
+
+.re-eq {
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  color: var(--text3);
+  margin: 2px 0 5px;
+}
+
+#reLabel {
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  transition: all 0.3s;
+}
+
+/* Sliders */
+.ctrl { margin-bottom: 9px; }
+.ctrl:last-child { margin-bottom: 0; }
+
+.ctrl-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text2);
+  margin-bottom: 3px;
+}
+
+.ctrl-row .v { color: var(--red); font-weight: 500; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%; height: 2px;
+  background: var(--bg3);
+  border-radius: 2px;
+  outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--red);
+  cursor: pointer;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+/* Buttons */
+.btn-col { display: flex; flex-direction: column; gap: 5px; }
+.btn-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+
+button {
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 7px 8px;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+  color: var(--text2);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.11s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+button:hover { background: var(--bg2); color: var(--text); }
+
+button.on {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+button.on2 {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+/* ── CANVAS ──────────────────────────────────────────────────── */
+.canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #ece8e0;
+}
+
+#simCanvas {
+  display: block; width: 100%; height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#overCanvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  cursor: crosshair;
+}
+
+.hud {
+  position: absolute; top: 9px; right: 10px;
+  font-family: var(--mono); font-size: 0.55rem;
+  color: rgba(60,45,30,0.45);
+  text-align: right; line-height: 2;
+  pointer-events: none;
+}
+
+.legend {
+  position: absolute; bottom: 10px; left: 10px;
+  background: rgba(250,248,244,0.88);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-family: var(--mono); font-size: 0.52rem;
+  color: var(--text2); line-height: 2;
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+}
+
+.dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.cbar-wrap {
+  position: absolute; bottom: 10px; right: 10px;
+  pointer-events: none;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+}
+
+.cbar-labels {
+  position: absolute; right: 18px; top: 0; height: 100px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-family: var(--mono); font-size: 0.48rem;
+  color: var(--text3); text-align: right;
+}
+
+#cbar { width: 12px; height: 100px; border: 1px solid var(--border); border-radius: 2px; }
+
+/* ── TEORIA ──────────────────────────────────────────────────── */
+#theory {
+  display: none;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 56px 40px 80px;
+}
+
+#theory h1 {
+  font-family: var(--serif);
+  font-size: 2.2rem;
+  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.t-sub {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 44px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border2);
+}
+
+#theory h2 {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-style: italic;
+  margin: 36px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+#theory h3 {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text2);
+  margin: 20px 0 5px;
+}
+
+#theory p {
+  margin-bottom: 13px;
+  line-height: 1.72;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.eq {
+  background: var(--bg2);
+  border-left: 3px solid var(--red);
+  padding: 14px 18px;
+  margin: 18px 0;
+  border-radius: 0 3px 3px 0;
+  overflow-x: auto;
+}
+
+.eq.b { border-color: var(--blue); }
+.eq.g { border-color: var(--green); }
+
+.eq-cap {
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  color: var(--text3);
+  letter-spacing: 0.07em;
+  margin-top: 5px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 12px 14px;
+}
+
+.card-label {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.card-re {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.card p { font-size: 0.87rem; line-height: 1.55; text-align: left; color: var(--text2); margin: 0; }
+
+.method {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px 18px;
+  margin: 16px 0;
+}
+
+.method ol { padding-left: 18px; margin-top: 8px; }
+.method li { font-size: 0.95rem; color: var(--text2); margin-bottom: 7px; line-height: 1.6; }
+.method li code {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  background: var(--bg3);
+  padding: 1px 5px;
+  border-radius: 2px;
+  color: var(--text);
+}
+
+hr.div { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
+
+.foot {
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  color: var(--text3);
+  text-align: center;
+  letter-spacing: 0.06em;
+}
+
+/* ── LOADING ─────────────────────────────────────────────────── */
+#loading {
+  position: absolute; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; z-index: 50;
+}
+
+.spin {
+  width: 28px; height: 28px;
+  border: 2px solid var(--border);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.load-txt {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fluidodinamica 2D — Navier–Stokes</h1>
+  <span class="sub">Stable Fluids · C/WebAssembly · 300×160</span>
+  <nav class="nav">
+    <a href="#" id="tabSim"    class="on"  onclick="showSim();    return false">Simulazione</a>
+    <a href="#" id="tabTheory"             onclick="showTheory(); return false">Teoria</a>
+  </nav>
+</header>
+
+<!-- ════════════ SIMULAZIONE ════════════ -->
+<section id="sim">
+
+  <aside class="sidebar">
+
+    <!-- Reynolds -->
+    <div class="blk">
+      <div class="blk-title">Numero di Reynolds</div>
+      <div class="re-box">
+        <div id="reNum">—</div>
+        <div class="re-eq">Re = u₀ · L / ν</div>
+        <span id="reLabel">—</span>
+      </div>
+    </div>
+
+    <!-- Scenari -->
+    <div class="blk">
+      <div class="blk-title">Scenario</div>
+      <div class="btn-col">
+        <button id="sc0" class="on"  onclick="loadScene(0)">Scia di Kármán (cilindro)</button>
+        <button id="sc1"             onclick="loadScene(1)">Due cilindri</button>
+        <button id="sc2"             onclick="loadScene(2)">Fessura / Venturi</button>
+        <button id="sc3"             onclick="loadScene(3)">Griglia di ostacoli</button>
+        <button id="sc4"             onclick="loadScene(4)">Gradino — ricircolazione</button>
+        <button id="sc5"             onclick="loadScene(5)">Kelvin–Helmholtz</button>
+      </div>
+    </div>
+
+    <!-- Parametri -->
+    <div class="blk">
+      <div class="blk-title">Parametri di flusso</div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span>Velocità u₀</span><span class="v" id="vv">0.15</span></div>
+        <input type="range" id="slVel" min="0.02" max="0.40" step="0.01" value="0.15">
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span>Viscosità ν</span><span class="v" id="vvisc">8×10⁻⁴</span></div>
+        <input type="range" id="slVisc" min="0.0001" max="0.006" step="0.0001" value="0.0008">
+      </div>
+    </div>
+
+    <!-- Visualizzazione -->
+    <div class="blk">
+      <div class="blk-title">Campo visualizzato</div>
+      <div class="btn-2">
+        <button id="viVort" class="on"  onclick="setVis('vorticity')">Vorticità ω</button>
+        <button id="viVel"              onclick="setVis('velocity')">Velocità |u|</button>
+        <button id="viPres"             onclick="setVis('pressure')">Pressione p</button>
+        <button id="viDye"              onclick="setVis('dye')">Tracciante</button>
+      </div>
+    </div>
+
+    <!-- Azioni -->
+    <div class="blk">
+      <div class="blk-title">Azioni</div>
+      <div class="btn-col">
+        <button onclick="doReset()">↺ Reset campi</button>
+        <button id="btnPause" onclick="togglePause()">⏸ Pausa</button>
+        <button onclick="doTurb()">⚡ Perturba flusso</button>
+      </div>
+    </div>
+
+    <div class="blk" style="font-family:var(--mono);font-size:0.56rem;color:var(--text3);line-height:1.9">
+      <div class="blk-title">Uso</div>
+      Per alzare Re: aumenta u₀ e/o abbassa ν.<br><br>
+      Trascina il mouse nel dominio per aggiungere forze locali.
+    </div>
+
+  </aside>
+
+  <div class="canvas-wrap">
+    <div id="loading">
+      <div class="spin"></div>
+      <div class="load-txt">caricamento fluid.js…</div>
+    </div>
+    <canvas id="simCanvas"></canvas>
+    <canvas id="overCanvas"></canvas>
+
+    <div class="hud">
+      <div id="fpsTxt">— fps</div>
+      <div id="stepTxt">step —</div>
+    </div>
+
+    <div class="legend">
+      <div><span class="dot" style="background:#b83232"></span>ω &lt; 0 — rotazione oraria</div>
+      <div><span class="dot" style="background:#1e5f8a"></span>ω &gt; 0 — rotazione antioraria</div>
+      <div><span class="dot" style="background:#888"></span>Ostacolo solido</div>
+    </div>
+
+    <div class="cbar-wrap">
+      <div class="cbar-labels"><span>+ω</span><span>0</span><span>−ω</span></div>
+      <canvas id="cbar" width="12" height="100"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ TEORIA ════════════ -->
+<section id="theory">
+
+  <h1>Fondamenti di Fluidodinamica:<br>Navier–Stokes e Instabilità</h1>
+  <div class="t-sub">Note di teoria — simulazione numerica 2D, fluido incomprimibile newtoniano</div>
+
+  <h2>1. Le equazioni di Navier–Stokes</h2>
+  <p>Le equazioni di Navier–Stokes (NS) per un fluido viscoso newtoniano incomprimibile derivano dall'applicazione del secondo principio della dinamica a un elemento fluido infinitesimo. Il termine sinistro è la <em>derivata materiale</em> (o sostanziale) della velocità: segue il fluido nel suo moto, sommando la variazione locale $\partial_t \mathbf{u}$ alla variazione convettiva $(\mathbf{u}\cdot\nabla)\mathbf{u}$.</p>
+
+  <div class="eq">
+    $$\rho\!\left(\frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u}\cdot\nabla)\mathbf{u}\right) = -\nabla p + \mu\,\nabla^2\mathbf{u} + \mathbf{f}$$
+    <div class="eq-cap">Equazione della quantità di moto — il termine convettivo non lineare è la sorgente della turbolenza.</div>
+  </div>
+
+  <div class="eq b">
+    $$\nabla \cdot \mathbf{u} = 0$$
+    <div class="eq-cap">Conservazione della massa per fluido incomprimibile (ρ = cost).</div>
+  </div>
+
+  <p>Il termine $(\mathbf{u}\cdot\nabla)\mathbf{u}$ è <em>non lineare</em> in $\mathbf{u}$: è la causa matematica della turbolenza e rende le NS uno dei problemi aperti del millennio in 3D. Il termine $\mu\nabla^2\mathbf{u}$ è la diffusione viscosa (dissipazione); tende a smorzare le fluttuazioni. La competizione tra questi due termini è catturata dal numero di Reynolds.</p>
+
+  <h3>Numero di Reynolds</h3>
+  <div class="eq g">
+    $$Re = \frac{\rho\,u_0\,L}{\mu} = \frac{u_0\,L}{\nu}$$
+    <div class="eq-cap">$u_0$ = velocità caratteristica, $L$ = scala geometrica (es. diametro), $\nu = \mu/\rho$ = viscosità cinematica.</div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Laminare stabile</div>
+      <div class="card-re" style="color:#2a7a50">Re &lt; 40</div>
+      <p>Flusso ordinato, simmetrico. Eventuale coppia di vortici stazionari nella scia. Soluzione unica e stabile alle perturbazioni.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Scia di Kármán</div>
+      <div class="card-re" style="color:#c07020">40 ≲ Re ≲ 200</div>
+      <p>Distacco periodico e alternato di vortici. Frequenza descritta dal numero di Strouhal $St = fL/u_0 \approx 0.2$.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Turbolenza incipiente</div>
+      <div class="card-re" style="color:#b83232">200 ≲ Re ≲ 1000</div>
+      <p>La scia diventa irregolare, i vortici interagiscono e si frammentano. Perdita della periodicità temporale.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Turbolenza sviluppata</div>
+      <div class="card-re" style="color:#7a1818">Re ≳ 1000</div>
+      <p>Cascata energetica verso scale più piccole (Kolmogorov). In 2D la cascata è inversa: energia verso scale grandi.</p>
+    </div>
+  </div>
+
+  <h2>2. Le instabilità simulate</h2>
+
+  <h3>Scia di von Kármán</h3>
+  <p>Dietro un cilindro per $Re \gtrsim 40$ la scia simmetrica diventa instabile: i vortici si distaccano alternativamente dai due lati, formando due file parallele di vortici di segno opposto. Questa struttura periodica esercita una forza oscillante trasversale sul corpo (lift alternante) alla stessa frequenza del distacco, quantificata dal numero di Strouhal. Il fenomeno è alla base della risonanza eoliana nei cavi (vibrazioni delle linee elettriche) e del collasso del ponte di Tacoma Narrows (1940).</p>
+
+  <h3>Instabilità di Kelvin–Helmholtz</h3>
+  <p>Quando due strati di fluido scorrono a velocità diverse, la loro interfaccia è soggetta all'instabilità di Kelvin–Helmholtz. In assenza di densità diverse e gravità, l'interfaccia è instabile per qualsiasi numero d'onda della perturbazione: ogni piccola ondulazione viene amplificata dal campo di pressione generato dalla velocità differenziale, e l'interfaccia si arrotola a formare i caratteristici "rotoli" vorticosi. Il criterio di stabilità in presenza di stratificazione di densità è il numero di Richardson:</p>
+
+  <div class="eq">
+    $$Ri = \frac{g}{\rho}\frac{\partial\rho/\partial z}{(\partial u/\partial z)^2} < \frac{1}{4}$$
+    <div class="eq-cap">Criterio di Miles–Howard: instabilità necessaria per $Ri &lt; 1/4$. Per densità omogenea $Ri = 0$ sempre.</div>
+  </div>
+
+  <h3>Separazione al gradino (backward-facing step)</h3>
+  <p>Un brusco allargamento della sezione forza la separazione del flusso dalla parete. Si forma una "bolla" di ricircolazione la cui lunghezza adimensionale $x_r/H$ cresce con $Re$. A valori sufficientemente alti la bolla stessa diventa instabile e il flusso nella zona di riattacco diventa turbolento: è un classico problema di validazione dei solver NS.</p>
+
+  <h2>3. Il metodo numerico: Stable Fluids</h2>
+  <p>La simulazione usa il metodo di <em>Stable Fluids</em> (Stam, 1999), progettato per essere incondizionatamente stabile: nessuna restrizione sul passo temporale. Ogni step è diviso in tre sotto-problemi via <em>operator splitting</em>:</p>
+
+  <div class="method">
+    <ol>
+      <li><strong>Diffusione implicita:</strong> si risolve $(I - \nu\Delta t\,\nabla^2)\mathbf{u}^* = \mathbf{u}^n$ con Gauss–Seidel (4 iter). Schema implicito: stabile per qualsiasi $\Delta t$, mentre lo schema esplicito richiederebbe $\Delta t &lt; \Delta x^2/(2\nu)$.</li>
+      <li><strong>Advection semi-lagrangiana:</strong> si calcola $\mathbf{u}^{**}(\mathbf{x}) = \mathbf{u}^*(\mathbf{x} - \mathbf{u}^*\Delta t)$ tracciando le caratteristiche a ritroso e interpolando bilinearmente. Stabile senza condizione CFL.</li>
+      <li><strong>Proiezione di Helmholtz–Hodge:</strong> si rimuove la componente a divergenza non-nulla risolvendo $\nabla^2 p = \nabla\cdot\mathbf{u}^{**}$ (Poisson, Gauss–Seidel 20 iter), poi $\mathbf{u}^{n+1} = \mathbf{u}^{**} - \nabla p$. Questo garantisce $\nabla\cdot\mathbf{u} = 0$ (incomprimibilità).</li>
+    </ol>
+  </div>
+
+  <h3>Vorticità e visualizzazione</h3>
+  <div class="eq g">
+    $$\omega = \frac{\partial u_y}{\partial x} - \frac{\partial u_x}{\partial y}$$
+    <div class="eq-cap">Vorticità 2D: componente z del rotore. Misura la rotazione locale del fluido.</div>
+  </div>
+  <p>La colormap bipolare (rosso per $\omega &lt; 0$, blu per $\omega &gt; 0$, nero per $\omega = 0$) rende immediatamente leggibili le strutture vorticose e la loro chiralità. Il tracciante passivo (dye) viene advettato dal campo di velocità senza influenzarlo, simulando l'iniezione di fumo o colorante in una galleria del vento.</p>
+
+  <h3>Implementazione C / WebAssembly</h3>
+  <p>Tutta la fisica è implementata in C puro (<code>fluid.c</code>), compilato con Emscripten per target WebAssembly. Il guadagno rispetto a JavaScript puro è tipicamente 4–8× su questi kernel: il compilatore C con <code>-O3 -ffast-math</code> può vettorializzare i loop interni, mentre il JIT di V8 fatica con accessi a indici calcolati dinamicamente. I buffer Float32 risiedono nella memoria lineare WASM e vengono letti direttamente dal renderer canvas via <code>HEAPF32</code> senza copia.</p>
+
+  <hr class="div">
+  <div class="foot">Simulazione didattica — Navier–Stokes 2D · Stable Fluids (Stam 1999) · C/WebAssembly</div>
+
+</section>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIGURAZIONE — modifica questi path se necessario
+// ═══════════════════════════════════════════════════════════
+const WASM_JS_PATH = 'fluid.js';   // file generato da Emscripten
+
+// Dimensioni griglia (devono corrispondere alle #define in fluid.c)
+const NX = 300, NY = 160, N = NX * NY;
+
+// ═══════════════════════════════════════════════════════════
+// STATO
+// ═══════════════════════════════════════════════════════════
+let M       = null;   // modulo Emscripten
+let vis     = 'vorticity';
+let paused  = false;
+let step_n  = 0;
+let scene   = 0;
+let vel     = 0.15;
+let visc    = 0.0008;
+let obstR   = 12;
+
+let lastTs  = 0, fps = 0;
+
+// Puntatori (offset in HEAPF32/HEAPU8)
+let pUx, pUy, pVort, pPres, pDye, pWall;
+
+// ═══════════════════════════════════════════════════════════
+// CARICAMENTO MODULO EMSCRIPTEN
+// ═══════════════════════════════════════════════════════════
+async function loadModule() {
+  return new Promise((resolve, reject) => {
+    // Emscripten con MODULARIZE=1 espone FluidModule()
+    const script = document.createElement('script');
+    script.src = WASM_JS_PATH;
+    script.onerror = () => reject(new Error('Impossibile caricare ' + WASM_JS_PATH));
+    script.onload = async () => {
+      try {
+        const mod = await FluidModule();
+        resolve(mod);
+      } catch(e) { reject(e); }
+    };
+    document.head.appendChild(script);
+  });
+}
+
+function getPtrs() {
+  pUx   = M._get_ux()   / 4;  // offset in Float32
+  pUy   = M._get_uy()   / 4;
+  pVort = M._get_vort()  / 4;
+  pPres = M._get_pres()  / 4;
+  pDye  = M._get_dye()   / 4;
+  pWall = M._get_wall();       // offset in Uint8
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCENARI
+// ═══════════════════════════════════════════════════════════
+function loadScene(id) {
+  scene = id;
+  // Deseleziona tutti i bottoni scenario
+  for (let i = 0; i < 6; i++) {
+    const b = document.getElementById('sc'+i);
+    if (b) b.classList.toggle('on', i === id);
+  }
+
+  if (!M) return;
+
+  if (id === 5) {
+    // Kelvin-Helmholtz: nessun ostacolo, init campo speciale
+    M._build_obstacle(5, obstR);
+    M._init_kelvin_helmholtz();
+  } else if (id === 2) {
+    // Fessura: param = larghezza gap
+    M._build_obstacle(2, NY * 28 / 100);
+    M._reset_fields();
+  } else {
+    M._build_obstacle(id, obstR);
+    M._reset_fields();
+  }
+  getPtrs();
+  step_n = 0;
+}
+
+// ═══════════════════════════════════════════════════════════
+// COLORMAP
+// ═══════════════════════════════════════════════════════════
+// Identica alla prima versione JS che funzionava
+function colorVort(v, maxV) {
+  const t = Math.max(-1, Math.min(1, v / maxV));
+  let r, g, b;
+  if (t > 0) {
+    r = (t * t * 60)|0;
+    g = (t * 130)|0;
+    b = Math.min(255, t * 255)|0;
+    if (t > 0.5) {
+      r = Math.min(255, r + ((t-0.5)*2*100)|0);
+      g = Math.min(255, g + ((t-0.5)*2*60 )|0);
+    }
+  } else {
+    const s = -t;
+    r = Math.min(255, s * 255)|0;
+    g = (s * s * 80)|0;
+    b = (s * s * 20)|0;
+    if (s > 0.5) g = Math.min(255, g + ((s-0.5)*2*80)|0);
+  }
+  return [r, g, b];
+}
+
+function colorVel(v, maxV) {
+  const t = Math.min(1, v / Math.max(maxV*0.8, 1e-4));
+  const r = Math.min(255, t < 0.5 ? t*2*200 : 200+(t-0.5)*2*55)|0;
+  const g = Math.min(255, t < 0.25 ? 0 : (t-0.25)/0.75*230)|0;
+  const b = Math.min(255, t < 0.15 ? t/0.15*160 : Math.max(0,160-(t-0.15)/0.85*160))|0;
+  return [r, g, b];
+}
+
+function colorPres(v, maxV) {
+  const t = Math.max(-1, Math.min(1, v / Math.max(maxV*0.6, 1e-4)));
+  return [t>0?(t*200)|0:0, 0, t<0?((-t)*200)|0:0];
+}
+
+// ═══════════════════════════════════════════════════════════
+// CANVAS & RENDERING
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('simCanvas');
+const ctx    = canvas.getContext('2d');
+let imgData, pixData;
+
+function initCanvas() {
+  canvas.width  = NX;
+  canvas.height = NY;
+  imgData = ctx.createImageData(NX, NY);
+  pixData = imgData.data;
+  drawCbar();
+}
+
+function drawCbar() {
+  const cb  = document.getElementById('cbar');
+  const cx  = cb.getContext('2d');
+  const h   = cb.height;
+  for (let y = 0; y < h; y++) {
+    const [r,g,b] = colorVort(1 - 2*y/h, 1);
+    cx.fillStyle = `rgb(${r},${g},${b})`;
+    cx.fillRect(0, y, 12, 1);
+  }
+}
+
+function render() {
+  if (!M) return;
+  M._compute_vorticity();
+
+  const F = M.HEAPF32;
+  const U = M.HEAPU8;
+
+  let maxV = 0.005, maxVel = 0.001, maxP = 0.001;
+  for (let k = 0; k < N; k++) {
+    if (U[pWall+k]) continue;
+    const av = Math.abs(F[pVort+k]);
+    if (av > maxV) maxV = av;
+    const vel2 = Math.sqrt(F[pUx+k]*F[pUx+k] + F[pUy+k]*F[pUy+k]);
+    if (vel2 > maxVel) maxVel = vel2;
+    const ap = Math.abs(F[pPres+k]);
+    if (ap > maxP) maxP = ap;
+  }
+
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      const k  = i + j*NX;
+      const pi = k * 4;
+      if (U[pWall+k]) {
+        pixData[pi]=120; pixData[pi+1]=115; pixData[pi+2]=105; pixData[pi+3]=255;
+        continue;
+      }
+      let r, g, b;
+      if (vis === 'vorticity') {
+        [r,g,b] = colorVort(F[pVort+k], maxV * 0.5);
+        const s = F[pDye+k] * 25;
+        r=Math.min(255,r+s|0); g=Math.min(255,g+s|0); b=Math.min(255,b+s|0);
+      } else if (vis === 'velocity') {
+        const spd = Math.sqrt(F[pUx+k]*F[pUx+k]+F[pUy+k]*F[pUy+k]);
+        [r,g,b] = colorVel(spd, maxVel);
+      } else if (vis === 'pressure') {
+        [r,g,b] = colorPres(F[pPres+k], maxP);
+      } else {
+        const d = Math.min(1, F[pDye+k]);
+        r=(220-d*160)|0; g=(215-d*80)|0; b=(200+d*30)|0;
+      }
+      pixData[pi]=r; pixData[pi+1]=g; pixData[pi+2]=b; pixData[pi+3]=255;
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+function updateHUD() {
+  const Re = (vel * obstR * 2 / visc)|0;
+  const reEl = document.getElementById('reNum');
+  const lb   = document.getElementById('reLabel');
+  reEl.textContent = Re.toLocaleString('it');
+
+  let color, label;
+  if      (Re < 40)   { color='#2a7a50'; label='Laminare'; }
+  else if (Re < 150)  { color='#c07020'; label='Scia di Kármán'; }
+  else if (Re < 600)  { color='#b83232'; label='Turbolenza incipiente'; }
+  else                { color='#7a1818'; label='Turbolenza'; }
+
+  reEl.style.color    = color;
+  lb.textContent      = label;
+  lb.style.color      = color;
+  lb.style.borderColor= color + '55';
+  lb.style.background = color + '11';
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOOP
+// ═══════════════════════════════════════════════════════════
+function loop(ts) {
+  requestAnimationFrame(loop);
+  const dt_ = (ts - lastTs) / 1000;
+  lastTs = ts;
+  fps = fps * 0.95 + (1 / Math.max(0.001, dt_)) * 0.05;
+  document.getElementById('fpsTxt').textContent  = fps.toFixed(0) + ' fps';
+  document.getElementById('stepTxt').textContent = 'step ' + step_n;
+
+  if (!paused && M) {
+    M._step();
+    M._step();
+    // ricarica dye all'inlet (scenari con flusso da sx)
+    if (scene !== 5) M._refresh_inlet_dye(20);
+    step_n++;
+  }
+  render();
+  updateHUD();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MOUSE
+// ═══════════════════════════════════════════════════════════
+const oCanvas = document.getElementById('overCanvas');
+let mDown = false, mX = 0, mY = 0;
+
+function simXY(e) {
+  const r = oCanvas.getBoundingClientRect();
+  return [
+    ((e.clientX - r.left) / r.width  * NX)|0,
+    ((e.clientY - r.top)  / r.height * NY)|0,
+  ];
+}
+
+oCanvas.addEventListener('mousedown',  e => { mDown=true; [mX,mY]=simXY(e); });
+oCanvas.addEventListener('mouseup',    () => mDown=false);
+oCanvas.addEventListener('mouseleave', () => mDown=false);
+oCanvas.addEventListener('mousemove',  e => {
+  if (!mDown || !M) return;
+  const [x,y] = simXY(e);
+  M._add_force(x, y, (x-mX)*0.3, (y-mY)*0.3, 7);
+  [mX,mY] = [x,y];
+});
+
+// ═══════════════════════════════════════════════════════════
+// CONTROLLI
+// ═══════════════════════════════════════════════════════════
+document.getElementById('slVel').oninput = function() {
+  vel = parseFloat(this.value);
+  document.getElementById('vv').textContent = vel.toFixed(2);
+  if (M) M._set_params(vel, visc);
+};
+
+document.getElementById('slVisc').oninput = function() {
+  visc = parseFloat(this.value);
+  const e = visc.toExponential(1);
+  document.getElementById('vvisc').textContent = e;
+  if (M) M._set_params(vel, visc);
+};
+
+function setVis(v) {
+  vis = v;
+  ['viVort','viVel','viPres','viDye'].forEach(id => document.getElementById(id).classList.remove('on'));
+  const map = {vorticity:'viVort', velocity:'viVel', pressure:'viPres', dye:'viDye'};
+  document.getElementById(map[v]).classList.add('on');
+}
+
+function doReset() { if (M) { step_n=0; loadScene(scene); } }
+
+function togglePause() {
+  paused = !paused;
+  document.getElementById('btnPause').textContent = paused ? '▶ Riprendi' : '⏸ Pausa';
+}
+
+function doTurb() { if (M) M._add_turbulence(0.08); }
+
+function showSim() {
+  document.getElementById('sim').style.display    = 'flex';
+  document.getElementById('theory').style.display = 'none';
+  document.getElementById('tabSim').classList.add('on');
+  document.getElementById('tabTheory').classList.remove('on');
+}
+
+function showTheory() {
+  document.getElementById('sim').style.display    = 'none';
+  document.getElementById('theory').style.display = 'block';
+  document.getElementById('tabTheory').classList.add('on');
+  document.getElementById('tabSim').classList.remove('on');
+  if (window.renderMathInElement)
+    renderMathInElement(document.getElementById('theory'));
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+function resizeOverlay() {
+  oCanvas.width  = oCanvas.offsetWidth;
+  oCanvas.height = oCanvas.offsetHeight;
+}
+
+async function init() {
+  initCanvas();
+  resizeOverlay();
+  window.addEventListener('resize', resizeOverlay);
+
+  const ldEl = document.getElementById('loading');
+  try {
+    M = await loadModule();
+    getPtrs();
+    M._set_params(vel, visc);
+    loadScene(0);
+    ldEl.style.display = 'none';
+    requestAnimationFrame(loop);
+  } catch(e) {
+    ldEl.innerHTML = `<div style="font-family:var(--mono);font-size:0.65rem;color:#b83232;padding:20px;text-align:center">
+      Errore: ${e.message}<br><br>
+      Assicurati che <code>fluid.js</code> e <code>fluid.wasm</code><br>
+      siano nella stessa cartella di questo file HTML.
+    </div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>

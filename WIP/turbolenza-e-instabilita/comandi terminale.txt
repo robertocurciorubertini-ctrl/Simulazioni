@@ -1,0 +1,18 @@
+Comandi per entrare nell'ambiente Emscripten:
+
+cd C:\Users\rober\emsdk
+emsdk_env.bat
+
+
+comando per generare file trasporto particelle:
+
+cd \Users\rober\OneDrive\Desktop\Simulazioni\WIP\turbolenza-e-instabilita
+
+emcc fluid.c -O3 -o fluid.js \
+  -s EXPORTED_FUNCTIONS='["_step","_compute_vorticity","_add_force","_add_turbulence","_set_params","_reset_fields","_build_obstacle","_init_kelvin_helmholtz","_refresh_inlet_dye","_get_ux","_get_uy","_get_vort","_get_pres","_get_dye","_get_wall"]' \
+  -s EXPORTED_RUNTIME_METHODS='["cwrap","HEAPF32","HEAPU8"]' \
+  -s ALLOW_MEMORY_GROWTH=1 \
+  -s MODULARIZE=1 \
+  -s EXPORT_NAME='FluidModule' \
+  -lm
+

@@ -1,0 +1,11 @@
+Comandi per entrare nell'ambiente Emscripten:
+
+cd C:\Users\rober\emsdk
+emsdk_env.bat
+
+
+comando per generare file trasporto particelle:
+
+cd \Users\rober\OneDrive\Desktop\Simulazioni\WIP\trasporto-particelle
+emcc transport.c -O3 -o transport.js -s EXPORTED_FUNCTIONS='["_sim_init","_sim_step","_sim_reset","_set_source","_get_fluence_n","_get_fluence_p","_get_fluence_e","_get_dose","_get_tracks_buffer","_get_track_count","_get_track_stride","_get_total_histories","_get_total_fissions","_get_total_captures","_get_total_scatterings","_set_geometry","_get_mat_grid"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' -s ALLOW_MEMORY_GROWTH=1 -s INITIAL_MEMORY=67108864 -s ENVIRONMENT='web'
+

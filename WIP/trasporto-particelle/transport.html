@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Trasporto di particelle",
+  "description": "Simulazione Monte Carlo del trasporto di neutroni, fotoni ed elettroni in materiali diversi, con visualizzazione di tracce, fluenza, dose e principali processi di interazione.",
+  "category": "Fisica nucleare",
+  "icon": "☢️",
+  "order": 10,
+  "tags": ["trasporto di particelle", "monte carlo", "neutroni", "fotoni", "elettroni", "dose", "fluenza", "interazioni radiazione-materia"],
+  "level": "avanzato"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulazione Trasporto di Particelle — Monte Carlo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Exo+2:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   RESET & BASE
+   ══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #060a10;
+  --bg2:       #0c1220;
+  --bg3:       #111b2e;
+  --border:    #1e3050;
+  --accent:    #00d4ff;
+  --accent2:   #ff6b35;
+  --accent3:   #39ff14;
+  --warn:      #ffcc00;
+  --text:      #c8ddf0;
+  --text-dim:  #4a6a8a;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-ui:   'Rajdhani', sans-serif;
+  --font-body: 'Exo 2', sans-serif;
+
+  /* Colori particelle */
+  --col-neutron:  #39ff14;
+  --col-photon:   #ffcc00;
+  --col-electron: #00a8ff;
+  --col-positron: #ff3399;
+  --col-fission:  #ff6b35;
+
+  /* Colori materiali */
+  --col-vacuum:   #060a10;
+  --col-air:      #0d1a2e;
+  --col-water:    #0a3d6b;
+  --col-iron:     #3a4a5a;
+  --col-lead:     #2a1a3a;
+  --col-u235:     #4a0000;
+  --col-concrete: #2a2a1a;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════
+   LAYOUT PRINCIPALE
+   ══════════════════════════════════════════════ */
+#app {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  grid-template-rows: 48px 1fr 180px;
+  height: 100vh;
+  gap: 1px;
+  background: var(--border);
+}
+
+/* Header */
+#header {
+  grid-column: 1 / -1;
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 20px;
+  border-bottom: 1px solid var(--border);
+}
+#header h1 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+#header h1 span { color: var(--text-dim); }
+.header-stat {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+.header-stat b { color: var(--accent3); font-weight: normal; }
+#status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent3);
+  box-shadow: 0 0 8px var(--accent3);
+  margin-left: auto;
+  transition: background 0.3s;
+}
+#status-dot.paused { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+#status-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+
+/* Pannelli laterali */
+.panel {
+  background: var(--bg2);
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.panel::-webkit-scrollbar { width: 4px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.panel-section {
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.panel-section-title {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--bg3);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-section-body { padding: 8px 10px; }
+
+/* Area canvas principale */
+#canvas-container {
+  position: relative;
+  background: var(--bg);
+  overflow: hidden;
+  cursor: crosshair;
+}
+#canvas-main  { position: absolute; top: 0; left: 0; }
+#canvas-track { position: absolute; top: 0; left: 0; pointer-events: none; }
+#canvas-overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
+
+/* Footer / grafici */
+#footer {
+  grid-column: 1 / -1;
+  background: var(--bg2);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1px;
+  border-top: 1px solid var(--border);
+}
+.footer-chart {
+  position: relative;
+  background: var(--bg2);
+  padding: 6px 10px 4px;
+}
+.footer-chart-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+
+/* ══════════════════════════════════════════════
+   CONTROLLI UI
+   ══════════════════════════════════════════════ */
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ctrl-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  flex: 0 0 90px;
+}
+.ctrl-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  flex: 0 0 50px;
+  text-align: right;
+}
+
+input[type=range] {
+  flex: 1;
+  height: 3px;
+  -webkit-appearance: none;
+  background: var(--border);
+  outline: none;
+  border-radius: 2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 4px var(--accent);
+}
+
+select {
+  flex: 1;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 3px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  outline: none;
+}
+select:focus { border-color: var(--accent); }
+
+button {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 11px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--bg3);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+button:hover { border-color: var(--accent); color: var(--accent); }
+button.primary { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.05); }
+button.primary:hover { background: rgba(0,212,255,0.15); }
+button.danger { border-color: #ff4444; color: #ff4444; }
+button.danger:hover { background: rgba(255,68,68,0.1); }
+button.active { background: rgba(57,255,20,0.1); border-color: var(--accent3); color: var(--accent3); }
+
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Legenda particelle */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Palette materiali */
+.mat-palette {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.mat-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  background: var(--bg3);
+}
+.mat-btn:hover, .mat-btn.selected { border-color: var(--accent); color: var(--text); }
+.mat-swatch { width: 10px; height: 10px; border-radius: 1px; flex-shrink: 0; }
+
+/* Stat box */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.stat-box {
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 5px 7px;
+  background: var(--bg);
+}
+.stat-box-label { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.stat-box-val   { font-family: var(--font-mono); font-size: 14px; color: var(--accent3); margin-top: 1px; }
+
+/* Brush size indicator */
+#brush-preview {
+  width: 40px; height: 40px;
+  border: 1px dashed var(--border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Tooltip */
+#tooltip {
+  position: absolute;
+  background: rgba(12, 18, 32, 0.95);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text);
+  pointer-events: none;
+  display: none;
+  z-index: 100;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ HEADER ══ -->
+  <div id="header">
+    <h1>TRASPORTO <span>DI</span> PARTICELLE <span>—</span> MC</h1>
+    <div class="header-stat">STORIE <b id="hd-hist">0</b></div>
+    <div class="header-stat">FISSIONI <b id="hd-fiss">0</b></div>
+    <div class="header-stat">CATTURE <b id="hd-capt">0</b></div>
+    <div class="header-stat">SCATTERING <b id="hd-scat">0</b></div>
+    <div class="header-stat">FPS <b id="hd-fps">0</b></div>
+    <div id="status-dot"></div>
+    <div id="status-label">IN ESECUZIONE</div>
+  </div>
+
+  <!-- ══ PANNELLO SINISTRO ══ -->
+  <div class="panel" id="panel-left">
+
+    <!-- Sorgente -->
+    <div class="panel-section">
+      <div class="panel-section-title">Sorgente</div>
+      <div class="panel-section-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label">Particella</div>
+          <select id="src-type">
+            <option value="0">Neutrone</option>
+            <option value="1">Fotone</option>
+            <option value="2">Elettrone</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Energia</div>
+          <input type="range" id="src-energy" min="0.01" max="14" step="0.01" value="2.0">
+          <div class="ctrl-val" id="src-energy-val">2.00 MeV</div>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Storie/step</div>
+          <input type="range" id="n-primary" min="1" max="50" step="1" value="5">
+          <div class="ctrl-val" id="n-primary-val">5</div>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Emissione</div>
+          <select id="src-mode">
+            <option value="1">Isotropica</option>
+            <option value="0">Direzionale →</option>
+          </select>
+        </div>
+        <div class="btn-row" style="margin-top:6px">
+          <button class="primary" id="btn-play" onclick="toggleRun()">⏸ PAUSA</button>
+          <button class="danger" onclick="resetSim()">↺ RESET</button>
+        </div>
+        <div style="margin-top:6px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">
+          Click sul canvas per riposizionare la sorgente
+        </div>
+      </div>
+    </div>
+
+    <!-- Visualizzazione -->
+    <div class="panel-section">
+      <div class="panel-section-title">Visualizzazione</div>
+      <div class="panel-section-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label">Mappa</div>
+          <select id="view-mode">
+            <option value="dose">Dose (Gy)</option>
+            <option value="fluence_n">Fluenza N</option>
+            <option value="fluence_p">Fluenza γ</option>
+            <option value="fluence_e">Fluenza e⁻</option>
+            <option value="material">Materiale</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Tracce</div>
+          <select id="track-mode">
+            <option value="all">Tutte</option>
+            <option value="neutron">Solo N</option>
+            <option value="photon">Solo γ</option>
+            <option value="electron">Solo e⁻/e⁺</option>
+            <option value="none">Nascondi</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Fade tracce</div>
+          <input type="range" id="track-fade" min="0.90" max="0.999" step="0.001" value="0.97">
+          <div class="ctrl-val" id="track-fade-val">0.97</div>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Saturazione</div>
+          <input type="range" id="dose-scale" min="0.1" max="5.0" step="0.05" value="1.0">
+          <div class="ctrl-val" id="dose-scale-val">1.0×</div>
+        </div>
+        <div class="ctrl-row" style="margin-top:4px">
+          <input type="checkbox" id="show-grid" style="margin-right:4px">
+          <label for="show-grid" style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">Griglia materiali</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legenda -->
+    <div class="panel-section">
+      <div class="panel-section-title">Legenda Particelle</div>
+      <div class="panel-section-body">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--col-neutron);box-shadow:0 0 4px var(--col-neutron)"></div>Neutrone (n)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--col-photon);box-shadow:0 0 4px var(--col-photon)"></div>Fotone (γ)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--col-electron);box-shadow:0 0 4px var(--col-electron)"></div>Elettrone (e⁻)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--col-positron);box-shadow:0 0 4px var(--col-positron)"></div>Positrone (e⁺)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--col-fission);box-shadow:0 0 4px var(--col-fission)"></div>Evento fissione</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CANVAS CENTRALE ══ -->
+  <div id="canvas-container">
+    <canvas id="canvas-main"></canvas>
+    <canvas id="canvas-track"></canvas>
+    <canvas id="canvas-overlay"></canvas>
+    <div id="tooltip"></div>
+  </div>
+
+  <!-- ══ PANNELLO DESTRO ══ -->
+  <div class="panel" id="panel-right">
+
+    <!-- Editor geometria -->
+    <div class="panel-section">
+      <div class="panel-section-title">Editor Geometria</div>
+      <div class="panel-section-body">
+        <div class="mat-palette" id="mat-palette"></div>
+        <div class="ctrl-row" style="margin-top:8px">
+          <div class="ctrl-label">Pennello</div>
+          <input type="range" id="brush-size" min="1" max="20" step="1" value="3">
+          <div id="brush-preview">
+            <div id="brush-dot" style="background:var(--accent);border-radius:50%;"></div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:6px">
+          <button onclick="loadPreset('default')">Preset: Reattore</button>
+          <button onclick="loadPreset('shield')">Schermatura</button>
+          <button onclick="clearGeometry()">Pulisci</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiche fisiche -->
+    <div class="panel-section">
+      <div class="panel-section-title">Statistiche Fisiche</div>
+      <div class="panel-section-body">
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-box-label">Storie totali</div>
+            <div class="stat-box-val" id="stat-hist">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">Fissioni</div>
+            <div class="stat-box-val" id="stat-fiss" style="color:var(--col-fission)">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">Catture</div>
+            <div class="stat-box-val" id="stat-capt" style="color:var(--col-photon)">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">Scattering</div>
+            <div class="stat-box-val" id="stat-scat" style="color:var(--col-neutron)">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">k_eff (stimato)</div>
+            <div class="stat-box-val" id="stat-keff" style="color:var(--warn)">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">Dose max (Gy)</div>
+            <div class="stat-box-val" id="stat-dose">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sezioni d'urto al cursore -->
+    <div class="panel-section">
+      <div class="panel-section-title">Sezioni d'Urto (Cursore)</div>
+      <div class="panel-section-body" id="xs-display" style="font-family:var(--font-mono);font-size:10px;line-height:1.8;color:var(--text-dim)">
+        Sposta il cursore sul canvas
+      </div>
+    </div>
+
+    <!-- Info materiali -->
+    <div class="panel-section">
+      <div class="panel-section-title">Materiali — Proprietà</div>
+      <div class="panel-section-body" id="mat-info" style="font-family:var(--font-mono);font-size:9px;line-height:1.7;color:var(--text-dim)">
+        Seleziona un materiale
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <div id="footer">
+    <div class="footer-chart">
+      <div class="footer-chart-title">SPETTRO ENERGETICO — NEUTRONI</div>
+      <canvas id="chart-neut" style="width:100%;height:120px"></canvas>
+    </div>
+    <div class="footer-chart">
+      <div class="footer-chart-title">SPETTRO ENERGETICO — FOTONI</div>
+      <canvas id="chart-phot" style="width:100%;height:120px"></canvas>
+    </div>
+    <div class="footer-chart">
+      <div class="footer-chart-title">PROFILO DI DOSE — asse X</div>
+      <canvas id="chart-dose" style="width:100%;height:120px"></canvas>
+    </div>
+    <div class="footer-chart">
+      <div class="footer-chart-title">STORIA FISSIONI / CATTURE</div>
+      <canvas id="chart-hist" style="width:100%;height:120px"></canvas>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   COSTANTI FISICHE (specchio del C)
+   ══════════════════════════════════════════════════════════════════════ */
+const PI         = Math.PI;
+const TWO_PI     = 2 * PI;
+const M_E_MEV    = 0.510998950;
+const R_E_CM     = 2.8179403227e-13;
+const AVOGADRO   = 6.02214076e23;
+const E_PAIR     = 1.021999;
+
+const GRID_W     = 200;
+const GRID_H     = 200;
+const CELL_CM    = 0.1;
+const DOMAIN_W   = GRID_W * CELL_CM;
+const DOMAIN_H   = GRID_H * CELL_CM;
+
+/* ══════════════════════════════════════════════════════════════════════
+   MATERIALI
+   ══════════════════════════════════════════════════════════════════════ */
+const MAT = {
+  VACUUM:   0, AIR: 1, WATER: 2, IRON: 3,
+  LEAD:     4, U235: 5, CONCRETE: 6
+};
+const MAT_NAMES    = ['Vuoto','Aria','Acqua','Ferro','Piombo','U-235','Cemento'];
+const MAT_COLORS   = ['#060a10','#0d1a2e','#0a3d6b','#3a4a5a','#2a1a3a','#6b0000','#2a2a1a'];
+const MAT_COLORS_B = ['transparent','#0d2040','#0a4d8b','#4a5a6a','#3a2a4a','#8b1a1a','#3a3a2a'];
+
+const MATERIALS = [
+  { name:'Vuoto',   density:0,       Z:0,    A:0,      I_eV:0,    sig_s:0,   sig_c:0,    sig_f:0,    nu:0,    Ef:0,    rho_e:0       },
+  { name:'Aria',    density:1.293e-3, Z:7.36, A:14.5,   I_eV:85.7, sig_s:10,  sig_c:1,    sig_f:0,    nu:0,    Ef:0,    mu_pe:3e-4, mu_c:0.1535, mu_pp:0 },
+  { name:'Acqua',   density:1.0,      Z:7.22, A:11.9,   I_eV:75.0, sig_s:20,  sig_c:0.3,  sig_f:0,    nu:0,    Ef:0,    mu_pe:0.0025,mu_c:0.0706, mu_pp:0 },
+  { name:'Ferro',   density:7.874,    Z:26,   A:55.85,  I_eV:286,  sig_s:2.5, sig_c:2.6,  sig_f:0,    nu:0,    Ef:0,    mu_pe:0.0294,mu_c:0.0595, mu_pp:0.00567 },
+  { name:'Piombo',  density:11.35,    Z:82,   A:207.2,  I_eV:823,  sig_s:11,  sig_c:0.17, sig_f:0,    nu:0,    Ef:0,    mu_pe:5.55,  mu_c:0.0455, mu_pp:0.0457 },
+  { name:'U-235',   density:18.95,    Z:92,   A:235,    I_eV:890,  sig_s:4,   sig_c:99,   sig_f:584,  nu:2.43, Ef:200,  mu_pe:8.0,   mu_c:0.0370, mu_pp:0.0827 },
+  { name:'Cemento', density:2.3,      Z:11,   A:22,     I_eV:135.7,sig_s:3,   sig_c:0.1,  sig_f:0,    nu:0,    Ef:0,    mu_pe:0.0023,mu_c:0.0639, mu_pp:3.2e-4 }
+];
+
+/* ══════════════════════════════════════════════════════════════════════
+   RNG — xoshiro128** (JS a 32-bit)
+   ══════════════════════════════════════════════════════════════════════ */
+let s0=123456789, s1=362436069, s2=521288629, s3=88675123;
+function rotl32(x,k){return ((x<<k)|(x>>>(32-k)))>>>0;}
+function rng(){
+  const res=(rotl32((s1*5)>>>0,7)*9)>>>0;
+  const t=(s1<<17)>>>0;
+  s2=(s2^s0)>>>0; s3=(s3^s1)>>>0;
+  s1=(s1^s2)>>>0; s0=(s0^s3)>>>0;
+  s2=(s2^t)>>>0; s3=rotl32(s3,45)>>>0;
+  return res/4294967296;
+}
+function rng_seed(seed){
+  function splitmix(x){ x=((x+0x9e3779b9)>>>0); x=((x^(x>>>16))*0x85ebca6b)>>>0; x=((x^(x>>>13))*0xc2b2ae35)>>>0; return (x^(x>>>16))>>>0; }
+  s0=splitmix(seed); s1=splitmix(s0); s2=splitmix(s1); s3=splitmix(s2);
+}
+rng_seed(0xDEADBEEF);
+
+/* ══════════════════════════════════════════════════════════════════════
+   FISICA — sezioni d'urto (speculare al C)
+   ══════════════════════════════════════════════════════════════════════ */
+
+function neutron_xs(mid, E){
+  const m=MATERIALS[mid];
+  if(!m.density||!m.A) return {s:0,c:0,f:0,tot:0};
+  const N=AVOGADRO*m.density/m.A;
+  const E_th=2.53e-8, barn=1e-24;
+  const sig_s = m.sig_s * Math.pow(1/Math.max(E,1e-10), 0.1);
+  const sig_c = m.sig_c * Math.sqrt(E_th/Math.max(E,E_th));
+  let   sig_f = m.sig_f * Math.sqrt(E_th/Math.max(E,E_th));
+  if(E>1) sig_f *= (0.3+0.7*Math.exp(-(E-1)/2));
+  const Σs=N*sig_s*barn, Σc=N*sig_c*barn, Σf=N*sig_f*barn;
+  return {s:Σs, c:Σc, f:Σf, tot:Σs+Σc+Σf};
+}
+
+function kn_total(E){
+  const k=E/M_E_MEV;
+  if(k<1e-6) return 8*PI*R_E_CM*R_E_CM/3;
+  const ln1p2k=Math.log(1+2*k);
+  const t1=(1+k)/(k*k)*(2*(1+k)/(1+2*k)-ln1p2k/k);
+  const t2=ln1p2k/(2*k);
+  const t3=-(1+3*k)/((1+2*k)**2);
+  return 2*PI*R_E_CM*R_E_CM*(t1+t2+t3);
+}
+
+function photon_xs(mid, E){
+  const m=MATERIALS[mid];
+  if(!m.density) return {pe:0,c:0,pp:0,tot:0};
+  const pe_rho  = m.mu_pe * Math.pow(1/Math.max(E,0.001),3.5);
+  const n_e_mol = AVOGADRO*m.Z/m.A;
+  const c_rho   = n_e_mol*kn_total(E);
+  let pp_rho=0;
+  if(E>E_PAIR && m.mu_pp>0){
+    const lf=Math.log(2*E/M_E_MEV)/Math.log(2/M_E_MEV);
+    pp_rho=m.mu_pp*Math.max(lf,0);
+  }
+  const pe=m.density*pe_rho, c=m.density*c_rho, pp=m.density*pp_rho;
+  return {pe, c, pp, tot:pe+c+pp};
+}
+
+function bethe_bloch(mid, E){
+  const m=MATERIALS[mid];
+  if(!m.density||!m.Z) return 0;
+  const tau=E/M_E_MEV;
+  const b2=tau*(tau+2)/((tau+1)**2);
+  if(b2<=0) return 0;
+  const I=m.I_eV*1e-6;
+  const arg=2*M_E_MEV*b2*tau*(tau+2)/(I*I);
+  if(arg<=1) return 0;
+  let delta=0;
+  if(b2>0.01) delta=Math.max(0, 2*Math.log(Math.sqrt(b2/(1-b2)))-1);
+  return Math.max(0, 0.307075*(m.Z/m.A)*m.density/b2*(0.5*Math.log(arg)-b2-delta/2));
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   STATO SIMULAZIONE
+   ══════════════════════════════════════════════════════════════════════ */
+const MAX_P     = 3000;   /* particelle attive per step */
+const MAX_SEC   = 8000;
+const MAX_TR    = 500;    /* tracce per frame render */
+const TRACK_PTS = 48;
+
+let matGrid   = new Uint8Array(GRID_H*GRID_W);
+let fluenceN  = new Float32Array(GRID_H*GRID_W);
+let fluenceP  = new Float32Array(GRID_H*GRID_W);
+let fluenceE  = new Float32Array(GRID_H*GRID_W);
+let doseMap   = new Float32Array(GRID_H*GRID_W);
+
+let totalHist=0, totalFiss=0, totalCapt=0, totalScat=0;
+let fissHistory=[], captHistory=[];
+
+/* Sorgente */
+let srcX=10, srcY=10, srcE=2.0, srcType=0, srcIso=1;
+let srcDx=1, srcDy=0;
+
+/* Per spettri energetici (bin logaritmici) */
+const N_BINS = 80;
+const E_MIN_BIN = 1e-8, E_MAX_BIN = 20;
+let specNeut = new Float32Array(N_BINS);
+let specPhot = new Float32Array(N_BINS);
+
+function eBin(E){
+  const logE=Math.log10(Math.max(E,E_MIN_BIN)/E_MIN_BIN)/Math.log10(E_MAX_BIN/E_MIN_BIN);
+  return Math.min(N_BINS-1, Math.max(0, Math.floor(logE*N_BINS)));
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   GEOMETRIA DEFAULT
+   ══════════════════════════════════════════════════════════════════════ */
+function loadPreset(name){
+  matGrid.fill(MAT.WATER);
+  if(name==='default'||name===undefined){
+    // Reattore: nocciolo U-235 + riflettore acqua + schermatura piombo
+    for(let y=0;y<GRID_H;y++) for(let x=0;x<GRID_W;x++){
+      const dx=x-60, dy=y-100;
+      if(dx*dx+dy*dy<=15*15) matGrid[y*GRID_W+x]=MAT.U235;
+    }
+    for(let y=60;y<140;y++) for(let x=120;x<160;x++)
+      matGrid[y*GRID_W+x]=MAT.LEAD;
+    for(let y=80;y<120;y++) for(let x=160;x<185;x++)
+      matGrid[y*GRID_W+x]=MAT.CONCRETE;
+    srcX=(60*CELL_CM); srcY=(100*CELL_CM); srcE=2.0; srcType=0;
+  } else if(name==='shield'){
+    matGrid.fill(MAT.AIR);
+    for(let y=30;y<170;y++) for(let x=80;x<100;x++) matGrid[y*GRID_W+x]=MAT.LEAD;
+    for(let y=30;y<170;y++) for(let x=110;x<130;x++) matGrid[y*GRID_W+x]=MAT.IRON;
+    for(let y=30;y<170;y++) for(let x=140;x<170;x++) matGrid[y*GRID_W+x]=MAT.CONCRETE;
+    srcX=2; srcY=10; srcE=1.25; srcType=1; srcIso=0; srcDx=1; srcDy=0;
+    document.getElementById('src-type').value='1';
+    document.getElementById('src-energy').value=1.25;
+    document.getElementById('src-mode').value='0';
+    updateSliderLabels();
+  }
+  renderMaterial();
+  resetAccumulators();
+}
+function clearGeometry(){
+  matGrid.fill(MAT.AIR);
+  renderMaterial();
+  resetAccumulators();
+}
+function resetAccumulators(){
+  fluenceN.fill(0); fluenceP.fill(0); fluenceE.fill(0); doseMap.fill(0);
+  totalHist=0; totalFiss=0; totalCapt=0; totalScat=0;
+  specNeut.fill(0); specPhot.fill(0);
+  fissHistory=[]; captHistory=[];
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MOTORE FISICA JAVASCRIPT
+   ══════════════════════════════════════════════════════════════════════ */
+
+function sampleIso(){ const a=TWO_PI*rng(); return [Math.cos(a),Math.sin(a)]; }
+function rotatDir(dx,dy,ct,st){
+  const phi=TWO_PI*rng();
+  const nx=ct*dx-st*Math.sin(phi)*dy;
+  const ny=ct*dy+st*Math.cos(phi)*dx;
+  const n=Math.sqrt(nx*nx+ny*ny);
+  return n>1e-12?[nx/n,ny/n]:[1,0];
+}
+
+function inDomain(x,y){ return x>=0&&x<DOMAIN_W&&y>=0&&y<DOMAIN_H; }
+function getMat(x,y){
+  if(!inDomain(x,y)) return MAT.VACUUM;
+  const cx=Math.floor(x/CELL_CM), cy=Math.floor(y/CELL_CM);
+  return matGrid[cy*GRID_W+cx]||0;
+}
+function addFluence(x,y,type,w){
+  if(!inDomain(x,y)) return;
+  const i=Math.floor(y/CELL_CM)*GRID_W+Math.floor(x/CELL_CM);
+  if(type===0) fluenceN[i]+=w;
+  else if(type===1) fluenceP[i]+=w;
+  else fluenceE[i]+=w;
+}
+function addDose(x,y,dE,rho){
+  if(!inDomain(x,y)||rho<=0) return;
+  const i=Math.floor(y/CELL_CM)*GRID_W+Math.floor(x/CELL_CM);
+  const vol=CELL_CM**3, dose_gy=dE*1.602176634e-13/(rho*vol*1e-3);
+  doseMap[i]+=dose_gy;
+}
+
+/* ── Tracce per rendering ── */
+let frameTrackBuf = []; // [{type, pts:[{x,y,e}], gen}]
+
+function newTrack(type,gen,x,y,e){
+  if(frameTrackBuf.length>=MAX_TR) return null;
+  const t={type,gen,pts:[{x,y,e}]};
+  frameTrackBuf.push(t); return t;
+}
+function trackPt(t,x,y,e){ if(t&&t.pts.length<TRACK_PTS) t.pts.push({x,y,e}); }
+
+/* ── Coda secondari ── */
+let secQueue=[];
+function pushSec(x,y,dx,dy,e,type,w,gen){
+  if(secQueue.length>=MAX_SEC||e<1e-5) return;
+  secQueue.push({x,y,dx,dy,e,type,w,gen,alive:1});
+}
+
+/* ── Neutrone ── */
+function transportNeutron(p, trk){
+  while(p.alive && p.e > 1e-8){
+    const mid=getMat(p.x,p.y);
+    if(!inDomain(p.x,p.y)){p.alive=0;break;}
+    const xs=neutron_xs(mid,p.e);
+    const step = xs.tot<1e-20 ? 1.0 : -Math.log(rng()+1e-300)/xs.tot;
+    const s=Math.min(step,5);
+    const nx=p.x+p.dx*s, ny=p.y+p.dy*s;
+    addFluence((p.x+nx)/2,(p.y+ny)/2,0,p.w);
+    specNeut[eBin(p.e)]++;
+    trackPt(trk,nx,ny,p.e);
+    p.x=nx; p.y=ny;
+    if(!inDomain(p.x,p.y)){p.alive=0;break;}
+    if(xs.tot<1e-20) continue;
+    const r=rng()*xs.tot;
+    if(r<xs.s){
+      // Scattering elastico
+      const A=MATERIALS[mid].A||1;
+      const alpha=((A-1)/(A+1))**2;
+      const cosCM=2*rng()-1;
+      p.e=p.e*(alpha+(1-alpha)*(1+cosCM)/2);
+      const cosL=(1+A*cosCM)/Math.sqrt(A*A+2*A*cosCM+1);
+      const sinL=Math.sqrt(Math.max(0,1-cosL*cosL));
+      [p.dx,p.dy]=rotatDir(p.dx,p.dy,cosL,sinL);
+      totalScat++;
+    } else if(r<xs.s+xs.c){
+      // Cattura radiativa
+      const Eg=p.e+6;
+      const [gx,gy]=sampleIso();
+      pushSec(p.x,p.y,gx,gy,Eg,1,p.w,p.gen+1);
+      addDose(p.x,p.y,p.e,MATERIALS[mid].density);
+      p.alive=0; totalCapt++;
+    } else {
+      // Fissione
+      const nu=MATERIALS[mid].nu||2.43;
+      const nNu=Math.floor(nu)+(rng()<(nu-Math.floor(nu))?1:0);
+      for(let i=0;i<nNu;i++){
+        // Spettro Watt approssimato (Maxwell T=1.33 MeV)
+        const Ew=Math.max(0.01, 1.33*(-Math.log(rng()+1e-300)));
+        const [nx,ny]=sampleIso();
+        pushSec(p.x,p.y,nx,ny,Ew,0,p.w,p.gen+1);
+      }
+      // Fotoni prompt
+      for(let i=0;i<7;i++){
+        const Eg=-Math.log(rng()+1e-300)*1.0;
+        const [gx,gy]=sampleIso();
+        pushSec(p.x,p.y,gx,gy,Math.max(0.01,Eg),1,p.w/7,p.gen+1);
+      }
+      // Flash visivo fissione
+      fissionEvents.push({x:p.x,y:p.y,t:0});
+      addDose(p.x,p.y,6,MATERIALS[mid].density);
+      p.alive=0; totalFiss++;
+    }
+  }
+}
+
+/* ── Fotone ── */
+function transportPhoton(p, trk){
+  while(p.alive && p.e>0.001){
+    const mid=getMat(p.x,p.y);
+    if(!inDomain(p.x,p.y)){p.alive=0;break;}
+    const xs=photon_xs(mid,p.e);
+    const step=xs.tot<1e-20?1:-Math.log(rng()+1e-300)/xs.tot;
+    const s=Math.min(step,5);
+    const nx=p.x+p.dx*s, ny=p.y+p.dy*s;
+    addFluence((p.x+nx)/2,(p.y+ny)/2,1,p.w);
+    specPhot[eBin(p.e)]++;
+    trackPt(trk,nx,ny,p.e);
+    p.x=nx; p.y=ny;
+    if(!inDomain(p.x,p.y)){p.alive=0;break;}
+    if(xs.tot<1e-20) continue;
+    const r=rng()*xs.tot;
+    if(r<xs.pe){
+      // Fotoelettrico
+      const Ee=p.e-MATERIALS[mid].I_eV*1e-6*MATERIALS[mid].Z*0.05;
+      if(Ee>0.001){const [ex,ey]=sampleIso(); pushSec(p.x,p.y,ex,ey,Ee,2,p.w,p.gen+1);}
+      addDose(p.x,p.y,p.e,MATERIALS[mid].density);
+      p.alive=0;
+    } else if(r<xs.pe+xs.c){
+      // Compton (Klein-Nishina semplificato)
+      const k=p.e/M_E_MEV;
+      const epsMin=1/(1+2*k);
+      let eps;
+      for(let iter=0;iter<20;iter++){
+        eps=epsMin+rng()*(1-epsMin);
+        const costh=1+1/k-1/(k*eps);
+        if(Math.abs(costh)>1) continue;
+        if(rng()<=eps*(2-(1-costh*costh))) break;
+      }
+      if(!eps) eps=1/(1+2*k);
+      const costh=Math.min(1,Math.max(-1,1+1/k-1/(k*eps)));
+      const sinth=Math.sqrt(Math.max(0,1-costh*costh));
+      [p.dx,p.dy]=rotatDir(p.dx,p.dy,costh,sinth);
+      const Ee=p.e*(1-eps);
+      p.e*=eps;
+      if(Ee>0.001){
+        const [ex,ey]=sampleIso();
+        pushSec(p.x,p.y,ex,ey,Ee,2,p.w,p.gen+1);
+      }
+    } else {
+      // Produzione di coppie
+      const Ea=p.e-E_PAIR;
+      const Ee=Ea*rng(), Ep=Ea-Ee;
+      const [ex,ey]=sampleIso();
+      if(Ee>0.001) pushSec(p.x,p.y,ex,ey,Ee,2,p.w,p.gen+1);
+      if(Ep>0.001) pushSec(p.x,p.y,-ex,-ey,Ep,3,p.w,p.gen+1);
+      addDose(p.x,p.y,E_PAIR,MATERIALS[mid].density);
+      p.alive=0;
+    }
+  }
+}
+
+/* ── Elettrone/positrone ── */
+function transportElectron(p, trk){
+  while(p.alive && p.e>0.001){
+    const mid=getMat(p.x,p.y);
+    if(!inDomain(p.x,p.y)){p.alive=0;break;}
+    const dEdx=bethe_bloch(mid,p.e);
+    const step=Math.min(0.05, p.e/(dEdx+1e-30)*0.5);
+    if(step<1e-6){p.alive=0;break;}
+    // Molière
+    const m=MATERIALS[mid];
+    if(m.density>0){
+      const X0_g=(716.4*m.A)/(m.Z*(m.Z+1)*Math.log(287/Math.sqrt(m.Z)));
+      const X0cm=X0_g/m.density;
+      const xf=step/X0cm;
+      const pbeta=Math.sqrt(p.e*(p.e+2*M_E_MEV));
+      const sig=13.6/pbeta*Math.sqrt(xf)*(1+0.038*Math.log(xf));
+      if(sig>0){
+        const u1=rng()+1e-300, u2=rng();
+        const theta=sig*Math.sqrt(-2*Math.log(u1))*Math.cos(TWO_PI*u2);
+        [p.dx,p.dy]=rotatDir(p.dx,p.dy,Math.cos(theta),Math.abs(Math.sin(theta)));
+      }
+    }
+    const nx=p.x+p.dx*step, ny=p.y+p.dy*step;
+    addFluence((p.x+nx)/2,(p.y+ny)/2,2,p.w);
+    trackPt(trk,nx,ny,p.e);
+    const dE=Math.min(dEdx*step, p.e);
+    addDose(p.x,p.y,dE*p.w,m.density);
+    p.e-=dE;
+    // Bremsstrahlung
+    if(m.density>0){
+      const X0_g=(716.4*m.A)/Math.max(m.Z*(m.Z+1)*Math.log(287/Math.sqrt(m.Z)),0.01);
+      const X0cm=X0_g/m.density;
+      const tau=p.e/M_E_MEV;
+      const pb=(4/3)*(step/X0cm)*Math.max(0,Math.log(2*tau)-1/3);
+      if(rng()<pb&&p.e>0.01){
+        const kmin=0.001, kmax=p.e*0.5;
+        const Eb=kmin*Math.exp(rng()*Math.log(kmax/kmin));
+        pushSec(p.x,p.y,p.dx,p.dy,Math.min(Eb,p.e*0.5),1,p.w,p.gen+1);
+        p.e-=Math.min(Eb,p.e*0.5);
+      }
+    }
+    p.x=nx; p.y=ny;
+    // Annichilazione positrone
+    if(p.type===3&&p.e<0.01){
+      pushSec(p.x,p.y,p.dx,p.dy,0.511,1,p.w,p.gen+1);
+      pushSec(p.x,p.y,-p.dx,-p.dy,0.511,1,p.w,p.gen+1);
+      p.alive=0;
+    }
+  }
+}
+
+function transportP(p,trk){
+  if(p.type===0) transportNeutron(p,trk);
+  else if(p.type===1) transportPhoton(p,trk);
+  else transportElectron(p,trk);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   STEP DI SIMULAZIONE
+   ══════════════════════════════════════════════════════════════════════ */
+let fissionEvents=[];
+
+function simStep(nPrim){
+  frameTrackBuf=[];
+  for(let h=0;h<nPrim;h++){
+    secQueue=[];
+    let dx,dy;
+    if(srcIso){[dx,dy]=sampleIso();}
+    else{dx=srcDx;dy=srcDy;}
+    const prim={x:srcX,y:srcY,dx,dy,e:srcE,type:srcType,w:1,gen:0,alive:1};
+    const trk=newTrack(srcType,0,prim.x,prim.y,prim.e);
+    transportP(prim,trk);
+    // BFS secondari
+    let start=0;
+    while(start<secQueue.length&&start<MAX_SEC){
+      const end=Math.min(secQueue.length,MAX_SEC);
+      for(let si=start;si<end;si++){
+        const sp=secQueue[si];
+        const strk=newTrack(sp.type,sp.gen,sp.x,sp.y,sp.e);
+        transportP(sp,strk);
+      }
+      start=end;
+    }
+    totalHist++;
+  }
+  fissHistory.push(totalFiss);
+  captHistory.push(totalCapt);
+  if(fissHistory.length>200){fissHistory.shift();captHistory.shift();}
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   CANVAS E RENDERING
+   ══════════════════════════════════════════════════════════════════════ */
+const cMain    = document.getElementById('canvas-main');
+const cTrack   = document.getElementById('canvas-track');
+const cOverlay = document.getElementById('canvas-overlay');
+const ctxMain  = cMain.getContext('2d');
+const ctxTrack = cTrack.getContext('2d');
+const ctxOvr   = cOverlay.getContext('2d');
+
+let CW=0, CH=0, scaleX=1, scaleY=1;
+
+function resizeCanvases(){
+  const cont=document.getElementById('canvas-container');
+  CW=cont.clientWidth; CH=cont.clientHeight;
+  [cMain,cTrack,cOverlay].forEach(c=>{c.width=CW;c.height=CH;});
+  scaleX=CW/DOMAIN_W; scaleY=CH/DOMAIN_H;
+  renderMaterial();
+}
+
+/* Mappa colori heatmap (nero→blu→ciano→verde→giallo→rosso→bianco) */
+function heatColor(t){
+  t=Math.max(0,Math.min(1,t));
+  const stops=[
+    [0,   [0,0,20]],
+    [0.15,[ 0,0,180]],
+    [0.35,[0,200,255]],
+    [0.55,[0,255,100]],
+    [0.7, [255,255,0]],
+    [0.85,[255,100,0]],
+    [1,   [255,255,255]]
+  ];
+  for(let i=0;i<stops.length-1;i++){
+    if(t<=stops[i+1][0]){
+      const f=(t-stops[i][0])/(stops[i+1][0]-stops[i][0]);
+      const a=stops[i][1],b=stops[i+1][1];
+      return `rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`;
+    }
+  }
+  return 'white';
+}
+
+/* Rendering griglia materiali */
+function renderMaterial(){
+  const img=ctxMain.createImageData(GRID_W,GRID_H);
+  const d=img.data;
+  for(let y=0;y<GRID_H;y++) for(let x=0;x<GRID_W;x++){
+    const mi=matGrid[y*GRID_W+x];
+    const hex=MAT_COLORS[mi]||'#060a10';
+    const r=parseInt(hex.slice(1,3),16);
+    const g=parseInt(hex.slice(3,5),16);
+    const b=parseInt(hex.slice(5,7),16);
+    const i4=(y*GRID_W+x)*4;
+    d[i4]=r; d[i4+1]=g; d[i4+2]=b; d[i4+3]=255;
+  }
+  const tmp=document.createElement('canvas');
+  tmp.width=GRID_W; tmp.height=GRID_H;
+  tmp.getContext('2d').putImageData(img,0,0);
+  ctxMain.drawImage(tmp,0,0,CW,CH);
+}
+
+/* Rendering heatmap fluenza/dose */
+function renderHeatmap(buf, scale){
+  let maxV=0;
+  for(let i=0;i<buf.length;i++) if(buf[i]>maxV) maxV=buf[i];
+  if(maxV<=0) return;
+  const img=ctxMain.createImageData(GRID_W,GRID_H);
+  const d=img.data;
+  for(let y=0;y<GRID_H;y++) for(let x=0;x<GRID_W;x++){
+    const v=buf[y*GRID_W+x];
+    if(v<=0) continue;
+    // scala logaritmica
+    const t=Math.log10(1+v*scale/maxV*9)/1 * scale;
+    const col=heatColor(Math.min(1,t));
+    const m=col.match(/\d+/g);
+    const i4=(y*GRID_W+x)*4;
+    d[i4]=+m[0]; d[i4+1]=+m[1]; d[i4+2]=+m[2]; d[i4+3]=180;
+  }
+  const tmp=document.createElement('canvas');
+  tmp.width=GRID_W; tmp.height=GRID_H;
+  tmp.getContext('2d').putImageData(img,0,0);
+  ctxMain.drawImage(tmp,0,0,CW,CH);
+}
+
+/* ── Rendering tracce (canvas trasparente, con fade) ── */
+const PART_COLORS=['#39ff14','#ffcc00','#00a8ff','#ff3399'];
+const PART_ALPHA =[0.6,      0.5,      0.4,      0.4     ];
+const PART_WIDTH =[1.2,      1.0,      0.7,      0.7     ];
+
+let trackFade=0.97;
+let showTrackMode='all';
+
+function renderTracks(){
+  // Fade parziale
+  ctxTrack.globalAlpha=1-trackFade;
+  ctxTrack.fillStyle='#060a10';
+  ctxTrack.fillRect(0,0,CW,CH);
+  ctxTrack.globalAlpha=1;
+
+  for(const trk of frameTrackBuf){
+    const t=trk.type;
+    if(showTrackMode==='neutron'&&t!==0) continue;
+    if(showTrackMode==='photon'&&t!==1) continue;
+    if(showTrackMode==='electron'&&t!==2&&t!==3) continue;
+    if(showTrackMode==='none') continue;
+    const pts=trk.pts;
+    if(pts.length<2) continue;
+    for(let i=1;i<pts.length;i++){
+      const E=pts[i].e;
+      // Colore energeticamente dipendente: più chiaro = più energetico
+      const Enorm=Math.min(1, Math.log10(1+E*10)/Math.log10(1+srcE*10+10));
+      ctxTrack.beginPath();
+      ctxTrack.moveTo(pts[i-1].x*scaleX, pts[i-1].y*scaleY);
+      ctxTrack.lineTo(pts[i].x*scaleX,   pts[i].y*scaleY);
+      ctxTrack.strokeStyle=PART_COLORS[t];
+      ctxTrack.globalAlpha=PART_ALPHA[t]*(0.4+0.6*Enorm);
+      ctxTrack.lineWidth=PART_WIDTH[t]*(trk.gen===0?1.5:0.8);
+      ctxTrack.stroke();
+    }
+    ctxTrack.globalAlpha=1;
+  }
+}
+
+/* ── Flash fissione ── */
+function renderFissionFlash(){
+  fissionEvents=fissionEvents.filter(f=>f.t<1);
+  for(const f of fissionEvents){
+    const px=f.x*scaleX, py=f.y*scaleY;
+    const r=12*(1-f.t);
+    const g=ctxOvr.createRadialGradient(px,py,0,px,py,r);
+    g.addColorStop(0,`rgba(255,120,30,${0.9*(1-f.t)})`);
+    g.addColorStop(0.5,`rgba(255,200,0,${0.5*(1-f.t)})`);
+    g.addColorStop(1,'transparent');
+    ctxOvr.beginPath();
+    ctxOvr.arc(px,py,r,0,TWO_PI);
+    ctxOvr.fillStyle=g;
+    ctxOvr.fill();
+    f.t+=0.05;
+  }
+}
+
+/* ── Rendering sorgente ── */
+function renderSource(){
+  ctxOvr.clearRect(0,0,CW,CH);
+  const sx=srcX*scaleX, sy=srcY*scaleY;
+  ctxOvr.beginPath();
+  ctxOvr.arc(sx,sy,6,0,TWO_PI);
+  ctxOvr.fillStyle='rgba(255,255,255,0.9)';
+  ctxOvr.fill();
+  ctxOvr.beginPath();
+  ctxOvr.arc(sx,sy,10,0,TWO_PI);
+  ctxOvr.strokeStyle='rgba(255,255,255,0.4)';
+  ctxOvr.lineWidth=1;
+  ctxOvr.stroke();
+  // Label sorgente
+  ctxOvr.font='10px "Share Tech Mono"';
+  ctxOvr.fillStyle='rgba(255,255,255,0.6)';
+  ctxOvr.fillText(['N','γ','e⁻'][srcType]||'?', sx+12, sy-8);
+  ctxOvr.fillText(srcE.toFixed(2)+' MeV', sx+12, sy+4);
+  renderFissionFlash();
+  if(document.getElementById('show-grid').checked) renderGridOverlay();
+}
+
+function renderGridOverlay(){
+  ctxOvr.strokeStyle='rgba(30,48,80,0.3)';
+  ctxOvr.lineWidth=0.5;
+  for(let x=0;x<GRID_W;x+=10){
+    ctxOvr.beginPath();
+    ctxOvr.moveTo(x*CELL_CM*scaleX,0);
+    ctxOvr.lineTo(x*CELL_CM*scaleX,CH);
+    ctxOvr.stroke();
+  }
+  for(let y=0;y<GRID_H;y+=10){
+    ctxOvr.beginPath();
+    ctxOvr.moveTo(0,y*CELL_CM*scaleY);
+    ctxOvr.lineTo(CW,y*CELL_CM*scaleY);
+    ctxOvr.stroke();
+  }
+}
+
+/* ── Render completo frame ── */
+const doseScaleSlider=document.getElementById('dose-scale');
+const viewModeSelect=document.getElementById('view-mode');
+
+function renderFrame(){
+  const vm=viewModeSelect.value;
+  renderMaterial();
+  if(vm==='dose'||vm==='fluence_n'||vm==='fluence_p'||vm==='fluence_e'){
+    const buf=vm==='dose'?doseMap:vm==='fluence_n'?fluenceN:vm==='fluence_p'?fluenceP:fluenceE;
+    renderHeatmap(buf, parseFloat(doseScaleSlider.value));
+  }
+  renderTracks();
+  renderSource();
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   GRAFICI FOOTER
+   ══════════════════════════════════════════════════════════════════════ */
+function resizeFooterCharts(){
+  ['chart-neut','chart-phot','chart-dose','chart-hist'].forEach(id=>{
+    const c=document.getElementById(id);
+    const cont=c.parentElement;
+    c.width=cont.clientWidth-20;
+    c.height=120;
+  });
+}
+
+function drawBarChart(canvas, data, color, logScale){
+  const c=canvas, ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='rgba(255,255,255,0.03)';
+  ctx.fillRect(0,0,c.width,c.height);
+  const n=data.length, bw=c.width/n, h=c.height;
+  let maxV=0;
+  for(let i=0;i<n;i++) if(data[i]>maxV) maxV=data[i];
+  if(maxV<=0) return;
+  for(let i=0;i<n;i++){
+    if(data[i]<=0) continue;
+    const v=logScale?Math.log10(1+data[i])/Math.log10(1+maxV):data[i]/maxV;
+    ctx.fillStyle=color;
+    ctx.fillRect(i*bw, h*(1-v), bw-0.5, h*v);
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  ctx.strokeRect(0,0,c.width,c.height);
+}
+
+function drawLineChart(canvas, data1, data2, col1, col2){
+  const c=canvas, ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='rgba(255,255,255,0.03)';
+  ctx.fillRect(0,0,c.width,c.height);
+  const n=data1.length, h=c.height;
+  if(n<2) return;
+  const max1=Math.max(...data1,1), max2=Math.max(...data2,1);
+  const maxV=Math.max(max1,max2);
+  for(const [dat,col] of [[data1,col1],[data2,col2]]){
+    ctx.beginPath();
+    ctx.strokeStyle=col;
+    ctx.lineWidth=1.5;
+    for(let i=0;i<n;i++){
+      const px=i/(n-1)*c.width, py=h*(1-dat[i]/maxV);
+      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  ctx.strokeRect(0,0,c.width,c.height);
+}
+
+function drawDoseProfile(canvas){
+  const c=canvas, ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='rgba(255,255,255,0.03)';
+  ctx.fillRect(0,0,c.width,c.height);
+  // Profilo integrato lungo y per ogni x
+  const prof=new Float32Array(GRID_W);
+  for(let y=0;y<GRID_H;y++) for(let x=0;x<GRID_W;x++) prof[x]+=doseMap[y*GRID_W+x];
+  let maxV=0; for(let x=0;x<GRID_W;x++) if(prof[x]>maxV) maxV=prof[x];
+  if(maxV<=0) return;
+  const h=c.height, bw=c.width/GRID_W;
+  ctx.fillStyle='rgba(255,100,50,0.6)';
+  for(let x=0;x<GRID_W;x++){
+    const v=Math.log10(1+prof[x])/Math.log10(1+maxV);
+    ctx.fillRect(x*bw, h*(1-v), bw, h*v);
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  ctx.strokeRect(0,0,c.width,c.height);
+}
+
+function updateCharts(){
+  drawBarChart(document.getElementById('chart-neut'), specNeut, 'rgba(57,255,20,0.7)', true);
+  drawBarChart(document.getElementById('chart-phot'), specPhot, 'rgba(255,204,0,0.7)',  true);
+  drawDoseProfile(document.getElementById('chart-dose'));
+  drawLineChart(document.getElementById('chart-hist'), fissHistory, captHistory, '#ff6b35','#ffcc00');
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   AGGIORNAMENTO UI
+   ══════════════════════════════════════════════════════════════════════ */
+function updateStats(){
+  const ids=['hist','fiss','capt','scat'];
+  const vals=[totalHist,totalFiss,totalCapt,totalScat];
+  ids.forEach((id,i)=>{
+    document.getElementById('hd-'+id).textContent=vals[i].toLocaleString();
+    document.getElementById('stat-'+id).textContent=vals[i].toLocaleString();
+  });
+  // k_eff stimato (n_fission_seconde / n_fission_prime — solo indicativo)
+  if(totalFiss>0&&totalHist>0){
+    const keff=(totalFiss*2.43/totalHist).toFixed(3);
+    document.getElementById('stat-keff').textContent=keff;
+  }
+  let maxDose=0;
+  for(let i=0;i<doseMap.length;i++) if(doseMap[i]>maxDose) maxDose=doseMap[i];
+  document.getElementById('stat-dose').textContent=maxDose.toExponential(2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LOOP PRINCIPALE
+   ══════════════════════════════════════════════════════════════════════ */
+let running=true, lastT=0, fps=0, fpsCount=0, fpsT=0;
+
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(!running) return;
+  const dt=ts-lastT; lastT=ts;
+  fpsCount++;
+  if(ts-fpsT>500){ fps=Math.round(fpsCount*1000/(ts-fpsT)); fpsT=ts; fpsCount=0;
+    document.getElementById('hd-fps').textContent=fps; }
+  const nPrim=parseInt(document.getElementById('n-primary').value)||5;
+  simStep(nPrim);
+  renderFrame();
+  updateCharts();
+  updateStats();
+}
+
+function toggleRun(){
+  running=!running;
+  const btn=document.getElementById('btn-play');
+  const dot=document.getElementById('status-dot');
+  const lbl=document.getElementById('status-label');
+  btn.textContent=running?'⏸ PAUSA':'▶ AVVIA';
+  dot.className=running?'':'paused';
+  lbl.textContent=running?'IN ESECUZIONE':'IN PAUSA';
+}
+function resetSim(){
+  resetAccumulators();
+  ctxTrack.clearRect(0,0,CW,CH);
+  fissionEvents=[];
+  renderMaterial();
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   INTERAZIONE CANVAS — click per sorgente, drag per disegno
+   ══════════════════════════════════════════════════════════════════════ */
+let isPainting=false, paintMat=MAT.WATER;
+let brushSize=3;
+
+cMain.addEventListener('mousedown', e=>{
+  if(e.button===2){ // click destro = posiziona sorgente
+    const rect=cMain.getBoundingClientRect();
+    srcX=(e.clientX-rect.left)/scaleX;
+    srcY=(e.clientY-rect.top)/scaleY;
+    return;
+  }
+  isPainting=true;
+  paintCell(e);
+});
+cMain.addEventListener('mousemove', e=>{
+  if(isPainting) paintCell(e);
+  showTooltip(e);
+  showXS(e);
+});
+cMain.addEventListener('mouseup', ()=>isPainting=false);
+cMain.addEventListener('mouseleave', ()=>{ isPainting=false; hideTooltip(); });
+cMain.addEventListener('contextmenu', e=>e.preventDefault());
+
+function getCanvasPos(e){
+  const r=cMain.getBoundingClientRect();
+  const cx=Math.floor((e.clientX-r.left)/scaleX/CELL_CM);
+  const cy=Math.floor((e.clientY-r.top)/scaleY/CELL_CM);
+  return [cx,cy];
+}
+function paintCell(e){
+  const [cx,cy]=getCanvasPos(e);
+  const bs=brushSize;
+  for(let dy=-bs;dy<=bs;dy++) for(let dx=-bs;dx<=bs;dx++){
+    if(dx*dx+dy*dy<=bs*bs){
+      const nx=cx+dx, ny=cy+dy;
+      if(nx>=0&&nx<GRID_W&&ny>=0&&ny<GRID_H)
+        matGrid[ny*GRID_W+nx]=paintMat;
+    }
+  }
+  // Ridisegna immediatamente solo se non in esecuzione
+  if(!running) renderMaterial();
+}
+
+const tooltip=document.getElementById('tooltip');
+function showTooltip(e){
+  const [cx,cy]=getCanvasPos(e);
+  if(cx<0||cx>=GRID_W||cy<0||cy>=GRID_H){hideTooltip();return;}
+  const mid=matGrid[cy*GRID_W+cx];
+  const dose=doseMap[cy*GRID_W+cx];
+  const fn=fluenceN[cy*GRID_W+cx], fp=fluenceP[cy*GRID_W+cx], fe=fluenceE[cy*GRID_W+cx];
+  tooltip.style.display='block';
+  tooltip.style.left=(e.offsetX+14)+'px';
+  tooltip.style.top=(e.offsetY-10)+'px';
+  tooltip.innerHTML=`${MAT_NAMES[mid]} | Dose: ${dose.toExponential(2)} Gy<br>Φ_n=${fn.toFixed(1)} Φ_γ=${fp.toFixed(1)} Φ_e=${fe.toFixed(1)}`;
+}
+function hideTooltip(){ tooltip.style.display='none'; }
+
+function showXS(e){
+  const [cx,cy]=getCanvasPos(e);
+  if(cx<0||cx>=GRID_W||cy<0||cy>=GRID_H) return;
+  const mid=matGrid[cy*GRID_W+cx];
+  const E=srcE;
+  const nxs=neutron_xs(mid,E);
+  const pxs=photon_xs(mid,E);
+  const sp=bethe_bloch(mid,E);
+  const m=MATERIALS[mid];
+  document.getElementById('xs-display').innerHTML=
+    `<span style="color:var(--text)">Mat: ${MAT_NAMES[mid]}</span><br>`+
+    `<span style="color:var(--text-dim)">ρ = ${m.density.toFixed(3)} g/cm³, Z=${m.Z}</span><br><br>`+
+    `<span style="color:var(--col-neutron)">Neutroni @${E.toFixed(2)}MeV:</span><br>`+
+    `  Σs = ${nxs.s.toExponential(3)} cm⁻¹<br>`+
+    `  Σc = ${nxs.c.toExponential(3)} cm⁻¹<br>`+
+    `  Σf = ${nxs.f.toExponential(3)} cm⁻¹<br>`+
+    `  Σt = ${nxs.tot.toExponential(3)} cm⁻¹<br><br>`+
+    `<span style="color:var(--col-photon)">Fotoni:</span><br>`+
+    `  μpe = ${pxs.pe.toExponential(3)} cm⁻¹<br>`+
+    `  μc  = ${pxs.c.toExponential(3)} cm⁻¹<br>`+
+    `  μpp = ${pxs.pp.toExponential(3)} cm⁻¹<br><br>`+
+    `<span style="color:var(--col-electron)">-dE/dx e⁻:</span> ${sp.toFixed(4)} MeV/cm`;
+  // Info materiale
+  document.getElementById('mat-info').innerHTML=
+    `Z_eff = ${m.Z} | A = ${m.A}<br>`+
+    `I = ${m.I_eV} eV<br>`+
+    `σ_s(1MeV) = ${m.sig_s} barn<br>`+
+    `σ_c(th) = ${m.sig_c} barn<br>`+
+    `σ_f(th) = ${m.sig_f} barn<br>`+
+    (m.nu?`ν = ${m.nu} | E_f = ${m.Ef} MeV<br>`:'');
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   PALETTE MATERIALI
+   ══════════════════════════════════════════════════════════════════════ */
+function buildPalette(){
+  const pal=document.getElementById('mat-palette');
+  MAT_NAMES.forEach((name,i)=>{
+    const btn=document.createElement('div');
+    btn.className='mat-btn'+(i===MAT.WATER?' selected':'');
+    btn.innerHTML=`<div class="mat-swatch" style="background:${MAT_COLORS_B[i]||MAT_COLORS[i]};border:1px solid #444"></div>${name}`;
+    btn.addEventListener('click',()=>{
+      paintMat=i;
+      document.querySelectorAll('.mat-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+    pal.appendChild(btn);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SLIDER LABELS
+   ══════════════════════════════════════════════════════════════════════ */
+function updateSliderLabels(){
+  const E=parseFloat(document.getElementById('src-energy').value);
+  document.getElementById('src-energy-val').textContent=E.toFixed(2)+' MeV';
+  srcE=E;
+  const np=parseInt(document.getElementById('n-primary').value);
+  document.getElementById('n-primary-val').textContent=np;
+  const fade=parseFloat(document.getElementById('track-fade').value);
+  document.getElementById('track-fade-val').textContent=fade.toFixed(3);
+  trackFade=fade;
+  document.getElementById('dose-scale-val').textContent=parseFloat(document.getElementById('dose-scale').value).toFixed(1)+'×';
+  showTrackMode=document.getElementById('track-mode').value;
+  srcType=parseInt(document.getElementById('src-type').value);
+  srcIso=parseInt(document.getElementById('src-mode').value);
+  // Brush
+  brushSize=parseInt(document.getElementById('brush-size').value);
+  const d=document.getElementById('brush-dot');
+  const sz=Math.min(36,brushSize*3);
+  d.style.width=sz+'px'; d.style.height=sz+'px';
+}
+
+['src-energy','n-primary','track-fade','dose-scale','track-mode','src-type','src-mode','brush-size']
+  .forEach(id=>document.getElementById(id).addEventListener('input',updateSliderLabels));
+
+/* ══════════════════════════════════════════════════════════════════════
+   INTEGRAZIONE WebAssembly
+   (se transport.wasm è presente, sovrascrive la fisica JS)
+   ══════════════════════════════════════════════════════════════════════ */
+async function tryLoadWASM(){
+  try {
+    const resp=await fetch('transport.js');
+    if(!resp.ok) throw new Error('transport.js non trovato');
+    // Carica Emscripten module
+    const script=document.createElement('script');
+    script.src='transport.js';
+    document.head.appendChild(script);
+    script.onload=()=>{
+      if(typeof Module!=='undefined'){
+        Module.onRuntimeInitialized=()=>{
+          console.log('[WASM] Modulo caricato, sostituisco la fisica JS con C compilato');
+          overrideWithWASM();
+        };
+      }
+    };
+  } catch(err){
+    console.log('[JS] Fallback alla fisica JavaScript pura. Per usare WASM, compila con:');
+    console.log('emcc transport.c -O3 -o transport.js -s EXPORTED_FUNCTIONS=\'[...]\' -s ALLOW_MEMORY_GROWTH=1');
+  }
+}
+
+function overrideWithWASM(){
+  /* Wrapping delle funzioni C esportate */
+  const c_init   = Module.cwrap('sim_init','null',[]);
+  const c_step   = Module.cwrap('sim_step','number',['number']);
+  const c_reset  = Module.cwrap('sim_reset','null',[]);
+  const c_setSrc = Module.cwrap('set_source','null',['number','number','number','number','number','number','number']);
+  const c_getFlN = Module.cwrap('get_fluence_n','number',[]);
+  const c_getFlP = Module.cwrap('get_fluence_p','number',[]);
+  const c_getFlE = Module.cwrap('get_fluence_e','number',[]);
+  const c_getDose= Module.cwrap('get_dose','number',[]);
+  const c_getTrk = Module.cwrap('get_tracks_buffer','number',[]);
+  const c_getNTr = Module.cwrap('get_track_count','number',[]);
+  const c_getStr = Module.cwrap('get_track_stride','number',[]);
+  const c_getH   = Module.cwrap('get_total_histories','number',[]);
+  const c_getF   = Module.cwrap('get_total_fissions','number',[]);
+  const c_getC   = Module.cwrap('get_total_captures','number',[]);
+  const c_getS   = Module.cwrap('get_total_scatterings','number',[]);
+
+  c_init();
+
+  const N=GRID_W*GRID_H;
+  window._wasmSimStep=function(nPrim){
+    c_setSrc(srcX,srcY,srcE,srcType,srcIso,srcDx,srcDy);
+    c_step(nPrim);
+    // Copia buffer WASM → JS arrays
+    const flnPtr=c_getFlN(), flpPtr=c_getFlP(), flePtr=c_getFlE(), dosePtr=c_getDose();
+    fluenceN=new Float32Array(Module.HEAPF32.buffer, flnPtr, N);
+    fluenceP=new Float32Array(Module.HEAPF32.buffer, flpPtr, N);
+    fluenceE=new Float32Array(Module.HEAPF32.buffer, flePtr, N);
+    doseMap =new Float32Array(Module.HEAPF32.buffer, dosePtr, N);
+    totalHist=c_getH(); totalFiss=c_getF();
+    totalCapt=c_getC(); totalScat=c_getS();
+    // Leggi tracce
+    frameTrackBuf=[];
+    const nTr=c_getNTr(), stride=c_getStr();
+    const trkPtr=c_getTrk();
+    const trkArr=new Float32Array(Module.HEAPF32.buffer, trkPtr, nTr*stride);
+    for(let i=0;i<nTr&&i<MAX_TR;i++){
+      const base=i*stride;
+      const type=Math.round(trkArr[base]);
+      const npts=Math.round(trkArr[base+1]);
+      const pts=[];
+      for(let j=0;j<npts;j++) pts.push({x:trkArr[base+2+j*3],y:trkArr[base+2+j*3+1],e:trkArr[base+2+j*3+2]});
+      frameTrackBuf.push({type,gen:0,pts});
+    }
+    fissHistory.push(totalFiss);
+    captHistory.push(totalCapt);
+    if(fissHistory.length>200){fissHistory.shift();captHistory.shift();}
+  };
+
+  // Sostituisce simStep con la versione WASM
+  window.simStep=window._wasmSimStep;
+  console.log('[WASM] Override completato.');
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   INIZIALIZZAZIONE
+   ══════════════════════════════════════════════════════════════════════ */
+window.addEventListener('load', ()=>{
+  resizeCanvases();
+  resizeFooterCharts();
+  buildPalette();
+  loadPreset('default');
+  updateSliderLabels();
+  tryLoadWASM();
+  requestAnimationFrame(loop);
+});
+window.addEventListener('resize', ()=>{ resizeCanvases(); resizeFooterCharts(); });
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     NOTA PER LA COMPILAZIONE WASM
+     ══════════════════════════════════════════════════════════════════════
+     Per sostituire la fisica JS con il C compilato (molto più veloce):
+
+     1. Installa Emscripten: https://emscripten.org/docs/getting_started/
+     2. Compila:
+        emcc transport.c -O3 -o transport.js \
+          -s EXPORTED_FUNCTIONS='["_sim_init","_sim_step","_sim_reset","_set_source",
+                                  "_get_fluence_n","_get_fluence_p","_get_fluence_e",
+                                  "_get_dose","_get_tracks_buffer","_get_track_count",
+                                  "_get_track_stride","_get_total_histories",
+                                  "_get_total_fissions","_get_total_captures",
+                                  "_get_total_scatterings","_set_geometry","_get_mat_grid"]' \
+          -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' \
+          -s ALLOW_MEMORY_GROWTH=1 \
+          -s INITIAL_MEMORY=67108864 \
+          -s ENVIRONMENT='web'
+     3. Metti transport.js e transport.wasm nella stessa cartella dell'HTML.
+        La pagina li carica automaticamente e sostituisce la fisica JS.
+     ══════════════════════════════════════════════════════════════════════ -->
+</body>
+</html>

@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Onde gravitazionali — simulazione avanzata</title>
-
-  <script>
+ <script>
   window.SIM_METADATA = {
     title: "Onde gravitazionali",
     description: "Simulazione avanzata di sistemi binari compatti con inspiral, merger e ringdown, deformazione qualitativa dello spaziotempo, segnale di strain in stile LIGO, polarizzazioni e pannello tempo-frequenza.",
@@ -16,6 +15,7 @@
     level: "avanzato"
   };
   </script>
+
 
   <style>
     :root {
@@ -403,8 +403,13 @@
               </div>
 
               <div class="field">
-                <label>Vista scena</label>
-                <div class="hint">Visualizzazione fissata sui soli fronti d’onda.</div>
+                <label for="viewMode">Vista scena</label>
+                <select id="viewMode">
+                  <option value="grid">Griglia di spaziotempo</option>
+                  <option value="rings">Fronti d’onda</option>
+                  <option value="both">Entrambe</option>
+                </select>
+                <div class="hint">La griglia enfatizza la perturbazione locale; gli anelli la propagazione qualitativa.</div>
               </div>
             </div>
 
@@ -573,7 +578,7 @@
       </ul>
 
       <p class="foot">
-        Nota: i fronti d’onda servono a rendere visibile in modo qualitativo la propagazione della perturbazione gravitazionale. L’ampiezza grafica non è in scala reale.
+        Nota: la griglia e i fronti d’onda servono a rendere visibile la natura quadrupolare della perturbazione. L’ampiezza grafica non è in scala reale.
       </p>
     </section>
   </div>
@@ -1114,8 +1119,8 @@
       }
       sctx.restore();
 
-      
-      drawWaveRings(sctx, cx, cy, s, strength, params.preset.ringColor);
+      if (view === 'grid' || view === 'both') drawGridWarp(sctx, cx, cy, s, strength);
+      if (view === 'rings' || view === 'both') drawWaveRings(sctx, cx, cy, s, strength, params.preset.ringColor);
       drawBodies(sctx, cx, cy, s, params);
       drawSceneLegend(sctx, params);
 

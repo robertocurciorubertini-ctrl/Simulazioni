@@ -385,6 +385,24 @@
       "isWip": true
     },
     {
+      "title": "Decadimento radioattivo",
+      "description": "Visualizza il decadimento statistico di un campione radioattivo, l’andamento esponenziale del numero di nuclei non decaduti e l’evoluzione temporale dell’attività.",
+      "category": "WIP",
+      "icon": "☢️",
+      "order": 1,
+      "tags": [
+        "decadimento radioattivo",
+        "fisica nucleare",
+        "attività",
+        "tempo di dimezzamento",
+        "legge esponenziale",
+        "nuclei instabili"
+      ],
+      "level": "base",
+      "file": "WIP/decadimento_radioattivo.html",
+      "isWip": true
+    },
+    {
       "title": "Fluidodinamica",
       "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
       "category": "WIP",

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<script>
+window.SIM_METADATA = {
+  title: "Figure di Chladni",
+  description: "Visualizza la formazione dei pattern nodali su una piastra vibrante e l'accumulo della sabbia lungo le linee nodali, esplorando il legame tra modi normali, onde stazionarie e dissipazione.",
+  category: "Onde",
+  icon: "〰️",
+  order: 6,
+  tags: ["figure di Chladni", "onde stazionarie", "modi normali", "risonanza", "piastre vibranti", "linee nodali"],
+  level: "intermedio"
+};
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figure di Chladni — Onde Stazionarie su Piastra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[
+    {left:'$$',right:'$$',display:true},
+    {left:'$',right:'$',display:false}
+  ]})"></script>
+
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --cream-dark: #ede6d5;
+    --cream-darker: #e0d5c0;
+    --ink: #1a1510;
+    --ink-soft: #3d3428;
+    --ink-faint: #7a6e5e;
+    --amber: #b8860b;
+    --amber-light: #d4a020;
+    --amber-pale: #f0d090;
+    --rust: #8b3a1a;
+    --sand: #c8a86e;
+    --sand-light: #e8d4a8;
+    --node-color: #c8a86e;
+    --antinode-color: #2a1e0a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 2.5rem 3rem 2rem;
+    border-bottom: 3px solid var(--amber);
+  }
+
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.3rem;
+  }
+
+  header .subtitle {
+    font-style: italic;
+    color: var(--sand);
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+    align-items: start;
+  }
+
+  .sim-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding-right: 2rem;
+  }
+
+  .canvas-wrapper {
+    position: relative;
+    background: var(--ink);
+    border: 2px solid var(--ink-soft);
+    box-shadow: 6px 6px 0px var(--amber-pale), 10px 10px 0px var(--ink-soft);
+  }
+
+  canvas {
+    display: block;
+  }
+
+  .plate-label {
+    position: absolute;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    background: var(--cream);
+    padding: 1px 4px;
+  }
+  .plate-label.tl { top: -1px; left: -1px; }
+  .plate-label.br { bottom: -1px; right: -1px; }
+
+  /* Controls */
+  .controls {
+    width: 100%;
+    background: var(--cream-dark);
+    border: 1.5px solid var(--cream-darker);
+    padding: 1.5rem 1.8rem;
+  }
+
+  .controls h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--cream-darker);
+  }
+
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .control-row label {
+    flex: 0 0 120px;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+
+  .control-row .val {
+    flex: 0 0 70px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--amber);
+    font-weight: 400;
+    text-align: right;
+  }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    background: var(--cream-darker);
+    outline: none;
+    border-radius: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    background: var(--amber);
+    border-radius: 0;
+    cursor: pointer;
+    border: none;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    background: var(--amber);
+    border-radius: 0;
+    cursor: pointer;
+    border: none;
+  }
+
+  input[type=range]:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .control-note {
+    margin: -0.35rem 0 1rem 120px;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    line-height: 1.4;
+  }
+
+  /* Preset buttons */
+  .preset-section {
+    margin-top: 0.5rem;
+  }
+  .preset-section h4 {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 0.7rem;
+  }
+  .presets-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+  }
+  .preset-btn {
+    background: var(--cream);
+    border: 1.5px solid var(--cream-darker);
+    color: var(--ink-soft);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.2rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .preset-btn:hover {
+    background: var(--amber-pale);
+    border-color: var(--amber);
+    color: var(--ink);
+  }
+  .preset-btn.active {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .info-card {
+    background: var(--cream-dark);
+    border: 1.5px solid var(--cream-darker);
+    border-left: 4px solid var(--amber);
+    padding: 1.4rem 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .info-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    margin-bottom: 0.8rem;
+  }
+
+  .info-card p, .info-card li {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-card .katex-display {
+    margin: 0.8rem 0;
+    font-size: 0.85rem;
+  }
+
+  .mode-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    color: var(--ink-faint);
+    margin-top: 0.3rem;
+  }
+  .mode-display span {
+    color: var(--amber);
+    font-size: 1rem;
+  }
+
+  /* Resonance indicator */
+  .resonance-bar-wrap {
+    margin-top: 0.6rem;
+  }
+  .resonance-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.3rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .resonance-bar {
+    height: 6px;
+    background: var(--cream-darker);
+    position: relative;
+    overflow: hidden;
+  }
+  .resonance-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber), var(--rust));
+    transition: width 0.3s;
+  }
+
+  /* Description section */
+  .description {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem;
+    border-top: 1px solid var(--cream-darker);
+  }
+
+  .description h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 2rem 0 1rem;
+    color: var(--ink);
+  }
+
+  .description p {
+    margin-bottom: 1rem;
+    color: var(--ink-soft);
+    max-width: 800px;
+  }
+
+  .description .katex-display {
+    margin: 1.2rem 0;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 1.5rem 0;
+    max-width: 900px;
+  }
+
+  .eq-block {
+    background: var(--cream-dark);
+    border-left: 3px solid var(--amber);
+    padding: 1rem 1.2rem;
+  }
+  .eq-block .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 0.5rem;
+  }
+
+  footer {
+    background: var(--ink);
+    color: var(--ink-faint);
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.82rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  @media (max-width: 900px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .sim-panel { padding-right: 0; }
+    .sidebar { position: static; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Figure di Chladni</h1>
+  <div class="subtitle">Onde stazionarie bidimensionali su piastra quadrata — Pattern nodali</div>
+</header>
+
+<div class="main-layout">
+  <div class="sim-panel">
+    <div class="canvas-wrapper">
+      <canvas id="canvas" width="520" height="520"></canvas>
+      <div class="plate-label tl">0,0</div>
+      <div class="plate-label br">L,L</div>
+    </div>
+
+    <div class="controls">
+      <h3>Parametri</h3>
+      <div class="control-row">
+        <label>Frequenza $f$</label>
+        <input type="range" id="freqSlider" min="50" max="2000" value="400" step="1">
+        <span class="val" id="freqVal">400 Hz</span>
+      </div>
+      <div class="control-row">
+        <label>Smorzamento $Q^{-1}$</label>
+        <input type="range" id="dampSlider" min="0" max="40" value="0" step="1">
+        <span class="val" id="dampVal">0</span>
+      </div>
+      <div class="control-note">Valore iniziale: $Q^{-1}=0$. Quando $Q^{-1}>0$, la dissipazione è modellata come minima presso il punto di eccitazione centrale e crescente con la distanza radiale.</div>
+      <div class="control-row">
+        <label>N° granelli</label>
+        <input type="range" id="sandSlider" min="2000" max="15000" value="8000" step="250">
+        <span class="val" id="sandVal">8000</span>
+      </div>
+      <div class="control-row">
+        <label>Visualizzazione</label>
+        <select id="viewMode" style="flex:1;background:var(--cream);border:1.5px solid var(--cream-darker);padding:0.3rem 0.5rem;font-family:inherit;font-size:0.9rem;color:var(--ink-soft);">
+          <option value="sand">Sabbia su fondo scuro</option>
+          <option value="wave">Ampiezza dell'onda (mappa colori)</option>
+          <option value="both">Entrambi sovrapposti</option>
+        </select>
+      </div>
+
+      <div class="preset-section">
+        <h4>Modi propri notevoli</h4>
+        <div class="presets-grid" id="presetGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="info-card">
+      <h3>Stato corrente</h3>
+      <div class="mode-display">
+        Frequenza: <span id="infoFreq">—</span><br>
+        Modo dominante: <span id="infoMode">—</span><br>
+        $f_{mn}$ più vicina: <span id="infoNearest">—</span>
+      </div>
+      <div class="resonance-bar-wrap">
+        <div class="resonance-label">
+          <span>Risonanza</span>
+          <span id="resLabel">0%</span>
+        </div>
+        <div class="resonance-bar">
+          <div class="resonance-fill" id="resFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>Fisica</h3>
+      <p>I nodi stazionari (in giallo/dorato) corrispondono alle linee dove l'ampiezza di vibrazione è nulla. La sabbia, per effetto della vibrazione, migra verso queste zone di minima energia cinetica.</p>
+      <p>Modi propri per bordi <em>liberi</em> (condizione di Neumann):</p>
+      <p>$$\phi_{mn}(x,y) = \cos\!\frac{m\pi x}{L}\cos\!\frac{n\pi y}{L}$$</p>
+      <p>Frequenze proprie (approssimazione membrana 2D):</p>
+      <p>$$f_{mn} = \frac{c}{2L}\sqrt{m^2+n^2}$$</p>
+    </div>
+
+    <div class="info-card">
+      <h3>Legenda colori</h3>
+      <p style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+        <span style="display:inline-block;width:14px;height:14px;background:#c8a86e;border-radius:50%;"></span>
+        Sabbia (nodi stazionari)
+      </p>
+      <p style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+        <span style="display:inline-block;width:14px;height:14px;background:#1a4a6e;"></span>
+        Ventre negativo (ampiezza min)
+      </p>
+      <p style="display:flex;align-items:center;gap:0.5rem;">
+        <span style="display:inline-block;width:14px;height:14px;background:#8b1a1a;"></span>
+        Ventre positivo (ampiezza max)
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Physics description -->
+<div class="description">
+  <h2>Le figure di Chladni: onde stazionarie bidimensionali</h2>
+
+  <p>Quando una piastra metallica è posta in vibrazione da una sorgente puntuale — un archetto, un altoparlante, una bacchetta — le onde meccaniche si propagano radialmente dalla sorgente e si riflettono ai bordi. Se la frequenza di eccitazione è pari a una delle <em>frequenze proprie</em> della piastra, si instaura un regime stazionario: l'interferenza tra l'onda diretta e le sue riflessioni produce un campo di ampiezza fisso nel tempo, con <strong>nodi</strong> (linee a ampiezza zero) e <strong>ventri</strong> (linee ad ampiezza massima). Questo fenomeno fu documentato sistematicamente da Ernst Florens Friedrich Chladni nel 1787, che utilizzava la sabbia come rivelatore visivo.</p>
+
+  <p>La sabbia, investita dalla vibrazione del piatto, percepisce una forza media proporzionale al gradiente quadratico dell'ampiezza locale. Nei ventri l'accelerazione è massima e la sabbia viene <em>espulsa</em>; nei nodi l'accelerazione è nulla e la sabbia vi si <em>accumula</em>. Il risultato sono le caratteristiche geometrie nodali: linee, croci, stelle, che variano radicalmente con la frequenza.</p>
+
+  <h2>Modello fisico adottato</h2>
+
+  <p>Per una piastra quadrata di lato $L$ con bordi <em>liberi</em> (condizione al contorno di Neumann: $\partial u/\partial n = 0$), le soluzioni della equazione d'onda sono prodotti di coseni:</p>
+
+  <div class="two-col">
+    <div class="eq-block">
+      <div class="label">Modi propri</div>
+      $$\phi_{mn}(x,y) = \cos\!\frac{m\pi x}{L}\cos\!\frac{n\pi y}{L}$$
+    </div>
+    <div class="eq-block">
+      <div class="label">Frequenze di risonanza</div>
+      $$f_{mn} = \frac{c}{2L}\sqrt{m^2 + n^2}$$
+    </div>
+  </div>
+
+  <p>con $m,n = 0,1,2,\ldots$ (non entrambi nulli). Il campo di ampiezza stazionaria risultante per un'eccitazione alla frequenza $f$ è la sovrapposizione di tutti i modi, pesata da un fattore risonante lorentziano:</p>
+
+  $$A(x,y) = \sum_{m,n} \frac{\phi_{mn}(x,y)}{(f_{mn}^2 - f^2)^2 + \gamma^2 f^2}$$
+
+  <p>dove $\gamma = f_{mn}/Q$ rappresenta l'amortizzamento del sistema (in questa simulazione controllabile tramite il parametro $Q^{-1}$). Per mantenere coerenza con un'eccitazione localizzata al centro, quando si introduce dissipazione il campo viene inoltre attenuato con un inviluppo radiale centrato nel punto di forcing: l'ampiezza resta meno smorzata vicino al centro e più smorzata procedendo verso i bordi. La distribuzione finale della sabbia è proporzionale alla probabilità di trovare un granello in una zona dove $|A(x,y)|$ è prossimo a zero — ovvero dove l'accelerazione di vibrazione è trascurabile e il granello non viene espulso.</p>
+
+  <p>In questa simulazione i granelli di sabbia sono inizializzati con distribuzione uniforme sulla piastra e spostati ad ogni variazione di frequenza: la posizione di ogni granello viene perturbata da un piccolo displacement casuale, poi il granello migra verso la zona nodale più vicina con un'intensità proporzionale all'ampiezza locale del campo. Il processo è iterato fino a convergenza, producendo la figura di Chladni corrispondente.</p>
+</div>
+
+<footer>
+  Simulazione — Figure di Chladni — Onde stazionarie 2D
+</footer>
+
+<script>
+(function() {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // --- Physical parameters ---
+  const C = 200; // effective wave speed [Hz * grid_units]
+  const L = 1.0;
+  const NMODES = 12; // modes from 0..NMODES in each direction
+
+  // Presets: [m, n, label]
+  const PRESETS = [
+    [1,1,'(1,1)'], [2,0,'(2,0)'], [2,1,'(2,1)'],
+    [2,2,'(2,2)'], [3,0,'(3,0)'], [3,1,'(3,1)'],
+    [3,2,'(3,2)'], [3,3,'(3,3)'], [4,0,'(4,0)'],
+    [4,1,'(4,1)'], [4,2,'(4,2)'], [4,4,'(4,4)'],
+  ];
+
+  // Build preset grid
+  const presetGrid = document.getElementById('presetGrid');
+  PRESETS.forEach(([m,n,lbl]) => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.textContent = lbl;
+    const f = freqMN(m,n);
+    btn.title = `f${m}${n} = ${f.toFixed(0)} Hz`;
+    btn.dataset.freq = f.toFixed(0);
+    btn.addEventListener('click', () => {
+      document.getElementById('freqSlider').value = f.toFixed(0);
+      onFreqChange();
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    presetGrid.appendChild(btn);
+  });
+
+  function freqMN(m,n) {
+    return C / (2*L) * Math.sqrt(m*m + n*n);
+  }
+
+  // --- State ---
+  let freq = 400;
+  let damp = 0;
+  let nSand = 8000;
+  let viewMode = 'sand';
+
+  // Amplitude field grid
+  const GRID = 256;
+  const ampField = new Float32Array(GRID * GRID);
+
+  // Sand particles
+  let sandX = new Float32Array(nSand);
+  let sandY = new Float32Array(nSand);
+
+  function initSand(n) {
+    nSand = n;
+    sandX = new Float32Array(n);
+    sandY = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      sandX[i] = Math.random();
+      sandY[i] = Math.random();
+    }
+  }
+
+  // --- Compute amplitude field ---
+  function computeField() {
+    const f = freq;
+    const gamma = (damp / 100) * f * 2;
+    const x0 = 0.5;
+    const y0 = 0.5;
+    const rMax = Math.sqrt(0.5*0.5 + 0.5*0.5);
+
+    ampField.fill(0);
+
+    let maxContrib = 0;
+    let bestMode = [1,1];
+    let nearestFreq = Infinity;
+    let nearestMode = [1,1];
+
+    for (let m = 0; m <= NMODES; m++) {
+      for (let n = 0; n <= NMODES; n++) {
+        if (m === 0 && n === 0) continue;
+
+        const fmn = freqMN(m, n);
+        const df2 = (fmn*fmn - f*f);
+
+        // Approximate coupling of the external forcing point to the modal shape.
+        // This makes the excitation genuinely centered instead of implicitly biased
+        // by the coordinate origin or by an equal excitation of all modes.
+        const sourceCoupling = Math.cos(m * Math.PI * x0) * Math.cos(n * Math.PI * y0);
+
+        const weight = sourceCoupling / (df2*df2 + gamma*gamma*f*f + 1e-6);
+
+        if (Math.abs(weight) > maxContrib) { maxContrib = Math.abs(weight); bestMode = [m,n]; }
+        if (Math.abs(fmn - f) < Math.abs(nearestFreq - f)) {
+          nearestFreq = fmn; nearestMode = [m,n];
+        }
+
+        for (let iy = 0; iy < GRID; iy++) {
+          // Use pixel-center coordinates so the symmetry axis passes exactly through the center.
+          const y = (iy + 0.5) / GRID;
+          const cy = Math.cos(n * Math.PI * y);
+          for (let ix = 0; ix < GRID; ix++) {
+            const x = (ix + 0.5) / GRID;
+            const val = Math.cos(m * Math.PI * x) * cy;
+            ampField[iy * GRID + ix] += weight * val;
+          }
+        }
+      }
+    }
+
+    // Radial damping envelope referenced to the central excitation point.
+    // The attenuation depends only on the radial distance from the center,
+    // so no diagonal preference can appear.
+    if (damp > 0) {
+      const alpha = 1.8 * (damp / 40);
+      for (let iy = 0; iy < GRID; iy++) {
+        const y = (iy + 0.5) / GRID;
+        for (let ix = 0; ix < GRID; ix++) {
+          const x = (ix + 0.5) / GRID;
+          const dx = x - x0;
+          const dy = y - y0;
+          const r = Math.sqrt(dx*dx + dy*dy) / rMax;
+          const envelope = Math.exp(-alpha * r * r);
+          ampField[iy * GRID + ix] *= envelope;
+        }
+      }
+    }
+
+    // Normalize
+    let mx = 0;
+    for (let i = 0; i < GRID*GRID; i++) {
+      const v = Math.abs(ampField[i]);
+      if (v > mx) mx = v;
+    }
+    if (mx > 0) {
+      for (let i = 0; i < GRID*GRID; i++) ampField[i] /= mx;
+    }
+
+    // Update info
+    document.getElementById('infoFreq').textContent = `${f.toFixed(0)} Hz`;
+    document.getElementById('infoMode').textContent = `(${bestMode[0]},${bestMode[1]})`;
+    document.getElementById('infoNearest').textContent = `${nearestFreq.toFixed(1)} Hz  (${nearestMode[0]},${nearestMode[1]})`;
+
+    const resonance = Math.min(1, 1.0 / (1 + Math.abs(nearestFreq - f) / (f * 0.05 + 5)));
+    const pct = (resonance * 100).toFixed(0);
+    document.getElementById('resFill').style.width = pct + '%';
+    document.getElementById('resLabel').textContent = pct + '%';
+  }
+
+  // Bilinear sample of ampField at (x,y) in [0,1]
+  function sampleAmp(x, y) {
+    const gx = x * (GRID - 1);
+    const gy = y * (GRID - 1);
+    const ix = Math.floor(gx), iy = Math.floor(gy);
+    const fx = gx - ix, fy = gy - iy;
+    const ix1 = Math.min(ix+1, GRID-1), iy1 = Math.min(iy+1, GRID-1);
+    return (ampField[iy*GRID+ix]*(1-fx)+ampField[iy*GRID+ix1]*fx)*(1-fy)
+         + (ampField[iy1*GRID+ix]*(1-fx)+ampField[iy1*GRID+ix1]*fx)*fy;
+  }
+
+  // --- Move sand toward nodal lines ---
+  function moveSand(iters) {
+    const eps = 0.002;
+    const stepScale = 0.0062;
+    const noise = 0.0011;
+
+    for (let iter = 0; iter < iters; iter++) {
+      for (let i = 0; i < nSand; i++) {
+        let x = sandX[i], y = sandY[i];
+
+        // Gradient of |A|^2 via finite differences
+        const a0 = sampleAmp(x, y);
+        const ax = (sampleAmp(Math.min(1,x+eps),y) - sampleAmp(Math.max(0,x-eps),y)) / (2*eps);
+        const ay = (sampleAmp(x,Math.min(1,y+eps)) - sampleAmp(x,Math.max(0,y-eps))) / (2*eps);
+
+        // Move opposite to gradient of |A|^2 (toward nodes)
+        const amp2_ax = 2 * a0 * ax;
+        const amp2_ay = 2 * a0 * ay;
+
+        x -= amp2_ax * stepScale + (Math.random()-0.5)*noise;
+        y -= amp2_ay * stepScale + (Math.random()-0.5)*noise;
+
+        // Clamp
+        sandX[i] = Math.max(0, Math.min(1, x));
+        sandY[i] = Math.max(0, Math.min(1, y));
+      }
+    }
+  }
+
+  // --- Render ---
+  const colorFieldCanvas = document.createElement('canvas');
+  colorFieldCanvas.width = W; colorFieldCanvas.height = H;
+  const cfCtx = colorFieldCanvas.getContext('2d');
+
+  function buildColorField() {
+    const imgData = cfCtx.createImageData(W, H);
+    const d = imgData.data;
+    for (let iy = 0; iy < H; iy++) {
+      for (let ix = 0; ix < W; ix++) {
+        const x = ix / (W-1), y = iy / (H-1);
+        const a = sampleAmp(x, y); // in [-1,1]
+        const idx = (iy*W+ix)*4;
+        // Color: negative blue-ish, positive red-ish, zero dark
+        if (a > 0) {
+          const t = a;
+          d[idx]   = Math.round(139 * t * t);
+          d[idx+1] = Math.round(20 * t * t);
+          d[idx+2] = Math.round(10 * t * t);
+        } else {
+          const t = -a;
+          d[idx]   = Math.round(10 * t * t);
+          d[idx+1] = Math.round(40 * t * t);
+          d[idx+2] = Math.round(110 * t * t);
+        }
+        d[idx+3] = 255;
+      }
+    }
+    cfCtx.putImageData(imgData, 0, 0);
+  }
+
+  function render() {
+    ctx.fillStyle = '#0d0b08';
+    ctx.fillRect(0, 0, W, H);
+
+    if (viewMode === 'wave' || viewMode === 'both') {
+      ctx.drawImage(colorFieldCanvas, 0, 0);
+    }
+
+    if (viewMode === 'sand' || viewMode === 'both') {
+      // Draw sand with slight glow
+      const alpha = viewMode === 'both' ? 0.85 : 1.0;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // Batch draw as points
+      const r = nSand > 15000 ? 1.0 : nSand > 8000 ? 1.2 : 1.5;
+      ctx.fillStyle = '#c8a86e';
+      for (let i = 0; i < nSand; i++) {
+        const px = sandX[i] * W;
+        const py = sandY[i] * H;
+        ctx.fillRect(px - r/2, py - r/2, r, r);
+      }
+      ctx.restore();
+    }
+
+    // Thin border to show plate edges
+    ctx.strokeStyle = '#4a3e2e';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0.5, 0.5, W-1, H-1);
+
+    // Center dot (excitation point)
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 3, 0, Math.PI*2);
+    ctx.fillStyle = '#e0c060';
+    ctx.fill();
+  }
+
+  // --- Animation loop ---
+  let animId = null;
+  let itersLeft = 0;
+  const ITERS_PER_FRAME = 2;
+
+  function startAnimation() {
+    if (animId) cancelAnimationFrame(animId);
+    itersLeft = 140;
+    function frame() {
+      if (itersLeft > 0) {
+        const it = Math.min(ITERS_PER_FRAME, itersLeft);
+        moveSand(it);
+        itersLeft -= it;
+        render();
+        animId = requestAnimationFrame(frame);
+      } else {
+        render();
+      }
+    }
+    animId = requestAnimationFrame(frame);
+  }
+
+  function onFreqChange() {
+    freq = parseFloat(document.getElementById('freqSlider').value);
+    document.getElementById('freqVal').textContent = freq.toFixed(0) + ' Hz';
+    computeField();
+    buildColorField();
+    initSand(nSand);
+    startAnimation();
+  }
+
+  function onDampChange() {
+    damp = parseFloat(document.getElementById('dampSlider').value);
+    document.getElementById('dampVal').textContent = damp.toFixed(0);
+    computeField();
+    buildColorField();
+    initSand(nSand);
+    startAnimation();
+  }
+
+  function onSandChange() {
+    nSand = parseInt(document.getElementById('sandSlider').value);
+    document.getElementById('sandVal').textContent = nSand;
+    initSand(nSand);
+    startAnimation();
+  }
+
+  document.getElementById('freqSlider').addEventListener('input', onFreqChange);
+  document.getElementById('dampSlider').addEventListener('input', onDampChange);
+    document.getElementById('sandSlider').addEventListener('input', onSandChange);
+  document.getElementById('viewMode').addEventListener('change', () => {
+    viewMode = document.getElementById('viewMode').value;
+    render();
+  });
+
+  // --- Init ---
+  document.getElementById('dampVal').textContent = damp.toFixed(0);
+  document.getElementById('sandVal').textContent = nSand.toFixed(0);
+  computeField();
+  buildColorField();
+  initSand(nSand);
+  startAnimation();
+
+  // Trigger KaTeX re-render after DOM ready (if not already triggered)
+  if (window.renderMathInElement) {
+    renderMathInElement(document.querySelector('.description'));
+    renderMathInElement(document.querySelector('.sidebar'));
+  }
+})();
+</script>
+</body>
+</html>

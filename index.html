@@ -213,7 +213,20 @@
 
     .category-block {
       display: grid;
-      gap: 14px;
+      gap: 0;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .category-block:hover {
+      border-color: rgba(97, 218, 251, 0.24);
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
     }
 
     .category-toggle {
@@ -222,20 +235,17 @@
       justify-content: space-between;
       gap: 18px;
       align-items: center;
-      padding: 18px 20px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
+      padding: 20px 22px;
+      border: 0;
+      background: transparent;
       color: var(--text);
       text-align: left;
       cursor: pointer;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      transition: background 0.2s ease;
     }
 
     .category-toggle:hover {
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(97, 218, 251, 0.28);
-      transform: translateY(-1px);
+      background: rgba(255,255,255,0.02);
     }
 
     .category-toggle:focus-visible {
@@ -275,11 +285,20 @@
 
     .category-content {
       display: grid;
-      gap: 14px;
+      gap: 18px;
+      padding: 0 22px 22px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(7, 17, 31, 0.18);
     }
 
     .category-content[hidden] {
       display: none;
+    }
+
+    .category-toggle[aria-expanded="false"] + .category-content {
+      border-top: 0;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .category-head {

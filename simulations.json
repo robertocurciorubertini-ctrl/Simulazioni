@@ -451,6 +451,24 @@
       "isWip": true
     },
     {
+      "title": "Turbolenza e instabilità nei fluidi",
+      "description": "Esplora il passaggio da regimi laminari a regimi instabili e turbolenti, visualizzando l’evoluzione del flusso, la formazione di vortici e la crescita delle perturbazioni fluidodinamiche.",
+      "category": "WIP",
+      "icon": "🌀",
+      "order": 1,
+      "tags": [
+        "fluidodinamica",
+        "turbolenza",
+        "instabilità",
+        "vortici",
+        "numero di Reynolds",
+        "flussi"
+      ],
+      "level": "avanzato",
+      "file": "WIP/turbolenza-e-instabilita/old/turbolenza-e-instbilita.html",
+      "isWip": true
+    },
+    {
       "title": "Relatività generale",
       "description": "Introduzione alla gravità come curvatura dello spazio-tempo e visualizzazione degli effetti gravitazionali su traiettorie e tempo.",
       "category": "WIP",

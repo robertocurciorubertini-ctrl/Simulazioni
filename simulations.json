@@ -84,6 +84,25 @@
       "isWip": false
     },
     {
+      "title": "Grandezze e unità di misura",
+      "description": "Convertitore esteso tra grandezze fisiche e unità metriche con spiegazioni su unità fondamentali, derivate, prefissi SI e unità specialistiche come barn e jansky.",
+      "category": "Fondamenti",
+      "icon": "📏",
+      "order": 0,
+      "tags": [
+        "grandezze fisiche",
+        "unità di misura",
+        "SI",
+        "prefissi metrici",
+        "conversioni",
+        "barn",
+        "jansky"
+      ],
+      "level": "base",
+      "file": "fondamenti/grandezze-fondamentali.html",
+      "isWip": false
+    },
+    {
       "title": "Grandezze vettoriali",
       "description": "Introduzione alle grandezze vettoriali e alle principali operazioni tra vettori nel piano.",
       "category": "Fondamenti",
@@ -97,7 +116,27 @@
         "direzione"
       ],
       "level": "base",
-      "file": "vettori/vettori.html",
+      "file": "fondamenti/vettori.html",
+      "isWip": false
+    },
+    {
+      "title": "Costanti della fisica",
+      "description": "Archivio consultabile delle principali costanti fisiche in Sistema Internazionale, con ricerca, tag, categorie e schede descrittive.",
+      "category": "Fondamenti",
+      "icon": "📘",
+      "order": 2,
+      "tags": [
+        "costanti fisiche",
+        "SI",
+        "Sistema Internazionale",
+        "fisica",
+        "costanti fondamentali",
+        "costanti derivate",
+        "NIST",
+        "CODATA"
+      ],
+      "level": "base",
+      "file": "fondamenti/costanti-fisiche.html",
       "isWip": false
     },
     {

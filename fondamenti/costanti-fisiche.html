@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Costanti della fisica</title>
+  <script>
+  window.SIM_METADATA = {
+    title: "Costanti della fisica",
+    description: "Archivio consultabile delle principali costanti fisiche in Sistema Internazionale, con ricerca, tag, categorie e schede descrittive.",
+    category: "Fondamenti",
+    icon: "📘",
+    order: 2,
+    tags: ["costanti fisiche", "SI", "Sistema Internazionale", "fisica", "costanti fondamentali", "costanti derivate", "NIST", "CODATA"],
+    level: "base"
+  };
+  </script>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --panel-2: #f2f5fa;
+      --text: #18212f;
+      --muted: #5f6f86;
+      --border: #d7dfeb;
+      --accent: #2457d6;
+      --accent-soft: rgba(36, 87, 214, 0.10);
+      --good: #117a4b;
+      --warn: #995f00;
+      --shadow: 0 14px 40px rgba(24, 33, 47, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 214, 0.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(17, 122, 75, 0.06), transparent 18%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 28px 20px 36px;
+    }
+
+    .hero {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #c9d8fb;
+      background: #eef4ff;
+      color: var(--accent);
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      max-width: 1050px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .hero-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px 18px;
+    }
+
+    .hero-card h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .hero-card p,
+    .hero-card li {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .hero-card ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .stat .k {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stat .v {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr) 360px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .controls,
+    .detail,
+    .theory {
+      padding: 18px;
+    }
+
+    .controls {
+      position: sticky;
+      top: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1rem;
+    }
+
+    .search-box,
+    select,
+    button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .search-box,
+    select {
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .search-box:focus,
+    select:focus {
+      border-color: #b8c9f1;
+      box-shadow: 0 0 0 4px rgba(36, 87, 214, 0.08);
+    }
+
+    .ctrl-group {
+      margin-bottom: 14px;
+    }
+
+    .ctrl-label {
+      display: block;
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 8px;
+      max-height: 230px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .check-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.92rem;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .check-item input {
+      margin-top: 2px;
+      accent-color: var(--accent);
+    }
+
+    .small-note {
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    button {
+      padding: 11px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: #bac9ea;
+      box-shadow: 0 10px 18px rgba(24, 33, 47, 0.06);
+    }
+
+    .primary {
+      background: linear-gradient(180deg, #eef4ff 0%, #e6efff 100%);
+      color: var(--accent);
+      border-color: #c9d8fb;
+    }
+
+    .results-panel {
+      overflow: hidden;
+    }
+
+    .results-head {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .results-meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .results {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      max-height: 980px;
+      overflow: auto;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      padding: 16px;
+      cursor: pointer;
+      transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+      border-color: #c4d2ef;
+      box-shadow: 0 10px 20px rgba(24, 33, 47, 0.05);
+    }
+
+    .card.active {
+      border-color: #b9cdf8;
+      box-shadow: 0 0 0 4px rgba(36, 87, 214, 0.08);
+      background: linear-gradient(180deg, #fdfefe 0%, #f4f8ff 100%);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .name {
+      margin: 0;
+      font-size: 1.02rem;
+      line-height: 1.25;
+    }
+
+    .symbol {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 52px;
+      min-height: 40px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .chip.exact {
+      background: rgba(17, 122, 75, 0.08);
+      color: var(--good);
+      border-color: rgba(17, 122, 75, 0.22);
+    }
+
+    .chip.measured {
+      background: rgba(153, 95, 0, 0.08);
+      color: var(--warn);
+      border-color: rgba(153, 95, 0, 0.22);
+    }
+
+    .value-block {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+
+    .value-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .value-main {
+      font-size: 1.04rem;
+      font-weight: 800;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .desc {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.62;
+    }
+
+    .detail {
+      position: sticky;
+      top: 16px;
+      min-height: 300px;
+    }
+
+    .detail-placeholder {
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.7;
+    }
+
+    .detail h2 {
+      margin: 0 0 8px;
+      font-size: 1.28rem;
+      line-height: 1.2;
+    }
+
+    .detail-grid {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0 16px;
+    }
+
+    .detail-row {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel-2);
+      padding: 12px 13px;
+    }
+
+    .detail-row .k {
+      font-size: 0.76rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .detail-row .v {
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .theory {
+      margin-top: 20px;
+    }
+
+    .theory h2 {
+      margin: 0 0 16px;
+      font-size: 1.1rem;
+    }
+
+    .theory-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .theory-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel-2);
+      padding: 16px;
+    }
+
+    .theory-card h3 {
+      margin: 0 0 8px;
+      font-size: 0.98rem;
+    }
+
+    .theory-card p,
+    .theory-card li {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    .theory-card ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .footnote {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1260px) {
+      .layout {
+        grid-template-columns: 320px minmax(0, 1fr);
+      }
+      .detail-wrap {
+        grid-column: 1 / -1;
+      }
+      .detail {
+        position: static;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .theory-grid,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .controls {
+        position: static;
+      }
+      .actions {
+        grid-template-columns: 1fr;
+      }
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page { padding: 16px; }
+      .hero { padding: 18px; }
+      .results-head { padding: 16px; }
+      .results { padding: 16px; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero panel">
+      <div class="eyebrow">📘 Archivio di riferimento · Sistema Internazionale</div>
+      <h1>Costanti della fisica</h1>
+      <p class="subtitle">
+        Questa pagina raccoglie un insieme ampio di costanti fisiche fondamentali e derivate espresse in unità del Sistema Internazionale (SI), organizzate per argomento e ricercabili tramite nome, simbolo, unità, descrizione e tag. Per ciascuna costante trovi valore numerico, unità, stato metrologico, contesto d’uso e relazioni utili.
+      </p>
+
+      <div class="hero-grid">
+        <div class="hero-card">
+          <h2>Come usare la pagina</h2>
+          <ul>
+            <li>La barra di ricerca interroga contemporaneamente nome, simbolo, tag, unità e descrizione.</li>
+            <li>I filtri permettono di selezionare gli argomenti fisici di interesse.</li>
+            <li>Il pannello di destra mostra una scheda estesa della costante selezionata.</li>
+            <li>La distinzione tra <strong>costanti esatte</strong> e <strong>costanti misurate</strong> è riportata esplicitamente.</li>
+          </ul>
+        </div>
+        <div class="hero-card">
+          <h2>Panoramica</h2>
+          <div class="stats" id="topStats"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel controls">
+        <h2 class="section-title">Ricerca e filtri</h2>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="searchInput">Ricerca libera</label>
+          <input id="searchInput" class="search-box" type="text" placeholder="Es. Planck, epsilon, costante dei gas, gravitazione..." />
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="stateFilter">Stato metrologico</label>
+          <select id="stateFilter">
+            <option value="all">Tutte</option>
+            <option value="exact">Solo esatte</option>
+            <option value="measured">Solo misurate</option>
+          </select>
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">Argomenti</label>
+          <div id="categoryList" class="check-list"></div>
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="sortSelect">Ordinamento</label>
+          <select id="sortSelect">
+            <option value="category">Per argomento</option>
+            <option value="name">Per nome</option>
+            <option value="symbol">Per simbolo</option>
+            <option value="state">Per stato metrologico</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button id="clearBtn" type="button">Pulisci filtri</button>
+          <button id="showAllBtn" class="primary" type="button">Mostra tutto</button>
+        </div>
+
+        <p class="small-note" style="margin-top:14px;">
+          Nota didattica: in una pagina di questo tipo è utile distinguere tra costanti che definiscono il SI e costanti ottenute sperimentalmente. Questo aiuta a capire perché alcune grandezze hanno valore esatto mentre altre portano con sé un’incertezza sperimentale.
+        </p>
+      </aside>
+
+      <main class="panel results-panel">
+        <div class="results-head">
+          <div>
+            <h2 class="section-title" style="margin-bottom:6px;">Elenco delle costanti</h2>
+            <div class="results-meta" id="resultsMeta"></div>
+          </div>
+          <div class="results-meta" id="activeFilters"></div>
+        </div>
+        <div class="results" id="results"></div>
+      </main>
+
+      <div class="detail-wrap">
+        <aside class="panel detail" id="detailPanel">
+          <div class="detail-placeholder">
+            Seleziona una costante dall’elenco per visualizzare la scheda completa con simbolo, valore, unità, definizione, formule collegate, ambiti d’uso e tag di ricerca.
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="panel theory">
+      <h2>Quadro teorico e criteri di lettura</h2>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <h3>1. Costanti esatte e costanti misurate</h3>
+          <p>
+            Dopo la ridefinizione moderna del Sistema Internazionale, alcune costanti hanno valore numerico fissato esattamente perché definiscono le unità fondamentali. È il caso, per esempio, della velocità della luce nel vuoto, della costante di Planck, della carica elementare, della costante di Boltzmann e della costante di Avogadro. Altre costanti, come la costante gravitazionale universale o la massa dell’elettrone, restano invece determinate sperimentalmente.
+          </p>
+        </div>
+        <div class="theory-card">
+          <h3>2. Unità e coerenza dimensionale</h3>
+          <p>
+            Ogni costante è riportata in unità SI. Quando possibile viene anche mostrata la struttura dimensionale o una relazione definitoria. Questo è utile per controllare la coerenza delle equazioni fisiche: per esempio, la costante dielettrica del vuoto compare in relazioni elettrostatiche, mentre la permeabilità magnetica del vuoto compare nelle relazioni magnetiche e nell’elettrodinamica.
+          </p>
+        </div>
+        <div class="theory-card">
+          <h3>3. Organizzazione per argomento</h3>
+          <ul>
+            <li><strong>SI e definizioni:</strong> costanti che fissano il sistema di unità.</li>
+            <li><strong>Meccanica e gravitazione:</strong> costanti usate in dinamica, gravità e cosmologia.</li>
+            <li><strong>Elettromagnetismo:</strong> costanti per campi, onde elettromagnetiche e circuiti.</li>
+            <li><strong>Quantistica, atomica e nucleare:</strong> costanti tipiche della microfisica.</li>
+            <li><strong>Termodinamica e radiazione:</strong> costanti che legano temperatura, energia e spettro termico.</li>
+          </ul>
+        </div>
+        <div class="theory-card">
+          <h3>4. Suggerimenti didattici utili</h3>
+          <ul>
+            <li>Aggiungere una modalità “solo costanti fondamentali” e una “solo costanti derivate”.</li>
+            <li>Collegare ogni costante alle simulazioni del sito in cui compare.</li>
+            <li>Mostrare, in una futura versione, ordini di grandezza e confronti numerici.</li>
+            <li>Integrare una sezione con formule tipo: Coulomb, Planck, Stefan-Boltzmann, de Broglie, ideal gas, Schwarzschild.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footnote">
+        I valori riportati qui sono pensati come riferimento operativo per studio, didattica e consultazione rapida. Per applicazioni metrologiche o lavori numerici ad alta precisione conviene usare direttamente le tabelle ufficiali complete con cifre significative e incertezze complete.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const CONSTANTS = [
+      {
+        id: "c",
+        name: "Velocità della luce nel vuoto",
+        symbol: "c",
+        value: "299 792 458",
+        unit: "m s^-1",
+        category: "SI e definizioni",
+        state: "exact",
+        short: "Velocità di propagazione della radiazione elettromagnetica nel vuoto.",
+        description: "È una costante fondamentale della relatività ristretta e dell’elettromagnetismo. Compare nella relazione E = m c^2 e lega lunghezza d’onda e frequenza tramite λ ν = c.",
+        relation: "c = 299 792 458 m s^-1 (valore esatto)",
+        dimensions: "L T^-1",
+        tags: ["relatività", "elettromagnetismo", "onde", "vuoto", "radiazione", "fotoni"]
+      },
+      {
+        id: "h",
+        name: "Costante di Planck",
+        symbol: "h",
+        value: "6.626 070 15 × 10^-34",
+        unit: "J s",
+        category: "SI e definizioni",
+        state: "exact",
+        short: "Quanto fondamentale dell’azione.",
+        description: "Lega l’energia di un quanto di radiazione alla frequenza, E = h ν. È alla base della quantizzazione dell’energia e della ridefinizione moderna del chilogrammo.",
+        relation: "E = h ν",
+        dimensions: "M L^2 T^-1",
+        tags: ["quantistica", "fotoni", "azione", "energia", "frequenza"]
+      },
+      {
+        id: "hbar",
+        name: "Costante di Planck ridotta",
+        symbol: "ħ",
+        value: "1.054 571 817 × 10^-34",
+        unit: "J s",
+        category: "Quantistica e atomica",
+        state: "exact",
+        short: "Versione ridotta della costante di Planck, h/(2π).",
+        description: "Compare in meccanica quantistica, nella commutazione canonica, nell’equazione di Schrödinger e nella quantizzazione del momento angolare.",
+        relation: "ħ = h / (2π)",
+        dimensions: "M L^2 T^-1",
+        tags: ["quantistica", "schrodinger", "momento angolare", "azione"]
+      },
+      {
+        id: "e",
+        name: "Carica elementare",
+        symbol: "e",
+        value: "1.602 176 634 × 10^-19",
+        unit: "C",
+        category: "SI e definizioni",
+        state: "exact",
+        short: "Modulo della carica di protone ed elettrone.",
+        description: "Definisce l’ampere nel SI moderno e compare in elettromagnetismo, struttura atomica e fisica dello stato solido.",
+        relation: "q_e = e",
+        dimensions: "I T",
+        tags: ["carica", "elettrone", "protone", "elettromagnetismo", "coulomb"]
+      },
+      {
+        id: "kB",
+        name: "Costante di Boltzmann",
+        symbol: "k_B",
+        value: "1.380 649 × 10^-23",
+        unit: "J K^-1",
+        category: "SI e definizioni",
+        state: "exact",
+        short: "Lega temperatura ed energia a livello microscopico.",
+        description: "Connette la temperatura termodinamica all’energia media per grado di libertà e compare in termodinamica statistica, distribuzioni di Maxwell-Boltzmann, Fermi-Dirac e Bose-Einstein.",
+        relation: "E_termica tipica ~ k_B T",
+        dimensions: "M L^2 T^-2 Θ^-1",
+        tags: ["termodinamica", "statistica", "gas ideali", "temperatura", "entropia"]
+      },
+      {
+        id: "NA",
+        name: "Costante di Avogadro",
+        symbol: "N_A",
+        value: "6.022 140 76 × 10^23",
+        unit: "mol^-1",
+        category: "SI e definizioni",
+        state: "exact",
+        short: "Numero di entità elementari in una mole.",
+        description: "Collega scale microscopiche e macroscopiche in chimica fisica e termodinamica. Permette di passare da quantità di sostanza a numero di particelle.",
+        relation: "N = n N_A",
+        dimensions: "N^-1 (per mole)",
+        tags: ["mole", "chimica fisica", "gas", "particelle", "termodinamica"]
+      },
+      {
+        id: "Kcd",
+        name: "Efficacia luminosa della radiazione monocromatica a 540 THz",
+        symbol: "K_cd",
+        value: "683",
+        unit: "lm W^-1",
+        category: "SI e definizioni",
+        state: "exact",
+        short: "Costante fotometrica usata per definire la candela.",
+        description: "Serve a collegare la potenza radiante alla percezione fotometrica umana nella definizione della candela.",
+        relation: "K_cd = 683 lm W^-1",
+        dimensions: "fotometrica",
+        tags: ["fotometria", "candela", "radiometria", "visione"]
+      },
+      {
+        id: "delta_nu_Cs",
+        name: "Frequenza di transizione iperfine del cesio-133",
+        symbol: "Δν_Cs",
+        value: "9 192 631 770",
+        unit: "Hz",
+        category: "SI e definizioni",
+        state: "exact",
+        short: "Costante che definisce il secondo SI.",
+        description: "La durata del secondo è fissata assegnando questo valore esatto alla frequenza di transizione iperfine dell’atomo di cesio-133 non perturbato.",
+        relation: "1 s definito tramite Δν_Cs",
+        dimensions: "T^-1",
+        tags: ["tempo", "orologi atomici", "metrologia", "secondo"]
+      },
+      {
+        id: "mu0",
+        name: "Permeabilità magnetica del vuoto",
+        symbol: "μ_0",
+        value: "1.256 637 061 27 × 10^-6",
+        unit: "N A^-2",
+        category: "Elettromagnetismo",
+        state: "measured",
+        short: "Costante che lega campo magnetico, corrente e forze magnetiche nel vuoto.",
+        description: "Nel SI moderno non ha più valore esatto. Compare in magnetostatica, induzione e propagazione elettromagnetica nel vuoto.",
+        relation: "μ_0 ε_0 c^2 = 1",
+        dimensions: "M L T^-2 I^-2",
+        tags: ["vuoto", "magnetismo", "elettrodinamica", "maxwell", "induzione"]
+      },
+      {
+        id: "eps0",
+        name: "Permittività elettrica del vuoto",
+        symbol: "ε_0",
+        value: "8.854 187 8188 × 10^-12",
+        unit: "F m^-1",
+        category: "Elettromagnetismo",
+        state: "measured",
+        short: "Costante che misura la risposta elettrica del vuoto.",
+        description: "Compare nella legge di Coulomb, nelle equazioni di Maxwell e nella capacità di un condensatore. È collegata a μ_0 e c.",
+        relation: "ε_0 = 1 / (μ_0 c^2)",
+        dimensions: "M^-1 L^-3 T^4 I^2",
+        tags: ["coulomb", "campo elettrico", "maxwell", "condensatori", "vuoto"]
+      },
+      {
+        id: "G",
+        name: "Costante gravitazionale universale",
+        symbol: "G",
+        value: "6.674 30 × 10^-11",
+        unit: "m^3 kg^-1 s^-2",
+        category: "Meccanica e gravitazione",
+        state: "measured",
+        short: "Intensità dell’interazione gravitazionale newtoniana.",
+        description: "Entra nella legge di gravitazione universale F = G m_1 m_2 / r^2 e in molte formule di astrofisica, orbite, collasso e cosmologia.",
+        relation: "F = G m_1 m_2 / r^2",
+        dimensions: "M^-1 L^3 T^-2",
+        tags: ["gravità", "newton", "orbite", "masse", "astrofisica", "cosmologia"]
+      },
+      {
+        id: "g0",
+        name: "Accelerazione standard di gravità terrestre",
+        symbol: "g_0",
+        value: "9.806 65",
+        unit: "m s^-2",
+        category: "Meccanica e gravitazione",
+        state: "exact",
+        short: "Valore convenzionale standard dell’accelerazione di gravità sulla Terra.",
+        description: "È un valore convenzionale usato in ingegneria e metrologia. Non coincide ovunque con l’accelerazione locale reale, che varia con latitudine e quota.",
+        relation: "peso standard = m g_0",
+        dimensions: "L T^-2",
+        tags: ["gravità terrestre", "peso", "caduta libera", "meccanica"]
+      },
+      {
+        id: "R",
+        name: "Costante universale dei gas",
+        symbol: "R",
+        value: "8.314 462 618",
+        unit: "J mol^-1 K^-1",
+        category: "Termodinamica e statistica",
+        state: "exact",
+        short: "Costante macroscopica dei gas ideali.",
+        description: "È legata a k_B tramite R = N_A k_B e compare nell’equazione di stato pV = nRT.",
+        relation: "R = N_A k_B",
+        dimensions: "M L^2 T^-2 Θ^-1 mol^-1",
+        tags: ["gas ideali", "termodinamica", "moli", "equazione di stato"]
+      },
+      {
+        id: "sigma",
+        name: "Costante di Stefan-Boltzmann",
+        symbol: "σ",
+        value: "5.670 374 419 × 10^-8",
+        unit: "W m^-2 K^-4",
+        category: "Termodinamica e radiazione",
+        state: "exact",
+        short: "Costante della potenza irradiata da un corpo nero.",
+        description: "Compare nella legge di Stefan-Boltzmann, secondo cui la potenza emessa per unità di superficie è proporzionale a T^4.",
+        relation: "j* = σ T^4",
+        dimensions: "M T^-3 Θ^-4",
+        tags: ["corpo nero", "radiazione termica", "astrofisica", "temperatura"]
+      },
+      {
+        id: "bWien",
+        name: "Costante di spostamento di Wien",
+        symbol: "b",
+        value: "2.897 771 955 × 10^-3",
+        unit: "m K",
+        category: "Termodinamica e radiazione",
+        state: "exact",
+        short: "Lega temperatura e massimo spettrale di corpo nero.",
+        description: "Nella legge di Wien il prodotto tra temperatura e lunghezza d’onda del massimo di emissione è costante.",
+        relation: "λ_max T = b",
+        dimensions: "L Θ",
+        tags: ["corpo nero", "spettro", "temperatura", "radiazione termica"]
+      },
+      {
+        id: "c1",
+        name: "Prima costante di radiazione",
+        symbol: "c_1",
+        value: "3.741 771 852 × 10^-16",
+        unit: "W m^2",
+        category: "Termodinamica e radiazione",
+        state: "exact",
+        short: "Costante che compare nella formula di Planck per il corpo nero.",
+        description: "È usata nella legge di Planck in forma spettrale in lunghezza d’onda.",
+        relation: "B_λ(T) ∝ c_1 / [λ^5 (e^{c_2/(λT)} - 1)]",
+        dimensions: "M L^4 T^-3",
+        tags: ["planck", "corpo nero", "spettro", "radiazione"]
+      },
+      {
+        id: "c2",
+        name: "Seconda costante di radiazione",
+        symbol: "c_2",
+        value: "1.438 776 877 × 10^-2",
+        unit: "m K",
+        category: "Termodinamica e radiazione",
+        state: "exact",
+        short: "Costante esponenziale nella legge di Planck.",
+        description: "Controlla la scala termica nell’esponenziale della distribuzione spettrale di corpo nero.",
+        relation: "c_2 = h c / k_B",
+        dimensions: "L Θ",
+        tags: ["planck", "radiazione", "corpo nero", "temperatura"]
+      },
+      {
+        id: "alpha",
+        name: "Costante di struttura fine",
+        symbol: "α",
+        value: "7.297 352 5643 × 10^-3",
+        unit: "adimensionale",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Misura l’intensità dell’interazione elettromagnetica a bassa energia.",
+        description: "È una costante adimensionale centrale in elettrodinamica quantistica, spettroscopia atomica e struttura fine dei livelli energetici.",
+        relation: "α = e^2 / (4π ε_0 ħ c)",
+        dimensions: "1",
+        tags: ["QED", "atomi", "spettroscopia", "elettromagnetismo", "microfisica"]
+      },
+      {
+        id: "me",
+        name: "Massa dell’elettrone",
+        symbol: "m_e",
+        value: "9.109 383 7139 × 10^-31",
+        unit: "kg",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Massa a riposo dell’elettrone.",
+        description: "Entra nella dinamica relativistica, nell’atomo di Bohr, nel raggio di Bohr, nel magnetone di Bohr e in molte scale della fisica atomica e della materia.",
+        relation: "E_0 = m_e c^2",
+        dimensions: "M",
+        tags: ["elettrone", "atomo", "materia", "quantistica", "relatività"]
+      },
+      {
+        id: "mp",
+        name: "Massa del protone",
+        symbol: "m_p",
+        value: "1.672 621 9259 × 10^-27",
+        unit: "kg",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Massa a riposo del protone.",
+        description: "Fondamentale in fisica nucleare, plasma, astrofisica e idrogeno. Compare nella massa ridotta dell’atomo di idrogeno e nella scala dei nuclei.",
+        relation: "E_0 = m_p c^2",
+        dimensions: "M",
+        tags: ["protone", "nucleo", "idrogeno", "plasma", "astrofisica"]
+      },
+      {
+        id: "mn",
+        name: "Massa del neutrone",
+        symbol: "m_n",
+        value: "1.674 927 5006 × 10^-27",
+        unit: "kg",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Massa a riposo del neutrone.",
+        description: "È essenziale in fisica dei nuclei, decadimento beta, reattori e trasporto neutronico.",
+        relation: "E_0 = m_n c^2",
+        dimensions: "M",
+        tags: ["neutrone", "reattori", "decadimento beta", "nucleare"]
+      },
+      {
+        id: "u",
+        name: "Costante di massa atomica",
+        symbol: "m_u",
+        value: "1.660 539 068 92 × 10^-27",
+        unit: "kg",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Unità di massa atomica unificata espressa in chilogrammi.",
+        description: "È usata per esprimere le masse atomiche e nucleari in scala conveniente. 1 u corrisponde a 1/12 della massa dell’atomo di carbonio-12 neutro in stato fondamentale.",
+        relation: "1 u = m_u",
+        dimensions: "M",
+        tags: ["massa atomica", "u", "nucleare", "spettrometria"]
+      },
+      {
+        id: "muB",
+        name: "Magnetone di Bohr",
+        symbol: "μ_B",
+        value: "9.274 010 0657 × 10^-24",
+        unit: "J T^-1",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Scala naturale del momento magnetico elettronico.",
+        description: "Compare nel magnetismo atomico, effetto Zeeman, spin elettronico e spettroscopia magnetica.",
+        relation: "μ_B = e ħ / (2 m_e)",
+        dimensions: "I L^2",
+        tags: ["spin", "zeeman", "magnetismo atomico", "elettrone"]
+      },
+      {
+        id: "muN",
+        name: "Magnetone nucleare",
+        symbol: "μ_N",
+        value: "5.050 783 7393 × 10^-27",
+        unit: "J T^-1",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Scala naturale dei momenti magnetici nucleari.",
+        description: "È analogo al magnetone di Bohr ma costruito con la massa del protone. Compare in risonanza magnetica nucleare e fisica nucleare.",
+        relation: "μ_N = e ħ / (2 m_p)",
+        dimensions: "I L^2",
+        tags: ["nucleo", "NMR", "risonanza magnetica", "momento magnetico"]
+      },
+      {
+        id: "a0",
+        name: "Raggio di Bohr",
+        symbol: "a_0",
+        value: "5.291 772 105 44 × 10^-11",
+        unit: "m",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Scala di lunghezza dell’atomo di idrogeno nel modello di Bohr.",
+        description: "Fornisce l’ordine di grandezza tipico delle dimensioni atomiche e compare in molte unità atomiche.",
+        relation: "a_0 = 4π ε_0 ħ^2 / (m_e e^2)",
+        dimensions: "L",
+        tags: ["idrogeno", "atomo di bohr", "lunghezza atomica", "quantistica"]
+      },
+      {
+        id: "re",
+        name: "Raggio classico dell’elettrone",
+        symbol: "r_e",
+        value: "2.817 940 3205 × 10^-15",
+        unit: "m",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Scala classica associata all’elettrone carico.",
+        description: "Compare in scattering elettromagnetico e in formule classiche di interazione radiazione-materia.",
+        relation: "r_e = e^2 / (4π ε_0 m_e c^2)",
+        dimensions: "L",
+        tags: ["scattering", "thomson", "elettrone", "radiazione"]
+      },
+      {
+        id: "lambdaC",
+        name: "Lunghezza d’onda di Compton dell’elettrone",
+        symbol: "λ_C",
+        value: "2.426 310 235 38 × 10^-12",
+        unit: "m",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Scala relativistico-quantistica associata alla massa dell’elettrone.",
+        description: "Compare nello scattering Compton e come scala limite sotto cui diventano rilevanti effetti relativistici-quantistici per l’elettrone.",
+        relation: "λ_C = h / (m_e c)",
+        dimensions: "L",
+        tags: ["compton", "fotoni", "elettrone", "relatività quantistica"]
+      },
+      {
+        id: "Ry",
+        name: "Costante di Rydberg",
+        symbol: "R_∞",
+        value: "10 973 731.568 157",
+        unit: "m^-1",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Costante spettrale dell’idrogeno e degli atomi idrogenoidi.",
+        description: "È centrale nella spettroscopia atomica e nella formula delle righe dell’idrogeno.",
+        relation: "1/λ = R_∞ (1/n_1^2 - 1/n_2^2)",
+        dimensions: "L^-1",
+        tags: ["idrogeno", "spettroscopia", "livelli energetici", "atomi"]
+      },
+      {
+        id: "EH",
+        name: "Energia di Hartree",
+        symbol: "E_h",
+        value: "4.359 744 722 2060 × 10^-18",
+        unit: "J",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Scala energetica naturale nella fisica atomica.",
+        description: "È usata in teoria atomica e chimica quantistica. Corrisponde circa a 27.211 eV.",
+        relation: "E_h = 2 R_∞ h c = α^2 m_e c^2",
+        dimensions: "M L^2 T^-2",
+        tags: ["chimica quantistica", "energia atomica", "hartree"]
+      },
+      {
+        id: "F",
+        name: "Costante di Faraday",
+        symbol: "F",
+        value: "96 485.332 12",
+        unit: "C mol^-1",
+        category: "Elettromagnetismo",
+        state: "exact",
+        short: "Carica elettrica trasportata da una mole di cariche elementari.",
+        description: "Importante in elettrochimica e trasporto di carica. È il prodotto della costante di Avogadro per la carica elementare.",
+        relation: "F = N_A e",
+        dimensions: "I T mol^-1",
+        tags: ["elettrochimica", "mole", "carica", "corrente"]
+      },
+      {
+        id: "Rk",
+        name: "Costante di von Klitzing",
+        symbol: "R_K",
+        value: "25 812.807 45",
+        unit: "Ω",
+        category: "Elettromagnetismo",
+        state: "exact",
+        short: "Costante quantistica di resistenza dell’effetto Hall quantistico.",
+        description: "È usata in metrologia elettrica e fisica dello stato solido.",
+        relation: "R_K = h / e^2",
+        dimensions: "M L^2 T^-3 I^-2",
+        tags: ["hall quantistico", "resistenza", "metrologia", "stato solido"]
+      },
+      {
+        id: "KJ",
+        name: "Costante di Josephson",
+        symbol: "K_J",
+        value: "483 597.848 4 × 10^9",
+        unit: "Hz V^-1",
+        category: "Elettromagnetismo",
+        state: "exact",
+        short: "Costante quantistica del rapporto frequenza-tensione nell’effetto Josephson.",
+        description: "Fondamentale nella metrologia della tensione e nei campioni quantistici.",
+        relation: "K_J = 2 e / h",
+        dimensions: "T^-1 V^-1",
+        tags: ["josephson", "tensione", "metrologia", "superconduttività"]
+      },
+      {
+        id: "phi0",
+        name: "Quanto di flusso magnetico",
+        symbol: "Φ_0",
+        value: "2.067 833 848 × 10^-15",
+        unit: "Wb",
+        category: "Elettromagnetismo",
+        state: "exact",
+        short: "Unità quantizzata di flusso magnetico in superconduttività.",
+        description: "Compare nella quantizzazione del flusso e nella fisica dei dispositivi superconduttivi.",
+        relation: "Φ_0 = h / (2e)",
+        dimensions: "M L^2 T^-2 I^-1",
+        tags: ["superconduttività", "flusso magnetico", "SQUID", "quantizzazione"]
+      },
+      {
+        id: "Z0",
+        name: "Impedenza caratteristica del vuoto",
+        symbol: "Z_0",
+        value: "376.730 313 41",
+        unit: "Ω",
+        category: "Elettromagnetismo",
+        state: "measured",
+        short: "Rapporto tra campo elettrico e magnetico in un’onda piana nel vuoto.",
+        description: "È importante in propagazione delle onde elettromagnetiche, antenne e linee di trasmissione ideali nel vuoto.",
+        relation: "Z_0 = μ_0 c",
+        dimensions: "M L^2 T^-3 I^-2",
+        tags: ["onde elettromagnetiche", "antenne", "vuoto", "maxwell"]
+      },
+      {
+        id: "eV",
+        name: "Elettronvolt",
+        symbol: "eV",
+        value: "1.602 176 634 × 10^-19",
+        unit: "J",
+        category: "Quantistica e atomica",
+        state: "exact",
+        short: "Unità di energia pari al lavoro su una carica elementare per differenza di potenziale di 1 volt.",
+        description: "È comunemente usata in fisica atomica, nucleare, delle particelle e dello stato solido. Qui è riportata come costante di conversione verso il joule.",
+        relation: "1 eV = e × 1 V",
+        dimensions: "M L^2 T^-2",
+        tags: ["energia", "conversione", "particelle", "atomica", "nucleare"]
+      },
+      {
+        id: "amuMeV",
+        name: "Equivalente energetico dell’unità di massa atomica",
+        symbol: "m_u c^2",
+        value: "931.494 103 72",
+        unit: "MeV",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Energia equivalente alla massa unificata 1 u.",
+        description: "Costante molto usata in fisica nucleare per passare da difetti di massa a energie di legame.",
+        relation: "E = m_u c^2",
+        dimensions: "energia",
+        tags: ["massa-energia", "difetto di massa", "energia di legame", "nucleare"]
+      },
+      {
+        id: "aRad",
+        name: "Costante di radiazione",
+        symbol: "a",
+        value: "7.565 733 250 × 10^-16",
+        unit: "J m^-3 K^-4",
+        category: "Termodinamica e radiazione",
+        state: "exact",
+        short: "Densità di energia della radiazione termica per T^4.",
+        description: "Compare nell’energia volumica del campo di radiazione di corpo nero: u = a T^4.",
+        relation: "a = 4σ / c",
+        dimensions: "M L^-1 T^-2 Θ^-4",
+        tags: ["corpo nero", "densità di energia", "astrofisica", "radiazione"]
+      },
+      {
+        id: "molarVolume",
+        name: "Volume molare di un gas ideale",
+        symbol: "V_m",
+        value: "22.413 969 54 × 10^-3",
+        unit: "m^3 mol^-1",
+        category: "Termodinamica e statistica",
+        state: "exact",
+        short: "Volume molare ideale a T = 273.15 K e p = 100 kPa.",
+        description: "È un valore convenzionale utile per gas ideali in condizioni standard moderne (100 kPa).",
+        relation: "V_m = R T / p",
+        dimensions: "L^3 mol^-1",
+        tags: ["gas ideali", "condizioni standard", "mole", "termodinamica"]
+      },
+      {
+        id: "VmLoschmidt",
+        name: "Costante di Loschmidt",
+        symbol: "n_0",
+        value: "2.651 645 804 × 10^25",
+        unit: "m^-3",
+        category: "Termodinamica e statistica",
+        state: "exact",
+        short: "Numero di particelle per unità di volume in un gas ideale a 273.15 K e 100 kPa.",
+        description: "È la densità numerica del gas ideale in condizioni standard moderne.",
+        relation: "n_0 = p / (k_B T)",
+        dimensions: "L^-3",
+        tags: ["gas ideali", "densità numerica", "loschmidt", "particelle"]
+      },
+      {
+        id: "sigmaTh",
+        name: "Sezione d’urto di Thomson",
+        symbol: "σ_T",
+        value: "6.652 458 7051 × 10^-29",
+        unit: "m^2",
+        category: "Termodinamica e radiazione",
+        state: "measured",
+        short: "Sezione d’urto classica di scattering di fotoni su elettroni liberi a bassa energia.",
+        description: "È importante in astrofisica, plasma e interazione radiazione-materia nel regime classico.",
+        relation: "σ_T = (8π/3) r_e^2",
+        dimensions: "L^2",
+        tags: ["scattering", "thomson", "fotoni", "plasma", "astrofisica"]
+      },
+      {
+        id: "bohrMagnetonHz",
+        name: "Rapporto magnetone di Bohr-frequenza",
+        symbol: "μ_B / h",
+        value: "13.996 245 041",
+        unit: "GHz T^-1",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Conversione tra campo magnetico e frequenza per il magnetone di Bohr.",
+        description: "Molto utile in spettroscopia EPR/ESR e nell’effetto Zeeman.",
+        relation: "ν = (μ_B / h) B",
+        dimensions: "T^-1 s^-1",
+        tags: ["zeeman", "risonanza elettronica", "magnetismo", "spettroscopia"]
+      },
+      {
+        id: "gammaP",
+        name: "Rapporto giromagnetico del protone",
+        symbol: "γ_p",
+        value: "2.675 221 870 × 10^8",
+        unit: "s^-1 T^-1",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Rapporto giromagnetico del protone libero.",
+        description: "È centrale in risonanza magnetica nucleare e tecniche di imaging RMN/RM.",
+        relation: "ω = γ B",
+        dimensions: "T^-1 T^-1? frequenza per campo",
+        tags: ["NMR", "MRI", "protone", "spin", "risonanza magnetica"]
+      },
+      {
+        id: "RinfHz",
+        name: "Costante di Rydberg in frequenza",
+        symbol: "c R_∞",
+        value: "3.289 841 960 2508 × 10^15",
+        unit: "Hz",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Versione in frequenza della costante di Rydberg.",
+        description: "È utile per esprimere salti energetici atomici in termini di frequenza anziché di numero d’onda.",
+        relation: "ν = c R_∞ × (...) ",
+        dimensions: "T^-1",
+        tags: ["spettroscopia", "idrogeno", "frequenza", "livelli atomici"]
+      },
+      {
+        id: "muSun",
+        name: "Parametro gravitazionale eliocentrico",
+        symbol: "GM_☉",
+        value: "1.327 124 4 × 10^20",
+        unit: "m^3 s^-2",
+        category: "Astrofisica e cosmologia",
+        state: "measured",
+        short: "Prodotto G M del Sole, molto usato in meccanica orbitale.",
+        description: "In dinamica orbitale il parametro gravitazionale è spesso noto più precisamente del singolo valore di massa e di G presi separatamente.",
+        relation: "μ = G M",
+        dimensions: "L^3 T^-2",
+        tags: ["sole", "orbite", "meccanica celeste", "astrofisica"]
+      },
+      {
+        id: "Msol",
+        name: "Massa solare nominale",
+        symbol: "M_☉^N",
+        value: "1.988 47 × 10^30",
+        unit: "kg",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Valore nominale usato per esprimere masse stellari.",
+        description: "È una costante nominale adottata per praticità in astrofisica, utile per confrontare masse di stelle, pianeti e buchi neri.",
+        relation: "M = x M_☉^N",
+        dimensions: "M",
+        tags: ["sole", "stelle", "buchi neri", "masse stellari"]
+      },
+      {
+        id: "Rsol",
+        name: "Raggio solare nominale",
+        symbol: "R_☉^N",
+        value: "6.957 × 10^8",
+        unit: "m",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Valore nominale del raggio del Sole.",
+        description: "È usato per confronti dimensionali in astrofisica stellare.",
+        relation: "R = x R_☉^N",
+        dimensions: "L",
+        tags: ["sole", "stelle", "raggio stellare", "astrofisica"]
+      },
+      {
+        id: "Lsol",
+        name: "Luminosità solare nominale",
+        symbol: "L_☉^N",
+        value: "3.828 × 10^26",
+        unit: "W",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Valore nominale della luminosità del Sole.",
+        description: "Molto usato per esprimere luminosità stellari e bilanci radiativi.",
+        relation: "L = x L_☉^N",
+        dimensions: "M L^2 T^-3",
+        tags: ["sole", "luminosità", "stelle", "radiazione", "astrofisica"]
+      },
+      {
+        id: "au",
+        name: "Unità astronomica",
+        symbol: "au",
+        value: "149 597 870 700",
+        unit: "m",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Distanza astronomica di riferimento del Sistema Solare.",
+        description: "È la lunghezza esatta usata per esprimere distanze nel Sistema Solare.",
+        relation: "1 au = 149 597 870 700 m",
+        dimensions: "L",
+        tags: ["sistema solare", "orbite", "distanze astronomiche"]
+      },
+      {
+        id: "ly",
+        name: "Anno luce",
+        symbol: "ly",
+        value: "9.460 730 472 5808 × 10^15",
+        unit: "m",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Distanza percorsa dalla luce in un anno giuliano.",
+        description: "Unità utile per esprimere distanze interstellari.",
+        relation: "1 ly = c × 1 anno giuliano",
+        dimensions: "L",
+        tags: ["distanze stellari", "luce", "astronomia"]
+      },
+      {
+        id: "pc",
+        name: "Parsec",
+        symbol: "pc",
+        value: "3.085 677 581 49137 × 10^16",
+        unit: "m",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Unità di distanza basata sulla parallasse stellare.",
+        description: "Molto usata in astrofisica e cosmologia osservativa.",
+        relation: "1 pc = au / tan(1 arcsec)",
+        dimensions: "L",
+        tags: ["parallasse", "distanze astronomiche", "stelle", "galassie"]
+      },
+      {
+        id: "H0",
+        name: "Costante di Hubble (valore di riferimento didattico)",
+        symbol: "H_0",
+        value: "2.2 × 10^-18",
+        unit: "s^-1",
+        category: "Astrofisica e cosmologia",
+        state: "measured",
+        short: "Scala attuale di espansione cosmica in forma SI, riportata qui come valore indicativo tipico.",
+        description: "In cosmologia osservativa il suo valore dipende dai dati e dal modello adottato. Qui è inserito come ordine di grandezza didattico, utile per conversioni e stime temporali cosmiche.",
+        relation: "v ≈ H_0 d",
+        dimensions: "T^-1",
+        tags: ["cosmologia", "espansione", "universo", "galassie"]
+      },
+      {
+        id: "Tcmb",
+        name: "Temperatura della radiazione cosmica di fondo",
+        symbol: "T_CMB",
+        value: "2.7255",
+        unit: "K",
+        category: "Astrofisica e cosmologia",
+        state: "measured",
+        short: "Temperatura media attuale del fondo cosmico a microonde.",
+        description: "È un parametro osservativo centrale della cosmologia fisica e del bilancio radiativo cosmico.",
+        relation: "spettro di corpo nero cosmico",
+        dimensions: "Θ",
+        tags: ["CMB", "cosmologia", "microonde", "corpo nero"]
+      },
+      {
+        id: "sigmaSBnuc",
+        name: "Sezione d’urto efficace tipica del barn",
+        symbol: "barn",
+        value: "1 × 10^-28",
+        unit: "m^2",
+        category: "Atomica e nucleare",
+        state: "exact",
+        short: "Unità di superficie usata per esprimere sezioni d’urto nucleari.",
+        description: "Non è una costante fondamentale, ma una costante di conversione estremamente utile in fisica nucleare e delle particelle.",
+        relation: "1 barn = 10^-28 m^2",
+        dimensions: "L^2",
+        tags: ["barn", "sezione d'urto", "reattori", "nucleare", "particelle"]
+      },
+      {
+        id: "amuKg",
+        name: "Conversione massa atomica-chilogrammo",
+        symbol: "u",
+        value: "1.660 539 068 92 × 10^-27",
+        unit: "kg",
+        category: "Conversioni utili",
+        state: "measured",
+        short: "Ripetuta qui come costante di conversione pratica per problemi nucleari.",
+        description: "Serve a convertire rapidamente masse atomiche in unità SI quando si lavora in problemi misti tra fisica nucleare e meccanica classica.",
+        relation: "1 u = 1.660 539 068 92 × 10^-27 kg",
+        dimensions: "M",
+        tags: ["conversione", "massa atomica", "SI", "nucleare"]
+      },
+      {
+        id: "epsSi",
+        name: "Permittività relativa del silicio (tipica)",
+        symbol: "ε_r(Si)",
+        value: "11.7",
+        unit: "adimensionale",
+        category: "Materia e stato solido",
+        state: "measured",
+        short: "Valore tipico della costante dielettrica relativa del silicio.",
+        description: "Non è universale nel senso fondamentale, ma è molto utile in elettronica e fisica dei semiconduttori. Inserita qui come costante materiale frequentemente usata.",
+        relation: "ε = ε_r ε_0",
+        dimensions: "1",
+        tags: ["silicio", "semiconduttori", "dielettrico", "elettronica"]
+      },
+      {
+        id: "epsWater",
+        name: "Permittività relativa dell’acqua a temperatura ambiente (tipica)",
+        symbol: "ε_r(H2O)",
+        value: "≈ 78",
+        unit: "adimensionale",
+        category: "Materia e stato solido",
+        state: "measured",
+        short: "Valore tipico della costante dielettrica relativa dell’acqua liquida.",
+        description: "Molto usata in elettrochimica, biofisica e modellistica dei mezzi materiali. È fortemente dipendente dalla temperatura e dalla frequenza.",
+        relation: "ε = ε_r ε_0",
+        dimensions: "1",
+        tags: ["acqua", "dielettrico", "biofisica", "elettrochimica"]
+      },
+      {
+        id: "muBtoEVT",
+        name: "Magnetone di Bohr in elettronvolt per tesla",
+        symbol: "μ_B",
+        value: "5.788 381 7982 × 10^-5",
+        unit: "eV T^-1",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Versione pratica del magnetone di Bohr in unità elettronvolt per tesla.",
+        description: "È molto utile quando si stimano splitting di Zeeman in spettroscopia atomica e dello stato solido.",
+        relation: "ΔE ≈ μ_B B",
+        dimensions: "energia per campo",
+        tags: ["zeeman", "elettronvolt", "spettroscopia", "magnetismo"]
+      },
+      {
+        id: "mpme",
+        name: "Rapporto massa protone-elettrone",
+        symbol: "m_p / m_e",
+        value: "1836.152 673 43",
+        unit: "adimensionale",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Rapporto tra la massa del protone e quella dell’elettrone.",
+        description: "Parametro importante nella struttura atomica, molecolare e nelle scale energetiche della materia ordinaria.",
+        relation: "m_p / m_e",
+        dimensions: "1",
+        tags: ["rapporto di massa", "protone", "elettrone", "atomica"]
+      },
+      {
+        id: "mnmp",
+        name: "Rapporto massa neutrone-protone",
+        symbol: "m_n / m_p",
+        value: "1.001 378 419 31",
+        unit: "adimensionale",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Rapporto tra massa del neutrone e massa del protone.",
+        description: "Rilevante per decadimento beta, stabilità nucleare e fisica delle interazioni deboli.",
+        relation: "m_n / m_p",
+        dimensions: "1",
+        tags: ["neutrone", "protone", "decadimento beta", "nucleare"]
+      },
+      {
+        id: "alphaInv",
+        name: "Inverso della costante di struttura fine",
+        symbol: "α^-1",
+        value: "137.035 999 177",
+        unit: "adimensionale",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Forma tradizionalmente usata della costante di struttura fine.",
+        description: "Spesso riportata come 1/α nella letteratura, soprattutto in elettrodinamica quantistica e nelle discussioni sulle costanti fondamentali.",
+        relation: "α^-1 = 1 / α",
+        dimensions: "1",
+        tags: ["QED", "struttura fine", "costanti fondamentali"]
+      },
+      {
+        id: "RinfEnergy",
+        name: "Energia di Rydberg",
+        symbol: "R_y",
+        value: "2.179 872 361 1035 × 10^-18",
+        unit: "J",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Energia di ionizzazione dell’idrogeno nel limite di massa nucleare infinita.",
+        description: "È collegata alla costante di Rydberg e viene usata spesso in atomica teorica.",
+        relation: "R_y = h c R_∞",
+        dimensions: "M L^2 T^-2",
+        tags: ["idrogeno", "energia di ionizzazione", "spettroscopia", "rydberg"]
+      },
+      {
+        id: "kEeV",
+        name: "Conversione kelvin-elettronvolt",
+        symbol: "k_B",
+        value: "8.617 333 262 × 10^-5",
+        unit: "eV K^-1",
+        category: "Conversioni utili",
+        state: "exact",
+        short: "Versione pratica della costante di Boltzmann in elettronvolt per kelvin.",
+        description: "Molto utile in fisica dello stato solido, plasma e astrofisica per tradurre temperature in scale energetiche.",
+        relation: "k_B = 8.617... × 10^-5 eV/K",
+        dimensions: "energia per temperatura",
+        tags: ["kelvin", "elettronvolt", "plasma", "stato solido", "astrofisica"]
+      },
+      {
+        id: "hc",
+        name: "Prodotto h c",
+        symbol: "h c",
+        value: "1.986 445 857 × 10^-25",
+        unit: "J m",
+        category: "Quantistica e atomica",
+        state: "exact",
+        short: "Prodotto utile per convertire tra energia dei fotoni e lunghezza d’onda.",
+        description: "È usato continuamente in ottica, spettroscopia e fisica atomica tramite E = hc/λ.",
+        relation: "E = h c / λ",
+        dimensions: "M L^3 T^-2",
+        tags: ["fotoni", "spettroscopia", "ottica", "energia", "lunghezza d'onda"]
+      },
+      {
+        id: "hcEVnm",
+        name: "Prodotto h c in eV·nm",
+        symbol: "h c",
+        value: "1239.841 984",
+        unit: "eV nm",
+        category: "Conversioni utili",
+        state: "exact",
+        short: "Forma pratica usatissima per i fotoni visibili e UV.",
+        description: "Consente di stimare rapidamente l’energia in eV da una lunghezza d’onda espressa in nanometri.",
+        relation: "E[eV] = 1239.84 / λ[nm]",
+        dimensions: "energia × lunghezza",
+        tags: ["fotoni", "nanometri", "ottica", "spettroscopia", "conversione"]
+      },
+      {
+        id: "muEarth",
+        name: "Parametro gravitazionale geocentrico",
+        symbol: "GM_⊕",
+        value: "3.986 004 418 × 10^14",
+        unit: "m^3 s^-2",
+        category: "Astrofisica e cosmologia",
+        state: "measured",
+        short: "Parametro gravitazionale della Terra.",
+        description: "Usato in meccanica orbitale terrestre, satelliti e traiettorie balistiche su scala planetaria.",
+        relation: "μ = G M",
+        dimensions: "L^3 T^-2",
+        tags: ["terra", "satelliti", "orbite", "meccanica celeste"]
+      },
+      {
+        id: "Mearth",
+        name: "Massa terrestre nominale",
+        symbol: "M_⊕^N",
+        value: "5.972 2 × 10^24",
+        unit: "kg",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Valore nominale della massa terrestre usato come riferimento.",
+        description: "Comodo per confronti planetari e problemi didattici di gravitazione.",
+        relation: "M = x M_⊕^N",
+        dimensions: "M",
+        tags: ["terra", "pianeti", "massa planetaria", "gravitazione"]
+      },
+      {
+        id: "Rearth",
+        name: "Raggio terrestre nominale",
+        symbol: "R_⊕^N",
+        value: "6.3781 × 10^6",
+        unit: "m",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Valore nominale del raggio terrestre.",
+        description: "Utile in problemi di campo gravitazionale, satelliti e geofisica introduttiva.",
+        relation: "R = x R_⊕^N",
+        dimensions: "L",
+        tags: ["terra", "raggio terrestre", "satelliti", "geofisica"]
+      },
+      {
+        id: "alphaParticleMass",
+        name: "Massa della particella alfa",
+        symbol: "m_α",
+        value: "6.644 657 3450 × 10^-27",
+        unit: "kg",
+        category: "Atomica e nucleare",
+        state: "measured",
+        short: "Massa del nucleo di elio-4.",
+        description: "Importante in decadimenti alfa, scattering nucleare e struttura del nucleo.",
+        relation: "particella α = nucleo di He-4",
+        dimensions: "M",
+        tags: ["alfa", "elio", "decadimento alfa", "nucleo"]
+      },
+      {
+        id: "rydbergEV",
+        name: "Energia di Rydberg in elettronvolt",
+        symbol: "R_y",
+        value: "13.605 693 123",
+        unit: "eV",
+        category: "Quantistica e atomica",
+        state: "measured",
+        short: "Forma pratica in eV della scala di Rydberg.",
+        description: "Usata spesso per l’atomo di idrogeno e la teoria atomica introduttiva.",
+        relation: "R_y ≈ 13.6 eV",
+        dimensions: "energia",
+        tags: ["idrogeno", "eV", "atomica", "livelli energetici"]
+      },
+      {
+        id: "bohrRadiusAngstrom",
+        name: "Raggio di Bohr in ångström",
+        symbol: "a_0",
+        value: "0.529 177 210 544",
+        unit: "Å",
+        category: "Conversioni utili",
+        state: "measured",
+        short: "Forma pratica del raggio di Bohr in unità atomiche comode.",
+        description: "Utile in chimica, spettroscopia e stime dimensionali della struttura atomica.",
+        relation: "1 Å = 10^-10 m",
+        dimensions: "lunghezza",
+        tags: ["bohr", "angstrom", "atomi", "chimica"]
+      },
+      {
+        id: "jansky",
+        name: "Jansky",
+        symbol: "Jy",
+        value: "1 × 10^-26",
+        unit: "W m^-2 Hz^-1",
+        category: "Astrofisica e cosmologia",
+        state: "exact",
+        short: "Unità di densità di flusso spettrale usata in radioastronomia.",
+        description: "Non è una costante fondamentale ma una conversione standard molto utile per astrofisica osservativa.",
+        relation: "1 Jy = 10^-26 W m^-2 Hz^-1",
+        dimensions: "M T^-2",
+        tags: ["jansky", "radioastronomia", "flusso spettrale", "astrofisica"]
+      },
+      {
+        id: "deg2rad",
+        name: "Conversione gradi-radianti",
+        symbol: "π/180",
+        value: "1.745 329 251 9943 × 10^-2",
+        unit: "rad deg^-1",
+        category: "Conversioni utili",
+        state: "exact",
+        short: "Fattore di conversione da gradi sessagesimali a radianti.",
+        description: "Utile in meccanica, onde, ottica e rotazioni. Anche se non è una costante fisica fondamentale, è estremamente pratica in ogni simulazione interattiva.",
+        relation: "θ[rad] = θ[deg] × π / 180",
+        dimensions: "1",
+        tags: ["angoli", "radianti", "gradi", "trigonometria"]
+      }
+    ];
+
+    const resultsEl = document.getElementById('results');
+    const detailEl = document.getElementById('detailPanel');
+    const categoryListEl = document.getElementById('categoryList');
+    const searchInput = document.getElementById('searchInput');
+    const stateFilter = document.getElementById('stateFilter');
+    const sortSelect = document.getElementById('sortSelect');
+    const resultsMeta = document.getElementById('resultsMeta');
+    const activeFiltersEl = document.getElementById('activeFilters');
+    const clearBtn = document.getElementById('clearBtn');
+    const showAllBtn = document.getElementById('showAllBtn');
+    const topStats = document.getElementById('topStats');
+
+    let selectedId = CONSTANTS[0]?.id || null;
+
+    const categories = [...new Set(CONSTANTS.map(c => c.category))].sort((a, b) => a.localeCompare(b, 'it'));
+
+    function renderTopStats() {
+      const exactCount = CONSTANTS.filter(c => c.state === 'exact').length;
+      const measuredCount = CONSTANTS.filter(c => c.state === 'measured').length;
+      const html = [
+        { k: 'Costanti', v: CONSTANTS.length },
+        { k: 'Argomenti', v: categories.length },
+        { k: 'Esatte', v: exactCount },
+        { k: 'Misurate', v: measuredCount }
+      ].map(item => `
+        <div class="stat">
+          <div class="k">${item.k}</div>
+          <div class="v">${item.v}</div>
+        </div>
+      `).join('');
+      topStats.innerHTML = html;
+    }
+
+    function renderCategories() {
+      categoryListEl.innerHTML = categories.map(cat => `
+        <label class="check-item">
+          <input type="checkbox" value="${escapeHtml(cat)}" checked />
+          <span>${cat}</span>
+        </label>
+      `).join('');
+
+      categoryListEl.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', applyFilters);
+      });
+    }
+
+    function getSelectedCategories() {
+      return [...categoryListEl.querySelectorAll('input:checked')].map(i => i.value);
+    }
+
+    function normalize(str) {
+      return (str || '')
+        .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+    }
+
+    function getSearchBlob(item) {
+      return normalize([
+        item.name,
+        item.symbol,
+        item.unit,
+        item.category,
+        item.short,
+        item.description,
+        item.relation,
+        item.dimensions,
+        ...(item.tags || [])
+      ].join(' | '));
+    }
+
+    function sortItems(items) {
+      const mode = sortSelect.value;
+      const arr = [...items];
+      if (mode === 'name') {
+        arr.sort((a, b) => a.name.localeCompare(b.name, 'it'));
+      } else if (mode === 'symbol') {
+        arr.sort((a, b) => a.symbol.localeCompare(b.symbol, 'it'));
+      } else if (mode === 'state') {
+        arr.sort((a, b) => a.state.localeCompare(b.state, 'it') || a.name.localeCompare(b.name, 'it'));
+      } else {
+        arr.sort((a, b) => a.category.localeCompare(b.category, 'it') || a.name.localeCompare(b.name, 'it'));
+      }
+      return arr;
+    }
+
+    function applyFilters() {
+      const query = normalize(searchInput.value.trim());
+      const chosenCats = getSelectedCategories();
+      const state = stateFilter.value;
+
+      let items = CONSTANTS.filter(item => {
+        const matchesQuery = !query || getSearchBlob(item).includes(query);
+        const matchesCategory = chosenCats.includes(item.category);
+        const matchesState = state === 'all' || item.state === state;
+        return matchesQuery && matchesCategory && matchesState;
+      });
+
+      items = sortItems(items);
+      renderResults(items);
+      renderActiveFilters(items.length, chosenCats, state, query);
+
+      if (!items.some(i => i.id === selectedId)) {
+        selectedId = items[0]?.id || null;
+      }
+      renderDetail(items.find(i => i.id === selectedId) || null);
+    }
+
+    function renderActiveFilters(count, chosenCats, state, query) {
+      resultsMeta.textContent = `${count} costante${count === 1 ? '' : 'i'} visualizzat${count === 1 ? 'a' : 'e'}.`;
+
+      const parts = [];
+      if (query) parts.push(`ricerca: “${searchInput.value.trim()}”`);
+      if (state !== 'all') parts.push(state === 'exact' ? 'solo esatte' : 'solo misurate');
+      if (chosenCats.length !== categories.length) parts.push(`${chosenCats.length} categorie selezionate`);
+      activeFiltersEl.textContent = parts.length ? parts.join(' · ') : 'nessun filtro specifico';
+    }
+
+    function renderResults(items) {
+      if (!items.length) {
+        resultsEl.innerHTML = `
+          <div class="card">
+            <h3 class="name">Nessun risultato</h3>
+            <p class="desc">Prova a cambiare parola chiave, riattivare qualche categoria o rimuovere il filtro sullo stato metrologico.</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultsEl.innerHTML = items.map(item => `
+        <article class="card ${item.id === selectedId ? 'active' : ''}" data-id="${item.id}">
+          <div class="card-top">
+            <div>
+              <h3 class="name">${escapeHtml(item.name)}</h3>
+              <div class="meta-line">
+                <span class="chip">${escapeHtml(item.category)}</span>
+                <span class="chip ${item.state}">${item.state === 'exact' ? 'esatta' : 'misurata'}</span>
+              </div>
+            </div>
+            <div class="symbol">${escapeHtml(item.symbol)}</div>
+          </div>
+          <div class="value-block">
+            <div class="value-label">Valore</div>
+            <div class="value-main">${escapeHtml(item.value)} ${escapeHtml(item.unit)}</div>
+          </div>
+          <p class="desc">${escapeHtml(item.short)}</p>
+        </article>
+      `).join('');
+
+      resultsEl.querySelectorAll('.card[data-id]').forEach(card => {
+        card.addEventListener('click', () => {
+          selectedId = card.dataset.id;
+          applyFilters();
+        });
+      });
+    }
+
+    function renderDetail(item) {
+      if (!item) {
+        detailEl.innerHTML = `
+          <div class="detail-placeholder">
+            Nessuna costante selezionata.
+          </div>
+        `;
+        return;
+      }
+
+      detailEl.innerHTML = `
+        <div class="meta-line" style="margin-top:0; margin-bottom:10px;">
+          <span class="chip">${escapeHtml(item.category)}</span>
+          <span class="chip ${item.state}">${item.state === 'exact' ? 'costante esatta' : 'costante misurata'}</span>
+        </div>
+        <h2>${escapeHtml(item.name)}</h2>
+        <div class="symbol" style="margin-bottom:14px;">${escapeHtml(item.symbol)}</div>
+
+        <div class="detail-grid">
+          <div class="detail-row">
+            <div class="k">Valore</div>
+            <div class="v">${escapeHtml(item.value)}</div>
+          </div>
+          <div class="detail-row">
+            <div class="k">Unità SI</div>
+            <div class="v">${escapeHtml(item.unit)}</div>
+          </div>
+          <div class="detail-row">
+            <div class="k">Formula / relazione</div>
+            <div class="v">${escapeHtml(item.relation || '—')}</div>
+          </div>
+          <div class="detail-row">
+            <div class="k">Struttura dimensionale / nota</div>
+            <div class="v">${escapeHtml(item.dimensions || '—')}</div>
+          </div>
+        </div>
+
+        <div class="detail-row" style="margin-bottom:12px;">
+          <div class="k">Descrizione</div>
+          <div class="v" style="font-weight:500;">${escapeHtml(item.description)}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="k">Tag di ricerca</div>
+          <div class="tag-cloud">
+            ${(item.tags || []).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function resetFilters() {
+      searchInput.value = '';
+      stateFilter.value = 'all';
+      sortSelect.value = 'category';
+      categoryListEl.querySelectorAll('input').forEach(i => i.checked = true);
+      applyFilters();
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+    stateFilter.addEventListener('change', applyFilters);
+    sortSelect.addEventListener('change', applyFilters);
+    clearBtn.addEventListener('click', resetFilters);
+    showAllBtn.addEventListener('click', resetFilters);
+
+    renderTopStats();
+    renderCategories();
+    applyFilters();
+  </script>
+</body>
+</html>

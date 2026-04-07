@@ -1,10 +1,64 @@
 DA FARE:
--Radiazione corpo nero/bremsstrahlung/sincrotrone/ciclotrnone/altro
+-Radiazione corpo nero (legge di Wien e legge di Stefan-Boltzmann)/bremsstrahlung/sincrotrone/ciclotrnone/altro con autoassorbimenti magari
 -Tipi di elettrizzazione
 -Traiettorie orbitali (effetto fionda e simili)
 -Oscillatore armonico (smaorzato e forzato, con risonanza)
 -Diffrazione da reticolo cristallino
-
+-Reattore nucleare (decadimento, moderazione, fissione spontanea e indotta, criticita, luce cherenkov)
+-Particle shower (particelle energetiche collidono con alta atmosfera)
+-Acceleratoe di particelle
+-Campi magnetici (visualizzazione, moti di particelle cariche, induzione, elgame con elettromagnetismo)
+-Sistemi di riferimento (?)
+-Attrito aria
+-Lavoro di una forza
+-Momento d'inerzia
+-Momento angolare
+-Giroscopio e precessione
+-Velocita di fase e di gruppo nelle onde
+-Moto browniano
+-Selettore di velocita e spettrometro di massa
+-Spettro luce
+-Specchio piano
+-Relativita
+-Atomo di Bohr
+-Effetto fotoelettrico
+-Effetto Compton
+-Esperimetno di Stern-Gerlach
+-Sfera di Bloch spin 1/2
+-struttura del nucleo
+-difetto di massa ed energia di legame
+-curva di energia di legame per nucleone
+-carta dei nuclidi semplificata
+-decadimento alfa, beta e gamma
+-legge del decadimento radioattivo
+-tempo di dimezzamento e costante di decadimento
+-decadimento stocastico con metodo Monte Carlo
+-fissione nucleare
+-fusione nucleare
+-modello standard delle particelle
+-conservazioni nei decadimenti
+-tracce in rivelatore
+-curvatura di tracce in campo magnetico
+-oscillazioni dei neutrini
+-diagramma Hertzsprung-Russell
+-evoluzione stellare in funzione della massa
+-fusione nelle stelle
+-orbite kepleriane
+-problema dei due corpi
+-problema dei tre corpi semplificato
+-punti lagrangiani
+-velocità di fuga
+-curve di rotazione galattica
+-espansione dell’universo
+-legge di Hubble-Lemaître
+-cronologia cosmica
+-radiazione cosmica di fondo a microonde
+-campi scalari e vettoriali
+-gradiente, divergenza e rotore
+-serie di Fourier
+-trasformata di Fourier
+-spazio delle fasi
+-sistemi caotici
 
 SISTEMARE:
 -Turbolena-instabilita:
@@ -31,7 +85,9 @@ SISTEMARE:
 Simulazioni:
 
 Fondamenti:
+- Grandezze e unità di misura
 - Grandezze vettoriali
+- Costanti della fisica
 
 Meccanica:
 - Moto rettilineo uniforme

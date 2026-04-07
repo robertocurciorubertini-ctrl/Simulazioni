@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  title: "Grandezze e unità di misura",
+  description: "Convertitore esteso tra grandezze fisiche e unità metriche con spiegazioni su unità fondamentali, derivate, prefissi SI e unità specialistiche come barn e jansky.",
+  category: "Fondamenti",
+  icon: "📏",
+  order: 0,
+  tags: ["grandezze fisiche", "unità di misura", "SI", "prefissi metrici", "conversioni", "barn", "jansky"],
+  level: "base"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grandezze e unità di misura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f4ef;
+  --bg-soft: #fbfaf7;
+  --panel: #fffdf9;
+  --ink: #1b1a17;
+  --ink-soft: #5e594f;
+  --muted: #8b8475;
+  --line: #d9d0c1;
+  --accent: #1f6fb2;
+  --accent-2: #b25d1f;
+  --accent-3: #2f7d54;
+  --danger: #b74444;
+  --shadow: 0 12px 28px rgba(33, 30, 23, 0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: linear-gradient(180deg, #f8f6f1 0%, #f2eee6 100%);
+  color: var(--ink);
+  line-height: 1.6;
+}
+header {
+  padding: 30px 46px 24px;
+  background: #171a20;
+  color: #f7f3ea;
+  border-bottom: 3px solid var(--accent);
+}
+header h1 {
+  font-family: 'EB Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+header p {
+  margin-top: 8px;
+  max-width: 950px;
+  color: #d0d6df;
+  font-size: 0.98rem;
+}
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8dbbe8;
+}
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 46px;
+  background: #171a20;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  border: none;
+  background: transparent;
+  color: #aeb7c4;
+  cursor: pointer;
+  padding: 12px 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid transparent;
+}
+.tab-btn.active {
+  color: #ffffff;
+  border-bottom-color: var(--accent);
+}
+.main-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 28px 52px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.grid-main {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr) 360px;
+  gap: 22px;
+  align-items: start;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+.panel-pad { padding: 20px; }
+.panel-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.control-group { margin-bottom: 16px; }
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+.control-label span {
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+}
+select, input[type="number"], input[type="text"] {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+  padding: 10px 12px;
+  font-size: 0.96rem;
+}
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+button.btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.77rem;
+  letter-spacing: 0.05em;
+}
+button.btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+button.btn:hover { filter: brightness(0.98); }
+.converter-hero {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, #fdfcf8 0%, #f6f1e7 100%);
+}
+.converter-hero h2 {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.85rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.converter-hero p {
+  color: var(--ink-soft);
+  max-width: 840px;
+}
+.converter-core {
+  padding: 22px 24px 24px;
+}
+.conversion-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 70px 1.15fr;
+  gap: 14px;
+  align-items: end;
+}
+.arrow-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 46px;
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 1.5rem;
+  background: var(--bg-soft);
+}
+.result-bar {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 6px;
+  background: #eef5fb;
+  border: 1px solid #c9dced;
+}
+.result-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #597492;
+}
+.result-main {
+  margin-top: 6px;
+  font-size: 1.28rem;
+  font-weight: 600;
+  color: #16344c;
+  word-break: break-word;
+}
+.result-extra {
+  margin-top: 8px;
+  color: #4a6178;
+  font-size: 0.92rem;
+}
+.mini-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.stat-box {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  padding: 12px 14px;
+}
+.stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+}
+.stat-val {
+  margin-top: 4px;
+  font-size: 1rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+.info-card, .theory-card, .formula-card {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  padding: 16px 18px;
+}
+.info-card + .info-card, .theory-card + .theory-card, .formula-card + .formula-card { margin-top: 14px; }
+.info-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.info-head h3, .theory-card h3, .formula-card h3 {
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+.unit-symbol {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+.dim-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #f7f9fb;
+  border: 1px solid #d8e3ec;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.84rem;
+  color: #24455f;
+}
+.description {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+.bullet-list {
+  margin-top: 10px;
+  padding-left: 18px;
+}
+.bullet-list li { margin-bottom: 6px; color: var(--ink-soft); }
+.prefix-table, .units-table, .formula-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.92rem;
+}
+.prefix-table th, .prefix-table td,
+.units-table th, .units-table td,
+.formula-table th, .formula-table td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.prefix-table th, .units-table th, .formula-table th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.note {
+  margin-top: 10px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+.section-block {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 22px;
+  margin-top: 22px;
+}
+.section-block.single { grid-template-columns: 1fr; }
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.kpi {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 12px 14px;
+}
+.kpi .n {
+  display: block;
+  font-weight: 600;
+  font-size: 1.14rem;
+  color: var(--accent-2);
+}
+.kpi .t {
+  margin-top: 3px;
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+.inline-code {
+  font-family: 'IBM Plex Mono', monospace;
+  background: #f2efe7;
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.callout {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 5px;
+  border-left: 4px solid var(--accent-2);
+  background: #fdf5ea;
+  color: #684b2d;
+}
+.formula {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #f8f8f8;
+  border: 1px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace;
+  color: #253345;
+  overflow-x: auto;
+}
+.footer-sources {
+  margin-top: 18px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+@media (max-width: 1180px) {
+  .grid-main { grid-template-columns: 1fr; }
+  .section-block { grid-template-columns: 1fr; }
+}
+@media (max-width: 820px) {
+  header, .tabs { padding-left: 22px; padding-right: 22px; }
+  .main-wrap { padding: 18px 14px 42px; }
+  .conversion-grid { grid-template-columns: 1fr; }
+  .arrow-box { height: 40px; }
+  .mini-grid, .kpi-strip { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="badge">Laboratorio digitale di fisica</div>
+  </div>
+  <h1>Grandezze e unità di misura</h1>
+  <p>
+    Convertitore esteso e atlante ragionato delle unità metriche. La simulazione distingue tra grandezze fisiche,
+    unità fondamentali del Sistema Internazionale (SI, Sistema Internazionale), unità derivate, prefissi decimali e
+    unità specialistiche usate in contesti come fisica nucleare, radioastronomia e dosimetria.
+  </p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="0">Convertitore</button>
+  <button class="tab-btn" data-tab="1">Teoria</button>
+  <button class="tab-btn" data-tab="2">Formulario</button>
+</div>
+
+<div class="main-wrap">
+  <section class="tab-panel active" id="tab0">
+    <div class="grid-main">
+      <aside class="panel panel-pad">
+        <div class="panel-title">Selezione della grandezza</div>
+
+        <div class="control-group">
+          <div class="control-label"><label for="quantitySelect">Grandezza fisica</label><span id="groupTag">Fondamenti</span></div>
+          <select id="quantitySelect"></select>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><label for="inputValue">Valore numerico</label><span>dato</span></div>
+          <input id="inputValue" type="number" value="1" step="any">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><label for="fromUnit">Unità di partenza</label><span id="fromDim">SI</span></div>
+          <select id="fromUnit"></select>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><label for="toUnit">Unità di arrivo</label><span id="toDim">SI</span></div>
+          <select id="toUnit"></select>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn primary" id="swapBtn">Scambia</button>
+          <button class="btn" id="resetBtn">Reset</button>
+        </div>
+
+        <div class="callout">
+          Il convertitore permette solo trasformazioni tra unità della <strong>stessa grandezza</strong>.
+          Non ha senso convertire direttamente una lunghezza in un’energia, perché cambiano le dimensioni fisiche.
+        </div>
+      </aside>
+
+      <main class="panel">
+        <div class="converter-hero">
+          <h2>Convertitore dimensionale</h2>
+          <p>
+            Ogni conversione è ricondotta internamente all’unità di riferimento della grandezza selezionata. Nelle unità derivate
+            viene anche mostrata la decomposizione in unità fondamentali, per esempio <span class="inline-code">N = kg·m·s<sup>−2</sup></span>
+            e <span class="inline-code">J = kg·m<sup>2</sup>·s<sup>−2</sup></span>.
+          </p>
+        </div>
+        <div class="converter-core">
+          <div class="conversion-grid">
+            <div>
+              <div class="control-label"><label for="inputValue2">Valore in ingresso</label><span id="fromPretty">—</span></div>
+              <input id="inputValue2" type="text" readonly>
+            </div>
+            <div class="arrow-box">→</div>
+            <div>
+              <div class="control-label"><label for="outputValue">Valore convertito</label><span id="toPretty">—</span></div>
+              <input id="outputValue" type="text" readonly>
+            </div>
+          </div>
+
+          <div class="result-bar">
+            <div class="result-label">Equivalenza</div>
+            <div class="result-main" id="resultMain">1 m = 100 cm</div>
+            <div class="result-extra" id="resultExtra">La conversione viene espressa anche in notazione scientifica e tramite unità SI di riferimento.</div>
+          </div>
+
+          <div class="mini-grid">
+            <div class="stat-box">
+              <div class="stat-label">Grandezza</div>
+              <div class="stat-val" id="quantityName">Lunghezza</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Unità SI di riferimento</div>
+              <div class="stat-val" id="referenceUnit">metro (m)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Formula dimensionale</div>
+              <div class="stat-val" id="dimensionFormula">L</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel panel-pad">
+        <div class="panel-title">Scheda dell’unità selezionata</div>
+
+        <div class="info-card">
+          <div class="info-head">
+            <h3 id="unitTitle">Metro</h3>
+            <div class="unit-symbol" id="unitSymbol">m</div>
+          </div>
+          <div class="description" id="unitDescription"></div>
+          <div class="dim-box" id="unitDefinition"></div>
+          <ul class="bullet-list" id="unitUsage"></ul>
+        </div>
+
+        <div class="info-card">
+          <div class="info-head">
+            <h3>Relazione con il SI</h3>
+            <div class="unit-symbol" id="unitKind">fondamentale</div>
+          </div>
+          <div class="description" id="unitRelation"></div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-head">
+            <h3>Prefissi e ordini di grandezza</h3>
+            <div class="unit-symbol">10<sup>n</sup></div>
+          </div>
+          <div class="description">
+            Per l’unità selezionata sono mostrati alcuni multipli e sottomultipli metrici utili. Quando il loro uso non è standard,
+            la tabella è limitata alle forme più comuni.
+          </div>
+          <table class="prefix-table">
+            <thead>
+              <tr><th>Prefisso</th><th>Simbolo</th><th>Fattore</th><th>Esempio</th></tr>
+            </thead>
+            <tbody id="prefixTableBody"></tbody>
+          </table>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab1">
+    <div class="section-block">
+      <div class="theory-card">
+        <h3>1. Grandezza fisica, misura e unità</h3>
+        <p class="description">
+          Una <strong>grandezza fisica</strong> è una proprietà quantitativa di un sistema o di un fenomeno che può essere misurata,
+          cioè confrontata con un campione o con una definizione convenzionale. Il risultato di una misura si scrive in generale come
+          <span class="inline-code">Q = {numero} × {unità}</span>. Il numero da solo non basta: il valore <span class="inline-code">12</span>
+          è ambiguo finché non si specifica se si tratta di <span class="inline-code">12 m</span>, <span class="inline-code">12 s</span>,
+          <span class="inline-code">12 J</span> oppure <span class="inline-code">12 T</span>.
+        </p>
+        <div class="formula">Q = n · [Q]</div>
+        <p class="note">
+          Qui <strong>Q</strong> indica la grandezza fisica, <strong>n</strong> il valore numerico e <strong>[Q]</strong> l’unità di misura.
+          La stessa grandezza può essere espressa con unità diverse, purché siano compatibili dimensionalmente.
+        </p>
+        <div class="callout">
+          Concetto chiave: cambiare unità non cambia la grandezza fisica. Cambia solo il numero che usi per rappresentarla.
+        </div>
+      </div>
+      <div class="theory-card">
+        <h3>2. Unità fondamentali del SI</h3>
+        <table class="units-table">
+          <thead>
+            <tr><th>Grandezza</th><th>Unità</th><th>Simbolo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Lunghezza</td><td>metro</td><td>m</td></tr>
+            <tr><td>Massa</td><td>chilogrammo</td><td>kg</td></tr>
+            <tr><td>Tempo</td><td>secondo</td><td>s</td></tr>
+            <tr><td>Corrente elettrica</td><td>ampere</td><td>A</td></tr>
+            <tr><td>Temperatura termodinamica</td><td>kelvin</td><td>K</td></tr>
+            <tr><td>Quantità di sostanza</td><td>mole</td><td>mol</td></tr>
+            <tr><td>Intensità luminosa</td><td>candela</td><td>cd</td></tr>
+          </tbody>
+        </table>
+        <p class="note">
+          Queste sette unità sono assunte come fondamentali: tutte le altre unità coerenti del SI si ricavano come prodotti e quozienti di loro potenze.
+        </p>
+      </div>
+    </div>
+
+    <div class="kpi-strip">
+      <div class="kpi"><span class="n">7</span><span class="t">unità fondamentali del SI</span></div>
+      <div class="kpi"><span class="n">24</span><span class="t">prefissi SI riconosciuti</span></div>
+      <div class="kpi"><span class="n">2 classi</span><span class="t">unità fondamentali e unità derivate</span></div>
+      <div class="kpi"><span class="n">1 coerenza</span><span class="t">niente fattori nascosti nelle equazioni</span></div>
+    </div>
+
+    <div class="section-block">
+      <div class="theory-card">
+        <h3>3. Unità derivate e significato fisico</h3>
+        <p class="description">
+          Un’<strong>unità derivata</strong> è costruita a partire dalle unità fondamentali. Questo ha un valore concettuale importante:
+          la struttura dell’unità riflette la struttura della legge fisica. Se una forza soddisfa la seconda legge di Newton,
+          la sua unità deve essere il prodotto tra massa e accelerazione.
+        </p>
+        <div class="formula">1 N = 1 kg · m · s<sup>−2</sup></div>
+        <p class="description">
+          Qui <strong>N</strong> è il newton, unità di forza; <strong>kg</strong> è il chilogrammo, unità di massa; <strong>m</strong>
+          è il metro, unità di lunghezza; <strong>s</strong> è il secondo, unità di tempo. Analogamente:
+        </p>
+        <table class="units-table">
+          <thead>
+            <tr><th>Unità</th><th>Grandezza</th><th>Espressione in unità fondamentali</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>newton (N)</td><td>forza</td><td>kg·m·s<sup>−2</sup></td></tr>
+            <tr><td>joule (J)</td><td>energia, lavoro</td><td>kg·m<sup>2</sup>·s<sup>−2</sup></td></tr>
+            <tr><td>watt (W)</td><td>potenza</td><td>kg·m<sup>2</sup>·s<sup>−3</sup></td></tr>
+            <tr><td>pascal (Pa)</td><td>pressione</td><td>kg·m<sup>−1</sup>·s<sup>−2</sup></td></tr>
+            <tr><td>volt (V)</td><td>differenza di potenziale</td><td>kg·m<sup>2</sup>·s<sup>−3</sup>·A<sup>−1</sup></td></tr>
+            <tr><td>tesla (T)</td><td>induzione magnetica</td><td>kg·s<sup>−2</sup>·A<sup>−1</sup></td></tr>
+            <tr><td>becquerel (Bq)</td><td>attività radioattiva</td><td>s<sup>−1</sup></td></tr>
+            <tr><td>gray (Gy)</td><td>dose assorbita</td><td>m<sup>2</sup>·s<sup>−2</sup> = J·kg<sup>−1</sup></td></tr>
+            <tr><td>sievert (Sv)</td><td>dose equivalente/efficace</td><td>m<sup>2</sup>·s<sup>−2</sup> = J·kg<sup>−1</sup></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="theory-card">
+        <h3>4. Prefissi metrici</h3>
+        <p class="description">
+          I prefissi SI permettono di evitare numeri troppo grandi o troppo piccoli. Per esempio,
+          <span class="inline-code">1 mm = 10<sup>−3</sup> m</span> e <span class="inline-code">1 MJ = 10<sup>6</sup> J</span>.
+          L’idea è puramente decimale: ogni prefisso corrisponde a una potenza di 10.
+        </p>
+        <table class="prefix-table">
+          <thead>
+            <tr><th>Prefisso</th><th>Simbolo</th><th>Fattore</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>quetta</td><td>Q</td><td>10<sup>30</sup></td></tr>
+            <tr><td>ronna</td><td>R</td><td>10<sup>27</sup></td></tr>
+            <tr><td>yotta</td><td>Y</td><td>10<sup>24</sup></td></tr>
+            <tr><td>zetta</td><td>Z</td><td>10<sup>21</sup></td></tr>
+            <tr><td>exa</td><td>E</td><td>10<sup>18</sup></td></tr>
+            <tr><td>peta</td><td>P</td><td>10<sup>15</sup></td></tr>
+            <tr><td>tera</td><td>T</td><td>10<sup>12</sup></td></tr>
+            <tr><td>giga</td><td>G</td><td>10<sup>9</sup></td></tr>
+            <tr><td>mega</td><td>M</td><td>10<sup>6</sup></td></tr>
+            <tr><td>kilo</td><td>k</td><td>10<sup>3</sup></td></tr>
+            <tr><td>milli</td><td>m</td><td>10<sup>−3</sup></td></tr>
+            <tr><td>micro</td><td>µ</td><td>10<sup>−6</sup></td></tr>
+            <tr><td>nano</td><td>n</td><td>10<sup>−9</sup></td></tr>
+            <tr><td>pico</td><td>p</td><td>10<sup>−12</sup></td></tr>
+            <tr><td>femto</td><td>f</td><td>10<sup>−15</sup></td></tr>
+            <tr><td>atto</td><td>a</td><td>10<sup>−18</sup></td></tr>
+            <tr><td>zepto</td><td>z</td><td>10<sup>−21</sup></td></tr>
+            <tr><td>yocto</td><td>y</td><td>10<sup>−24</sup></td></tr>
+            <tr><td>ronto</td><td>r</td><td>10<sup>−27</sup></td></tr>
+            <tr><td>quecto</td><td>q</td><td>10<sup>−30</sup></td></tr>
+          </tbody>
+        </table>
+        <p class="note">
+          Il chilogrammo è un caso storico particolare: l’unità fondamentale di massa del SI contiene già il prefisso <span class="inline-code">kilo</span>.
+          Per questo, nei sottomultipli della massa si usa spesso il <strong>grammo</strong> come riferimento pratico: g, mg, µg.
+        </p>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="theory-card">
+        <h3>5. Unità specialistiche: perché esistono</h3>
+        <p class="description">
+          Alcune comunità scientifiche usano unità molto specifiche perché le unità SI pure, pur essendo corrette, diventano scomode nella pratica quotidiana.
+        </p>
+        <table class="units-table">
+          <thead>
+            <tr><th>Unità</th><th>Definizione</th><th>Contesto d’uso</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>barn (b)</td><td>1 b = 10<sup>−28</sup> m<sup>2</sup></td><td>sezioni d’urto nucleari e subnucleari</td></tr>
+            <tr><td>jansky (Jy)</td><td>1 Jy = 10<sup>−26</sup> W·m<sup>−2</sup>·Hz<sup>−1</sup></td><td>radioastronomia e flusso spettrale</td></tr>
+            <tr><td>elettronvolt (eV)</td><td>1 eV = 1.602176634×10<sup>−19</sup> J</td><td>fisica atomica, nucleare, particellare</td></tr>
+            <tr><td>litro (L)</td><td>1 L = 10<sup>−3</sup> m<sup>3</sup></td><td>volumi pratici in laboratorio</td></tr>
+            <tr><td>bar</td><td>1 bar = 10<sup>5</sup> Pa</td><td>tecnica dei fluidi, atmosfere controllate</td></tr>
+          </tbody>
+        </table>
+        <p class="note">
+          Queste unità non sostituiscono il SI: lo completano in contesti dove la scala tipica del fenomeno rende più leggibili i numeri.
+        </p>
+      </div>
+      <div class="theory-card">
+        <h3>6. Coerenza dimensionale</h3>
+        <p class="description">
+          Una legge fisica corretta deve essere <strong>dimensionalmente omogenea</strong>. I membri di un’equazione devono avere la stessa dimensione.
+          Per esempio, nella relazione del lavoro meccanico
+        </p>
+        <div class="formula">L = F · s</div>
+        <p class="note">
+          qui <strong>L</strong> è il lavoro, <strong>F</strong> la forza, <strong>s</strong> lo spostamento. Poiché
+          <span class="inline-code">[F] = kg·m·s<sup>−2</sup></span> e <span class="inline-code">[s] = m</span>, segue
+          <span class="inline-code">[L] = kg·m<sup>2</sup>·s<sup>−2</sup> = J</span>.
+        </p>
+        <div class="callout">
+          Controllare le dimensioni è uno dei modi più rapidi per individuare errori in formule, conversioni e modelli numerici.
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block single">
+      <div class="theory-card">
+        <h3>7. Definizioni moderne del SI</h3>
+        <p class="description">
+          Il SI moderno definisce le unità fissando il valore numerico di costanti fisiche fondamentali. Per esempio,
+          il <strong>metro</strong> è legato alla velocità della luce nel vuoto, il <strong>secondo</strong> alla frequenza di transizione iperfine del cesio-133,
+          il <strong>chilogrammo</strong> alla costante di Planck, l’<strong>ampere</strong> alla carica elementare, il <strong>kelvin</strong> alla costante di Boltzmann,
+          la <strong>mole</strong> alla costante di Avogadro e la <strong>candela</strong> all’efficacia luminosa di una radiazione monocromatica a frequenza fissata.
+        </p>
+        <p class="description">
+          Questo approccio rende il sistema più stabile e universale: le definizioni non dipendono più da oggetti materiali campione, ma da invarianti della natura.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-sources">
+      Per il contenuto teorico di questa pagina conviene fare riferimento a fonti metrologiche primarie come BIPM (Bureau International des Poids et Mesures),
+      NIST (National Institute of Standards and Technology), IAU (International Astronomical Union) e NRAO (National Radio Astronomy Observatory).
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab2">
+    <div class="section-block">
+      <div class="formula-card">
+        <h3>Formulario essenziale</h3>
+        <table class="formula-table">
+          <thead>
+            <tr><th>Relazione</th><th>Significato</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="inline-code">Q = n · [Q]</span></td><td><strong>Q</strong> è la grandezza, <strong>n</strong> il valore numerico, <strong>[Q]</strong> l’unità.</td></tr>
+            <tr><td><span class="inline-code">1 km = 10<sup>3</sup> m</span></td><td>conversione con prefisso kilo.</td></tr>
+            <tr><td><span class="inline-code">1 mm = 10<sup>−3</sup> m</span></td><td>conversione con prefisso milli.</td></tr>
+            <tr><td><span class="inline-code">1 cm<sup>2</sup> = 10<sup>−4</sup> m<sup>2</sup></span></td><td>nei cambi di area l’esponente si applica anche al fattore di scala.</td></tr>
+            <tr><td><span class="inline-code">1 cm<sup>3</sup> = 10<sup>−6</sup> m<sup>3</sup></span></td><td>nei cambi di volume il fattore di scala va elevato al cubo.</td></tr>
+            <tr><td><span class="inline-code">1 N = 1 kg·m·s<sup>−2</sup></span></td><td>forza.</td></tr>
+            <tr><td><span class="inline-code">1 J = 1 N·m = 1 kg·m<sup>2</sup>·s<sup>−2</sup></span></td><td>energia o lavoro.</td></tr>
+            <tr><td><span class="inline-code">1 W = 1 J·s<sup>−1</sup></span></td><td>potenza.</td></tr>
+            <tr><td><span class="inline-code">1 Pa = 1 N·m<sup>−2</sup></span></td><td>pressione.</td></tr>
+            <tr><td><span class="inline-code">1 C = 1 A·s</span></td><td>carica elettrica.</td></tr>
+            <tr><td><span class="inline-code">1 V = 1 W·A<sup>−1</sup></span></td><td>differenza di potenziale.</td></tr>
+            <tr><td><span class="inline-code">1 Ω = 1 V·A<sup>−1</sup></span></td><td>resistenza elettrica.</td></tr>
+            <tr><td><span class="inline-code">1 T = 1 Wb·m<sup>−2</sup></span></td><td>induzione magnetica.</td></tr>
+            <tr><td><span class="inline-code">1 Bq = 1 s<sup>−1</sup></span></td><td>attività radioattiva.</td></tr>
+            <tr><td><span class="inline-code">1 Gy = 1 J·kg<sup>−1</sup></span></td><td>dose assorbita.</td></tr>
+            <tr><td><span class="inline-code">1 Sv = 1 J·kg<sup>−1</sup></span></td><td>dose equivalente o efficace.</td></tr>
+            <tr><td><span class="inline-code">1 b = 10<sup>−28</sup> m<sup>2</sup></span></td><td>barn, tipico per sezioni d’urto nucleari.</td></tr>
+            <tr><td><span class="inline-code">1 Jy = 10<sup>−26</sup> W·m<sup>−2</sup>·Hz<sup>−1</sup></span></td><td>jansky, tipico per flusso spettrale in astronomia.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="formula-card">
+        <h3>Promemoria operativo</h3>
+        <ul class="bullet-list">
+          <li>Nei passaggi tra unità di <strong>area</strong>, il fattore lineare va quadrato.</li>
+          <li>Nei passaggi tra unità di <strong>volume</strong>, il fattore lineare va cubato.</li>
+          <li>Per la massa conviene ragionare spesso in <strong>grammi</strong> per i sottomultipli pratici, pur ricordando che l’unità fondamentale SI è il <strong>chilogrammo</strong>.</li>
+          <li>Le unità come <strong>barn</strong>, <strong>jansky</strong> ed <strong>eV</strong> sono comode perché si adattano alla scala naturale del fenomeno.</li>
+          <li>Quando una formula è corretta, anche le sue dimensioni devono essere corrette.</li>
+        </ul>
+
+        <div class="callout">
+          Suggerimento didattico: questa simulazione si presta bene come pagina introduttiva del sito, con collegamenti successivi a vettori, dinamica,
+          elettromagnetismo, dosimetria e astrofisica, così da far vedere subito che le unità non sono una convenzione sterile ma la struttura quantitativa della fisica.
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const PREFIXES = [
+  {name:'quetta', symbol:'Q', factor:1e30},
+  {name:'ronna', symbol:'R', factor:1e27},
+  {name:'yotta', symbol:'Y', factor:1e24},
+  {name:'zetta', symbol:'Z', factor:1e21},
+  {name:'exa', symbol:'E', factor:1e18},
+  {name:'peta', symbol:'P', factor:1e15},
+  {name:'tera', symbol:'T', factor:1e12},
+  {name:'giga', symbol:'G', factor:1e9},
+  {name:'mega', symbol:'M', factor:1e6},
+  {name:'kilo', symbol:'k', factor:1e3},
+  {name:'hecto', symbol:'h', factor:1e2},
+  {name:'deca', symbol:'da', factor:1e1},
+  {name:'deci', symbol:'d', factor:1e-1},
+  {name:'centi', symbol:'c', factor:1e-2},
+  {name:'milli', symbol:'m', factor:1e-3},
+  {name:'micro', symbol:'µ', factor:1e-6},
+  {name:'nano', symbol:'n', factor:1e-9},
+  {name:'pico', symbol:'p', factor:1e-12},
+  {name:'femto', symbol:'f', factor:1e-15},
+  {name:'atto', symbol:'a', factor:1e-18},
+  {name:'zepto', symbol:'z', factor:1e-21},
+  {name:'yocto', symbol:'y', factor:1e-24},
+  {name:'ronto', symbol:'r', factor:1e-27},
+  {name:'quecto', symbol:'q', factor:1e-30}
+];
+
+const QUANTITIES = [
+  {
+    id:'length', name:'Lunghezza', reference:'metro (m)', dimension:'L',
+    units:[
+      unit('m','metro',1,'unità fondamentale SI della lunghezza.','È la distanza di riferimento per tutte le grandezze lineari. Oggi è definito fissando il valore della velocità della luce nel vuoto.','fondamentale','m','lunghezza',true,[2,0,-2,-3,-6,3]),
+      unit('km','chilometro',1e3,'Multiplo metrico del metro, usato per distanze terrestri e astronomia di base su scala locale.','Comodo quando il metro produrrebbe numeri troppo grandi.','multiplo metrico','m','lunghezza',true,[3,0,-3]),
+      unit('cm','centimetro',1e-2,'Sottomultiplo del metro, frequente in laboratorio didattico e misure geometriche ordinarie.','Molto usato per oggetti di scala quotidiana.','sottomultiplo metrico','m','lunghezza',true,[0,-2,-3,-6]),
+      unit('mm','millimetro',1e-3,'Sottomultiplo del metro adatto a spessori, piccoli spostamenti e meccanica di precisione.','Utile quando le variazioni sono inferiori al centimetro.','sottomultiplo metrico','m','lunghezza',true,[0,-3,-6,-9]),
+      unit('µm','micrometro',1e-6,'Scala tipica di cellule, polveri fini, rugosità e microfabbricazione.','Spesso scritto anche come micron, anche se il simbolo corretto è µm.','sottomultiplo metrico','m','lunghezza',true,[-3,-6,-9]),
+      unit('nm','nanometro',1e-9,'Scala tipica di molecole, semiconduttori, lunghezze d’onda della luce visibile.','Molto usato in ottica, spettroscopia e scienza dei materiali.','sottomultiplo metrico','m','lunghezza',true,[-6,-9,-12])
+    ]
+  },
+  {
+    id:'area', name:'Area', reference:'metro quadrato (m²)', dimension:'L²',
+    units:[
+      unit('m²','metro quadrato',1,'Unità SI coerente per superfici e sezioni geometriche.','Si ottiene dal quadrato di una lunghezza: 1 m² = (1 m)².','derivata coerente','m² = m²','superficie',false,[2,0,-2,-4]),
+      unit('cm²','centimetro quadrato',1e-4,'Utile per sezioni piccole, superfici di campioni e aree da banco.','Attenzione: il fattore di conversione deriva dal quadrato di 10⁻².','sottomultiplo metrico','cm² = 10⁻⁴ m²','superficie',false,[0,-4,-6,-8]),
+      unit('mm²','millimetro quadrato',1e-6,'Molto usato in meccanica, elettronica e sezioni di fili conduttori.','Serve per aree piccole ma non microscopiche.','sottomultiplo metrico','mm² = 10⁻⁶ m²','superficie',false,[-4,-6,-8]),
+      unit('km²','chilometro quadrato',1e6,'Adatto a superfici geografiche e territoriali.','Riduce la dimensione numerica in cartografia e geofisica.','multiplo metrico','km² = 10⁶ m²','superficie',false,[6,3,0]),
+      unit('b','barn',1e-28,'Unità non SI ma molto usata in fisica nucleare per esprimere sezioni d’urto microscopiche.','È comoda perché le sezioni d’urto nucleari tipiche cadono proprio in questo ordine di grandezza.','unità specialistica','1 b = 10⁻²⁸ m² = 100 fm²','sezione d’urto nucleare',true,[-3,-6]),
+      unit('mb','millibarn',1e-31,'Sottomultiplo del barn, tipico in fisica delle particelle e processi con sezioni d’urto più piccole.','Molto comune in scattering ad alte energie.','unità specialistica prefissata','1 mb = 10⁻³ b','sezione d’urto',false,[-3,-6]),
+      unit('µb','microbarn',1e-34,'Usato quando le sezioni d’urto sono ancora più piccole.','Frequente in processi rari o a energie elevate.','unità specialistica prefissata','1 µb = 10⁻⁶ b','sezione d’urto',false,[-6]),
+      unit('fm²','femtometro quadrato',1e-30,'Scala naturale del nucleo atomico e delle interazioni nucleari.','Poiché 1 fm ≈ dimensione tipica nucleare, fm² è intuitivo in fisica del nucleo.','unità metrica su scala nucleare','1 fm² = 10⁻³⁰ m²','superficie microscopica',false,[-6])
+    ]
+  },
+  {
+    id:'volume', name:'Volume', reference:'metro cubo (m³)', dimension:'L³',
+    units:[
+      unit('m³','metro cubo',1,'Unità SI coerente per il volume.','Misura lo spazio occupato da un corpo o da una regione.','derivata coerente','m³','volume',false,[0,-3]),
+      unit('dm³','decimetro cubo',1e-3,'È numericamente uguale al litro.','Molto comodo nei contesti didattici e chimici.','derivata metrica','1 dm³ = 10⁻³ m³','volume',false,[0,-3,-6]),
+      unit('cm³','centimetro cubo',1e-6,'Usato per piccoli volumi, medicina, materiali e officina.','Coincide con il millilitro.','sottomultiplo metrico','1 cm³ = 10⁻⁶ m³','volume',false,[-3,-6,-9]),
+      unit('L','litro',1e-3,'Unità non SI ma accettata con il SI; molto usata per liquidi e recipienti.','Più pratica del metro cubo nella vita quotidiana e nei laboratori.','unità accettata con il SI','1 L = 10⁻³ m³','volume',true,[2,0,-2,-3,-6]),
+      unit('mL','millilitro',1e-6,'Sottomultiplo del litro, molto usato in chimica, biologia e medicina.','Equivale a 1 cm³.','unità accettata con il SI','1 mL = 10⁻³ L = 10⁻⁶ m³','volume',false,[0,-3,-6])
+    ]
+  },
+  {
+    id:'mass', name:'Massa', reference:'chilogrammo (kg)', dimension:'M',
+    units:[
+      unit('kg','chilogrammo',1,'Unità fondamentale SI della massa.','Nel SI moderno è definito fissando il valore della costante di Planck.','fondamentale','kg','massa',false,[3,0,-3]),
+      unit('g','grammo',1e-3,'Sottomultiplo pratico del chilogrammo, molto usato per masse piccole.','È la base pratica per mg, µg e altre sottoscales.','sottomultiplo pratico','1 g = 10⁻³ kg','massa',true,[2,0,-3,-6]),
+      unit('mg','milligrammo',1e-6,'Utile per dosaggi, analisi di laboratorio e campioni piccoli.','Molto comune in chimica analitica e dosimetria.','sottomultiplo pratico','1 mg = 10⁻⁶ kg','massa',false,[0,-3,-6,-9]),
+      unit('µg','microgrammo',1e-9,'Adatto a quantità estremamente piccole di sostanza.','Comune in tossicologia e chimica delle tracce.','sottomultiplo pratico','1 µg = 10⁻⁹ kg','massa',false,[-3,-6,-9]),
+      unit('t','tonnellata',1e3,'Multiplo metrico usato per masse elevate.','Frequente in ingegneria, geologia, logistica e bilanci di massa macroscopici.','multiplo metrico pratico','1 t = 10³ kg','massa',false,[6,3,0])
+    ]
+  },
+  {
+    id:'time', name:'Tempo', reference:'secondo (s)', dimension:'T',
+    units:[
+      unit('s','secondo',1,'Unità fondamentale SI del tempo.','È definito tramite la frequenza di transizione iperfine del cesio-133.','fondamentale','s','tempo',false,[3,0,-3,-6]),
+      unit('ms','millisecondo',1e-3,'Adatto a fenomeni veloci ma ancora macroscopici.','Elettronica, segnali, risposta strumentale.','sottomultiplo metrico','1 ms = 10⁻³ s','tempo',false,[0,-3,-6,-9]),
+      unit('µs','microsecondo',1e-6,'Scala tipica di elettronica rapida e acquisizione dati.','Spesso usato in rivelazione e strumentazione.','sottomultiplo metrico','1 µs = 10⁻⁶ s','tempo',false,[-3,-6,-9]),
+      unit('ns','nanosecondo',1e-9,'Scala tipica di processi ultraveloci, fotonica ed elettronica ad alta frequenza.','Molto importante in telecomunicazioni e timing.','sottomultiplo metrico','1 ns = 10⁻⁹ s','tempo',false,[-6,-9,-12])
+    ]
+  },
+  {
+    id:'speed', name:'Velocità', reference:'metro al secondo (m/s)', dimension:'L·T⁻¹',
+    units:[
+      unit('m/s','metro al secondo',1,'Unità SI coerente della velocità.','Esprime lo spostamento lineare per unità di tempo.','derivata coerente','m·s⁻¹','velocità',false,[0,-3,-6]),
+      unit('km/h','chilometro all’ora',1000/3600,'Molto usato nella vita quotidiana e nei trasporti.','Pratico ma non coerente nel SI.','unità pratica','1 km/h = 1000/3600 m·s⁻¹','velocità',false,[2,0,-3]),
+      unit('cm/s','centimetro al secondo',1e-2,'Adatto a moti lenti o fenomeni in fluidi e biologia.','Consente di leggere meglio velocità piccole.','unità pratica metrica','1 cm/s = 10⁻² m·s⁻¹','velocità',false,[0,-3,-6,-9])
+    ]
+  },
+  {
+    id:'acceleration', name:'Accelerazione', reference:'metro al secondo quadrato (m/s²)', dimension:'L·T⁻²',
+    units:[
+      unit('m/s²','metro al secondo quadrato',1,'Unità SI dell’accelerazione.','Misura la variazione di velocità per unità di tempo.','derivata coerente','m·s⁻²','accelerazione',false,[0,-3,-6]),
+      unit('cm/s²','centimetro al secondo quadrato',1e-2,'Utile per accelerazioni piccole o misure in sistemi cgs-metrici.','Talvolta usato in geofisica e meccanica classica.','unità pratica metrica','1 cm/s² = 10⁻² m·s⁻²','accelerazione',false,[0,-3,-6,-9]),
+      unit('g0','accelerazione standard di gravità',9.80665,'Unità pratica non SI usata per confronti con la gravità terrestre standard.','Comoda in dinamica, biomeccanica e tecnologia dei sensori.','unità pratica','1 g₀ = 9.80665 m·s⁻²','accelerazione',false,[0])
+    ]
+  },
+  {
+    id:'force', name:'Forza', reference:'newton (N)', dimension:'M·L·T⁻²',
+    units:[
+      unit('N','newton',1,'Unità SI della forza.','Deriva dalla relazione F = m·a: una forza di 1 N accelera di 1 m/s² una massa di 1 kg.','derivata con nome speciale','1 N = 1 kg·m·s⁻²','forza',true,[3,0,-3,-6]),
+      unit('kN','chilonewton',1e3,'Usato in ingegneria strutturale e meccanica applicata.','Riduce numeri molto grandi nelle forze macroscopiche.','multiplo metrico','1 kN = 10³ N','forza',false,[6,3,0]),
+      unit('mN','millinewton',1e-3,'Adatto a forze piccole, attriti deboli e sistemi di precisione.','Comune in micro-meccanica e sensori.','sottomultiplo metrico','1 mN = 10⁻³ N','forza',false,[0,-3,-6,-9])
+    ]
+  },
+  {
+    id:'energy', name:'Energia / Lavoro', reference:'joule (J)', dimension:'M·L²·T⁻²',
+    units:[
+      unit('J','joule',1,'Unità SI di energia e lavoro.','È il lavoro compiuto da una forza di 1 N lungo 1 m.','derivata con nome speciale','1 J = 1 N·m = 1 kg·m²·s⁻²','energia',true,[3,0,-3,-6]),
+      unit('kJ','chilojoule',1e3,'Molto usato in termodinamica, chimica e nutrizione scientifica.','Riduce numeri grandi in bilanci energetici.','multiplo metrico','1 kJ = 10³ J','energia',false,[6,3,0]),
+      unit('MJ','megajoule',1e6,'Comune in impiantistica, energetica e fenomeni esplosivi o impulsivi.','Pratico per scale energetiche macroscopiche.','multiplo metrico','1 MJ = 10⁶ J','energia',false,[9,6,3]),
+      unit('mJ','millijoule',1e-3,'Utile per impulsi piccoli, elettronica e ottica.','Molto usato per laser da banco.','sottomultiplo metrico','1 mJ = 10⁻³ J','energia',false,[0,-3,-6]),
+      unit('eV','elettronvolt',1.602176634e-19,'Energia acquistata da una carica elementare attraversando una differenza di potenziale di 1 volt.','È fondamentale in fisica atomica, nucleare e delle particelle.','unità specialistica','1 eV = 1.602176634×10⁻¹⁹ J','energia',true,[12,9,6,3,0,-3]),
+      unit('keV','chiloelettronvolt',1.602176634e-16,'Scala tipica di raggi X, elettroni energetici e transizioni atomiche profonde.','Molto usato in spettroscopia e imaging.','unità specialistica prefissata','1 keV = 10³ eV','energia',false,[9,6,3,0]),
+      unit('MeV','megaelettronvolt',1.602176634e-13,'Scala tipica di fisica nucleare e decadimenti radioattivi.','Molto utile per energie di particelle e nuclei.','unità specialistica prefissata','1 MeV = 10⁶ eV','energia',false,[9,6,3,0]),
+      unit('GeV','gigaelettronvolt',1.602176634e-10,'Scala tipica di fisica delle alte energie e acceleratori.','Usato per masse e energie relativistiche di particelle elementari.','unità specialistica prefissata','1 GeV = 10⁹ eV','energia',false,[9,6,3])
+    ]
+  },
+  {
+    id:'power', name:'Potenza', reference:'watt (W)', dimension:'M·L²·T⁻³',
+    units:[
+      unit('W','watt',1,'Unità SI della potenza.','Misura il ritmo con cui energia viene trasferita o trasformata.','derivata con nome speciale','1 W = 1 J·s⁻¹','potenza',true,[3,0,-3,-6]),
+      unit('kW','chilowatt',1e3,'Usato in elettrotecnica, macchine e impianti.','Comodo per potenze ordinarie di apparati e motori.','multiplo metrico','1 kW = 10³ W','potenza',false,[6,3,0]),
+      unit('MW','megawatt',1e6,'Usato per centrali, impianti industriali e grandi sistemi energetici.','Riduce molto la scala numerica in ingegneria.','multiplo metrico','1 MW = 10⁶ W','potenza',false,[9,6,3]),
+      unit('mW','milliwatt',1e-3,'Comune in elettronica e dispositivi a bassa potenza.','Frequente per LED, sensori e segnali.','sottomultiplo metrico','1 mW = 10⁻³ W','potenza',false,[0,-3,-6])
+    ]
+  },
+  {
+    id:'pressure', name:'Pressione', reference:'pascal (Pa)', dimension:'M·L⁻¹·T⁻²',
+    units:[
+      unit('Pa','pascal',1,'Unità SI della pressione, definita come forza per unità di area.','È la pressione esercitata da 1 N distribuito su 1 m².','derivata con nome speciale','1 Pa = 1 N·m⁻² = 1 kg·m⁻¹·s⁻²','pressione',true,[3,0,-3,-6]),
+      unit('kPa','kilopascal',1e3,'Comodo per pressioni in fluidi, pneumatici e processi di laboratorio.','Evita numeri troppo piccoli o troppo grandi.','multiplo metrico','1 kPa = 10³ Pa','pressione',false,[6,3,0]),
+      unit('MPa','megapascal',1e6,'Usato in resistenza dei materiali e meccanica strutturale.','Molto utile per tensioni meccaniche e pressioni elevate.','multiplo metrico','1 MPa = 10⁶ Pa','pressione',false,[9,6,3]),
+      unit('bar','bar',1e5,'Unità non SI ma diffusissima in tecnica dei fluidi e strumentazione.','Vale esattamente 100 000 Pa.','unità pratica','1 bar = 10⁵ Pa','pressione',false,[3,0,-3])
+    ]
+  },
+  {
+    id:'frequency', name:'Frequenza', reference:'hertz (Hz)', dimension:'T⁻¹',
+    units:[
+      unit('Hz','hertz',1,'Unità SI della frequenza.','Indica il numero di cicli o eventi periodici per secondo.','derivata con nome speciale','1 Hz = 1 s⁻¹','frequenza',true,[3,0,-3,-6]),
+      unit('kHz','kilohertz',1e3,'Usato per acustica, elettronica e onde radio a bassa frequenza.','Riduce la scala numerica.','multiplo metrico','1 kHz = 10³ Hz','frequenza',false,[6,3,0]),
+      unit('MHz','megahertz',1e6,'Tipico di radiofrequenza, telecomunicazioni e spettroscopia.','Molto comune nella pratica strumentale.','multiplo metrico','1 MHz = 10⁶ Hz','frequenza',false,[9,6,3]),
+      unit('GHz','gigahertz',1e9,'Usato in microonde, radar, Wi‑Fi, elettronica ad alta frequenza.','È una scala naturale per molte tecnologie moderne.','multiplo metrico','1 GHz = 10⁹ Hz','frequenza',false,[12,9,6])
+    ]
+  },
+  {
+    id:'charge', name:'Carica elettrica', reference:'coulomb (C)', dimension:'I·T',
+    units:[
+      unit('C','coulomb',1,'Unità SI della carica elettrica.','È la carica trasportata da una corrente di 1 A in 1 s.','derivata con nome speciale','1 C = 1 A·s','carica elettrica',true,[3,0,-3,-6]),
+      unit('mC','millicoulomb',1e-3,'Comodo per cariche macroscopiche piccole.','Usato in elettrostatica e circuiti.','sottomultiplo metrico','1 mC = 10⁻³ C','carica elettrica',false,[0,-3,-6]),
+      unit('µC','microcoulomb',1e-6,'Comune in elettrostatica e condensatori.','Permette di esprimere cariche piccole con numeri semplici.','sottomultiplo metrico','1 µC = 10⁻⁶ C','carica elettrica',false,[-3,-6,-9]),
+      unit('nC','nanocoulomb',1e-9,'Adatto a segnali e fenomeni con cariche molto piccole.','Frequente in strumentazione elettronica.','sottomultiplo metrico','1 nC = 10⁻⁹ C','carica elettrica',false,[-6,-9,-12])
+    ]
+  },
+  {
+    id:'voltage', name:'Differenza di potenziale', reference:'volt (V)', dimension:'M·L²·T⁻³·I⁻¹',
+    units:[
+      unit('V','volt',1,'Unità SI della differenza di potenziale elettrico.','Corrisponde a 1 joule per coulomb.','derivata con nome speciale','1 V = 1 W·A⁻¹ = 1 J·C⁻¹','potenziale elettrico',true,[3,0,-3,-6]),
+      unit('mV','millivolt',1e-3,'Utile per segnali deboli, sensori ed elettronica.','Molto comune in acquisizione dati.','sottomultiplo metrico','1 mV = 10⁻³ V','potenziale elettrico',false,[0,-3,-6]),
+      unit('kV','chilovolt',1e3,'Usato in alta tensione, acceleratori e radiologia.','Riduce la scala numerica per tensioni elevate.','multiplo metrico','1 kV = 10³ V','potenziale elettrico',false,[6,3,0])
+    ]
+  },
+  {
+    id:'current', name:'Corrente elettrica', reference:'ampere (A)', dimension:'I',
+    units:[
+      unit('A','ampere',1,'Unità fondamentale SI della corrente elettrica.','Nel SI moderno è definito fissando il valore della carica elementare.','fondamentale','A','corrente elettrica',true,[3,0,-3,-6]),
+      unit('mA','milliampere',1e-3,'Comodo per elettronica e strumenti da laboratorio.','Scala tipica di circuiti e sensori.','sottomultiplo metrico','1 mA = 10⁻³ A','corrente elettrica',false,[0,-3,-6]),
+      unit('µA','microampere',1e-6,'Adatto a correnti molto piccole.','Frequente in rivelatori e bioelettricità.','sottomultiplo metrico','1 µA = 10⁻⁶ A','corrente elettrica',false,[-3,-6,-9]),
+      unit('kA','kiloampere',1e3,'Usato in impianti di potenza e scariche elevate.','Riduce numeri grandi in elettrotecnica pesante.','multiplo metrico','1 kA = 10³ A','corrente elettrica',false,[6,3,0])
+    ]
+  },
+  {
+    id:'resistance', name:'Resistenza elettrica', reference:'ohm (Ω)', dimension:'M·L²·T⁻³·I⁻²',
+    units:[
+      unit('Ω','ohm',1,'Unità SI della resistenza elettrica.','Deriva dalla legge di Ohm: V = R·I.','derivata con nome speciale','1 Ω = 1 V·A⁻¹','resistenza elettrica',true,[3,0,-3,-6]),
+      unit('mΩ','milliohm',1e-3,'Utile per resistenze molto piccole e contatti elettrici.','Importante in misure di precisione.','sottomultiplo metrico','1 mΩ = 10⁻³ Ω','resistenza elettrica',false,[0,-3,-6]),
+      unit('kΩ','chiloohm',1e3,'Scala tipica di moltissimi componenti elettronici.','Molto comune in circuiti didattici e reali.','multiplo metrico','1 kΩ = 10³ Ω','resistenza elettrica',false,[6,3,0]),
+      unit('MΩ','megaohm',1e6,'Usato per isolamenti e resistenze elevate.','Comune in strumentazione e sensori.','multiplo metrico','1 MΩ = 10⁶ Ω','resistenza elettrica',false,[9,6,3])
+    ]
+  },
+  {
+    id:'magneticField', name:'Induzione magnetica', reference:'tesla (T)', dimension:'M·T⁻²·I⁻¹',
+    units:[
+      unit('T','tesla',1,'Unità SI dell’induzione magnetica.','È una misura della densità di flusso magnetico.','derivata con nome speciale','1 T = 1 Wb·m⁻² = 1 kg·s⁻²·A⁻¹','campo magnetico',true,[3,0,-3,-6]),
+      unit('mT','millitesla',1e-3,'Comodo per magneti permanenti, sensori e campi da laboratorio.','Scala molto frequente nelle applicazioni.','sottomultiplo metrico','1 mT = 10⁻³ T','campo magnetico',false,[0,-3,-6]),
+      unit('µT','microtesla',1e-6,'Scala del campo magnetico terrestre e di deboli campi ambientali.','Utile in geofisica e misure ambientali.','sottomultiplo metrico','1 µT = 10⁻⁶ T','campo magnetico',false,[-3,-6,-9])
+    ]
+  },
+  {
+    id:'magneticFlux', name:'Flusso magnetico', reference:'weber (Wb)', dimension:'M·L²·T⁻²·I⁻¹',
+    units:[
+      unit('Wb','weber',1,'Unità SI del flusso magnetico.','Misura il flusso totale del campo magnetico attraverso una superficie.','derivata con nome speciale','1 Wb = 1 V·s','flusso magnetico',true,[3,0,-3,-6]),
+      unit('mWb','milliweber',1e-3,'Comodo per flussi piccoli e applicazioni elettromagnetiche da banco.','Riduce numeri molto piccoli.','sottomultiplo metrico','1 mWb = 10⁻³ Wb','flusso magnetico',false,[0,-3,-6]),
+      unit('µWb','microweber',1e-6,'Usato per flussi molto deboli.','Frequente in sensori e strumentazione fine.','sottomultiplo metrico','1 µWb = 10⁻⁶ Wb','flusso magnetico',false,[-3,-6,-9])
+    ]
+  },
+  {
+    id:'capacitance', name:'Capacità elettrica', reference:'farad (F)', dimension:'M⁻¹·L⁻²·T⁴·I²',
+    units:[
+      unit('F','farad',1,'Unità SI della capacità elettrica.','Un condensatore ha capacità di 1 F se accumula 1 C per ogni 1 V applicato.','derivata con nome speciale','1 F = 1 C·V⁻¹','capacità elettrica',true,[3,0,-3,-6]),
+      unit('mF','millifarad',1e-3,'Usato per condensatori relativamente grandi.','Comune in alimentazioni e filtri.','sottomultiplo metrico','1 mF = 10⁻³ F','capacità elettrica',false,[0,-3,-6]),
+      unit('µF','microfarad',1e-6,'Scala molto comune in elettronica.','Presente in moltissimi circuiti RC.','sottomultiplo metrico','1 µF = 10⁻⁶ F','capacità elettrica',false,[-3,-6,-9]),
+      unit('nF','nanofarad',1e-9,'Usato per condensatori piccoli.','Frequente in filtri e accoppiamenti.','sottomultiplo metrico','1 nF = 10⁻⁹ F','capacità elettrica',false,[-6,-9,-12]),
+      unit('pF','picofarad',1e-12,'Tipico di circuiti ad alta frequenza e capacità parassite.','Molto utile in radiofrequenza.','sottomultiplo metrico','1 pF = 10⁻¹² F','capacità elettrica',false,[-9,-12,-15])
+    ]
+  },
+  {
+    id:'inductance', name:'Induttanza', reference:'henry (H)', dimension:'M·L²·T⁻²·I⁻²',
+    units:[
+      unit('H','henry',1,'Unità SI dell’induttanza.','Quantifica il legame tra variazione di corrente e forza elettromotrice indotta.','derivata con nome speciale','1 H = 1 Wb·A⁻¹ = 1 V·s·A⁻¹','induttanza',true,[3,0,-3,-6]),
+      unit('mH','millihenry',1e-3,'Molto usato in circuiti e avvolgimenti reali.','Scala tipica di induttori pratici.','sottomultiplo metrico','1 mH = 10⁻³ H','induttanza',false,[0,-3,-6]),
+      unit('µH','microhenry',1e-6,'Tipico di elettronica a radiofrequenza e componenti compatti.','Comodo per induttanze piccole.','sottomultiplo metrico','1 µH = 10⁻⁶ H','induttanza',false,[-3,-6,-9])
+    ]
+  },
+  {
+    id:'activity', name:'Attività radioattiva', reference:'becquerel (Bq)', dimension:'T⁻¹',
+    units:[
+      unit('Bq','becquerel',1,'Unità SI dell’attività radioattiva.','Corrisponde a un decadimento nucleare al secondo.','derivata con nome speciale','1 Bq = 1 s⁻¹','attività radioattiva',true,[3,0,-3,-6]),
+      unit('kBq','kilobecquerel',1e3,'Comodo per attività moderate.','Usato in laboratorio e radiochimica.','multiplo metrico','1 kBq = 10³ Bq','attività radioattiva',false,[6,3,0]),
+      unit('MBq','megabecquerel',1e6,'Tipico in medicina nucleare e sorgenti intense.','Riduce la scala numerica.','multiplo metrico','1 MBq = 10⁶ Bq','attività radioattiva',false,[9,6,3]),
+      unit('GBq','gigabecquerel',1e9,'Usato per attività elevate e sorgenti industriali o cliniche.','Molto comune nei contesti applicativi.','multiplo metrico','1 GBq = 10⁹ Bq','attività radioattiva',false,[12,9,6])
+    ]
+  },
+  {
+    id:'dose', name:'Dose assorbita', reference:'gray (Gy)', dimension:'L²·T⁻²',
+    units:[
+      unit('Gy','gray',1,'Unità SI della dose assorbita.','Misura l’energia impartita per unità di massa: 1 J/kg.','derivata con nome speciale','1 Gy = 1 J·kg⁻¹ = 1 m²·s⁻²','dose assorbita',true,[3,0,-3,-6]),
+      unit('mGy','milligray',1e-3,'Scala molto comune in radioprotezione e diagnostica.','Evita numeri troppo piccoli in medicina e dosimetria.','sottomultiplo metrico','1 mGy = 10⁻³ Gy','dose assorbita',false,[0,-3,-6]),
+      unit('µGy','microgray',1e-6,'Adatto a basse dosi e monitoraggio ambientale.','Molto usato in valutazioni di fondo.','sottomultiplo metrico','1 µGy = 10⁻⁶ Gy','dose assorbita',false,[-3,-6,-9])
+    ]
+  },
+  {
+    id:'equivalentDose', name:'Dose equivalente / efficace', reference:'sievert (Sv)', dimension:'L²·T⁻²',
+    units:[
+      unit('Sv','sievert',1,'Unità SI della dose equivalente o efficace.','Ha la stessa dimensione del gray ma incorpora pesi radiobiologici.','derivata con nome speciale','1 Sv = 1 J·kg⁻¹','dose equivalente o efficace',true,[3,0,-3,-6]),
+      unit('mSv','millisievert',1e-3,'Scala più comune in radioprotezione occupazionale e medica.','Consente letture immediate di dosi realistiche.','sottomultiplo metrico','1 mSv = 10⁻³ Sv','dose equivalente o efficace',false,[0,-3,-6]),
+      unit('µSv','microsievert',1e-6,'Usato per dosi ambientali e tempi brevi di esposizione.','Molto utile per monitoraggi di fondo.','sottomultiplo metrico','1 µSv = 10⁻⁶ Sv','dose equivalente o efficace',false,[-3,-6,-9])
+    ]
+  },
+  {
+    id:'spectralFluxDensity', name:'Flusso spettrale', reference:'W·m⁻²·Hz⁻¹', dimension:'M·T⁻²',
+    units:[
+      unit('W·m⁻²·Hz⁻¹','watt per metro quadrato per hertz',1,'Unità SI coerente della densità di flusso spettrale.','Esprime potenza ricevuta per unità di area e per unità di banda in frequenza.','derivata coerente','W·m⁻²·Hz⁻¹ = kg·s⁻²','flusso spettrale',false,[0]),
+      unit('Jy','jansky',1e-26,'Unità specialistica usata soprattutto in radioastronomia.','È comoda perché i flussi spettrali astrofisici tipici sono estremamente piccoli in unità SI pure.','unità specialistica','1 Jy = 10⁻²⁶ W·m⁻²·Hz⁻¹','flusso spettrale',true,[9,6,3,0,-3]),
+      unit('mJy','millijansky',1e-29,'Molto usato per sorgenti deboli in radioastronomia.','Scala naturale per molte osservazioni moderne.','unità specialistica prefissata','1 mJy = 10⁻³ Jy','flusso spettrale',false,[6,3,0,-3]),
+      unit('µJy','microjansky',1e-32,'Adatto a sorgenti molto deboli e survey profonde.','Frequentissimo in radioastronomia moderna e multi-banda.','unità specialistica prefissata','1 µJy = 10⁻⁶ Jy','flusso spettrale',false,[3,0,-3,-6]),
+      unit('kJy','kilojansky',1e-23,'Usato per sorgenti molto intense.','Riduce numeri grandi quando il flusso è elevato.','unità specialistica prefissata','1 kJy = 10³ Jy','flusso spettrale',false,[12,9,6])
+    ]
+  },
+  {
+    id:'temperature', name:'Temperatura', reference:'kelvin (K)', dimension:'Θ',
+    units:[
+      unit('K','kelvin',1,'Unità fondamentale SI della temperatura termodinamica.','Nel SI moderno è definita fissando il valore della costante di Boltzmann.','fondamentale','K','temperatura',false,[3,0,-3]),
+      offsetUnit('°C','grado Celsius',1,273.15,'Scala pratica legata al kelvin da T(K) = t(°C) + 273.15.','Usata quasi universalmente in laboratorio, meteorologia e vita quotidiana.','unità accettata con il SI','t(°C) = T(K) − 273.15','temperatura',false,[0])
+    ]
+  },
+  {
+    id:'amount', name:'Quantità di sostanza', reference:'mole (mol)', dimension:'N',
+    units:[
+      unit('mol','mole',1,'Unità fondamentale SI della quantità di sostanza.','Una mole contiene esattamente il numero di Avogadro di entità elementari specificate.','fondamentale','mol','quantità di sostanza',false,[0]),
+      unit('mmol','millimole',1e-3,'Comoda in chimica e biochimica per quantità piccole.','Molto usata in laboratorio.','sottomultiplo metrico','1 mmol = 10⁻³ mol','quantità di sostanza',false,[0,-3,-6]),
+      unit('µmol','micromole',1e-6,'Adatta a analisi con piccole quantità di campione.','Comune in chimica analitica e biologia.','sottomultiplo metrico','1 µmol = 10⁻⁶ mol','quantità di sostanza',false,[-3,-6,-9])
+    ]
+  },
+  {
+    id:'luminousIntensity', name:'Intensità luminosa', reference:'candela (cd)', dimension:'J',
+    units:[
+      unit('cd','candela',1,'Unità fondamentale SI dell’intensità luminosa in una data direzione.','Serve in fotometria, cioè nella misura della luce pesata secondo la sensibilità visiva umana.','fondamentale','cd','intensità luminosa',false,[0]),
+      unit('mcd','millicandela',1e-3,'Molto usata per LED e sorgenti deboli.','Consente di esprimere intensità luminose modeste con numeri leggibili.','sottomultiplo metrico','1 mcd = 10⁻³ cd','intensità luminosa',false,[0,-3,-6]),
+      unit('kcd','chilocandela',1e3,'Usata per sorgenti molto intense.','Comoda in illuminotecnica.','multiplo metrico','1 kcd = 10³ cd','intensità luminosa',false,[6,3,0])
+    ]
+  }
+];
+
+function unit(symbol, name, factor, description, relation, kind, definition, field, prefixable, commonExponents = []) {
+  return {symbol, name, factor, description, relation, kind, definition, field, prefixable, commonExponents, offset:0};
+}
+function offsetUnit(symbol, name, factor, offsetToBase, description, relation, kind, definition, field, prefixable, commonExponents = []) {
+  return {symbol, name, factor, description, relation, kind, definition, field, prefixable, commonExponents, offset:offsetToBase};
+}
+
+const quantitySelect = document.getElementById('quantitySelect');
+const fromUnit = document.getElementById('fromUnit');
+const toUnit = document.getElementById('toUnit');
+const inputValue = document.getElementById('inputValue');
+const inputValue2 = document.getElementById('inputValue2');
+const outputValue = document.getElementById('outputValue');
+const outputMain = document.getElementById('resultMain');
+const outputExtra = document.getElementById('resultExtra');
+const quantityName = document.getElementById('quantityName');
+const referenceUnit = document.getElementById('referenceUnit');
+const dimensionFormula = document.getElementById('dimensionFormula');
+const unitTitle = document.getElementById('unitTitle');
+const unitSymbol = document.getElementById('unitSymbol');
+const unitDescription = document.getElementById('unitDescription');
+const unitDefinition = document.getElementById('unitDefinition');
+const unitUsage = document.getElementById('unitUsage');
+const unitKind = document.getElementById('unitKind');
+const unitRelation = document.getElementById('unitRelation');
+const prefixTableBody = document.getElementById('prefixTableBody');
+const fromPretty = document.getElementById('fromPretty');
+const toPretty = document.getElementById('toPretty');
+const fromDim = document.getElementById('fromDim');
+const toDim = document.getElementById('toDim');
+const groupTag = document.getElementById('groupTag');
+
+function formatNumber(value) {
+  if (!Number.isFinite(value)) return '—';
+  const abs = Math.abs(value);
+  if (abs !== 0 && (abs >= 1e6 || abs < 1e-4)) {
+    return value.toExponential(8).replace('e+', ' × 10^').replace('e-', ' × 10^-');
+  }
+  return new Intl.NumberFormat('it-IT', {maximumFractionDigits: 12}).format(value);
+}
+
+function formatScientific(value) {
+  if (!Number.isFinite(value)) return '—';
+  if (value === 0) return '0';
+  const exp = Math.floor(Math.log10(Math.abs(value)));
+  const mant = value / Math.pow(10, exp);
+  return `${mant.toFixed(6)} × 10<sup>${exp}</sup>`;
+}
+
+function getCurrentQuantity() {
+  return QUANTITIES.find(q => q.id === quantitySelect.value) || QUANTITIES[0];
+}
+
+function getUnitBySymbol(quantity, symbol) {
+  return quantity.units.find(u => u.symbol === symbol);
+}
+
+function toBase(value, unit) {
+  return (value + (unit.offset || 0)) * unit.factor;
+}
+
+function fromBase(valueBase, unit) {
+  return valueBase / unit.factor - (unit.offset || 0);
+}
+
+function fillQuantities() {
+  QUANTITIES.forEach(q => {
+    const opt = document.createElement('option');
+    opt.value = q.id;
+    opt.textContent = q.name;
+    quantitySelect.appendChild(opt);
+  });
+}
+
+function fillUnits(quantity) {
+  fromUnit.innerHTML = '';
+  toUnit.innerHTML = '';
+  quantity.units.forEach((u, idx) => {
+    const a = document.createElement('option');
+    a.value = u.symbol;
+    a.textContent = `${u.name} (${u.symbol})`;
+    fromUnit.appendChild(a);
+    const b = a.cloneNode(true);
+    toUnit.appendChild(b);
+    if (idx === 0) {
+      fromUnit.value = u.symbol;
+      toUnit.value = quantity.units[Math.min(1, quantity.units.length - 1)].symbol;
+    }
+  });
+}
+
+function updateUnitCard(unit, quantity) {
+  unitTitle.textContent = unit.name.charAt(0).toUpperCase() + unit.name.slice(1);
+  unitSymbol.textContent = unit.symbol;
+  unitDescription.textContent = unit.description;
+  unitDefinition.innerHTML = `<strong>Definizione / struttura:</strong> ${unit.definition}`;
+  unitKind.textContent = unit.kind;
+  unitRelation.textContent = `${unit.relation} Questa unità appartiene alla grandezza “${quantity.name.toLowerCase()}”.`;
+  unitUsage.innerHTML = '';
+  [
+    `Contesto tipico: ${unit.field}.`,
+    `Unità di riferimento della grandezza: ${quantity.reference}.`,
+    `Formula dimensionale della grandezza: ${quantity.dimension}.`
+  ].forEach(text => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    unitUsage.appendChild(li);
+  });
+  buildPrefixTable(unit);
+}
+
+function buildPrefixTable(unit) {
+  prefixTableBody.innerHTML = '';
+  const exps = unit.commonExponents && unit.commonExponents.length ? unit.commonExponents : [3,0,-3,-6,-9];
+  exps.forEach(exp => {
+    const prefix = PREFIXES.find(p => Math.log10(p.factor) === exp);
+    if (!prefix && exp !== 0) return;
+    const tr = document.createElement('tr');
+    let pName = 'nessuno';
+    let pSymbol = '—';
+    let factor = '10<sup>0</sup>';
+    let example = unit.symbol;
+    if (exp !== 0 && prefix) {
+      pName = prefix.name;
+      pSymbol = prefix.symbol;
+      factor = `10<sup>${exp}</sup>`;
+      example = `${prefix.symbol}${unit.symbol}`;
+    }
+    if (!unit.prefixable && exp !== 0) {
+      if (!['mb','µb','mJy','µJy','kJy','keV','MeV','GeV'].includes(example)) return;
+    }
+    tr.innerHTML = `<td>${pName}</td><td>${pSymbol}</td><td>${factor}</td><td>${example}</td>`;
+    prefixTableBody.appendChild(tr);
+  });
+  if (!prefixTableBody.children.length) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="4">Per questa unità non è opportuno mostrare una tabella generale di prefissi oltre alle forme già presenti nel convertitore.</td>`;
+    prefixTableBody.appendChild(tr);
+  }
+}
+
+function updateConversion() {
+  const quantity = getCurrentQuantity();
+  const from = getUnitBySymbol(quantity, fromUnit.value);
+  const to = getUnitBySymbol(quantity, toUnit.value);
+  const val = parseFloat(inputValue.value);
+  quantityName.textContent = quantity.name;
+  referenceUnit.textContent = quantity.reference;
+  dimensionFormula.textContent = quantity.dimension;
+  fromPretty.textContent = `${from.name} (${from.symbol})`;
+  toPretty.textContent = `${to.name} (${to.symbol})`;
+  fromDim.textContent = quantity.dimension;
+  toDim.textContent = quantity.dimension;
+  groupTag.textContent = quantity.id === 'temperature' ? 'Offset' : 'SI';
+
+  if (!Number.isFinite(val)) {
+    inputValue2.value = 'Valore non valido';
+    outputValue.value = '—';
+    outputMain.textContent = 'Inserisci un numero valido';
+    outputExtra.textContent = 'Il convertitore accetta notazione decimale standard.';
+    updateUnitCard(from, quantity);
+    return;
+  }
+
+  const valueBase = toBase(val, from);
+  const converted = fromBase(valueBase, to);
+
+  inputValue2.value = `${formatNumber(val)} ${from.symbol}`;
+  outputValue.value = `${formatNumber(converted)} ${to.symbol}`;
+  outputMain.innerHTML = `${formatNumber(val)} ${from.symbol} = ${formatNumber(converted)} ${to.symbol}`;
+  outputExtra.innerHTML = `Valore nell’unità di riferimento della grandezza: <strong>${formatScientific(valueBase)} ${quantity.reference.match(/\((.*?)\)/)?.[1] || ''}</strong>. ` +
+    `Scrittura scientifica del risultato: <strong>${formatScientific(converted)} ${to.symbol}</strong>.`;
+
+  updateUnitCard(from, quantity);
+}
+
+quantitySelect.addEventListener('change', () => {
+  const q = getCurrentQuantity();
+  fillUnits(q);
+  if (q.id === 'length') {
+    fromUnit.value = 'm';
+    toUnit.value = 'cm';
+  }
+  if (q.id === 'energy') {
+    fromUnit.value = 'J';
+    toUnit.value = 'eV';
+  }
+  if (q.id === 'spectralFluxDensity') {
+    fromUnit.value = 'Jy';
+    toUnit.value = 'W·m⁻²·Hz⁻¹';
+  }
+  if (q.id === 'area') {
+    fromUnit.value = 'b';
+    toUnit.value = 'm²';
+  }
+  updateConversion();
+});
+fromUnit.addEventListener('change', updateConversion);
+toUnit.addEventListener('change', updateConversion);
+inputValue.addEventListener('input', updateConversion);
+document.getElementById('swapBtn').addEventListener('click', () => {
+  const tmp = fromUnit.value;
+  fromUnit.value = toUnit.value;
+  toUnit.value = tmp;
+  updateConversion();
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  quantitySelect.value = 'length';
+  fillUnits(getCurrentQuantity());
+  fromUnit.value = 'm';
+  toUnit.value = 'cm';
+  inputValue.value = '1';
+  updateConversion();
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`tab${idx}`).classList.add('active');
+  });
+});
+
+fillQuantities();
+quantitySelect.value = 'length';
+fillUnits(getCurrentQuantity());
+fromUnit.value = 'm';
+toUnit.value = 'cm';
+updateConversion();
+</script>
+</body>
+</html>

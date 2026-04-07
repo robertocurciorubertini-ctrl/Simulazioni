@@ -216,6 +216,72 @@
       gap: 14px;
     }
 
+    .category-toggle {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .category-toggle:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(97, 218, 251, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .category-toggle:focus-visible {
+      outline: 2px solid rgba(97, 218, 251, 0.55);
+      outline-offset: 2px;
+    }
+
+    .category-summary {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .category-count {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--text);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .category-chevron {
+      font-size: 1rem;
+      transition: transform 0.25s ease;
+    }
+
+    .category-toggle[aria-expanded="true"] .category-chevron {
+      transform: rotate(180deg);
+    }
+
+    .category-content {
+      display: grid;
+      gap: 14px;
+    }
+
+    .category-content[hidden] {
+      display: none;
+    }
+
     .category-head {
       display: flex;
       justify-content: space-between;
@@ -491,6 +557,24 @@
       return value || "";
     }
 
+    function simulationCountLabel(count) {
+      return count === 1 ? "1 simulazione" : `${count} simulazioni`;
+    }
+
+    function hasActiveFilters() {
+      return Boolean(
+        normalize(searchInput.value) ||
+        normalize(categoryFilter.value) ||
+        normalize(levelFilter.value)
+      );
+    }
+
+    function getCategoryKey(name) {
+      return normalize(name);
+    }
+
+    const expandedCategories = new Set();
+
     function getCategoryMap(categories) {
       const map = new Map();
       categories.forEach(cat => {
@@ -674,6 +758,7 @@
     function render() {
       const simulations = getVisibleSimulations();
       const orderedCategories = sortCategories(catalog.categories || [], simulations);
+      const autoExpand = hasActiveFilters();
 
       if (simulations.length === 0) {
         results.innerHTML = `
@@ -695,16 +780,32 @@
 
           if (sims.length === 0) return "";
 
+          const categoryKey = getCategoryKey(category.name);
+          const isExpanded = autoExpand || expandedCategories.has(categoryKey);
+
           return `
             <section class="category-block">
-              <div class="category-head">
-                <div>
-                  <h2 class="category-title">${escapeHtml(category.name)}</h2>
-                  ${category.description ? `<p class="category-desc">${escapeHtml(category.description)}</p>` : ""}
+              <button
+                class="category-toggle"
+                type="button"
+                data-category="${escapeHtml(category.name)}"
+                aria-expanded="${isExpanded ? "true" : "false"}"
+              >
+                <div class="category-head">
+                  <div>
+                    <h2 class="category-title">${escapeHtml(category.name)}</h2>
+                    ${category.description ? `<p class="category-desc">${escapeHtml(category.description)}</p>` : ""}
+                  </div>
                 </div>
-              </div>
-              <div class="grid">
-                ${sims.map(renderCard).join("")}
+                <div class="category-summary">
+                  <span class="category-count">${escapeHtml(simulationCountLabel(sims.length))}</span>
+                  <span class="category-chevron" aria-hidden="true">▾</span>
+                </div>
+              </button>
+              <div class="category-content" ${isExpanded ? "" : "hidden"}>
+                <div class="grid">
+                  ${sims.map(renderCard).join("")}
+                </div>
               </div>
             </section>
           `;
@@ -756,6 +857,22 @@
     categoryFilter.addEventListener("change", render);
     levelFilter.addEventListener("change", render);
     showWipToggle.addEventListener("change", refreshFiltersAndRender);
+
+    results.addEventListener("click", (event) => {
+      const toggle = event.target.closest(".category-toggle");
+      if (!toggle || hasActiveFilters()) return;
+
+      const categoryName = toggle.dataset.category || "";
+      const categoryKey = getCategoryKey(categoryName);
+
+      if (expandedCategories.has(categoryKey)) {
+        expandedCategories.delete(categoryKey);
+      } else {
+        expandedCategories.add(categoryKey);
+      }
+
+      render();
+    });
 
     loadCatalog();
   </script>

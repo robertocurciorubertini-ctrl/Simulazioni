@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onde gravitazionali — simulazione avanzata</title>
+
+  <script>
+  window.SIM_METADATA = {
+    title: "Onde gravitazionali",
+    description: "Simulazione avanzata di sistemi binari compatti con inspiral, merger e ringdown, deformazione qualitativa dello spaziotempo, segnale di strain in stile LIGO, polarizzazioni e pannello tempo-frequenza.",
+    category: "Relatività",
+    icon: "〰️",
+    order: 111,
+    tags: ["onde gravitazionali", "relatività generale", "LIGO", "Virgo", "buchi neri", "stelle di neutroni", "ringdown", "chirp"],
+    level: "avanzato"
+  };
+  </script>
+
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --card-soft: #f3f7ff;
+      --line: #d8e0ef;
+      --text: #162033;
+      --muted: #5e6f8d;
+      --accent: #335fff;
+      --accent2: #7d56ff;
+      --accent3: #0093b7;
+      --warn: #c56d00;
+      --good: #0b9f5a;
+      --shadow: 0 16px 34px rgba(26, 45, 78, 0.10);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(51,95,255,0.08), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(125,86,255,0.08), transparent 22%),
+        linear-gradient(180deg, #fbfcff 0%, #f6f8fc 100%);
+    }
+
+    .page {
+      width: min(1460px, calc(100% - 28px));
+      margin: 22px auto 34px;
+    }
+
+    .hero, .theory {
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 28px;
+    }
+
+    .hero {
+      padding: 22px 24px 18px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(51,95,255,0.08);
+      color: var(--accent);
+      border: 1px solid rgba(51,95,255,0.12);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2.1rem, 4.3vw, 3.25rem);
+      line-height: 1.04;
+      letter-spacing: -0.035em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 1080px;
+      color: var(--muted);
+      line-height: 1.68;
+      font-size: 1rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .leftCol, .rightCol {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid #edf1f8;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1.01rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card-head small {
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+      font-size: 0.8rem;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #f6f9ff;
+      border: 1px solid #dbe5f5;
+      color: #38517d;
+      font-size: 0.77rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .canvas-wrap {
+      padding: 10px;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      background: #f7faff;
+      border: 1px solid #e6edf8;
+      image-rendering: auto;
+    }
+
+    .controls {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .controlsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #22304b;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    select, button, input[type="range"] { width: 100%; }
+
+    select {
+      appearance: none;
+      border: 1px solid #d9e3f4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: var(--card-soft);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    input[type="range"] { accent-color: var(--accent); }
+
+    .rangeRow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill {
+      min-width: 88px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #eef3ff;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 0.93rem;
+      transition: transform 0.14s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: #eaf0ff; color: var(--accent); }
+    .ghost { background: #f2f5fa; color: #34435f; }
+
+    .stats {
+      padding: 0 18px 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      background: #f7faff;
+      border: 1px solid #e6edf8;
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .stat .name {
+      font-size: 0.77rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stat .val {
+      font-size: 1rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .miniGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .theory {
+      margin-top: 18px;
+      padding: 24px;
+    }
+
+    .theory h2 { margin-top: 0; font-size: 1.48rem; letter-spacing: -0.02em; }
+    .theory h3 { margin: 22px 0 8px; font-size: 1.05rem; }
+    .theory p, .theory li { color: #24324d; line-height: 1.72; }
+    .theory ul { padding-left: 1.25rem; }
+
+    .formula {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid #dde6f5;
+      background: linear-gradient(180deg, #fbfdff 0%, #f4f8ff 100%);
+      overflow-x: auto;
+      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+      font-size: 1.06rem;
+      color: #1a2640;
+    }
+
+    .foot {
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1120px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .page { width: min(100% - 14px, 1460px); margin: 14px auto 22px; }
+      .hero, .theory { padding: 18px; }
+      .controlsGrid, .stats, .buttons, .miniGrid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="eyebrow">Relatività generale · Sorgenti compatte · Interferometri laser</div>
+      <h1>Onde gravitazionali</h1>
+      <p class="subtitle">
+        Versione avanzata della simulazione: sistema binario compatto, deformazione qualitativa dello spaziotempo, forma d’onda di <em>strain</em>
+        in stile LIGO/Virgo, risposta interferometrica, polarizzazioni e pannello tempo-frequenza. Il modello non è una simulazione di relatività
+        numerica completa, ma riproduce in modo coerente la fenomenologia di <strong>inspiral</strong>, <strong>merger</strong> e <strong>ringdown</strong>.
+      </p>
+    </section>
+
+    <section class="layout">
+      <div class="leftCol">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Sistema binario e perturbazione dello spaziotempo</h2>
+              <small>Visualizzazione artistica sincronizzata con il segnale gravitazionale</small>
+            </div>
+            <div class="badges">
+              <span class="badge" id="phaseBadge">Inspiral</span>
+              <span class="badge" id="presetBadge">GW150914-like</span>
+              <span class="badge" id="polBadge">Polarizzazione +</span>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="sceneCanvas" width="980" height="560"></canvas>
+          </div>
+        </div>
+
+        <div class="miniGrid">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h2>Segnale di strain</h2>
+                <small>Forma d’onda principale h(t)</small>
+              </div>
+            </div>
+            <div class="canvas-wrap">
+              <canvas id="waveCanvas" width="640" height="300"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h2>Pannello tempo-frequenza</h2>
+                <small>Traccia del chirp nella banda sensibile</small>
+              </div>
+            </div>
+            <div class="canvas-wrap">
+              <canvas id="specCanvas" width="640" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Controlli</h2>
+              <small>Preset, masse, distanza, polarizzazione e vista</small>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="controlsGrid">
+              <div class="field">
+                <label for="preset">Preset fisico</label>
+                <select id="preset">
+                  <option value="gw150914">GW150914-like</option>
+                  <option value="gw170817">GW170817-like</option>
+                  <option value="bbh">Merge di buchi neri</option>
+                  <option value="bns">Merge di stelle di neutroni</option>
+                </select>
+                <div class="hint">I preset impostano parametri tipici, durata apparente e banda principale del segnale.</div>
+              </div>
+
+              <div class="field">
+                <label>Vista scena</label>
+                <div class="hint">Visualizzazione fissata sui soli fronti d’onda.</div>
+              </div>
+            </div>
+
+            <div class="controlsGrid">
+              <div class="field">
+                <label for="polarization">Polarizzazione mostrata</label>
+                <select id="polarization">
+                  <option value="plus">+</option>
+                  <option value="cross">×</option>
+                  <option value="mixed">Mix + e ×</option>
+                </select>
+                <div class="hint">Nel detector è mostrata la risposta differenziale associata alla polarizzazione selezionata.</div>
+              </div>
+
+              <div class="field">
+                <label for="noiseMode">Canale rivelatore</label>
+                <select id="noiseMode">
+                  <option value="clean">Segnale pulito</option>
+                  <option value="noise">Segnale con rumore</option>
+                </select>
+                <div class="hint">Il rumore è solo illustrativo: serve a rendere più simile l’aspetto del tracciato a un dato reale.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="m1">Massa oggetto 1, m₁</label>
+              <div class="rangeRow">
+                <input id="m1" type="range" min="1.2" max="80" step="0.1" value="36" />
+                <div class="pill" id="m1Val">36.0 M☉</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="m2">Massa oggetto 2, m₂</label>
+              <div class="rangeRow">
+                <input id="m2" type="range" min="1.2" max="80" step="0.1" value="29" />
+                <div class="pill" id="m2Val">29.0 M☉</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="distance">Distanza efficace della sorgente, D</label>
+              <div class="rangeRow">
+                <input id="distance" type="range" min="40" max="2500" step="10" value="410" />
+                <div class="pill" id="distanceVal">410 Mpc</div>
+              </div>
+              <div class="hint">D è usata qui come fattore di scala dell’ampiezza apparente del segnale misurato.</div>
+            </div>
+
+            <div class="field">
+              <label for="timeStretch">Fattore di dilatazione temporale della simulazione</label>
+              <div class="rangeRow">
+                <input id="timeStretch" type="range" min="0.35" max="2.8" step="0.05" value="1.00" />
+                <div class="pill" id="timeStretchVal">1.00×</div>
+              </div>
+            </div>
+
+            <div class="buttons">
+              <button class="primary" id="playBtn">Avvia</button>
+              <button class="secondary" id="pauseBtn">Pausa</button>
+              <button class="ghost" id="resetBtn">Reset</button>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="name">Fase</div>
+              <div class="val" id="phaseText">Inspiral</div>
+            </div>
+            <div class="stat">
+              <div class="name">Tempo simulato, t</div>
+              <div class="val" id="timeText">0.00 s</div>
+            </div>
+            <div class="stat">
+              <div class="name">Frequenza dominante, f</div>
+              <div class="val" id="freqText">35.0 Hz</div>
+            </div>
+            <div class="stat">
+              <div class="name">Strain normalizzato, h</div>
+              <div class="val" id="strainText">0.000</div>
+            </div>
+            <div class="stat">
+              <div class="name">Massa chirp, 𝓜</div>
+              <div class="val" id="chirpText">28.1 M☉</div>
+            </div>
+            <div class="stat">
+              <div class="name">Rapporto di massa, q = m₁/m₂</div>
+              <div class="val" id="ratioText">1.24</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Risposta interferometrica qualitativa</h2>
+              <small>Allungamento e compressione differenziale dei bracci</small>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="detectorCanvas" width="620" height="280"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="theory">
+      <h2>Spiegazione teorica</h2>
+
+      <p>
+        Le onde gravitazionali sono soluzioni ondulatorie delle equazioni di Einstein nel limite di campo debole, osservabili lontano dalla sorgente come perturbazioni
+        trasverse della metrica dello spaziotempo. La sorgente dominante per i rivelatori interferometrici terrestri è una distribuzione di massa con momento di quadrupolo variabile nel tempo.
+        Per questo un sistema binario compatto in orbita, come due buchi neri o due stelle di neutroni, è un emettitore naturale di radiazione gravitazionale.
+      </p>
+
+      <h3>1. Strain gravitazionale</h3>
+      <p>
+        La quantità misurata da un interferometro come LIGO o Virgo è lo <strong>strain</strong> gravitazionale, cioè la variazione relativa differenziale della lunghezza dei due bracci.
+        In forma schematica:
+      </p>
+      <div class="formula">h(t) \approx \frac{\Delta L(t)}{L}</div>
+      <p>
+        dove <strong>h(t)</strong> è lo strain, <strong>ΔL(t)</strong> è la differenza di variazione di lunghezza indotta dall’onda tra i due bracci e <strong>L</strong> è la lunghezza nominale del braccio.
+      </p>
+
+      <h3>2. Massa chirp</h3>
+      <p>
+        L’evoluzione della frequenza durante l’inspiral è controllata in prima approssimazione dalla massa chirp del sistema binario:
+      </p>
+      <div class="formula">\mathcal{M} = \frac{(m_1 m_2)^{3/5}}{(m_1 + m_2)^{1/5}}</div>
+      <p>
+        dove <strong>m₁</strong> e <strong>m₂</strong> sono le masse dei due oggetti compatti e <strong>𝓜</strong> è la massa chirp. A massa chirp più grande corrisponde, in generale,
+        un attraversamento più rapido della banda sensibile dei rivelatori terrestri.
+      </p>
+
+      <h3>3. Struttura del segnale</h3>
+      <ul>
+        <li><strong>Inspiral</strong>: la separazione orbitale diminuisce per perdita di energia via radiazione gravitazionale; frequenza e ampiezza crescono.</li>
+        <li><strong>Merger</strong>: la coalescenza produce il massimo del segnale.</li>
+        <li><strong>Ringdown</strong>: l’oggetto finale, tipicamente un buco nero rotante, si rilassa tramite modi quasi-normali smorzati.</li>
+      </ul>
+
+      <h3>4. Polarizzazioni</h3>
+      <p>
+        In relatività generale, nel gauge trasverso-traceless, un’onda gravitazionale possiede due polarizzazioni tensoriali indipendenti, indicate come <strong>h₊</strong> e <strong>h×</strong>.
+        La prima deforma alternativamente lungo due assi ortogonali, la seconda agisce con la stessa struttura ma ruotata di 45 gradi.
+        In questa simulazione puoi selezionare quale visualizzare nella scena e nel pannello del rivelatore.
+      </p>
+
+      <h3>5. Cosa mostra e cosa non mostra questa simulazione</h3>
+      <p>
+        La scena principale è una rappresentazione qualitativa. Non costituisce una soluzione esatta delle equazioni di Einstein né una simulazione di relatività numerica completa.
+        Riproduce però in modo coerente quattro aspetti fisicamente importanti: il <em>chirp</em> della forma d’onda, la distinzione tra inspiral, merger e ringdown, la dipendenza qualitativa del segnale
+        da massa e distanza, e la lettura interferometrica differenziale associata alle polarizzazioni dell’onda.
+      </p>
+
+      <h3>6. Variabili usate</h3>
+      <ul>
+        <li><strong>m₁, m₂</strong>: masse dei due oggetti compatti.</li>
+        <li><strong>D</strong>: distanza efficace della sorgente.</li>
+        <li><strong>f</strong>: frequenza dominante del segnale gravitazionale.</li>
+        <li><strong>h</strong>: strain gravitazionale osservato.</li>
+        <li><strong>t</strong>: tempo.</li>
+        <li><strong>𝓜</strong>: massa chirp del sistema.</li>
+        <li><strong>q = m₁/m₂</strong>: rapporto di massa.</li>
+      </ul>
+
+      <p class="foot">
+        Nota: i fronti d’onda servono a rendere visibile in modo qualitativo la propagazione della perturbazione gravitazionale. L’ampiezza grafica non è in scala reale.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const sceneCanvas = document.getElementById('sceneCanvas');
+    const waveCanvas = document.getElementById('waveCanvas');
+    const specCanvas = document.getElementById('specCanvas');
+    const detectorCanvas = document.getElementById('detectorCanvas');
+    const sctx = sceneCanvas.getContext('2d');
+    const wctx = waveCanvas.getContext('2d');
+    const spctx = specCanvas.getContext('2d');
+    const dctx = detectorCanvas.getContext('2d');
+
+    const canvasRegistry = [
+      { canvas: sceneCanvas, ctx: sctx },
+      { canvas: waveCanvas, ctx: wctx },
+      { canvas: specCanvas, ctx: spctx },
+      { canvas: detectorCanvas, ctx: dctx }
+    ];
+
+
+    const renderState = {
+      sizes: new Map(),
+      staticWave: document.createElement('canvas'),
+      staticSpec: document.createElement('canvas'),
+      staticDetector: document.createElement('canvas'),
+      waveDirty: true,
+      specDirty: true,
+      detectorDirty: true,
+      allDirty: true,
+      fps: 60,
+      fpsAccum: 0,
+      fpsCount: 0,
+      fpsStamp: 0
+    };
+
+    function setupCanvas(canvas, ctx) {
+      const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+      const rect = canvas.getBoundingClientRect();
+      const cssW = rect.width || canvas.width;
+      const aspect = canvas.height / canvas.width;
+      const cssH = rect.height || cssW * aspect;
+      const pxW = Math.round(cssW * dpr);
+      const pxH = Math.round(cssH * dpr);
+      const resized = canvas.width !== pxW || canvas.height !== pxH;
+      if (resized) {
+        canvas.width = pxW;
+        canvas.height = pxH;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      renderState.sizes.set(canvas, { w: cssW, h: cssH, dpr, pxW, pxH });
+      return { w: cssW, h: cssH, dpr, pxW, pxH, resized };
+    }
+
+    function setupAllCanvases() {
+      let resizedAny = false;
+      canvasRegistry.forEach(({ canvas, ctx }) => {
+        const dims = setupCanvas(canvas, ctx);
+        resizedAny = resizedAny || dims.resized;
+      });
+      if (resizedAny) markStaticDirty();
+    }
+
+    function matchBuffer(bufferCanvas, targetCanvas) {
+      const size = renderState.sizes.get(targetCanvas);
+      if (!size) return;
+      if (bufferCanvas.width !== size.pxW || bufferCanvas.height !== size.pxH) {
+        bufferCanvas.width = size.pxW;
+        bufferCanvas.height = size.pxH;
+      }
+    }
+
+    function markStaticDirty() {
+      renderState.waveDirty = true;
+      renderState.specDirty = true;
+      renderState.detectorDirty = true;
+      renderState.allDirty = true;
+    }
+
+    const controls = {
+      preset: document.getElementById('preset'),
+      viewMode: document.getElementById('viewMode'),
+      polarization: document.getElementById('polarization'),
+      noiseMode: document.getElementById('noiseMode'),
+      m1: document.getElementById('m1'),
+      m2: document.getElementById('m2'),
+      distance: document.getElementById('distance'),
+      timeStretch: document.getElementById('timeStretch')
+    };
+
+    const ui = {
+      phaseText: document.getElementById('phaseText'),
+      phaseBadge: document.getElementById('phaseBadge'),
+      presetBadge: document.getElementById('presetBadge'),
+      polBadge: document.getElementById('polBadge'),
+      timeText: document.getElementById('timeText'),
+      freqText: document.getElementById('freqText'),
+      strainText: document.getElementById('strainText'),
+      chirpText: document.getElementById('chirpText'),
+      ratioText: document.getElementById('ratioText'),
+      m1Val: document.getElementById('m1Val'),
+      m2Val: document.getElementById('m2Val'),
+      distanceVal: document.getElementById('distanceVal'),
+      timeStretchVal: document.getElementById('timeStretchVal')
+    };
+
+    const buttons = {
+      play: document.getElementById('playBtn'),
+      pause: document.getElementById('pauseBtn'),
+      reset: document.getElementById('resetBtn')
+    };
+
+    const presets = {
+      gw150914: {
+        name: 'GW150914-like', label: 'GW150914-like', kind: 'bh', m1: 36, m2: 29, D: 410,
+        duration: 7.2, f0: 34, fPeak: 170, bodyScale: 1.12, colorA: '#0e1728', colorB: '#243657',
+        glow: 'rgba(88,115,220,0.18)', ringColor: 'rgba(62,92,205,0.24)'
+      },
+      gw170817: {
+        name: 'GW170817-like', label: 'GW170817-like', kind: 'ns', m1: 1.46, m2: 1.27, D: 40,
+        duration: 12.5, f0: 26, fPeak: 520, bodyScale: 0.72, colorA: '#5f6fff', colorB: '#8a60ff',
+        glow: 'rgba(122,87,255,0.17)', ringColor: 'rgba(110,78,233,0.23)'
+      },
+      bbh: {
+        name: 'Merge di buchi neri', label: 'BH-BH', kind: 'bh', m1: 35, m2: 30, D: 450,
+        duration: 7.8, f0: 30, fPeak: 190, bodyScale: 1.15, colorA: '#0d1627', colorB: '#213453',
+        glow: 'rgba(86,111,215,0.18)', ringColor: 'rgba(70,95,205,0.24)'
+      },
+      bns: {
+        name: 'Merge di stelle di neutroni', label: 'NS-NS', kind: 'ns', m1: 1.40, m2: 1.35, D: 140,
+        duration: 11.8, f0: 28, fPeak: 480, bodyScale: 0.74, colorA: '#6574ff', colorB: '#8c5ef5',
+        glow: 'rgba(126,87,255,0.17)', ringColor: 'rgba(112,78,235,0.23)'
+      }
+    };
+
+    const state = {
+      running: false,
+      t: 0,
+      duration: presets.gw150914.duration,
+      mergerTime: 0.80,
+      ringdownStart: 0.845,
+      waveform: [],
+      maxAbsH: 1,
+      noiseSeed: [],
+      lastStamp: 0,
+      prevU: -1
+    };
+
+    function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+    function smoothstep(a, b, x) {
+      const u = clamp((x - a) / (b - a), 0, 1);
+      return u * u * (3 - 2 * u);
+    }
+    function chirpMass(m1, m2) {
+      return Math.pow(m1 * m2, 3/5) / Math.pow(m1 + m2, 1/5);
+    }
+    function currentPreset() { return presets[controls.preset.value]; }
+
+    function getParams() {
+      const p = currentPreset();
+      const m1 = parseFloat(controls.m1.value);
+      const m2 = parseFloat(controls.m2.value);
+      const D = parseFloat(controls.distance.value);
+      const timeStretch = parseFloat(controls.timeStretch.value);
+      const Mc = chirpMass(m1, m2);
+      const q = m1 / m2;
+      return { preset: p, m1, m2, D, timeStretch, Mc, q };
+    }
+
+    function setPreset(name) {
+      const p = presets[name];
+      controls.preset.value = name;
+      controls.m1.value = p.m1;
+      controls.m2.value = p.m2;
+      controls.distance.value = p.D;
+      state.duration = p.duration;
+      rebuildWaveform();
+      resetSim();
+    }
+
+    function regenNoise() {
+      const n = 2400;
+      state.noiseSeed = Array.from({ length: n }, (_, i) => {
+        const a = Math.sin(i * 12.9898) * 43758.5453;
+        return (a - Math.floor(a)) * 2 - 1;
+      });
+    }
+
+    function noiseAt(u) {
+      if (!state.noiseSeed.length) regenNoise();
+      const idx = clamp(u, 0, 1) * (state.noiseSeed.length - 1);
+      const i0 = Math.floor(idx);
+      const i1 = Math.min(state.noiseSeed.length - 1, i0 + 1);
+      const a = idx - i0;
+      return state.noiseSeed[i0] * (1 - a) + state.noiseSeed[i1] * a;
+    }
+
+    function rebuildWaveform() {
+      const { preset, m1, m2, D, Mc, q } = getParams();
+      state.duration = preset.duration;
+      const samples = 2600;
+      const waveform = [];
+      let phase = 0;
+
+      const kindScale = preset.kind === 'bh' ? 27 : 1.2;
+      const mcScale = clamp(Mc / kindScale, 0.45, 3.2);
+      const distanceScale = clamp(420 / D, 0.15, 10);
+      const asym = clamp(1 - Math.abs(1 - q) * 0.16, 0.72, 1.02);
+      const baseAmp = (preset.kind === 'bh' ? 1.0 : 0.70) * Math.pow(mcScale, 0.92) * Math.pow(distanceScale, 0.88) * asym;
+
+      const inspiralFreqEnd = preset.fPeak * (preset.kind === 'bh' ? 0.82 : 0.90);
+      const mergerFreqPeak = preset.fPeak;
+      const ringdownFloor = preset.fPeak * (preset.kind === 'bh' ? 0.72 : 0.62);
+
+      for (let i = 0; i < samples; i++) {
+        const u = i / (samples - 1);
+        const t = u * state.duration;
+        let amp, freq, phaseName;
+
+        if (u < state.mergerTime) {
+          const x = u / state.mergerTime;
+          const rise = Math.pow(x, preset.kind === 'bh' ? 2.45 : 2.05);
+          amp = baseAmp * (0.055 + 0.945 * Math.pow(x, preset.kind === 'bh' ? 2.05 : 1.65));
+          freq = preset.f0 + (inspiralFreqEnd - preset.f0) * rise;
+          phaseName = 'Inspiral';
+        } else if (u < state.ringdownStart) {
+          const x = (u - state.mergerTime) / (state.ringdownStart - state.mergerTime + 1e-9);
+          const sx = smoothstep(0, 1, x);
+          amp = baseAmp * (1.00 + 0.16 * Math.sin(Math.PI * sx));
+          freq = inspiralFreqEnd + (mergerFreqPeak - inspiralFreqEnd) * sx;
+          phaseName = 'Merger';
+        } else {
+          const x = (u - state.ringdownStart) / (1 - state.ringdownStart + 1e-9);
+          const damp = Math.exp(-(preset.kind === 'bh' ? 4.8 : 5.6) * x);
+          amp = baseAmp * 1.02 * damp;
+          freq = mergerFreqPeak - (mergerFreqPeak - ringdownFloor) * (1 - Math.exp(-(preset.kind === 'bh' ? 3.4 : 4.1) * x));
+          phaseName = 'Ringdown';
+        }
+
+        const dt = state.duration / (samples - 1);
+        phase += 2 * Math.PI * freq * dt * 0.088;
+
+        const hPlus = amp * Math.sin(phase);
+        const hCross = amp * Math.sin(phase + Math.PI / 2);
+        waveform.push({ t, u, amp, freq, phaseName, hPlus, hCross });
+      }
+
+      state.waveform = waveform;
+      state.maxAbsH = waveform.reduce((m, p) => Math.max(m, Math.abs(p.hPlus), Math.abs(p.hCross), p.amp), 1e-6);
+      updateReadouts();
+      markStaticDirty();
+      renderFrame();
+    }
+
+    function mixStrain(point) {
+      const pol = controls.polarization.value;
+      if (pol === 'plus') return point.hPlus;
+      if (pol === 'cross') return point.hCross;
+      return 0.76 * point.hPlus + 0.52 * point.hCross;
+    }
+
+    function sampleWave(t) {
+      const arr = state.waveform;
+      if (!arr.length) {
+        return { t: 0, u: 0, amp: 0, freq: 0, phaseName: 'Inspiral', hPlus: 0, hCross: 0, h: 0 };
+      }
+      const u = clamp(t / state.duration, 0, 1);
+      const idx = u * (arr.length - 1);
+      const i0 = Math.floor(idx);
+      const i1 = Math.min(arr.length - 1, i0 + 1);
+      const a = idx - i0;
+      const p0 = arr[i0], p1 = arr[i1];
+      const point = {
+        t,
+        u,
+        amp: p0.amp * (1 - a) + p1.amp * a,
+        freq: p0.freq * (1 - a) + p1.freq * a,
+        phaseName: a < 0.5 ? p0.phaseName : p1.phaseName,
+        hPlus: p0.hPlus * (1 - a) + p1.hPlus * a,
+        hCross: p0.hCross * (1 - a) + p1.hCross * a
+      };
+      point.h = mixStrain(point);
+      if (controls.noiseMode.value === 'noise') {
+        const noiseEnvelope = 0.10 + 0.04 * Math.sin(50 * u);
+        point.hObserved = point.h + noiseEnvelope * noiseAt(u);
+      } else {
+        point.hObserved = point.h;
+      }
+      return point;
+    }
+
+    function updateLabels() {
+      const { preset, Mc, q } = getParams();
+      ui.m1Val.textContent = `${parseFloat(controls.m1.value).toFixed(1)} M☉`;
+      ui.m2Val.textContent = `${parseFloat(controls.m2.value).toFixed(1)} M☉`;
+      ui.distanceVal.textContent = `${parseFloat(controls.distance.value).toFixed(0)} Mpc`;
+      ui.timeStretchVal.textContent = `${parseFloat(controls.timeStretch.value).toFixed(2)}×`;
+      ui.presetBadge.textContent = preset.name;
+      ui.polBadge.textContent = `Polarizzazione ${controls.polarization.value === 'plus' ? '+' : controls.polarization.value === 'cross' ? '×' : 'mista'}`;
+      ui.chirpText.textContent = `${Mc.toFixed(2)} M☉`;
+      ui.ratioText.textContent = `${q.toFixed(2)}`;
+    }
+
+    function updateReadouts() {
+      updateLabels();
+      const s = sampleWave(state.t);
+      ui.phaseText.textContent = s.phaseName;
+      ui.phaseBadge.textContent = s.phaseName;
+      ui.timeText.textContent = `${s.t.toFixed(2)} s`;
+      ui.freqText.textContent = `${s.freq.toFixed(1)} Hz`;
+      ui.strainText.textContent = `${s.hObserved.toFixed(3)}`;
+    }
+
+    function resetSim() {
+      state.running = false;
+      state.t = 0;
+      state.lastStamp = 0;
+      updateReadouts();
+      markStaticDirty();
+      renderFrame();
+    }
+
+    function panelBackground(ctx, w, h) {
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#fbfdff');
+      g.addColorStop(1, '#f2f7ff');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawGridWarp(ctx, cx, cy, s, strength) {
+      const pol = controls.polarization.value;
+      const rot = pol === 'cross' ? Math.PI / 4 : 0;
+      const lines = 16;
+      const spacingX = 56;
+      const spacingY = 42;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.translate(-cx, -cy);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(76,99,150,0.28)';
+
+      for (let i = -lines; i <= lines; i++) {
+        ctx.beginPath();
+        for (let yy = -8; yy <= 8; yy++) {
+          const y = cy + yy * spacingY;
+          const x0 = cx + i * spacingX;
+          const dx = x0 - cx;
+          const dy = y - cy;
+          const r2 = dx * dx + dy * dy + 1400;
+          const quad = Math.cos(2 * Math.atan2(dy, dx || 1e-6));
+          const wave = Math.sin(18 * Math.sqrt(r2) / 700 - 9 * s.u);
+          const x = x0 + strength * 2400 * quad * wave / r2;
+          yy === -8 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      for (let j = -10; j <= 10; j++) {
+        ctx.beginPath();
+        for (let xx = -10; xx <= 10; xx++) {
+          const x = cx + xx * spacingX;
+          const y0 = cy + j * spacingY;
+          const dx = x - cx;
+          const dy = y0 - cy;
+          const r2 = dx * dx + dy * dy + 1400;
+          const quad = -Math.cos(2 * Math.atan2(dy, dx || 1e-6));
+          const wave = Math.sin(18 * Math.sqrt(r2) / 700 - 9 * s.u);
+          const y = y0 + strength * 2400 * quad * wave / r2;
+          xx === -10 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawWaveRings(ctx, cx, cy, s, strength, ringColor) {
+      ctx.save();
+      const rot = controls.polarization.value === 'cross' ? Math.PI / 4 : 0;
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      for (let i = 0; i < 8; i++) {
+        const phase = ((s.u * 2.1 - i * 0.12) % 1 + 1) % 1;
+        const r = 38 + phase * 360;
+        const alpha = (1 - phase) * 0.42;
+        ctx.strokeStyle = ringColor.replace(/0\.24\)|0\.23\)/, `${alpha.toFixed(3)})`);
+        ctx.lineWidth = 1.4 + (1 - phase) * 1.2;
+        ctx.beginPath();
+        for (let a = 0; a <= Math.PI * 2 + 0.04; a += 0.08) {
+          const mod = 1 + 0.12 * strength * Math.cos(2 * a) * Math.sin(8 * phase * Math.PI);
+          const x = Math.cos(a) * r * mod;
+          const y = Math.sin(a) * r * (2 - mod);
+          a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawBodies(ctx, cx, cy, s, params) {
+      const { preset, m1, m2 } = params;
+      const u = s.u;
+      const sep0 = preset.kind === 'bh' ? 188 : 208;
+      const sep = sep0 * Math.pow(1 - clamp(u, 0, 0.995), 0.56) + 20;
+      const mergerBoost = smoothstep(state.mergerTime - 0.03, state.mergerTime + 0.03, u);
+      const angle = 18 * u * u + 3.4 * u;
+      const mu1 = m2 / (m1 + m2);
+      const mu2 = m1 / (m1 + m2);
+      const r1 = clamp((preset.bodyScale * (preset.kind === 'bh' ? 10 : 13)) * Math.pow(m1, 1/3), 10, 44);
+      const r2 = clamp((preset.bodyScale * (preset.kind === 'bh' ? 10 : 13)) * Math.pow(m2, 1/3), 10, 44);
+      const x1 = cx + Math.cos(angle) * sep * mu1;
+      const y1 = cy + Math.sin(angle) * sep * 0.66 * mu1;
+      const x2 = cx - Math.cos(angle) * sep * mu2;
+      const y2 = cy - Math.sin(angle) * sep * 0.66 * mu2;
+
+      const glow = ctx.createRadialGradient(cx, cy, 30, cx, cy, sep * 1.7);
+      glow.addColorStop(0, preset.glow);
+      glow.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, sep * 1.45 + 80, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (preset.kind === 'bh' && u < state.ringdownStart) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(240,188,102,0.16)';
+        ctx.lineWidth = 2;
+        for (let rr = sep * 0.34; rr <= sep * 0.92; rr += sep * 0.13) {
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rr, rr * 0.28, 0.24, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      if (u < state.ringdownStart) {
+        ctx.strokeStyle = 'rgba(55,84,142,0.18)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, sep * 0.55 + 18, sep * 0.36 + 12, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      function body(x, y, r, color, darkCenter) {
+        const grad = ctx.createRadialGradient(x - r * 0.28, y - r * 0.28, r * 0.18, x, y, r);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, darkCenter);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.26)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x - r*0.16, y - r*0.18, r*0.62, 0.12*Math.PI, 0.96*Math.PI);
+        ctx.stroke();
+      }
+
+      if (u < state.ringdownStart) {
+        body(x1, y1, r1, preset.colorA, '#0b101c');
+        body(x2, y2, r2, preset.colorB, '#121b2d');
+      } else {
+        const rf = Math.sqrt(r1*r1 + r2*r2) * (1.02 + 0.02 * Math.sin(42 * (u - state.ringdownStart)) * Math.exp(-8 * (u - state.ringdownStart)));
+        body(cx, cy, rf, preset.colorB, '#0a1020');
+      }
+
+      if (mergerBoost > 0.08) {
+        const halo = 68 + 34 * Math.sin(16 * u) * Math.exp(-10 * Math.max(0, u - state.mergerTime));
+        const hg = ctx.createRadialGradient(cx, cy, 12, cx, cy, halo);
+        hg.addColorStop(0, 'rgba(122,87,255,0.14)');
+        hg.addColorStop(1, 'rgba(122,87,255,0)');
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.arc(cx, cy, halo, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawSceneLegend(ctx, params) {
+      const { preset, Mc, D, q } = params;
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.77)';
+      ctx.strokeStyle = 'rgba(182,197,224,0.82)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, 18, 18, 310, 102, 14, true, true);
+      ctx.fillStyle = '#1d2a43';
+      ctx.font = '700 14px Inter, sans-serif';
+      ctx.fillText(`Preset: ${preset.name}`, 32, 42);
+      ctx.font = '12px Inter, sans-serif';
+      ctx.fillStyle = '#5b6d8a';
+      ctx.fillText(`Massa chirp, 𝓜 = ${Mc.toFixed(2)} M☉`, 32, 64);
+      ctx.fillText(`Distanza efficace, D = ${D.toFixed(0)} Mpc`, 32, 82);
+      ctx.fillText(`Rapporto di massa, q = ${q.toFixed(2)}`, 32, 100);
+      ctx.restore();
+    }
+
+    function drawScene() {
+      const dims = setupCanvas(sceneCanvas, sctx);
+      const w = dims.w, h = dims.h;
+      panelBackground(sctx, w, h);
+      const params = getParams();
+      const s = sampleWave(state.t);
+      const cx = w * 0.52, cy = h * 0.52;
+      const strength = clamp(Math.abs(s.h) / state.maxAbsH * 1.25 + s.amp * 0.14, 0.08, 1.22);
+      const view = controls.viewMode.value;
+
+      const g = sctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, 'rgba(51,95,255,0.035)');
+      g.addColorStop(1, 'rgba(125,86,255,0.018)');
+      sctx.fillStyle = g;
+      sctx.fillRect(0, 0, w, h);
+
+      sctx.save();
+      sctx.globalAlpha = 0.70;
+      for (let i = 0; i < 42; i++) {
+        const x = (i * 137.5) % w;
+        const y = (i * 73.2 + 19) % h;
+        const r = 0.7 + (i % 3) * 0.45;
+        sctx.fillStyle = 'rgba(130,150,195,0.16)';
+        sctx.beginPath();
+        sctx.arc(x, y, r, 0, Math.PI * 2);
+        sctx.fill();
+      }
+      sctx.restore();
+
+      
+      drawWaveRings(sctx, cx, cy, s, strength, params.preset.ringColor);
+      drawBodies(sctx, cx, cy, s, params);
+      drawSceneLegend(sctx, params);
+
+      sctx.fillStyle = '#4c607f';
+      sctx.font = '12px Inter, sans-serif';
+      sctx.fillText('Ampiezza visiva non in scala reale', 20, h - 18);
+    }
+
+
+    function renderWaveStatic() {
+      matchBuffer(renderState.staticWave, waveCanvas);
+      const ctx = renderState.staticWave.getContext('2d');
+      const dims = renderState.sizes.get(waveCanvas);
+      const w = dims.w, h = dims.h, dpr = dims.dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      panelBackground(ctx, w, h);
+      const left = 44, right = 18, top = 20, bottom = 32;
+      const innerW = w - left - right, innerH = h - top - bottom;
+      const zeroY = top + innerH / 2;
+
+      ctx.strokeStyle = '#dfe7f5';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = top + i * innerH / 4;
+        ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(left + innerW, y); ctx.stroke();
+      }
+      for (let i = 0; i <= 5; i++) {
+        const x = left + i * innerW / 5;
+        ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, top + innerH); ctx.stroke();
+      }
+      ctx.strokeStyle = '#98aed7';
+      ctx.beginPath(); ctx.moveTo(left, zeroY); ctx.lineTo(left + innerW, zeroY); ctx.stroke();
+
+      const grad = ctx.createLinearGradient(left, 0, left + innerW, 0);
+      grad.addColorStop(0, '#5071ff'); grad.addColorStop(1, '#8759ff');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2.3;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      state.waveform.forEach((p, i) => {
+        const x = left + p.u * innerW;
+        const mixed = mixStrain(p);
+        const y = zeroY - (mixed / state.maxAbsH) * innerH * 0.42;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      if (controls.noiseMode.value === 'noise') {
+        ctx.strokeStyle = 'rgba(0,147,183,0.52)';
+        ctx.lineWidth = 1.0;
+        ctx.beginPath();
+        state.waveform.forEach((p, i) => {
+          const x = left + p.u * innerW;
+          const noisy = mixStrain(p) + (0.08 + 0.03 * Math.sin(50 * p.u)) * noiseAt(p.u);
+          const y = zeroY - (noisy / state.maxAbsH) * innerH * 0.42;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#22314d';
+      ctx.font = '12px Inter, sans-serif';
+      ctx.fillText('h(t)', 10, zeroY + 4);
+      ctx.fillText('t', left + innerW - 3, h - 8);
+      ctx.fillText('strain', left + 4, 14);
+      ctx.fillStyle = '#5f6f8c';
+      ctx.fillText('Inspiral', left + innerW * 0.18, top + 16);
+      ctx.fillText('Merger', left + innerW * 0.73, top + 16);
+      ctx.fillText('Ringdown', left + innerW * 0.87, top + 16);
+    }
+
+    function renderSpectrogramStatic() {
+      matchBuffer(renderState.staticSpec, specCanvas);
+      const ctx = renderState.staticSpec.getContext('2d');
+      const dims = renderState.sizes.get(specCanvas);
+      const w = dims.w, h = dims.h, dpr = dims.dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      panelBackground(ctx, w, h);
+      const left = 52, right = 18, top = 18, bottom = 34;
+      const innerW = w - left - right, innerH = h - top - bottom;
+      const fMin = 20;
+      const fMax = Math.max(240, ...state.waveform.map(p => p.freq)) * 1.04;
+      function mapFreq(f) {
+        const lfMin = Math.log10(fMin);
+        const lfMax = Math.log10(fMax);
+        const lf = Math.log10(Math.max(fMin, f));
+        return top + innerH - ((lf - lfMin) / (lfMax - lfMin)) * innerH;
+      }
+      const ticks = [20, 30, 50, 80, 120, 200, 350, 500];
+      ctx.strokeStyle = '#dfe7f5';
+      ctx.lineWidth = 1;
+      ticks.filter(f => f <= fMax).forEach(f => {
+        const y = mapFreq(f);
+        ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(left + innerW, y); ctx.stroke();
+        ctx.fillStyle = '#5f6f8c';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillText(`${f} Hz`, 6, y + 4);
+      });
+      for (let i = 0; i <= 5; i++) {
+        const x = left + i * innerW / 5;
+        ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, top + innerH); ctx.stroke();
+      }
+      for (let i = 0; i < state.waveform.length - 1; i += 2) {
+        const p = state.waveform[i];
+        const x = left + p.u * innerW;
+        const yC = mapFreq(p.freq);
+        const ampNorm = clamp(p.amp / state.maxAbsH, 0, 1);
+        const sigma = 8 + 16 * (1 - ampNorm);
+        for (let k = -16; k <= 16; k++) {
+          const offset = k * 2.2;
+          const alpha = 0.30 * ampNorm * Math.exp(-(offset * offset) / (2 * sigma * sigma));
+          ctx.fillStyle = `rgba(83,114,255,${alpha.toFixed(3)})`;
+          ctx.fillRect(x, yC + offset, 2.6, 2.6);
+        }
+      }
+      ctx.strokeStyle = '#8659ff';
+      ctx.lineWidth = 2.2;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      state.waveform.forEach((p, i) => {
+        const x = left + p.u * innerW;
+        const y = mapFreq(p.freq);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      ctx.fillStyle = '#22314d';
+      ctx.font = '12px Inter, sans-serif';
+      ctx.fillText('f', 14, top + 10);
+      ctx.fillText('t', left + innerW - 4, h - 9);
+    }
+
+    function renderDetectorStatic() {
+      matchBuffer(renderState.staticDetector, detectorCanvas);
+      const ctx = renderState.staticDetector.getContext('2d');
+      const dims = renderState.sizes.get(detectorCanvas);
+      const w = dims.w, h = dims.h, dpr = dims.dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      panelBackground(ctx, w, h);
+      ctx.fillStyle = '#5f6f8c';
+      ctx.font = '12px Inter, sans-serif';
+      ctx.fillText('Risposta qualitativa del rivelatore alla polarizzazione selezionata', 18, 26);
+      const px = w * 0.67, py = 44, pw = Math.min(170, w * 0.27), ph = Math.min(132, h * 0.47);
+      ctx.strokeStyle = '#dde6f5';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px, py, pw, ph);
+      ctx.beginPath(); ctx.moveTo(px, py + ph/2); ctx.lineTo(px + pw, py + ph/2); ctx.stroke();
+      ctx.fillStyle = '#22314d';
+      ctx.font = '700 12px Inter, sans-serif';
+      ctx.fillText('Canale h(t)', px + 4, py - 8);
+    }
+
+
+    function drawWaveform() {
+      const dims = setupCanvas(waveCanvas, wctx);
+      const w = dims.w, h = dims.h;
+      if (renderState.waveDirty || dims.resized) {
+        renderWaveStatic();
+        renderState.waveDirty = false;
+      }
+      wctx.clearRect(0, 0, w, h);
+      wctx.drawImage(renderState.staticWave, 0, 0, dims.pxW, dims.pxH, 0, 0, w, h);
+      const left = 44, right = 18, top = 20, bottom = 32;
+      const innerW = w - left - right, innerH = h - top - bottom;
+      const zeroY = top + innerH / 2;
+      const s = sampleWave(state.t);
+      const u = clamp(state.t / state.duration, 0, 1);
+      const xPlay = left + u * innerW;
+      const yPlay = zeroY - (s.hObserved / state.maxAbsH) * innerH * 0.42;
+      wctx.strokeStyle = 'rgba(197,109,0,0.92)';
+      wctx.lineWidth = 2;
+      wctx.beginPath(); wctx.moveTo(xPlay, top); wctx.lineTo(xPlay, top + innerH); wctx.stroke();
+      wctx.fillStyle = '#c56d00';
+      wctx.beginPath(); wctx.arc(xPlay, yPlay, 4.3, 0, Math.PI * 2); wctx.fill();
+    }
+
+
+    function drawSpectrogram() {
+      const dims = setupCanvas(specCanvas, spctx);
+      const w = dims.w, h = dims.h;
+      if (renderState.specDirty || dims.resized) {
+        renderSpectrogramStatic();
+        renderState.specDirty = false;
+      }
+      spctx.clearRect(0, 0, w, h);
+      spctx.drawImage(renderState.staticSpec, 0, 0, dims.pxW, dims.pxH, 0, 0, w, h);
+      const left = 52, right = 18, top = 18, bottom = 34;
+      const innerW = w - left - right, innerH = h - top - bottom;
+      const fMin = 20;
+      const fMax = Math.max(240, ...state.waveform.map(p => p.freq)) * 1.04;
+      function mapFreq(f) {
+        const lfMin = Math.log10(fMin);
+        const lfMax = Math.log10(fMax);
+        const lf = Math.log10(Math.max(fMin, f));
+        return top + innerH - ((lf - lfMin) / (lfMax - lfMin)) * innerH;
+      }
+      const s = sampleWave(state.t);
+      const xPlay = left + s.u * innerW;
+      const yPlay = mapFreq(s.freq);
+      spctx.strokeStyle = 'rgba(197,109,0,0.92)';
+      spctx.lineWidth = 2;
+      spctx.beginPath(); spctx.moveTo(xPlay, top); spctx.lineTo(xPlay, top + innerH); spctx.stroke();
+      spctx.fillStyle = '#c56d00';
+      spctx.beginPath(); spctx.arc(xPlay, yPlay, 4.2, 0, Math.PI * 2); spctx.fill();
+    }
+
+
+    function drawDetector() {
+      const dims = setupCanvas(detectorCanvas, dctx);
+      const w = dims.w, h = dims.h;
+      if (renderState.detectorDirty || dims.resized) {
+        renderDetectorStatic();
+        renderState.detectorDirty = false;
+      }
+      dctx.clearRect(0, 0, w, h);
+      dctx.drawImage(renderState.staticDetector, 0, 0, dims.pxW, dims.pxH, 0, 0, w, h);
+      const s = sampleWave(state.t);
+      const cx = w * 0.34, cy = h * 0.58;
+      const arm = Math.min(116, w * 0.18);
+      const eps = 0.11 * (s.h / state.maxAbsH);
+      const rot = controls.polarization.value === 'cross' ? Math.PI / 4 : 0;
+
+      dctx.save();
+      dctx.translate(cx, cy);
+      dctx.rotate(rot);
+      dctx.translate(-cx, -cy);
+      const Lx = arm * (1 + eps);
+      const Ly = arm * (1 - eps);
+      dctx.strokeStyle = '#d7e1f2';
+      dctx.lineWidth = 14;
+      dctx.lineCap = 'round';
+      dctx.beginPath(); dctx.moveTo(cx, cy); dctx.lineTo(cx + Lx, cy); dctx.stroke();
+      dctx.beginPath(); dctx.moveTo(cx, cy); dctx.lineTo(cx, cy - Ly); dctx.stroke();
+      dctx.strokeStyle = '#5577ff';
+      dctx.lineWidth = 6;
+      dctx.beginPath(); dctx.moveTo(cx, cy); dctx.lineTo(cx + Lx, cy); dctx.stroke();
+      dctx.strokeStyle = '#7d57ff';
+      dctx.beginPath(); dctx.moveTo(cx, cy); dctx.lineTo(cx, cy - Ly); dctx.stroke();
+      dctx.fillStyle = '#23324f'; dctx.beginPath(); dctx.arc(cx, cy, 9, 0, Math.PI * 2); dctx.fill();
+      dctx.fillStyle = '#5071ff'; dctx.beginPath(); dctx.arc(cx + Lx, cy, 8, 0, Math.PI * 2); dctx.fill();
+      dctx.fillStyle = '#7c5cff'; dctx.beginPath(); dctx.arc(cx, cy - Ly, 8, 0, Math.PI * 2); dctx.fill();
+      dctx.restore();
+
+      dctx.fillStyle = '#22314d';
+      dctx.font = '700 12px Inter, sans-serif';
+      dctx.fillText('Braccio x', cx + 58, cy - 12);
+      dctx.fillText('Braccio y', cx + 12, cy - 74);
+
+      const px = w * 0.67, py = 44, pw = Math.min(170, w * 0.27), ph = Math.min(132, h * 0.47);
+      dctx.strokeStyle = '#2f61ff';
+      dctx.lineWidth = 2;
+      dctx.beginPath();
+      for (let i = 0; i <= pw; i += 2) {
+        const tt = state.t - 1.8 + (i / pw) * 1.8;
+        const ss = sampleWave(clamp(tt, 0, state.duration));
+        const y = py + ph/2 - (ss.hObserved / state.maxAbsH) * ph * 0.34;
+        i === 0 ? dctx.moveTo(px + i, y) : dctx.lineTo(px + i, y);
+      }
+      dctx.stroke();
+      dctx.font = '12px Inter, sans-serif';
+      dctx.fillStyle = '#5f6f8c';
+      dctx.fillText('Selezione: ' + (controls.noiseMode.value === 'noise' ? 'con rumore' : 'pulito'), px + 4, py + ph + 18);
+      dctx.fillText(`FPS ~ ${Math.round(renderState.fps)}`, 18, h - 14);
+    }
+
+
+    function drawAll() {
+      drawScene();
+      drawWaveform();
+      drawSpectrogram();
+      drawDetector();
+      renderState.allDirty = false;
+    }
+
+    function renderFrame(force = false) {
+      if (!force && !state.running && !renderState.allDirty) return;
+      drawAll();
+    }
+
+    function animate(ts) {
+      if (!state.lastStamp) state.lastStamp = ts;
+      const dt = Math.min(0.05, (ts - state.lastStamp) / 1000);
+      state.lastStamp = ts;
+
+      if (!renderState.fpsStamp) renderState.fpsStamp = ts;
+      renderState.fpsAccum += ts - renderState.fpsStamp;
+      renderState.fpsCount += 1;
+      renderState.fpsStamp = ts;
+      if (renderState.fpsAccum >= 300) {
+        renderState.fps = 1000 * renderState.fpsCount / renderState.fpsAccum;
+        renderState.fpsAccum = 0;
+        renderState.fpsCount = 0;
+        renderState.allDirty = true;
+      }
+
+      if (state.running) {
+        state.t += dt * parseFloat(controls.timeStretch.value);
+        if (state.t >= state.duration) {
+          state.t = state.duration;
+          state.running = false;
+        }
+        updateReadouts();
+        const u = clamp(state.t / state.duration, 0, 1);
+        if (Math.abs(u - state.prevU) > 0.0005) {
+          renderState.allDirty = true;
+          state.prevU = u;
+        }
+      }
+      renderFrame();
+      requestAnimationFrame(animate);
+    }
+
+    [controls.m1, controls.m2, controls.distance].forEach(el => {
+      el.addEventListener('input', () => {
+        updateLabels();
+        rebuildWaveform();
+      });
+    });
+
+    [controls.timeStretch, controls.viewMode, controls.polarization, controls.noiseMode].forEach(el => {
+      el.addEventListener('input', () => {
+        updateReadouts();
+        markStaticDirty();
+        renderFrame(true);
+      });
+      el.addEventListener('change', () => {
+        updateReadouts();
+        markStaticDirty();
+        renderFrame(true);
+      });
+    });
+
+    controls.preset.addEventListener('change', () => setPreset(controls.preset.value));
+    buttons.play.addEventListener('click', () => { state.running = true; });
+    buttons.pause.addEventListener('click', () => { state.running = false; });
+    buttons.reset.addEventListener('click', resetSim);
+
+    let resizeTimer = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setupAllCanvases();
+        renderFrame(true);
+      }, 80);
+    });
+
+    regenNoise();
+    setupAllCanvases();
+    setPreset('gw150914');
+    renderFrame(true);
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

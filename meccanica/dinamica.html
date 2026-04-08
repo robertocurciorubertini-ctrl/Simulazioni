@@ -116,7 +116,7 @@ button.action:active { transform: scale(0.98); }
     <div class="law-formula">Se &Sigma;F = 0 &rarr; v = costante &nbsp;(in qualunque sistema inerziale)</div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Oggetto</div>
-      <div class="legend-item"><div class="legend-line" style="background:#ddd"></div>Griglia S (laboratorio)</div>
+      <div class="legend-item"><div class="legend-line" style="background:#cfcfcf"></div>Sfondo S (laboratorio)</div>
       <div class="legend-item"><div class="legend-line" style="background:rgba(29,158,117,0.5)"></div>Griglia S′ (osservatore)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Forza apparente</div>
     </div>
@@ -302,13 +302,13 @@ function drawArrow(ctx, x1, y1, x2, y2, color, lw, label, lox, loy) {
 //  PANEL 1A — SISTEMA DI RIFERIMENTO LINEARE
 // ═══════════════════════════════════════════════════════════════════
 let vObj=2.0, vRef=0.0, aRef=0.0, vRefLive=0.0;
-let objX=0, gridOffS=0;
+let objX=0, gridOffS=0, mountainOff=0;
 const SCALE=60, GRID=60, BALL_R=20;
 let p1RAF=null, lastTs=null;
 
 function sr_initPos(){
   const c=document.getElementById('c1');
-  objX=(c.offsetWidth||700)/2; gridOffS=0; vRefLive=vRef;
+  objX=(c.offsetWidth||700)/2; gridOffS=0; mountainOff=0; vRefLive=vRef;
 }
 function sr_update(){
   vObj=parseFloat(document.getElementById('vObj').value);
@@ -323,7 +323,7 @@ function drawSR(dt){
   const c=document.getElementById('c1');
   if(!c.offsetWidth)return;
   const W=c.offsetWidth;
-  if(c.width!==W){c.width=W;objX=W/2;gridOffS=0;}
+  if(c.width!==W){c.width=W;objX=W/2;gridOffS=0; mountainOff=0;}
   const ctx=c.getContext('2d'), H=c.height;
   vRefLive+=aRef*dt;
   const vRel=vObj-vRefLive;
@@ -332,18 +332,53 @@ function drawSR(dt){
   if(objX<-BALL_R)  objX+=W+BALL_R*2;
   gridOffS-=vRefLive*SCALE*dt;
   gridOffS=((gridOffS%GRID)+GRID)%GRID;
+  mountainOff+=vRefLive*SCALE*dt;
   ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=1;
-  for(let x=gridOffS-GRID;x<W+GRID;x+=GRID){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=GRID;y<H;y+=GRID){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const groundY=H-50;
+  const horizonY=groundY-28;
+
+  const sky=ctx.createLinearGradient(0,0,0,groundY);
+  sky.addColorStop(0,'#ffffff');
+  sky.addColorStop(1,'#fafafa');
+  ctx.fillStyle=sky;
+  ctx.fillRect(0,0,W,groundY);
+
+  const mountainPeriod=960;
+  const phase=((mountainOff%mountainPeriod)+mountainPeriod)%mountainPeriod;
+  const mountainY=(wx)=> horizonY - (
+    11*Math.sin((2*Math.PI*wx)/mountainPeriod)
+    + 7*Math.sin((4*Math.PI*wx)/mountainPeriod + 0.9)
+    + 4*Math.sin((8*Math.PI*wx)/mountainPeriod + 1.7)
+  );
+  ctx.beginPath();
+  ctx.moveTo(0,groundY);
+  const step=8;
+  for(let x=-step;x<=W+step;x+=step){
+    const wx=x+phase;
+    ctx.lineTo(x,mountainY(wx));
+  }
+  ctx.lineTo(W+step,groundY);
+  ctx.closePath();
+  ctx.fillStyle='#efefef';
+  ctx.fill();
+  ctx.strokeStyle='#d6d6d6'; ctx.lineWidth=1;
+  ctx.beginPath();
+  for(let x=-step;x<=W+step;x+=step){
+    const wx=x+phase;
+    const y=mountainY(wx);
+    if(x===-step) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
   ctx.strokeStyle='rgba(29,158,117,0.2)'; ctx.lineWidth=1;
   for(let x=0;x<W+GRID;x+=GRID){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=GRID;y<H;y+=GRID){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  const labelSx=((gridOffS+GRID*2)%(W+GRID));
-  ctx.font='11px sans-serif'; ctx.fillStyle='#ccc'; ctx.fillText('S',labelSx+3,13);
+
+  ctx.font='11px sans-serif'; ctx.fillStyle='#bdbdbd'; ctx.fillText('S',10,16);
   ctx.font='bold 11px sans-serif'; ctx.fillStyle='#1D9E75';
   ctx.textAlign='right'; ctx.fillText("S′ (osservatore)",W-8,14); ctx.textAlign='left';
-  const groundY=H-50;
+
   ctx.strokeStyle='#ccc'; ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(0,groundY);ctx.lineTo(W,groundY);ctx.stroke();
   const ox=28,oy=groundY-10;
@@ -383,11 +418,11 @@ function drawSR(dt){
     sb.textContent='⚠ S′ non inerziale (a′='+aRef.toFixed(1)+' m/s²) — forza apparente F=−m·a′';
   } else if(stopped){
     sb.className='status-bar s-stop';
-    sb.textContent='✓ v_S′ = v_obj — l\'oggetto è FERMO in S′ pur senza forze: 1ª legge verificata';
+    sb.textContent="✓ v_S′ = v_obj — l'oggetto è FERMO in S′ pur senza forze: 1ª legge verificata";
   } else {
     const pct=Math.min(Math.abs(vRel)/Math.max(Math.abs(vObj),0.1),1);
     sb.className=pct<0.4?'status-bar s-slow':'status-bar s-move';
-    sb.textContent='Vista da S′  |  v_rel='+(vRel>=0?'+':'')+vRel.toFixed(1)+' m/s — avvicina v_S′ a v_obj per fermare l\'oggetto';
+    sb.textContent='Vista da S′  |  v_rel='+(vRel>=0?'+':'')+vRel.toFixed(1)+" m/s — avvicina v_S′ a v_obj per fermare l'oggetto";
   }
 }
 

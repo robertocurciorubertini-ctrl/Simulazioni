@@ -470,6 +470,17 @@
       letter-spacing: 0.01em;
       line-height: 1.2;
       color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .category-icon {
+      font-size: 1.05rem;
+      line-height: 1;
+      opacity: 0.75;
+      color: var(--cat-color, var(--text-soft));
+      flex-shrink: 0;
     }
 
     .category-desc {
@@ -879,30 +890,23 @@
       window.addEventListener("resize", () => { resize(); initStars(180); });
     })();
 
-    /* ── Category color palette ──────────────────────────────────── */
-    const CAT_COLORS = {
-      "fondamenti":         "#8ab4f0",
-      "meccanica":          "#5bd4c4",
-      "gravitazione":       "#a78bfa",
-      "fluidodinamica":     "#5bc8f0",
-      "termodinamica":      "#f08c5b",
-      "onde":               "#f0c060",
-      "ottica":             "#f0e060",
-      "elettromagnetismo":  "#f07070",
-      "relatività":         "#c084fc",
-      "meccanica quantistica": "#7dd3fc",
-      "astrofisica":        "#e879f9",
-      "fisica nucleare":    "#fb923c",
-      "wip":                "#6b7280",
-    };
+    /* ── Category color — read from simulations.json ────────────── */
+    // getCatColor() uses the categoryMap built from the loaded catalog.
+    // It is called only after loadCatalog() has populated `catalog`,
+    // so the map is always available at render time.
+    const FALLBACK_COLOR = "#8fa0be";
 
     function getCatColor(name) {
-      const key = String(name ?? "").trim().toLowerCase();
-      // partial match for robustness
-      for (const [k, v] of Object.entries(CAT_COLORS)) {
-        if (key.includes(k) || k.includes(key)) return v;
+      const key = normalize(name);
+      const map = getCategoryMap(catalog.categories || []);
+      // exact match first
+      const exact = map.get(key);
+      if (exact?.color) return exact.color;
+      // partial match as fallback (handles minor name discrepancies)
+      for (const [k, cat] of map.entries()) {
+        if (cat?.color && (key.includes(k) || k.includes(key))) return cat.color;
       }
-      return "#8fa0be";
+      return FALLBACK_COLOR;
     }
 
     /* ── Catalog logic ───────────────────────────────────────────── */
@@ -1024,7 +1028,7 @@
         const cd = map.get(normalize(name)) || {};
         let order = Number.isFinite(Number(cd.order)) ? Number(cd.order) : 9999;
         if (normalize(name)==="wip") order = 999999;
-        return { name, description: cd.description || "", order };
+        return { name, description: cd.description || "", icon: cd.icon || "", order };
       }).sort((a,b) => a.order !== b.order ? a.order - b.order : a.name.localeCompare(b.name,"it"));
     }
 
@@ -1123,7 +1127,9 @@
               <div class="category-left">
                 <div class="category-dot"></div>
                 <div class="category-text">
-                  <h2 class="category-title">${escapeHtml(cat.name)}</h2>
+                  <h2 class="category-title">
+                    ${cat.icon ? `<span class="category-icon" aria-hidden="true">${escapeHtml(cat.icon)}</span>` : ""}${escapeHtml(cat.name)}
+                  </h2>
                   ${cat.description ? `<p class="category-desc">${escapeHtml(cat.description)}</p>` : ""}
                 </div>
               </div>

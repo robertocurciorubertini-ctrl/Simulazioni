@@ -37,6 +37,11 @@ h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
 .law-title { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
 .law-formula { font-family: 'Courier New', monospace; font-size: 14px; color: #185FA5; margin-bottom: 1rem; }
 canvas { display: block; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; background: #fff; }
+.canvas-stack { position: relative; }
+.canvas-overlay-controls { position: absolute; left: 12px; top: 12px; display: flex; gap: 8px; z-index: 3; }
+button.canvas-action { padding: 6px 10px; border: 1px solid rgba(0,0,0,0.14); border-radius: 999px; font-size: 12px; cursor: pointer; background: rgba(255,255,255,0.92); color: #444; backdrop-filter: blur(4px); transition: background 0.12s, border-color 0.12s; }
+button.canvas-action:hover { background: rgba(245,245,245,0.98); border-color: rgba(0,0,0,0.24); }
+button.canvas-action.active { background: #fdf0ea; color: #993C1D; border-color: #F5C4B3; }
 .controls { margin-top: 1rem; display: flex; flex-direction: column; gap: 10px; }
 .control-row { display: flex; align-items: center; gap: 10px; }
 .control-row label { font-size: 13px; color: #444; min-width: 210px; }
@@ -121,7 +126,13 @@ button.action:active { transform: scale(0.98); }
       <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Forza apparente</div>
     </div>
     <div class="status-bar s-move" id="statusBar">L'oggetto si muove a v_rel = +2.0 m/s nel sistema S′</div>
-    <canvas id="c1" height="240"></canvas>
+    <div class="canvas-stack">
+      <canvas id="c1" height="240"></canvas>
+      <div class="canvas-overlay-controls">
+        <button class="canvas-action" id="pulseBrakeBtn" onclick="sr_triggerPulse(-2.6)">Frenata breve</button>
+        <button class="canvas-action" id="pulseBoostBtn" onclick="sr_triggerPulse(2.6)">Spinta breve</button>
+      </div>
+    </div>
     <div class="controls">
       <div class="control-row">
         <label>Velocità oggetto v<sub>obj</sub> (m/s)</label>
@@ -140,7 +151,7 @@ button.action:active { transform: scale(0.98); }
       </div>
     </div>
     <div class="info-box">
-      La canvas mostra la scena <strong>dal punto di vista di S′</strong>. Man mano che porti la velocità di S′ uguale a quella dell'oggetto, <strong>l'oggetto rallenta e si ferma visivamente</strong> — non perché agisca una forza, ma perché cambia sistema di osservazione. Quando v′ = v<sub>obj</sub>, l'oggetto è fermo in S′ pur non essendolo in S. Aggiungi a′ ≠ 0 per rendere S′ non inerziale: compare la <strong>forza apparente fittizia</strong> F = −m·a′.
+      La canvas mostra la scena <strong>dal punto di vista di S′</strong>. Man mano che porti la velocità di S′ uguale a quella dell'oggetto, <strong>l'oggetto rallenta e si ferma visivamente</strong> — non perché agisca una forza, ma perché cambia sistema di osservazione. Quando v′ = v<sub>obj</sub>, l'oggetto è fermo in S′ pur non essendolo in S. Aggiungi a′ ≠ 0 per rendere S′ non inerziale: compare la <strong>forza apparente fittizia</strong> F = −m·a′. I pulsanti sul canvas applicano invece un <strong>impulso breve</strong>: per poco tempo S′ accelera o frena, poi torna automaticamente alla velocità iniziale.
     </div>
 
     <hr class="section-sep">
@@ -303,21 +314,41 @@ function drawArrow(ctx, x1, y1, x2, y2, color, lw, label, lox, loy) {
 // ═══════════════════════════════════════════════════════════════════
 let vObj=2.0, vRef=0.0, aRef=0.0, vRefLive=0.0;
 let objX=0, gridOffS=0, mountainOff=0;
+let srPulseActive=false, srPulseAmp=0.0, srPulseT=0.0, srPulseDuration=1.8, srPulseBaseVRef=0.0, srPulseLabel='';
 const SCALE=60, GRID=60, BALL_R=20;
 let p1RAF=null, lastTs=null;
 
 function sr_initPos(){
   const c=document.getElementById('c1');
   objX=(c.offsetWidth||700)/2; gridOffS=0; mountainOff=0; vRefLive=vRef;
+  srPulseActive=false; srPulseAmp=0.0; srPulseT=0.0; srPulseBaseVRef=vRef; srPulseLabel='';
+  const b1=document.getElementById('pulseBrakeBtn');
+  const b2=document.getElementById('pulseBoostBtn');
+  if(b1) b1.classList.remove('active');
+  if(b2) b2.classList.remove('active');
 }
 function sr_update(){
   vObj=parseFloat(document.getElementById('vObj').value);
   vRef=parseFloat(document.getElementById('vRef').value);
   aRef=parseFloat(document.getElementById('aRef').value);
-  vRefLive=vRef;
+  if(!srPulseActive){
+    vRefLive=vRef;
+  }
   document.getElementById('vObjVal').textContent=(vObj>=0?'+':'')+vObj.toFixed(1)+' m/s';
   document.getElementById('vRefVal').textContent=(vRef>=0?'+':'')+vRef.toFixed(1)+' m/s';
   document.getElementById('aRefVal').textContent=(aRef>=0?'+':'')+aRef.toFixed(1)+' m/s²';
+}
+function sr_triggerPulse(amp){
+  srPulseActive=true;
+  srPulseAmp=amp;
+  srPulseT=0.0;
+  srPulseBaseVRef=vRef;
+  vRefLive=vRef;
+  srPulseLabel=amp<0 ? 'frenata breve' : 'spinta breve';
+  const b1=document.getElementById('pulseBrakeBtn');
+  const b2=document.getElementById('pulseBoostBtn');
+  if(b1) b1.classList.toggle('active', amp<0);
+  if(b2) b2.classList.toggle('active', amp>0);
 }
 function drawSR(dt){
   const c=document.getElementById('c1');
@@ -325,7 +356,39 @@ function drawSR(dt){
   const W=c.offsetWidth;
   if(c.width!==W){c.width=W;objX=W/2;gridOffS=0; mountainOff=0;}
   const ctx=c.getContext('2d'), H=c.height;
-  vRefLive+=aRef*dt;
+  let aEff=aRef;
+  let aShown=aRef;
+  let pulseReturnPhase=false;
+  if(srPulseActive){
+    srPulseT+=dt;
+    if(srPulseT>=srPulseDuration){
+      srPulseActive=false;
+      srPulseT=0.0;
+      vRefLive=srPulseBaseVRef;
+      const b1=document.getElementById('pulseBrakeBtn');
+      const b2=document.getElementById('pulseBoostBtn');
+      if(b1) b1.classList.remove('active');
+      if(b2) b2.classList.remove('active');
+    } else {
+      const tau=srPulseT/srPulseDuration;
+      const visFrac=0.68;
+      if(tau<visFrac){
+        const s=tau/visFrac;
+        const aPulse=srPulseAmp*Math.sin(Math.PI*s);
+        aEff+=aPulse;
+        aShown+=aPulse;
+      } else {
+        pulseReturnPhase=true;
+        const s=(tau-visFrac)/(1-visFrac);
+        const ampBack=srPulseAmp*(visFrac/(1-visFrac));
+        const aBack=-ampBack*Math.sin(Math.PI*s);
+        aEff+=aBack;
+      }
+      vRefLive+=aEff*dt;
+    }
+  } else {
+    vRefLive+=aEff*dt;
+  }
   const vRel=vObj-vRefLive;
   objX+=vRel*SCALE*dt;
   if(objX>W+BALL_R) objX-=W+BALL_R*2;
@@ -391,7 +454,7 @@ function drawSR(dt){
     drawArrow(ctx,W/2,H-22,W/2+vRefPx,H-22,'#1D9E75',2,"v_S′="+vRefLive.toFixed(1),3,-3);
   }
   const ballY=groundY-BALL_R;
-  const isNI=Math.abs(aRef)>0.05;
+  const isNI=Math.abs(aShown)>0.05;
   const stopped=Math.abs(vRel)<0.08&&!isNI;
   if(!stopped){
     const vRelPx=Math.sign(vRel)*Math.min(Math.abs(vRel)*20,100);
@@ -399,9 +462,9 @@ function drawSR(dt){
       '#185FA5',2.5,"v_rel="+(vRel>=0?'+':'')+vRel.toFixed(1)+" m/s",4,-3);
   }
   if(isNI){
-    const fPx=Math.sign(-aRef)*Math.min(Math.abs(aRef)*22,90);
+    const fPx=Math.sign(-aShown)*Math.min(Math.abs(aShown)*22,90);
     drawArrow(ctx,objX,ballY+6,objX+fPx,ballY+6,
-      '#D85A30',2.5,"F_app="+(-aRef).toFixed(1)+"·m N",4,-2);
+      '#D85A30',2.5,"F_app="+(-aShown).toFixed(1)+"·m N",4,-2);
   }
   const ballColor=stopped?'#0C447C':(isNI?'#993C1D':'#185FA5');
   ctx.beginPath();ctx.arc(objX,ballY,BALL_R,0,Math.PI*2);
@@ -415,7 +478,11 @@ function drawSR(dt){
   const sb=document.getElementById('statusBar');
   if(isNI){
     sb.className='status-bar s-noninertial';
-    sb.textContent='⚠ S′ non inerziale (a′='+aRef.toFixed(1)+' m/s²) — forza apparente F=−m·a′';
+    if(srPulseActive){
+      sb.textContent = pulseReturnPhase ? '↺ Rientro al moto iniziale di S′ — correzione interna non mostrata come forza fittizia' : '⚠ Impulso in corso: '+srPulseLabel+' — a′ istantanea = '+aShown.toFixed(1)+' m/s²';
+    } else {
+      sb.textContent='⚠ S′ non inerziale (a′='+aRef.toFixed(1)+' m/s²) — forza apparente F=−m·a′';
+    }
   } else if(stopped){
     sb.className='status-bar s-stop';
     sb.textContent="✓ v_S′ = v_obj — l'oggetto è FERMO in S′ pur senza forze: 1ª legge verificata";

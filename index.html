@@ -694,30 +694,34 @@
     /* ── Footer ──────────────────────────────────────────────────────── */
     .footer {
       margin-top: 56px;
+      padding: 18px 4px 0;
+      border-top: none;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      padding: 20px 4px 0;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-      gap: 12px;
     }
 
     .footer-author {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.07em;
-      color: var(--text-dim);
+      text-align: right;
     }
 
     .footer-author a {
-      color: var(--text-soft);
+      font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
+      font-size: 1.35rem;
+      font-style: italic;
+      letter-spacing: 0.01em;
+      color: var(--text-dim);
       text-decoration: none;
-      border-bottom: 1px solid var(--border);
-      transition: color 0.2s;
+      border-bottom: none;
+      opacity: 0.78;
+      transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
-    .footer-author a:hover { color: var(--gold); }
+    .footer-author a:hover {
+      color: var(--text-soft);
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
 
     .footer-note {
       font-family: var(--mono);
@@ -740,7 +744,7 @@
       .filter-group { flex-direction: column; }
       .grid { grid-template-columns: 1fr; }
       .category-desc { display: none; }
-      .footer { flex-direction: column; text-align: center; }
+      .footer { justify-content: flex-end; text-align: right; }
     }
 
     /* ── Utility ─────────────────────────────────────────────────────── */
@@ -839,7 +843,6 @@
         <a href="https://github.com/RobertoCurcioRubertini" target="_blank" rel="noopener">Roberto Curcio Rubertini</a>
       </div>
     </footer>
-
   </div>
 
   <script>

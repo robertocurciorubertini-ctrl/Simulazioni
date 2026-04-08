@@ -4,279 +4,507 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulazioni di Fisica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
+    /* ── Tokens ─────────────────────────────────────────────────────── */
     :root {
-      --bg-1: #07111f;
-      --bg-2: #0d1b2a;
-      --bg-3: #10263d;
-      --card: rgba(255, 255, 255, 0.08);
-      --card-border: rgba(255, 255, 255, 0.14);
-      --panel: rgba(255, 255, 255, 0.05);
-      --text: #eaf2ff;
-      --muted: #b8c7e6;
-      --accent: #61dafb;
-      --accent-2: #7ef0c7;
-      --danger: #ff9d9d;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      --bg-0: #06090f;
+      --bg-1: #0a0f1a;
+      --bg-2: #0f1623;
+      --bg-3: #141e2e;
+      --surface: rgba(255,255,255,0.042);
+      --surface-hi: rgba(255,255,255,0.068);
+      --border: rgba(255,255,255,0.09);
+      --border-hi: rgba(255,255,255,0.18);
+      --text: #e8edf7;
+      --text-soft: #8fa0be;
+      --text-dim: #4e5f7a;
+      --gold: #f0c060;
+      --gold-dim: rgba(240,192,96,0.18);
+      --gold-glow: rgba(240,192,96,0.08);
+      --teal: #5bd4c4;
+      --teal-dim: rgba(91,212,196,0.15);
+      --rose: #f07070;
+      --rose-dim: rgba(240,112,112,0.15);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 28px rgba(0,0,0,0.45);
+      --shadow-lg: 0 20px 50px rgba(0,0,0,0.55);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --radius-xl: 28px;
+      --mono: "DM Mono", monospace;
+      --sans: "DM Sans", sans-serif;
+      --display: "Crimson Pro", Georgia, serif;
     }
 
-    * { box-sizing: border-box; }
+    /* ── Reset ───────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: var(--sans);
+      font-size: 15px;
       color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(97, 218, 251, 0.15), transparent 30%),
-        radial-gradient(circle at top right, rgba(126, 240, 199, 0.12), transparent 25%),
-        linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+      background: var(--bg-0);
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
+    /* ── Background layers ───────────────────────────────────────────── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Gradient mesh */
+    .bg-layer::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 0%, rgba(91,212,196,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 5%, rgba(240,192,96,0.06) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 80% at 50% 100%, rgba(91,212,196,0.04) 0%, transparent 50%),
+        linear-gradient(175deg, var(--bg-1) 0%, var(--bg-0) 40%, var(--bg-2) 100%);
+    }
+
+    /* Grid reticle */
+    .bg-layer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(0,0,0,0.8), transparent 75%);
+    }
+
+    /* Animated star field */
     .stars {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.35;
-      background-image:
-        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
-        radial-gradient(2px 2px at 140px 80px, #ffffff, transparent),
-        radial-gradient(1.5px 1.5px at 300px 120px, #ffffff, transparent),
-        radial-gradient(2px 2px at 500px 40px, #ffffff, transparent),
-        radial-gradient(1.5px 1.5px at 700px 150px, #ffffff, transparent),
-        radial-gradient(2px 2px at 900px 70px, #ffffff, transparent),
-        radial-gradient(1.5px 1.5px at 1100px 180px, #ffffff, transparent);
-      background-size: 1200px 300px;
-      animation: drift 20s linear infinite;
+      z-index: 0;
     }
 
-    @keyframes drift {
-      from { transform: translateY(0); }
-      to { transform: translateY(30px); }
+    .stars canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.5;
     }
 
+    /* ── Layout ──────────────────────────────────────────────────────── */
     .container {
-      width: min(1200px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 48px 0 64px;
       position: relative;
       z-index: 1;
+      width: min(1280px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 40px 0 80px;
     }
 
-    .hero {
-      text-align: center;
-      padding: 32px 16px 20px;
-    }
-
+    /* ── Top nav ─────────────────────────────────────────────────────── */
     .top-nav {
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
-      padding: 0 6px;
+      margin-bottom: 52px;
+    }
+
+    .site-wordmark {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      user-select: none;
+    }
+
+    .site-wordmark span {
+      color: var(--gold);
+      opacity: 0.85;
+    }
+
+    .top-links {
+      display: flex;
+      gap: 10px;
     }
 
     .top-link {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      border-radius: 999px;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
       text-decoration: none;
-      color: var(--text);
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(8px);
-      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
     }
 
     .top-link:hover {
+      color: var(--gold);
+      border-color: rgba(240,192,96,0.35);
+      background: var(--gold-glow);
       transform: translateY(-1px);
-      border-color: rgba(97, 218, 251, 0.35);
-      background: rgba(97, 218, 251, 0.08);
     }
 
-    .hero-badge {
-      display: inline-block;
-      padding: 8px 14px;
-      border: 1px solid rgba(97, 218, 251, 0.35);
+    .top-link-icon {
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 8px 16px 56px;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 22px;
+      padding: 6px 14px 6px 10px;
       border-radius: 999px;
-      background: rgba(97, 218, 251, 0.08);
-      color: var(--accent);
-      font-size: 0.9rem;
-      letter-spacing: 0.04em;
-      margin-bottom: 18px;
-      backdrop-filter: blur(8px);
+      border: 1px solid rgba(240,192,96,0.28);
+      background: var(--gold-glow);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .hero-label-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.75); }
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(2.2rem, 5vw, 4rem);
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-    }
-
-    .subtitle {
-      max-width: 820px;
-      margin: 18px auto 0;
-      font-size: 1.08rem;
-      line-height: 1.7;
-      color: var(--muted);
-    }
-
-    .panel {
-      margin-top: 34px;
-      padding: 24px;
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      background: var(--panel);
-      backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-    }
-
-    .panel-header,
-    .filters {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .filters {
-      margin-top: 18px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .panel-title {
-      font-size: 1.35rem;
-      font-weight: 600;
-    }
-
-    .filters-left, .filters-right {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .search,
-    .select {
-      height: 42px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(7, 17, 31, 0.55);
+      margin: 0 0 16px;
+      font-family: var(--display);
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
       color: var(--text);
-      padding: 0 14px;
-      outline: none;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-subtitle {
+      max-width: 620px;
+      margin: 0 auto 32px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-soft);
+      font-weight: 300;
+    }
+
+    .hero-stats {
+      display: inline-flex;
+      gap: 2px;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 24px;
+      border-radius: 8px;
+    }
+
+    .hero-stat + .hero-stat {
+      border-left: 1px solid var(--border);
+    }
+
+    .hero-stat-n {
+      font-family: var(--mono);
+      font-size: 1.45rem;
+      font-weight: 500;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .hero-stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-family: var(--mono);
+    }
+
+    /* ── Search/filter panel ─────────────────────────────────────────── */
+    .panel {
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-md);
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .panel-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1 1 280px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      pointer-events: none;
+      font-family: var(--mono);
     }
 
     .search {
-      min-width: min(340px, 70vw);
+      width: 100%;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(6,9,15,0.6);
+      color: var(--text);
+      padding: 0 14px 0 38px;
+      outline: none;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background 0.2s;
     }
 
-    .select { min-width: 180px; }
+    .search::placeholder { color: var(--text-dim); }
+
+    .search:focus {
+      border-color: rgba(240,192,96,0.4);
+      background: rgba(6,9,15,0.8);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .select {
+      height: 44px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(6,9,15,0.6);
+      color: var(--text);
+      padding: 0 36px 0 14px;
+      outline: none;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234e5f7a'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      cursor: pointer;
+      min-width: 160px;
+      transition: border-color 0.2s;
+    }
+
+    .select:focus { border-color: rgba(240,192,96,0.4); }
+
+    .select option { background: #0f1623; }
 
     .wip-toggle {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      min-height: 42px;
-      padding: 0 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(7, 17, 31, 0.55);
-      color: var(--text);
+      gap: 9px;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(6,9,15,0.6);
+      color: var(--text-soft);
+      cursor: pointer;
       user-select: none;
-      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      transition: border-color 0.2s, color 0.2s;
     }
 
-    .wip-toggle input {
-      margin: 0;
-      accent-color: var(--accent);
-      cursor: pointer;
+    .wip-toggle:hover { border-color: rgba(240,192,96,0.3); color: var(--gold); }
+
+    .wip-toggle input { margin: 0; accent-color: var(--gold); cursor: pointer; }
+
+    .panel-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
     }
 
-    .wip-toggle span {
-      font-size: 0.95rem;
+    /* ── Results counter ─────────────────────────────────────────────── */
+    .results-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 2px;
     }
 
+    .results-count {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .results-count strong {
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    /* ── Category blocks ─────────────────────────────────────────────── */
     .results {
-      margin-top: 24px;
       display: grid;
-      gap: 28px;
+      gap: 16px;
     }
 
     .category-block {
-      display: grid;
-      gap: 0;
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
-      box-shadow: var(--shadow);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
       overflow: hidden;
-      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      animation: fadeUp 0.5s ease both;
     }
 
     .category-block:hover {
-      border-color: rgba(97, 218, 251, 0.24);
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38);
-      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
+      border-color: var(--border-hi);
+      box-shadow: var(--shadow-md);
     }
 
     .category-toggle {
       width: 100%;
       display: flex;
       justify-content: space-between;
-      gap: 18px;
       align-items: center;
-      padding: 20px 22px;
+      gap: 16px;
+      padding: 18px 22px;
       border: 0;
       background: transparent;
       color: var(--text);
       text-align: left;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background 0.2s;
     }
 
-    .category-toggle:hover {
-      background: rgba(255,255,255,0.02);
-    }
+    .category-toggle:hover { background: rgba(255,255,255,0.02); }
+    .category-toggle:focus-visible { outline: 2px solid rgba(240,192,96,0.5); outline-offset: -2px; }
 
-    .category-toggle:focus-visible {
-      outline: 2px solid rgba(97, 218, 251, 0.55);
-      outline-offset: 2px;
-    }
-
-    .category-summary {
+    .category-left {
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: var(--muted);
-      font-size: 0.95rem;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .category-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--cat-color, var(--text-dim));
+      box-shadow: 0 0 8px var(--cat-color, transparent);
+      opacity: 0.85;
+    }
+
+    .category-text { min-width: 0; }
+
+    .category-title {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 1.3rem;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .category-desc {
+      margin: 3px 0 0;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.5;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 600px;
+    }
+
+    .category-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .category-count {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
       padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.8rem;
-      color: var(--text);
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
     }
 
     .category-chevron {
-      font-size: 1rem;
-      transition: transform 0.25s ease;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
     }
 
     .category-toggle[aria-expanded="true"] .category-chevron {
@@ -284,239 +512,293 @@
     }
 
     .category-content {
-      display: grid;
-      gap: 18px;
-      padding: 0 22px 22px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      background: rgba(7, 17, 31, 0.18);
+      border-top: 1px solid var(--border);
+      padding: 20px 22px 22px;
+      background: rgba(0,0,0,0.12);
     }
 
-    .category-content[hidden] {
-      display: none;
-    }
+    .category-content[hidden] { display: none; }
 
-    .category-toggle[aria-expanded="false"] + .category-content {
-      border-top: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-
-    .category-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .category-title {
-      margin: 0;
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
-
-    .category-desc {
-      margin: 6px 0 0;
-      max-width: 780px;
-      color: var(--muted);
-      line-height: 1.65;
-      font-size: 0.97rem;
-    }
-
+    /* ── Card grid ───────────────────────────────────────────────────── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
     }
 
     .card {
       position: relative;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface);
       overflow: hidden;
-      border-radius: 20px;
-      padding: 22px 20px;
-      border: 1px solid var(--card-border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
-      box-shadow: var(--shadow);
-      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s cubic-bezier(0.34,1.2,0.64,1), border-color 0.25s, box-shadow 0.25s;
     }
 
-    .card::before {
+    /* Shimmer line on hover */
+    .card::after {
       content: "";
       position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(97, 218, 251, 0.10), rgba(126, 240, 199, 0.06));
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cat-color, var(--gold)), transparent);
       opacity: 0;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.3s;
     }
 
     .card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(97, 218, 251, 0.35);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38);
+      transform: translateY(-5px);
+      border-color: rgba(255,255,255,0.18);
+      box-shadow: var(--shadow-md), 0 0 0 1px rgba(240,192,96,0.08);
     }
 
-    .card:hover::before { opacity: 1; }
+    .card:hover::after { opacity: 0.9; }
 
-    .sim-card-link {
-      display: block;
-      text-decoration: none;
-      color: inherit;
+    .card-inner {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
-    .card-content { position: relative; z-index: 1; }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
 
     .icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
-      margin-bottom: 16px;
-      font-size: 1.35rem;
-      background: linear-gradient(135deg, rgba(97,218,251,0.18), rgba(126,240,199,0.18));
-      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      background: linear-gradient(135deg,
+        color-mix(in srgb, var(--cat-color, var(--gold)) 14%, transparent),
+        rgba(255,255,255,0.04)
+      );
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
+    .sim-level-chip {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid;
+      white-space: nowrap;
+      align-self: flex-start;
+    }
+
+    .sim-level-chip.base    { color: var(--teal); border-color: rgba(91,212,196,0.3); background: rgba(91,212,196,0.08); }
+    .sim-level-chip.intermedio { color: var(--gold); border-color: rgba(240,192,96,0.3); background: rgba(240,192,96,0.08); }
+    .sim-level-chip.avanzato  { color: var(--rose); border-color: rgba(240,112,112,0.3); background: rgba(240,112,112,0.08); }
+
     .sim-title {
-      margin: 0 0 10px;
-      font-size: 1.08rem;
-      font-weight: 600;
-      line-height: 1.35;
+      margin: 0 0 8px;
+      font-family: var(--display);
+      font-size: 1.12rem;
+      font-weight: 400;
+      line-height: 1.3;
       color: var(--text);
     }
 
     .sim-desc {
-      margin: 0 0 16px;
-      font-size: 0.94rem;
-      line-height: 1.6;
-      color: var(--muted);
-      min-height: 4.6em;
+      margin: 0;
+      font-size: 0.83rem;
+      line-height: 1.65;
+      color: var(--text-soft);
+      flex: 1;
     }
 
-    .meta-row {
+    .sim-footer {
+      margin-top: 18px;
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .chip {
+    .sim-open {
       display: inline-flex;
       align-items: center;
-      min-height: 28px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.75;
+      transition: opacity 0.2s, gap 0.2s;
     }
 
-    .chip.level {
-      font-weight: 600;
-    }
+    .card:hover .sim-open { opacity: 1; gap: 11px; }
 
-    .chip.level.base {
-      color: #dffcf4;
-      border-color: rgba(126,240,199,0.3);
-      background: rgba(126,240,199,0.12);
-    }
-
-    .chip.level.intermedio {
-      color: #fff4dc;
-      border-color: rgba(255,200,120,0.35);
-      background: rgba(255,200,120,0.15);
-    }
-
-    .chip.level.avanzato {
-      color: #ffe0e0;
-      border-color: rgba(255,120,120,0.35);
-      background: rgba(255,120,120,0.15);
-    }
-
-    .sim-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 16px;
-      border-radius: 12px;
-      text-decoration: none;
-      color: #00141f;
-      font-weight: 600;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      transition: transform 0.2s ease, filter 0.2s ease;
-    }
-
-    .sim-link:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-    }
-
+    /* ── States ──────────────────────────────────────────────────────── */
     .empty-state,
     .loading-state,
     .error-state {
       text-align: center;
-      color: var(--muted);
-      padding: 40px 20px;
-      font-size: 1rem;
-      border-radius: 18px;
-      border: 1px dashed rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.03);
+      padding: 56px 24px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      border-radius: var(--radius-lg);
+      border: 1px dashed var(--border);
     }
 
-    .error-state { color: var(--danger); }
+    .loading-state {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+    }
 
+    .loading-state::after {
+      content: "";
+      display: inline-block;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-left: 8px;
+      animation: blink 1.2s ease infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.15; }
+    }
+
+    .error-state { color: var(--rose); }
+
+    /* ── Footer ──────────────────────────────────────────────────────── */
     .footer {
-      text-align: center;
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      opacity: 0.9;
+      margin-top: 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 4px 0;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    @media (max-width: 760px) {
-      .container {
-        width: min(100% - 20px, 1200px);
-        padding-top: 26px;
-      }
+    .footer-author {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.07em;
+      color: var(--text-dim);
+    }
 
-      .panel { padding: 18px; }
-      .hero { padding-top: 14px; }
-      .subtitle { font-size: 1rem; }
-      .search { min-width: 100%; }
-      .filters-left, .filters-right { width: 100%; }
-      .select { flex: 1 1 180px; min-width: 0; }
-      .wip-toggle { width: 100%; justify-content: flex-start; }
+    .footer-author a {
+      color: var(--text-soft);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+
+    .footer-author a:hover { color: var(--gold); }
+
+    .footer-note {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .container { width: calc(100% - 24px); padding-top: 24px; }
+      .top-nav { margin-bottom: 32px; }
+      .hero { padding-bottom: 36px; }
+      h1 { font-size: clamp(2.4rem, 10vw, 3.6rem); }
+      .hero-stats { flex-wrap: wrap; }
+      .hero-stat + .hero-stat { border-left: none; border-top: 1px solid var(--border); }
+      .hero-stats { display: grid; grid-template-columns: 1fr 1fr; }
+      .panel-row { flex-direction: column; align-items: stretch; }
+      .search-wrap, .filter-group, .select, .wip-toggle { width: 100%; }
+      .filter-group { flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .category-desc { display: none; }
+      .footer { flex-direction: column; text-align: center; }
+    }
+
+    /* ── Utility ─────────────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="stars"></div>
+
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="stars" aria-hidden="true"><canvas id="starCanvas"></canvas></div>
 
   <div class="container">
-    <div class="top-nav">
-      <a class="top-link" href="theory/index.html" aria-label="Vai alla teoria">Teoria</a>
-    </div>
 
+    <!-- Top nav -->
+    <nav class="top-nav" aria-label="Navigazione principale">
+      <div class="site-wordmark">fisica.<span>sim</span></div>
+      <div class="top-links">
+        <a class="top-link" href="theory/index.html" aria-label="Sezione teoria">
+          <span class="top-link-icon">∫</span> Teoria
+        </a>
+      </div>
+    </nav>
+
+    <!-- Hero -->
     <section class="hero">
-      <h1>Simulazioni di Fisica</h1>
-<div class="hero-badge">Laboratorio digitale</div>
+      <div class="hero-label">
+        <span class="hero-label-dot"></span>
+        Laboratorio Digitale
+      </div>
+      <h1>Simulazioni<br>di <em>Fisica</em></h1>
+      <p class="hero-subtitle">
+        Esplora la fisica attraverso simulazioni interattive, dai fondamenti della meccanica alle frontiere della meccanica quantistica e della relatività.
+      </p>
+      <div class="hero-stats" id="heroStats" aria-label="Statistiche catalogo">
+        <div class="hero-stat">
+          <span class="hero-stat-n" id="statTotal">—</span>
+          <span class="hero-stat-label">Simulazioni</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-n" id="statCats">—</span>
+          <span class="hero-stat-label">Categorie</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-n" id="statWip">—</span>
+          <span class="hero-stat-label">In sviluppo</span>
+        </div>
+      </div>
     </section>
 
-    <section class="panel">
-      <div class="panel-header">
-        <div class="panel-title">Simulazioni disponibili</div>
-      </div>
-
-      <div class="filters">
-        <div class="filters-left">
-          <input id="searchInput" class="search" type="search" placeholder="Cerca per titolo, categoria o tag..." />
+    <!-- Filter panel -->
+    <section class="panel" aria-label="Ricerca e filtri">
+      <div class="panel-row">
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input
+            id="searchInput"
+            class="search"
+            type="search"
+            placeholder="Cerca titolo, tag, categoria…"
+            aria-label="Cerca simulazioni"
+          />
         </div>
-        <div class="filters-right">
-          <select id="categoryFilter" class="select">
+        <div class="filter-group">
+          <select id="categoryFilter" class="select" aria-label="Filtra per categoria">
             <option value="">Tutte le categorie</option>
           </select>
-          <select id="levelFilter" class="select">
+          <select id="levelFilter" class="select" aria-label="Filtra per livello">
             <option value="">Tutti i livelli</option>
             <option value="base">Base</option>
             <option value="intermedio">Intermedio</option>
@@ -529,55 +811,139 @@
         </div>
       </div>
 
-      <div class="results" id="results">
-        <div class="loading-state">Sto caricando il catalogo delle simulazioni...</div>
+      <div class="panel-divider"></div>
+
+      <div class="results-meta">
+        <div class="results-count" id="resultsCount" aria-live="polite"></div>
+      </div>
+
+      <div class="results" id="results" role="region" aria-label="Lista simulazioni">
+        <div class="loading-state" role="status">Caricamento catalogo in corso</div>
       </div>
     </section>
 
-    <div class="footer">
-      Repository GitHub Pages di Roberto Curcio Rubertini
-    </div>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-author">
+        <a href="https://github.com/RobertoCurcioRubertini" target="_blank" rel="noopener">Roberto Curcio Rubertini</a>
+      </div>
+      <div class="footer-note">GitHub Pages · Vanilla JS · No frameworks</div>
+    </footer>
+
   </div>
 
   <script>
+    /* ── Stars canvas ─────────────────────────────────────────────── */
+    (function () {
+      const canvas = document.getElementById("starCanvas");
+      const ctx = canvas.getContext("2d");
+      let stars = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function initStars(n) {
+        stars = [];
+        for (let i = 0; i < n; i++) {
+          stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 1.1 + 0.2,
+            alpha: Math.random() * 0.6 + 0.1,
+            speed: Math.random() * 0.012 + 0.003,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const t = frame * 0.012;
+        for (const s of stars) {
+          const a = s.alpha * (0.6 + 0.4 * Math.sin(t * s.speed * 60 + s.phase));
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(220,230,255,${a})`;
+          ctx.fill();
+        }
+        frame++;
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      initStars(180);
+      draw();
+      window.addEventListener("resize", () => { resize(); initStars(180); });
+    })();
+
+    /* ── Category color palette ──────────────────────────────────── */
+    const CAT_COLORS = {
+      "fondamenti":         "#8ab4f0",
+      "meccanica":          "#5bd4c4",
+      "gravitazione":       "#a78bfa",
+      "fluidodinamica":     "#5bc8f0",
+      "termodinamica":      "#f08c5b",
+      "onde":               "#f0c060",
+      "ottica":             "#f0e060",
+      "elettromagnetismo":  "#f07070",
+      "relatività":         "#c084fc",
+      "meccanica quantistica": "#7dd3fc",
+      "astrofisica":        "#e879f9",
+      "fisica nucleare":    "#fb923c",
+      "wip":                "#6b7280",
+    };
+
+    function getCatColor(name) {
+      const key = String(name ?? "").trim().toLowerCase();
+      // partial match for robustness
+      for (const [k, v] of Object.entries(CAT_COLORS)) {
+        if (key.includes(k) || k.includes(key)) return v;
+      }
+      return "#8fa0be";
+    }
+
+    /* ── Catalog logic ───────────────────────────────────────────── */
     const CATALOG_PATH = "simulations.json";
 
-    const results = document.getElementById("results");
-    const searchInput = document.getElementById("searchInput");
+    const results       = document.getElementById("results");
+    const resultsCount  = document.getElementById("resultsCount");
+    const searchInput   = document.getElementById("searchInput");
     const categoryFilter = document.getElementById("categoryFilter");
-    const levelFilter = document.getElementById("levelFilter");
+    const levelFilter   = document.getElementById("levelFilter");
     const showWipToggle = document.getElementById("showWipToggle");
 
+    const statTotal = document.getElementById("statTotal");
+    const statCats  = document.getElementById("statCats");
+    const statWip   = document.getElementById("statWip");
+
     let catalog = { categories: [], simulations: [] };
+    let expandedCategoryKey = null;
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
+    function escapeHtml(v) {
+      return String(v ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;")
+        .replaceAll(">","&gt;").replaceAll('"',"&quot;");
     }
 
-    function normalize(value) {
-      return String(value ?? "").trim().toLowerCase();
+    function normalize(v) { return String(v ?? "").trim().toLowerCase(); }
+
+    function titleCaseFromSlug(v) {
+      return String(v ?? "").replace(/[-_]+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
     }
 
-    function titleCaseFromSlug(value) {
-      return String(value ?? "")
-        .replace(/[-_]+/g, " ")
-        .replace(/\b\w/g, c => c.toUpperCase());
+    function levelLabel(v) {
+      const n = normalize(v);
+      if (n==="base") return "Base";
+      if (n==="intermedio") return "Intermedio";
+      if (n==="avanzato") return "Avanzato";
+      return v || "";
     }
 
-    function levelLabel(value) {
-      const v = normalize(value);
-      if (v === "base") return "Base";
-      if (v === "intermedio") return "Intermedio";
-      if (v === "avanzato") return "Avanzato";
-      return value || "";
-    }
-
-    function simulationCountLabel(count) {
-      return count === 1 ? "1 simulazione" : `${count} simulazioni`;
+    function simulationCountLabel(n) {
+      return n === 1 ? "1 simulazione" : `${n} simulazioni`;
     }
 
     function hasActiveFilters() {
@@ -588,249 +954,192 @@
       );
     }
 
-    function getCategoryKey(name) {
-      return normalize(name);
+    function getCategoryKey(name) { return normalize(name); }
+
+    function getCategoryMap(cats) {
+      const m = new Map();
+      cats.forEach(c => { if (c?.name) m.set(normalize(c.name), c); });
+      return m;
     }
 
-    let expandedCategoryKey = null;
-
-    function getCategoryMap(categories) {
-      const map = new Map();
-      categories.forEach(cat => {
-        if (!cat || !cat.name) return;
-        map.set(normalize(cat.name), cat);
-      });
-      return map;
-    }
-
-    function inferCategoryFromPath(filePath) {
-      const parts = String(filePath ?? "").split("/").filter(Boolean);
+    function inferCategoryFromPath(fp) {
+      const parts = String(fp ?? "").split("/").filter(Boolean);
       if (parts.length <= 1) return "Senza categoria";
       return titleCaseFromSlug(parts[0]);
     }
 
     function normalizeSimulation(sim) {
       const file = String(sim.file ?? "").trim();
-      const normalizedPath = file.replace(/\\/g, "/");
-      const firstPart = normalizedPath.split("/").filter(Boolean)[0] || "";
-      const isWip = normalize(firstPart) === "wip";
-
+      const norm = file.replace(/\\/g,"/");
+      const first = norm.split("/").filter(Boolean)[0] || "";
+      const isWip = normalize(first) === "wip";
       const inferredCategory = isWip ? "WIP" : inferCategoryFromPath(file);
-      const category = isWip
-        ? "WIP"
-        : (String(sim.category ?? inferredCategory).trim() || inferredCategory);
-
-      const tags = Array.isArray(sim.tags)
-        ? sim.tags.map(tag => String(tag).trim()).filter(Boolean)
-        : [];
-
-      const level = String(sim.level ?? "").trim();
-
+      const category = isWip ? "WIP" : (String(sim.category ?? inferredCategory).trim() || inferredCategory);
+      const tags = Array.isArray(sim.tags) ? sim.tags.map(t=>String(t).trim()).filter(Boolean) : [];
       return {
         ...sim,
         file,
         title: String(sim.title ?? "Simulazione senza titolo").trim(),
-        description: String(sim.description ?? "Simulazione interattiva di fisica accessibile direttamente dal browser.").trim(),
+        description: String(sim.description ?? "Simulazione interattiva di fisica.").trim(),
         icon: String(sim.icon ?? "Φ").trim() || "Φ",
         category,
         order: Number.isFinite(Number(sim.order)) ? Number(sim.order) : 9999,
         tags,
-        level,
+        level: String(sim.level ?? "").trim(),
         isWip
       };
     }
 
-    function getVisibleSimulations() {
-      return (catalog.simulations || [])
-        .map(normalizeSimulation)
-        .filter(matchesFilters);
-    }
-
-    function buildCategoryOptions(simulations, categories) {
-      const names = new Set();
-
-      categories.forEach(cat => {
-        if (!cat?.name) return;
-        if (normalize(cat.name) === "wip" && !showWipToggle.checked) return;
-        names.add(cat.name);
-      });
-
-      simulations.forEach(sim => {
-        if (sim?.category) names.add(sim.category);
-      });
-
-      const categoryMap = getCategoryMap(categories);
-      const sorted = Array.from(names)
-        .map(name => {
-          const cat = categoryMap.get(normalize(name)) || {};
-          let order = Number.isFinite(Number(cat.order)) ? Number(cat.order) : 9999;
-          if (normalize(name) === "wip") order = 999999;
-
-          return { name, order };
-        })
-        .sort((a, b) => {
-          if (a.order !== b.order) return a.order - b.order;
-          return a.name.localeCompare(b.name, "it");
-        });
-
-      const currentValue = categoryFilter.value;
-
-      categoryFilter.innerHTML = '<option value="">Tutte le categorie</option>' +
-        sorted.map(item => `<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}</option>`).join("");
-
-      const availableValues = new Set(sorted.map(item => item.name));
-      if (currentValue && availableValues.has(currentValue)) {
-        categoryFilter.value = currentValue;
-      } else {
-        categoryFilter.value = "";
-      }
-    }
-
-    function sortCategories(categories, simulations) {
-      const map = getCategoryMap(categories);
-      const names = new Set();
-
-      categories.forEach(cat => {
-        if (!cat?.name) return;
-        if (normalize(cat.name) === "wip" && !showWipToggle.checked) return;
-        names.add(cat.name);
-      });
-
-      simulations.forEach(sim => {
-        if (sim?.category) names.add(sim.category);
-      });
-
-      return Array.from(names)
-        .map(name => {
-          const categoryData = map.get(normalize(name)) || {};
-          let order = Number.isFinite(Number(categoryData.order)) ? Number(categoryData.order) : 9999;
-          if (normalize(name) === "wip") order = 999999;
-
-          return {
-            name,
-            description: categoryData.description || (normalize(name) === "wip"
-              ? "Simulazioni in sviluppo o in fase di test."
-              : ""),
-            order
-          };
-        })
-        .sort((a, b) => {
-          if (a.order !== b.order) return a.order - b.order;
-          return a.name.localeCompare(b.name, "it");
-        });
-    }
-
     function matchesFilters(sim) {
       const query = normalize(searchInput.value);
-      const selectedCategory = normalize(categoryFilter.value);
-      const selectedLevel = normalize(levelFilter.value);
+      const selCat = normalize(categoryFilter.value);
+      const selLvl = normalize(levelFilter.value);
       const showWip = showWipToggle.checked;
 
-      if (sim.isWip && !showWip) {
-        return false;
-      }
-
-      if (selectedCategory && normalize(sim.category) !== selectedCategory) {
-        return false;
-      }
-
-      if (selectedLevel && normalize(sim.level) !== selectedLevel) {
-        return false;
-      }
-
+      if (sim.isWip && !showWip) return false;
+      if (selCat && normalize(sim.category) !== selCat) return false;
+      if (selLvl && normalize(sim.level) !== selLvl) return false;
       if (!query) return true;
 
-      const haystack = [
-        sim.title,
-        sim.description,
-        sim.category,
-        sim.level,
-        ...(sim.tags || [])
-      ].map(normalize).join(" ");
+      const hay = [sim.title, sim.description, sim.category, sim.level, ...(sim.tags||[])]
+        .map(normalize).join(" ");
+      return hay.includes(query);
+    }
 
-      return haystack.includes(query);
+    function getVisibleSimulations() {
+      return (catalog.simulations || []).map(normalizeSimulation).filter(matchesFilters);
+    }
+
+    function sortCategories(cats, sims) {
+      const map = getCategoryMap(cats);
+      const names = new Set();
+      cats.forEach(c => {
+        if (!c?.name) return;
+        if (normalize(c.name)==="wip" && !showWipToggle.checked) return;
+        names.add(c.name);
+      });
+      sims.forEach(s => { if (s?.category) names.add(s.category); });
+
+      return Array.from(names).map(name => {
+        const cd = map.get(normalize(name)) || {};
+        let order = Number.isFinite(Number(cd.order)) ? Number(cd.order) : 9999;
+        if (normalize(name)==="wip") order = 999999;
+        return { name, description: cd.description || "", order };
+      }).sort((a,b) => a.order !== b.order ? a.order - b.order : a.name.localeCompare(b.name,"it"));
+    }
+
+    function buildCategoryOptions(sims, cats) {
+      const map = getCategoryMap(cats);
+      const names = new Set();
+      cats.forEach(c => {
+        if (!c?.name) return;
+        if (normalize(c.name)==="wip" && !showWipToggle.checked) return;
+        names.add(c.name);
+      });
+      sims.forEach(s => { if (s?.category) names.add(s.category); });
+
+      const sorted = Array.from(names).map(name => {
+        const cd = map.get(normalize(name)) || {};
+        let order = Number.isFinite(Number(cd.order)) ? Number(cd.order) : 9999;
+        if (normalize(name)==="wip") order = 999999;
+        return { name, order };
+      }).sort((a,b) => a.order !== b.order ? a.order - b.order : a.name.localeCompare(b.name,"it"));
+
+      const cur = categoryFilter.value;
+      categoryFilter.innerHTML = '<option value="">Tutte le categorie</option>' +
+        sorted.map(it => `<option value="${escapeHtml(it.name)}">${escapeHtml(it.name)}</option>`).join("");
+      if (sorted.some(it => it.name === cur)) categoryFilter.value = cur;
+    }
+
+    function updateStats() {
+      const all = (catalog.simulations || []).map(normalizeSimulation);
+      const visible = all.filter(s => !s.isWip);
+      const wip = all.filter(s => s.isWip);
+      const cats = new Set(visible.map(s => normalize(s.category)));
+      statTotal.textContent = visible.length;
+      statCats.textContent  = cats.size;
+      statWip.textContent   = wip.length;
+    }
+
+    function updateResultsCount(sims) {
+      const n = sims.length;
+      resultsCount.innerHTML = n === 0
+        ? "Nessun risultato"
+        : `<strong>${n}</strong> ${n === 1 ? "simulazione trovata" : "simulazioni trovate"}`;
     }
 
     function renderCard(sim) {
+      const color = getCatColor(sim.category);
       const levelMarkup = sim.level
-        ? `<span class="chip level ${normalize(sim.level)}">${escapeHtml(levelLabel(sim.level))}</span>`
+        ? `<span class="sim-level-chip ${escapeHtml(normalize(sim.level))}">${escapeHtml(levelLabel(sim.level))}</span>`
         : "";
-
       return `
-        <a class="card sim-card-link" href="${encodeURI(sim.file)}" aria-label="Apri simulazione ${escapeHtml(sim.title)}">
-          <div class="card-content">
-            <div class="icon">${escapeHtml(sim.icon)}</div>
-            <h2 class="sim-title">${escapeHtml(sim.title)}</h2>
-            <p class="sim-desc">${escapeHtml(sim.description)}</p>
-            <div class="meta-row">
+        <a class="card" href="${encodeURI(sim.file)}" style="--cat-color:${escapeHtml(color)}"
+           aria-label="Apri simulazione: ${escapeHtml(sim.title)}">
+          <div class="card-inner">
+            <div class="card-header">
+              <div class="icon" aria-hidden="true">${escapeHtml(sim.icon)}</div>
               ${levelMarkup}
             </div>
-            <span class="sim-link">
-              Apri simulazione
-              <span>→</span>
-            </span>
+            <h3 class="sim-title">${escapeHtml(sim.title)}</h3>
+            <p class="sim-desc">${escapeHtml(sim.description)}</p>
+            <div class="sim-footer">
+              <span class="sim-open" aria-hidden="true">Apri &nbsp;→</span>
+            </div>
           </div>
         </a>
       `;
     }
 
     function render() {
-      const simulations = getVisibleSimulations();
-      const orderedCategories = sortCategories(catalog.categories || [], simulations);
+      const sims = getVisibleSimulations();
+      const orderedCats = sortCategories(catalog.categories || [], sims);
       const autoExpand = hasActiveFilters();
 
-      if (simulations.length === 0) {
-        results.innerHTML = `
-          <div class="empty-state">
-            Nessuna simulazione corrisponde ai filtri selezionati.
-          </div>
-        `;
+      updateResultsCount(sims);
+
+      if (sims.length === 0) {
+        results.innerHTML = `<div class="empty-state">Nessuna simulazione corrisponde ai filtri selezionati.</div>`;
         return;
       }
 
-      const html = orderedCategories
-        .map(category => {
-          const sims = simulations
-            .filter(sim => normalize(sim.category) === normalize(category.name))
-            .sort((a, b) => {
-              if (a.order !== b.order) return a.order - b.order;
-              return a.title.localeCompare(b.title, "it");
-            });
+      const html = orderedCats.map((cat, catIdx) => {
+        const catSims = sims
+          .filter(s => normalize(s.category) === normalize(cat.name))
+          .sort((a,b) => a.order !== b.order ? a.order - b.order : a.title.localeCompare(b.title,"it"));
 
-          if (sims.length === 0) return "";
+        if (catSims.length === 0) return "";
 
-          const categoryKey = getCategoryKey(category.name);
-          const isExpanded = autoExpand || expandedCategoryKey === categoryKey;
+        const key = getCategoryKey(cat.name);
+        const isExpanded = autoExpand || expandedCategoryKey === key;
+        const color = getCatColor(cat.name);
+        const delay = `${catIdx * 0.05}s`;
 
-          return `
-            <section class="category-block">
-              <button
-                class="category-toggle"
-                type="button"
-                data-category="${escapeHtml(category.name)}"
-                aria-expanded="${isExpanded ? "true" : "false"}"
-              >
-                <div class="category-head">
-                  <div>
-                    <h2 class="category-title">${escapeHtml(category.name)}</h2>
-                    ${category.description ? `<p class="category-desc">${escapeHtml(category.description)}</p>` : ""}
-                  </div>
-                </div>
-                <div class="category-summary">
-                  <span class="category-count">${escapeHtml(simulationCountLabel(sims.length))}</span>
-                  <span class="category-chevron" aria-hidden="true">▾</span>
-                </div>
-              </button>
-              <div class="category-content" ${isExpanded ? "" : "hidden"}>
-                <div class="grid">
-                  ${sims.map(renderCard).join("")}
+        return `
+          <section class="category-block" style="animation-delay:${delay}; --cat-color:${escapeHtml(color)}">
+            <button class="category-toggle" type="button"
+              data-category="${escapeHtml(cat.name)}"
+              aria-expanded="${isExpanded ? "true" : "false"}">
+              <div class="category-left">
+                <div class="category-dot"></div>
+                <div class="category-text">
+                  <h2 class="category-title">${escapeHtml(cat.name)}</h2>
+                  ${cat.description ? `<p class="category-desc">${escapeHtml(cat.description)}</p>` : ""}
                 </div>
               </div>
-            </section>
-          `;
-        })
-        .filter(Boolean)
-        .join("");
+              <div class="category-right">
+                <span class="category-count">${escapeHtml(simulationCountLabel(catSims.length))}</span>
+                <span class="category-chevron" aria-hidden="true">▾</span>
+              </div>
+            </button>
+            <div class="category-content" ${isExpanded ? "" : "hidden"}>
+              <div class="grid">
+                ${catSims.map(renderCard).join("")}
+              </div>
+            </div>
+          </section>
+        `;
+      }).filter(Boolean).join("");
 
       results.innerHTML = html;
     }
@@ -842,33 +1151,24 @@
 
     async function loadCatalog() {
       try {
-        const response = await fetch(CATALOG_PATH, { cache: "no-store" });
-
-        if (!response.ok) {
-          throw new Error("Impossibile recuperare simulations.json");
-        }
-
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          catalog = { categories: [], simulations: data };
-        } else {
-          catalog = {
-            categories: Array.isArray(data.categories) ? data.categories : [],
-            simulations: Array.isArray(data.simulations) ? data.simulations : []
-          };
-        }
-
+        const resp = await fetch(CATALOG_PATH, { cache: "no-store" });
+        if (!resp.ok) throw new Error("Impossibile recuperare simulations.json");
+        const data = await resp.json();
+        catalog = Array.isArray(data)
+          ? { categories: [], simulations: data }
+          : {
+              categories: Array.isArray(data.categories) ? data.categories : [],
+              simulations: Array.isArray(data.simulations) ? data.simulations : []
+            };
+        updateStats();
         refreshFiltersAndRender();
-      } catch (error) {
+      } catch(err) {
         results.innerHTML = `
           <div class="error-state">
-            Non è stato possibile caricare il catalogo delle simulazioni.<br>
-            Verifica che <code>simulations.json</code> sia presente nella stessa cartella di questo file
-            e che la sua sintassi sia valida.
-          </div>
-        `;
-        console.error(error);
+            Non è stato possibile caricare il catalogo.<br>
+            Verifica che <code>simulations.json</code> sia presente e valido.
+          </div>`;
+        console.error(err);
       }
     }
 
@@ -877,15 +1177,11 @@
     levelFilter.addEventListener("change", render);
     showWipToggle.addEventListener("change", refreshFiltersAndRender);
 
-    results.addEventListener("click", (event) => {
-      const toggle = event.target.closest(".category-toggle");
+    results.addEventListener("click", e => {
+      const toggle = e.target.closest(".category-toggle");
       if (!toggle || hasActiveFilters()) return;
-
-      const categoryName = toggle.dataset.category || "";
-      const categoryKey = getCategoryKey(categoryName);
-
-      expandedCategoryKey = expandedCategoryKey === categoryKey ? null : categoryKey;
-
+      const key = getCategoryKey(toggle.dataset.category || "");
+      expandedCategoryKey = expandedCategoryKey === key ? null : key;
       render();
     });
 

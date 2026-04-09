@@ -692,36 +692,55 @@
     .error-state { color: var(--rose); }
 
     /* ── Footer ──────────────────────────────────────────────────────── */
-   .footer {
-  margin-top: 56px;
-  padding: 18px 4px 0;
-  border-top: none;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
+    .footer {
+      margin-top: 56px;
+      padding: 18px 4px 0;
+      border-top: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
 
-.footer-author {
-  text-align: right;
-}
+    .footer-stats {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      opacity: 0.72;
+    }
 
-.footer-author a {
-  font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
-  font-size: 1.35rem;
-  font-style: italic;
-  letter-spacing: 0.01em;
-  color: var(--text-dim);
-  text-decoration: none;
-  border-bottom: none;
-  opacity: 0.78;
-  transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
+    .footer-stats strong {
+      color: var(--text-soft);
+      font-weight: 500;
+    }
 
-.footer-author a:hover {
-  color: var(--text-soft);
-  opacity: 0.92;
-  transform: translateY(-1px);
-}
+    .footer-author {
+      text-align: right;
+    }
+
+    .footer-author a {
+      font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
+      font-size: 1.35rem;
+      font-style: italic;
+      letter-spacing: 0.01em;
+      color: var(--text-dim);
+      text-decoration: none;
+      border-bottom: none;
+      opacity: 0.78;
+      transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .footer-author a:hover {
+      color: var(--text-soft);
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
     .footer-note {
       font-family: var(--mono);
       font-size: 0.68rem;
@@ -779,7 +798,6 @@
       <p class="hero-subtitle">
         Esplora la fisica attraverso simulazioni interattive, dai fondamenti della meccanica alle frontiere della meccanica quantistica e della relatività.
       </p>
-
     </section>
 
     <!-- Filter panel -->
@@ -825,8 +843,16 @@
 
     <!-- Footer -->
     <footer class="footer">
-  <div class="footer-author">Roberto Curcio Rubertini</div>
-</footer>
+      <div class="footer-stats" id="heroStats" aria-label="Statistiche catalogo">
+        <span><strong id="statTotal">—</strong> simulazioni</span>
+        <span><strong id="statCats">—</strong> categorie</span>
+        <span><strong id="statWip">—</strong> WIP</span>
+      </div>
+      <div class="footer-author">
+       <a href="https://github.com/robertocurciorubertini-ctrl/Simulazioni" target="_blank" rel="noopener">Roberto Curcio Rubertini</a>
+      </div>
+    </footer>
+
   </div>
 
   <script>
@@ -1046,9 +1072,10 @@
       const visible = all.filter(s => !s.isWip);
       const wip = all.filter(s => s.isWip);
       const cats = new Set(visible.map(s => normalize(s.category)));
-      statTotal.textContent = visible.length;
-      statCats.textContent  = cats.size;
-      statWip.textContent   = wip.length;
+
+      if (statTotal) statTotal.textContent = visible.length;
+      if (statCats)  statCats.textContent  = cats.size;
+      if (statWip)   statWip.textContent   = wip.length;
     }
 
     function updateResultsCount(sims) {

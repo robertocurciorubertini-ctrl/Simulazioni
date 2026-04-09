@@ -287,7 +287,7 @@
     },
     {
       "title": "Principi della Dinamica",
-      "description": "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
+      "description": "Esplorazione interattiva delle tre leggi di Newton, inerzia, forza, massa, azione e reazione.",
       "category": "Meccanica",
       "icon": "➡️⬅️",
       "order": 50,

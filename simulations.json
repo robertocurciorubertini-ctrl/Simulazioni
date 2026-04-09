@@ -4,98 +4,90 @@
       "name": "Fondamenti",
       "order": 1,
       "color": "#8ab4f0",
-      "icon": "⊙",
       "description": "Il linguaggio con cui la fisica descrive il mondo."
     },
     {
       "name": "Meccanica",
       "order": 10,
       "color": "#5bd4c4",
-      "icon": "⟳",
       "description": "Dalla caduta di una mela alle orbite dei pianeti, la meccanica descrive come e perché i corpi si muovono."
     },
     {
       "name": "Gravitazione",
       "order": 20,
       "color": "#a78bfa",
-      "icon": "🪐",
       "description": "La forza che domina su grandi scale: governa la caduta di un sasso, la forma delle galassie e il destino dell'universo."
     },
     {
       "name": "Fluidodinamica",
       "order": 30,
       "color": "#5bc8f0",
-      "icon": "≋",
       "description": "Aria, acqua, plasma stellare: i fluidi sono ovunque, e il loro comportamento emerge da poche equazioni sorprendentemente difficili da risolvere."
     },
     {
       "name": "Termodinamica",
       "order": 40,
       "color": "#f08c5b",
-      "icon": "∆",
       "description": "Perché il calore non scorre mai spontaneamente dal freddo al caldo? La termodinamica risponde con quattro principi che delimitano ciò che è fisicamente possibile — e ciò che non lo è mai."
     },
     {
       "name": "Onde",
       "order": 50,
       "color": "#f0c060",
-      "icon": "∿",
       "description": "Capire le onde significa capire come l'informazione e l'energia si propagano nel mondo."
     },
     {
       "name": "Ottica",
       "order": 60,
       "color": "#f0e060",
-      "icon": "◈",
       "description": "La luce viaggia in linea retta, si piega, si divide nei colori, interferisce con se stessa. L'ottica esplora i comportamenti della radiazione elettromagnetica visibile."
     },
     {
       "name": "Elettromagnetismo",
       "order": 70,
       "color": "#f07070",
-      "icon": "⚡",
       "description": "Elettricità e magnetismo sembravano fenomeni separati fino a quando Maxwell non scrisse quattro equazioni che li unificarono. Da lì nacque la fisica moderna."
     },
     {
       "name": "Relatività",
       "order": 80,
       "color": "#c084fc",
-      "icon": "⌬",
       "description": "Il tempo scorre più lento vicino a una massa. Due eventi simultanei per un osservatore non lo sono per un altro in moto. La relatività descrrive alcuni tra i fenomeni meno intuitivi e più spettacolari."
     },
     {
       "name": "Meccanica Quantistica",
       "order": 90,
       "color": "#7dd3fc",
-      "icon": "ψ",
       "description": "Su scala atomica i fenomeni sono intrinsecamente probabilistici e un elettrone può attraversare due fenditure allo stesso tempo. La meccanica quantistica è controintuitiva per costruzione — e tuttavia è la teoria fisica più precisa mai verificata."
     },
     {
       "name": "Astrofisica",
       "order": 100,
       "color": "#e879f9",
-      "icon": "✦",
       "description": "Stelle che collassano in punti di densità infinita, galassie che si allontanano più veloce della luce, forme di energia e materia a noi sconosciute che rappresentano la maggioranza di cio che esiste nell'universo. Questa è l'astrofisica."
     },
     {
       "name": "Fisica nucleare",
       "order": 110,
       "color": "#fb923c",
-      "icon": "⚛",
+      "description": "Nel nucleo di ogni atomo sono compresse forze enormi tenute in equilibrio instabile. Capire come si formano, decadono e reagiscono i nuclei ha prodotto le applicazioni più potenti che la fisica abbia mai generato."
+    },
+    {
+      "name": "Fisica delle particelle",
+      "order": 120,
+      "color": "#fb923c",
       "description": "Nel nucleo di ogni atomo sono compresse forze enormi tenute in equilibrio instabile. Capire come si formano, decadono e reagiscono i nuclei ha prodotto le applicazioni più potenti che la fisica abbia mai generato."
     },
     {
       "name": "Matematica per la Fisica",
       "order": 9999,
       "color": "#67e8a0",
-      "description": "Gli strumenti matematici spesso utilizzati nello studio della fisica.",
-      "icon": "∑"
+      "description": "Gli strumenti matematici spesso utilizzati nello studio della fisica."
     },
     {
       "name": "WIP",
       "order": 999999,
       "color": "#6b7280",
-      "icon": "⚙",
       "description": "Simulazioni in costruzione. Potrebbero contenere imprecisioni o comportamenti inattesi."
     }
   ],
@@ -287,7 +279,7 @@
     },
     {
       "title": "Oscillatore armonico",
-      "description": "Esplora il moto oscillatorio in diversi regimi, includendo pendolo semplice, sistema massa-molla, oscillatore smorzato e oscillatore forzato con risonanza.",
+      "description": "Esplora il moto oscillatorio in diversi regimi tra cui il pendolo semplice, sistema massa-molla, oscillatore smorzato e oscillatore forzato con risonanza.",
       "category": "Meccanica",
       "icon": "∿",
       "order": 45,

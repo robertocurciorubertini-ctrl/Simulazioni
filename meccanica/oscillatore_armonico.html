@@ -4,1589 +4,860 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Oscillatore Armonico — Simulazione Interattiva</title>
+<script>
+window.SIM_METADATA = {
+  title: "Oscillatore armonico",
+  description: "Esplora il moto oscillatorio in diversi regimi tra cui il pendolo semplice, sistema massa-molla, oscillatore smorzato e oscillatore forzato con risonanza.",
+  category: "Meccanica",
+  icon: "∿",
+  order: 45,
+  tags: ["oscillatore armonico", "moto armonico", "pendolo", "massa-molla", "smorzamento", "risonanza", "oscillatore forzato"],
+  level: "intermedio"
+};
+</script>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
-
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
-:root {
-  --cream:    #f5f0e8;
-  --parchment:#ede6d4;
-  --warm-mid: #d4c9b0;
-  --ink:      #1a1410;
-  --ink-soft: #3a302a;
-  --ink-light:#6a5a50;
-  --accent:   #8b3a2a;
-  --accent2:  #2a5a8b;
-  --accent3:  #2a7a4a;
-  --border:   #c4b89a;
-  --shadow:   rgba(26,20,16,0.12);
-  --plot-bg:  #faf7f2;
-}
+:root{--cream:#f5f0e8;--parchment:#ede6d4;--warm-mid:#d4c9b0;--ink:#1a1410;--ink-soft:#3a302a;--ink-light:#6a5a50;--accent:#8b3a2a;--accent2:#2a5a8b;--accent3:#2a7a4a;--border:#c4b89a;--shadow:rgba(26,20,16,0.12);--plot-bg:#faf7f2;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+header{background:var(--ink);color:var(--cream);padding:2.5rem 3rem 2rem;border-bottom:3px solid var(--accent);}
+header .tag{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--warm-mid);margin-bottom:.5rem;}
+header h1{font-family:'EB Garamond',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:500;line-height:1.1;margin-bottom:.6rem;}
+header p{color:var(--warm-mid);font-family:'IBM Plex Sans',sans-serif;font-weight:300;font-size:.95rem;max-width:60ch;}
+main{max-width:1100px;margin:0 auto;padding:2rem 2rem 4rem;}
 
-body {
-  background: var(--cream);
-  color: var(--ink);
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  min-height: 100vh;
-}
+/* TAB */
+.tabs-wrapper{margin-bottom:2.5rem;}
+.tab-bar{display:flex;border-bottom:2px solid var(--border);overflow-x:auto;}
+.tab-btn{font-family:'IBM Plex Mono',monospace;font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:.7rem 1.3rem;color:var(--ink-light);cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:.45rem;}
+.tab-btn .tn{font-size:.63rem;background:var(--warm-mid);color:var(--ink-soft);border-radius:2px;padding:.04rem .32rem;transition:background .15s,color .15s;}
+.tab-btn:hover{color:var(--ink);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-btn.active .tn{background:var(--accent);color:white;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.tab-desc{font-size:.87rem;color:var(--ink-light);font-style:italic;padding:.55rem 0 1rem;}
 
-/* ── HEADER ── */
-header {
-  background: var(--ink);
-  color: var(--cream);
-  padding: 2.5rem 3rem 2rem;
-  border-bottom: 3px solid var(--accent);
-}
-header .tag {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--warm-mid);
-  margin-bottom: 0.5rem;
-}
-header h1 {
-  font-family: 'EB Garamond', serif;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  font-weight: 500;
-  line-height: 1.1;
-  margin-bottom: 0.6rem;
-}
-header p {
-  color: var(--warm-mid);
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 300;
-  font-size: 0.95rem;
-  max-width: 60ch;
-}
+/* CARD */
+.sim-card{background:white;border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:0 2px 12px var(--shadow);}
+.sim-card-header{background:var(--parchment);border-bottom:1px solid var(--border);padding:.85rem 1.4rem;display:flex;align-items:center;gap:.75rem;}
+.sim-card-header h3{font-family:'EB Garamond',serif;font-size:1.22rem;font-weight:500;color:var(--ink);}
+.badge{font-family:'IBM Plex Mono',monospace;font-size:.67rem;background:var(--accent);color:white;padding:.14rem .48rem;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;}
+.badge.blue{background:var(--accent2);} .badge.green{background:var(--accent3);}
+.sim-body{display:grid;grid-template-columns:1fr 1fr;}
+@media(max-width:720px){.sim-body{grid-template-columns:1fr;}}
+.canvas-wrap{border-right:1px solid var(--border);padding:1.1rem;display:flex;flex-direction:column;align-items:center;gap:.65rem;background:var(--plot-bg);}
+.canvas-wrap canvas{display:block;}
+.plot-wrap{padding:1.1rem;display:flex;flex-direction:column;gap:.5rem;background:var(--plot-bg);}
+.plot-label{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--ink-light);letter-spacing:.06em;text-transform:uppercase;}
 
-/* ── MAIN LAYOUT ── */
-main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+/* CONTROLS */
+.controls{background:white;border-top:1px solid var(--border);padding:.95rem 1.4rem;display:flex;flex-wrap:wrap;gap:1.4rem;align-items:flex-end;}
+.ctrl-group{display:flex;flex-direction:column;gap:.22rem;min-width:140px;}
+.ctrl-group label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:.08em;}
+.ctrl-group .val{font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:var(--accent);font-weight:500;}
+input[type=range]{-webkit-appearance:none;appearance:none;height:4px;background:var(--warm-mid);border-radius:2px;outline:none;width:155px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid white;box-shadow:0 1px 4px var(--shadow);}
+.btn{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:.37rem .95rem;border-radius:2px;cursor:pointer;transition:background .15s,color .15s;}
+.btn:hover{background:var(--ink);color:var(--cream);}
+.btn.accent{border-color:var(--accent);color:var(--accent);}
+.btn.accent:hover{background:var(--accent);color:white;}
 
-/* ── SECTION TITLES ── */
-.section-title {
-  font-family: 'EB Garamond', serif;
-  font-size: 1.75rem;
-  font-weight: 500;
-  color: var(--ink);
-  margin-bottom: 0.3rem;
-  display: flex;
-  align-items: baseline;
-  gap: 0.7rem;
-}
-.section-title .num {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.8rem;
-  color: var(--accent);
-  letter-spacing: 0.1em;
-}
-.section-sub {
-  font-size: 0.9rem;
-  color: var(--ink-light);
-  margin-bottom: 1.5rem;
-  font-style: italic;
-}
-.section-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 2.5rem 0;
-}
+.info-callout{background:var(--parchment);border-left:3px solid var(--accent2);padding:.55rem .9rem;font-size:.79rem;color:var(--ink-soft);font-style:italic;font-family:'IBM Plex Mono',monospace;}
+.drag-hint{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--ink-light);}
+.regime-badge{display:inline-flex;align-items:center;gap:.42rem;font-family:'IBM Plex Mono',monospace;font-size:.71rem;color:var(--ink-soft);padding:.28rem .65rem;background:var(--parchment);border:1px solid var(--border);border-radius:2px;}
+.regime-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-/* ── SIM CARD ── */
-.sim-card {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 2px 12px var(--shadow);
-  margin-bottom: 2.5rem;
-}
-.sim-card-header {
-  background: var(--parchment);
-  border-bottom: 1px solid var(--border);
-  padding: 0.9rem 1.4rem;
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-.sim-card-header h3 {
-  font-family: 'EB Garamond', serif;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: var(--ink);
-}
-.sim-card-header .badge {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
-  background: var(--accent);
-  color: white;
-  padding: 0.15rem 0.5rem;
-  border-radius: 2px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.sim-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-}
-@media(max-width: 700px) {
-  .sim-body { grid-template-columns: 1fr; }
-}
-.canvas-wrap {
-  border-right: 1px solid var(--border);
-  padding: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
-  background: var(--plot-bg);
-}
-.canvas-wrap canvas { display: block; }
-.plot-wrap {
-  padding: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  background: var(--plot-bg);
-}
-.plot-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--ink-light);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* ── CONTROLS ── */
-.controls {
-  background: white;
-  border-top: 1px solid var(--border);
-  padding: 1rem 1.4rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  align-items: flex-end;
-}
-.ctrl-group { display: flex; flex-direction: column; gap: 0.25rem; min-width: 140px; }
-.ctrl-group label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--ink-light);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-.ctrl-group .val {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 500;
-}
-input[type=range] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  background: var(--warm-mid);
-  border-radius: 2px;
-  outline: none;
-  width: 160px;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 1px 4px var(--shadow);
-}
-.btn {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border: 1.5px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
-  padding: 0.4rem 1rem;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-.btn:hover { background: var(--ink); color: var(--cream); }
-.btn.accent { border-color: var(--accent); color: var(--accent); }
-.btn.accent:hover { background: var(--accent); color: white; }
-
-/* ── INFO CALLOUT ── */
-.info-callout {
-  background: var(--parchment);
-  border-left: 3px solid var(--accent2);
-  padding: 0.7rem 1rem;
-  margin-top: 0.5rem;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-  font-style: italic;
-}
-
-/* ── TEORIA ── */
-.theory-section {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 2px solid var(--border);
-}
-.theory-section h2 {
-  font-family: 'EB Garamond', serif;
-  font-size: 2rem;
-  font-weight: 500;
-  margin-bottom: 1.5rem;
-  color: var(--ink);
-}
-.theory-block {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1.8rem 2rem;
-  margin-bottom: 1.8rem;
-  box-shadow: 0 1px 6px var(--shadow);
-}
-.theory-block h3 {
-  font-family: 'EB Garamond', serif;
-  font-size: 1.4rem;
-  font-weight: 500;
-  margin-bottom: 0.8rem;
-  color: var(--ink);
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-.theory-block p {
-  font-size: 0.93rem;
-  color: var(--ink-soft);
-  margin-bottom: 0.9rem;
-  line-height: 1.75;
-}
-.theory-block p:last-child { margin-bottom: 0; }
-.eq-box {
-  background: var(--plot-bg);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1rem 1.5rem;
-  margin: 1rem 0;
-  text-align: center;
-  overflow-x: auto;
-}
-.eq-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
-  color: var(--ink-light);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.4rem;
-  text-align: left;
-}
-.two-col-theory {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-@media(max-width:700px){ .two-col-theory { grid-template-columns:1fr; } }
-
-/* ── DRAG HINT ── */
-.drag-hint {
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.7rem;
-  color:var(--ink-light);
-  letter-spacing:0.05em;
-}
-
-/* ── RESONANCE PEAK INDICATOR ── */
-.resonance-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  color: var(--ink-light);
-  padding: 0.3rem 0.6rem;
-  background: var(--parchment);
-  border-radius: 2px;
-  border: 1px solid var(--border);
-  width: fit-content;
-}
-.resonance-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  flex-shrink: 0;
-}
+/* TEORIA */
+.theory-section{margin-top:3rem;padding-top:2rem;border-top:2px solid var(--border);}
+.theory-section h2{font-family:'EB Garamond',serif;font-size:2rem;font-weight:500;margin-bottom:1.5rem;color:var(--ink);}
+.theory-block{background:white;border:1px solid var(--border);border-radius:4px;padding:1.8rem 2rem;margin-bottom:1.8rem;box-shadow:0 1px 6px var(--shadow);}
+.theory-block h3{font-family:'EB Garamond',serif;font-size:1.4rem;font-weight:500;margin-bottom:.8rem;color:var(--ink);padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+.theory-block p{font-size:.93rem;color:var(--ink-soft);margin-bottom:.9rem;line-height:1.75;}
+.theory-block p:last-child{margin-bottom:0;}
+.eq-box{background:var(--plot-bg);border:1px solid var(--border);border-radius:3px;padding:1rem 1.5rem;margin:1rem 0;text-align:center;overflow-x:auto;}
+.eq-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem;text-align:left;}
+.two-col-theory{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+@media(max-width:700px){.two-col-theory{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
 <header>
   <div class="tag">Fisica — Meccanica / Simulazione Interattiva</div>
   <h1>L'Oscillatore Armonico</h1>
-  <p>Visualizzazione interattiva del moto oscillatorio: oscillatore libero, smorzato e forzato. Trascina il pendolo, modifica i parametri, osserva come cambia il comportamento del sistema.</p>
+  <p>Visualizzazione interattiva del moto oscillatorio: oscillatore libero, smorzato e forzato. Seleziona un tab, trascina la massa, modifica i parametri.</p>
 </header>
 
 <main>
+<div class="tabs-wrapper">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="pend"><span class="tn">01</span> Pendolo</button>
+    <button class="tab-btn" data-tab="spring"><span class="tn">02</span> Massa–Molla</button>
+    <button class="tab-btn" data-tab="damp"><span class="tn">03</span> Smorzato</button>
+    <button class="tab-btn" data-tab="forced"><span class="tn">04</span> Forzato &amp; Risonanza</button>
+  </div>
 
-<!-- ════════════════════════════════════════════
-     SEZIONE 1 — PENDOLO / OSCILLATORE LIBERO
-═════════════════════════════════════════════ -->
-<div class="section-title"><span class="num">01</span> Oscillatore Libero — Il Pendolo</div>
-<p class="section-sub">Trascina la massa per impostare la posizione iniziale. Osserva come l'ampiezza si conserva nel tempo.</p>
-
-<div class="sim-card">
-  <div class="sim-card-header">
-    <h3>Pendolo Semplice</h3>
-    <span class="badge">interattivo</span>
-  </div>
-  <div class="sim-body">
-    <div class="canvas-wrap">
-      <canvas id="pendCanvas" width="340" height="300"></canvas>
-      <span class="drag-hint">↖ trascina la massa per scegliere l'angolo iniziale</span>
-    </div>
-    <div class="plot-wrap">
-      <div class="plot-label">θ(t) — angolo nel tempo</div>
-      <canvas id="pendPlot" width="380" height="130"></canvas>
-      <div class="plot-label" style="margin-top:0.4rem">Energia cinetica / potenziale / totale</div>
-      <canvas id="pendEnergy" width="380" height="110"></canvas>
-      <div class="info-callout" id="pendInfo">Frequenza ω₀ = — rad/s &nbsp;|&nbsp; T = — s</div>
-    </div>
-  </div>
-  <div class="controls">
-    <div class="ctrl-group">
-      <label>Lunghezza L</label>
-      <input type="range" id="pendL" min="0.3" max="2.0" step="0.05" value="1.0">
-      <span class="val" id="pendLval">1.00 m</span>
-    </div>
-    <div class="ctrl-group">
-      <label>Massa m</label>
-      <input type="range" id="pendM" min="0.2" max="5.0" step="0.1" value="1.0">
-      <span class="val" id="pendMval">1.0 kg</span>
-    </div>
-    <div class="ctrl-group">
-      <label>g (gravitazione)</label>
-      <input type="range" id="pendG" min="1.6" max="24.8" step="0.2" value="9.8">
-      <span class="val" id="pendGval">9.80 m/s²</span>
-    </div>
-    <button class="btn accent" id="pendReset">Reset</button>
-    <button class="btn" id="pendPause">Pausa</button>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════
-     SEZIONE 2 — MOLLA / OSCILLATORE LIBERO
-═════════════════════════════════════════════ -->
-<div class="section-title"><span class="num">02</span> Oscillatore Massa–Molla</div>
-<p class="section-sub">Sistema equivalente al pendolo per piccole oscillazioni. Trascina la massa per impostare x₀.</p>
-
-<div class="sim-card">
-  <div class="sim-card-header">
-    <h3>Sistema Massa–Molla</h3>
-    <span class="badge">interattivo</span>
-  </div>
-  <div class="sim-body">
-    <div class="canvas-wrap">
-      <canvas id="springCanvas" width="340" height="260"></canvas>
-      <span class="drag-hint">↖ trascina la massa per scegliere lo spostamento iniziale</span>
-    </div>
-    <div class="plot-wrap">
-      <div class="plot-label">x(t) — spostamento nel tempo</div>
-      <canvas id="springPlot" width="380" height="120"></canvas>
-      <div class="plot-label" style="margin-top:0.4rem">Spazio delle fasi — piano (x, ẋ)</div>
-      <canvas id="phasePlot" width="380" height="115"></canvas>
-    </div>
-  </div>
-  <div class="controls">
-    <div class="ctrl-group">
-      <label>Costante k</label>
-      <input type="range" id="springK" min="1" max="50" step="0.5" value="10">
-      <span class="val" id="springKval">10.0 N/m</span>
-    </div>
-    <div class="ctrl-group">
-      <label>Massa m</label>
-      <input type="range" id="springM" min="0.2" max="5.0" step="0.1" value="1.0">
-      <span class="val" id="springMval">1.0 kg</span>
-    </div>
-    <button class="btn accent" id="springReset">Reset</button>
-    <button class="btn" id="springPause">Pausa</button>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════
-     SEZIONE 3 — OSCILLATORE SMORZATO
-═════════════════════════════════════════════ -->
-<hr class="section-divider">
-<div class="section-title"><span class="num">03</span> Oscillatore Smorzato</div>
-<p class="section-sub">La presenza di attrito viscoso dissipa energia. Modifica il coefficiente di smorzamento γ e osserva i tre regimi.</p>
-
-<div class="sim-card">
-  <div class="sim-card-header">
-    <h3>Smorzamento Viscoso</h3>
-    <span class="badge">3 regimi</span>
-  </div>
-  <div class="sim-body">
-    <div class="canvas-wrap">
-      <canvas id="dampCanvas" width="340" height="280"></canvas>
-    </div>
-    <div class="plot-wrap">
-      <div class="plot-label">x(t) — smorzamento visibile</div>
-      <canvas id="dampPlot" width="380" height="130"></canvas>
-      <div class="plot-label" style="margin-top:0.4rem">Energia totale E(t)</div>
-      <canvas id="dampEnergy" width="380" height="110"></canvas>
-      <div class="resonance-bar" id="dampRegime">
-        <span class="resonance-dot" id="dampDot"></span>
-        <span id="dampRegimeText">Regime: —</span>
+  <!-- TAB 1 -->
+  <div class="tab-panel active" id="tab-pend">
+    <p class="tab-desc">Trascina la massa per impostare l'angolo iniziale. L'integrazione usa l'equazione esatta con Runge–Kutta 4°: per angoli grandi il periodo aumenta rispetto all'approssimazione armonica.</p>
+    <div class="sim-card">
+      <div class="sim-card-header"><h3>Pendolo Semplice</h3><span class="badge">Runge–Kutta 4°</span><span class="badge blue">interattivo</span></div>
+      <div class="sim-body">
+        <div class="canvas-wrap">
+          <canvas id="pendCanvas" width="340" height="310"></canvas>
+          <span class="drag-hint">↖ trascina la massa per scegliere l'angolo iniziale</span>
+        </div>
+        <div class="plot-wrap">
+          <div class="plot-label">θ(t) — angolo nel tempo</div>
+          <canvas id="pendPlot" width="390" height="132"></canvas>
+          <div class="plot-label" style="margin-top:.3rem">Energia cinetica / potenziale / totale</div>
+          <canvas id="pendEnergy" width="390" height="118"></canvas>
+          <div class="info-callout" id="pendInfo">—</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group"><label>Lunghezza L</label><input type="range" id="pendL" min="0.3" max="2.0" step="0.05" value="1.0"><span class="val" id="pendLval">1.00 m</span></div>
+        <div class="ctrl-group"><label>Massa m</label><input type="range" id="pendM" min="0.2" max="5.0" step="0.1" value="1.0"><span class="val" id="pendMval">1.0 kg</span></div>
+        <div class="ctrl-group"><label>g (gravitazione)</label><input type="range" id="pendG" min="1.6" max="24.8" step="0.2" value="9.8"><span class="val" id="pendGval">9.80 m/s²</span></div>
+        <button class="btn accent" id="pendReset">Reset</button>
+        <button class="btn" id="pendPause">Pausa</button>
       </div>
     </div>
   </div>
-  <div class="controls">
-    <div class="ctrl-group">
-      <label>Costante k</label>
-      <input type="range" id="dampK" min="1" max="50" step="0.5" value="10">
-      <span class="val" id="dampKval">10.0 N/m</span>
-    </div>
-    <div class="ctrl-group">
-      <label>Massa m</label>
-      <input type="range" id="dampM" min="0.2" max="5.0" step="0.1" value="1.0">
-      <span class="val" id="dampMval">1.0 kg</span>
-    </div>
-    <div class="ctrl-group">
-      <label>Smorzamento γ (b)</label>
-      <input type="range" id="dampB" min="0.0" max="14" step="0.05" value="0.5">
-      <span class="val" id="dampBval">0.50 kg/s</span>
-    </div>
-    <button class="btn accent" id="dampReset">Reset</button>
-    <button class="btn" id="dampPause">Pausa</button>
-  </div>
-</div>
 
-<!-- ════════════════════════════════════════════
-     SEZIONE 4 — OSCILLATORE FORZATO
-═════════════════════════════════════════════ -->
-<hr class="section-divider">
-<div class="section-title"><span class="num">04</span> Oscillatore Forzato — Risonanza</div>
-<p class="section-sub">Una forza esterna periodica F = F₀ cos(ωt) viene applicata al sistema. Avvicina la frequenza di forzamento ω alla frequenza naturale ω₀ e osserva la risonanza.</p>
+  <!-- TAB 2 -->
+  <div class="tab-panel" id="tab-spring">
+    <p class="tab-desc">Sistema massa–molla verticale. Trascina la massa verso il basso per impostare lo spostamento iniziale dalla posizione di equilibrio. Il piano delle fasi mostra la traiettoria ellittica.</p>
+    <div class="sim-card">
+      <div class="sim-card-header"><h3>Sistema Massa–Molla Verticale</h3><span class="badge blue">piano delle fasi</span><span class="badge">interattivo</span></div>
+      <div class="sim-body">
+        <div class="canvas-wrap">
+          <canvas id="springCanvas" width="340" height="320"></canvas>
+          <span class="drag-hint">↖ trascina la massa per impostare x₀</span>
+        </div>
+        <div class="plot-wrap">
+          <div class="plot-label">x(t) — spostamento dall'equilibrio</div>
+          <canvas id="springPlot" width="390" height="132"></canvas>
+          <div class="plot-label" style="margin-top:.3rem">Piano delle fasi — (x, ẋ)</div>
+          <canvas id="phasePlot" width="390" height="136"></canvas>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group"><label>Costante k</label><input type="range" id="springK" min="1" max="50" step="0.5" value="10"><span class="val" id="springKval">10.0 N/m</span></div>
+        <div class="ctrl-group"><label>Massa m</label><input type="range" id="springM" min="0.2" max="5.0" step="0.1" value="1.0"><span class="val" id="springMval">1.0 kg</span></div>
+        <button class="btn accent" id="springReset">Reset</button>
+        <button class="btn" id="springPause">Pausa</button>
+      </div>
+    </div>
+  </div>
 
-<div class="sim-card">
-  <div class="sim-card-header">
-    <h3>Forzamento Armonico e Risonanza</h3>
-    <span class="badge">risonanza</span>
+  <!-- TAB 3 -->
+  <div class="tab-panel" id="tab-damp">
+    <p class="tab-desc">La forza viscosa F<sub>d</sub> = −bẋ dissipa energia. Al variare di b si attraversano i tre regimi: <em>sottosmorzato</em>, <em>criticamente smorzato</em> e <em>sovrasmorzato</em>. La simulazione si ferma automaticamente quando il sistema raggiunge l'equilibrio.</p>
+    <div class="sim-card">
+      <div class="sim-card-header"><h3>Oscillatore Smorzato</h3><span class="badge">3 regimi</span></div>
+      <div class="sim-body">
+        <div class="canvas-wrap">
+          <canvas id="dampCanvas" width="340" height="310"></canvas>
+        </div>
+        <div class="plot-wrap">
+          <div class="plot-label">x(t) — smorzamento nel tempo</div>
+          <canvas id="dampPlot" width="390" height="132"></canvas>
+          <div class="plot-label" style="margin-top:.3rem">Energia totale E(t)</div>
+          <canvas id="dampEnergy" width="390" height="114"></canvas>
+          <div class="regime-badge"><span class="regime-dot" id="dampDot" style="background:var(--accent2)"></span><span id="dampRegimeText">Regime: —</span></div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group"><label>Costante k</label><input type="range" id="dampK" min="1" max="50" step="0.5" value="10"><span class="val" id="dampKval">10.0 N/m</span></div>
+        <div class="ctrl-group"><label>Massa m</label><input type="range" id="dampM" min="0.2" max="5.0" step="0.1" value="1.0"><span class="val" id="dampMval">1.0 kg</span></div>
+        <div class="ctrl-group"><label>Smorzamento b</label><input type="range" id="dampB" min="0.0" max="14" step="0.05" value="0.5"><span class="val" id="dampBval">0.50 kg/s</span></div>
+        <button class="btn accent" id="dampReset">Reset</button>
+        <button class="btn" id="dampPause">Pausa</button>
+      </div>
+    </div>
   </div>
-  <div class="sim-body">
-    <div class="canvas-wrap">
-      <canvas id="forceCanvas" width="340" height="280"></canvas>
-    </div>
-    <div class="plot-wrap">
-      <div class="plot-label">x(t) — risposta del sistema</div>
-      <canvas id="forcePlot" width="380" height="130"></canvas>
-      <div class="plot-label" style="margin-top:0.4rem">Ampiezza stazionaria A(ω) — curva di risonanza</div>
-      <canvas id="resonancePlot" width="380" height="115"></canvas>
-    </div>
-  </div>
-  <div class="controls">
-    <div class="ctrl-group">
-      <label>ω₀ (freq. naturale)</label>
-      <input type="range" id="forceOmega0" min="0.5" max="6" step="0.05" value="3.16">
-      <span class="val" id="forceOmega0val">ω₀ = 3.16 rad/s</span>
-    </div>
-    <div class="ctrl-group">
-      <label>ω (forzamento)</label>
-      <input type="range" id="forceOmega" min="0.2" max="8" step="0.05" value="1.0">
-      <span class="val" id="forceOmegaval">ω = 1.00 rad/s</span>
-    </div>
-    <div class="ctrl-group">
-      <label>F₀ (ampiezza forza)</label>
-      <input type="range" id="forceF0" min="0.1" max="5" step="0.1" value="1.0">
-      <span class="val" id="forceF0val">1.0 N</span>
-    </div>
-    <div class="ctrl-group">
-      <label>Smorzamento γ</label>
-      <input type="range" id="forceGamma" min="0.05" max="4" step="0.05" value="0.4">
-      <span class="val" id="forceGammaval">γ = 0.40 s⁻¹</span>
-    </div>
-    <button class="btn accent" id="forceReset">Reset</button>
-    <button class="btn" id="forcePause">Pausa</button>
-  </div>
-</div>
 
-<!-- ════════════════════════════════════════════
-     SEZIONE TEORICA
-═════════════════════════════════════════════ -->
+  <!-- TAB 4 -->
+  <div class="tab-panel" id="tab-forced">
+    <p class="tab-desc">Una forza F = F₀ cos(ωt) agisce sul sistema smorzato. Avvicina ω a ω₀ per osservare la crescita dell'ampiezza. Il grafico in basso mostra la curva di risposta A(ω) con il punto corrente.</p>
+    <div class="sim-card">
+      <div class="sim-card-header"><h3>Oscillatore Forzato — Risonanza</h3><span class="badge green">risonanza</span></div>
+      <div class="sim-body">
+        <div class="canvas-wrap">
+          <canvas id="forceCanvas" width="340" height="310"></canvas>
+        </div>
+        <div class="plot-wrap">
+          <div class="plot-label">x(t) — risposta (transitorio → stazionario)</div>
+          <canvas id="forcePlot" width="390" height="132"></canvas>
+          <div class="plot-label" style="margin-top:.3rem">Curva di risonanza A(ω)</div>
+          <canvas id="resonancePlot" width="390" height="124"></canvas>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group"><label>ω₀ (freq. naturale)</label><input type="range" id="forceOmega0" min="0.5" max="6" step="0.05" value="3.16"><span class="val" id="forceOmega0val">ω₀ = 3.16 rad/s</span></div>
+        <div class="ctrl-group"><label>ω (forzamento)</label><input type="range" id="forceOmega" min="0.2" max="8" step="0.05" value="1.0"><span class="val" id="forceOmegaval">ω = 1.00 rad/s</span></div>
+        <div class="ctrl-group"><label>F₀ (ampiezza forza)</label><input type="range" id="forceF0" min="0.1" max="5" step="0.1" value="1.0"><span class="val" id="forceF0val">1.0 N</span></div>
+        <div class="ctrl-group"><label>Smorzamento γ</label><input type="range" id="forceGamma" min="0.05" max="4" step="0.05" value="0.4"><span class="val" id="forceGammaval">γ = 0.40 s⁻¹</span></div>
+        <button class="btn accent" id="forceReset">Reset</button>
+        <button class="btn" id="forcePause">Pausa</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /tabs-wrapper -->
+
+<!-- TEORIA -->
 <div class="theory-section">
   <h2>Fondamenti Teorici</h2>
-
   <div class="theory-block">
     <h3>1. L'Oscillatore Armonico Semplice</h3>
-    <p>Un sistema meccanico si comporta da oscillatore armonico ogni volta che la forza di richiamo è proporzionale allo spostamento dalla posizione di equilibrio e diretta verso di essa. Questa è la <em>legge di Hooke</em> nella sua forma più generale: $F = -kx$. Applicando la seconda legge di Newton si ottiene l'equazione del moto fondamentale:</p>
-    <div class="eq-box">
-      <div class="eq-label">Equazione del moto — oscillatore libero</div>
-      $$m\ddot{x} + kx = 0 \qquad \Longleftrightarrow \qquad \ddot{x} + \omega_0^2\, x = 0$$
-    </div>
-    <p>dove la <strong>pulsazione propria</strong> (o frequenza angolare naturale) vale $\omega_0 = \sqrt{k/m}$. La soluzione generale è una combinazione lineare di seno e coseno:</p>
-    <div class="eq-box">
-      $$x(t) = A\cos(\omega_0 t) + B\sin(\omega_0 t) = C\cos(\omega_0 t + \phi)$$
-    </div>
-    <p>dove le costanti $C$ (ampiezza) e $\phi$ (fase iniziale) sono determinate completamente dalle condizioni iniziali $x(0) = x_0$ e $\dot{x}(0) = v_0$. Si ha $C = \sqrt{x_0^2 + (v_0/\omega_0)^2}$. Il periodo di oscillazione è $T = 2\pi/\omega_0 = 2\pi\sqrt{m/k}$ e non dipende dall'ampiezza: questa è la proprietà di <em>isocronia</em>, scoperta da Galileo per il pendolo.</p>
-    <p>L'energia totale del sistema è costante nel tempo: $E = \tfrac{1}{2}m\dot{x}^2 + \tfrac{1}{2}kx^2 = \tfrac{1}{2}kC^2$. L'energia oscilla tra la forma cinetica (massima al centro) e la forma potenziale elastica (massima agli estremi), ma la loro somma rimane invariata.</p>
-    <div class="eq-box">
-      <div class="eq-label">Conservazione dell'energia</div>
-      $$E = \underbrace{\tfrac{1}{2}m\dot{x}^2}_{E_k} + \underbrace{\tfrac{1}{2}kx^2}_{E_p} = \text{cost}$$
-    </div>
+    <p>Un sistema meccanico si comporta da oscillatore armonico ogni volta che la forza di richiamo è proporzionale allo spostamento dalla posizione di equilibrio e diretta verso di essa. Questa è la <em>legge di Hooke</em>: $F = -kx$. Applicando la seconda legge di Newton si ottiene l'equazione del moto:</p>
+    <div class="eq-box"><div class="eq-label">Equazione del moto — oscillatore libero</div>$$m\ddot{x} + kx = 0 \qquad \Longleftrightarrow \qquad \ddot{x} + \omega_0^2\, x = 0$$</div>
+    <p>dove la <strong>pulsazione propria</strong> vale $\omega_0 = \sqrt{k/m}$. La soluzione è $x(t) = C\cos(\omega_0 t + \phi)$, con $C = \sqrt{x_0^2 + (v_0/\omega_0)^2}$. Il periodo $T = 2\pi/\omega_0$ non dipende dall'ampiezza: questa è la proprietà di <em>isocronia</em>. L'energia totale è conservata: $E = \tfrac{1}{2}m\dot{x}^2 + \tfrac{1}{2}kx^2 = \tfrac{1}{2}kC^2 = \text{cost}$.</p>
   </div>
-
   <div class="two-col-theory">
     <div class="theory-block">
       <h3>2. Il Pendolo Semplice</h3>
-      <p>Per un pendolo di lunghezza $L$ e massa $m$, la componente tangenziale della forza peso fornisce il momento di richiamo. L'equazione esatta del moto è:</p>
-      <div class="eq-box">
-        $$\ddot{\theta} + \frac{g}{L}\sin\theta = 0$$
-      </div>
-      <p>Per piccoli angoli ($\theta \ll 1$ rad, ovvero $\theta \lesssim 15°$) si usa l'approssimazione $\sin\theta \approx \theta$, ricadendo nell'oscillatore armonico con $\omega_0 = \sqrt{g/L}$. Il periodo diventa:</p>
-      <div class="eq-box">
-        $$T = 2\pi\sqrt{\frac{L}{g}}$$
-      </div>
-      <p>La simulazione al punto 01 usa l'equazione esatta (integrazione numerica con Runge-Kutta del quarto ordine), pertanto per grandi angoli si nota il periodo leggermente maggiore rispetto a quello delle piccole oscillazioni.</p>
+      <p>L'equazione esatta del moto per un pendolo di lunghezza $L$ è $\ddot{\theta} + (g/L)\sin\theta = 0$. Per piccoli angoli ($\theta\lesssim15°$), $\sin\theta\approx\theta$ e si ottiene $\omega_0=\sqrt{g/L}$, con periodo:</p>
+      <div class="eq-box">$$T = 2\pi\sqrt{\dfrac{L}{g}}$$</div>
+      <p>La simulazione usa l'equazione esatta (RK4): per angoli grandi il periodo effettivo supera il valore armonico. La massa non compare nel periodo.</p>
     </div>
     <div class="theory-block">
       <h3>3. Spazio delle Fasi</h3>
-      <p>Lo stato del sistema in ogni istante è completamente descritto dalla coppia $(x, \dot{x})$. Nel <strong>piano delle fasi</strong> le traiettorie di un oscillatore libero sono ellissi centrate nell'origine, parametrizzate dall'energia totale:</p>
-      <div class="eq-box">
-        $$\frac{x^2}{C^2} + \frac{\dot{x}^2}{\omega_0^2 C^2} = 1$$
-      </div>
-      <p>Sistemi con più energia descrivono ellissi più grandi. Aggiungendo smorzamento le traiettorie diventano spirali convergenti verso l'origine. In presenza di forzamento stazionario la traiettoria converge verso un attrattore ellittico la cui dimensione dipende dall'ampiezza della risposta.</p>
+      <p>Lo stato del sistema è descritto dalla coppia $(x,\dot{x})$. Nel <strong>piano delle fasi</strong> le traiettorie di un oscillatore libero sono ellissi: $x^2/C^2 + \dot{x}^2/(\omega_0^2C^2)=1$. Sistemi con più energia descrivono ellissi più grandi. Lo smorzamento trasforma le ellissi in spirali convergenti verso l'origine.</p>
     </div>
   </div>
-
   <div class="theory-block">
     <h3>4. L'Oscillatore Armonico Smorzato</h3>
-    <p>Nella realtà ogni oscillatore è soggetto a forze dissipative. La forma più semplice di dissipazione è l'attrito <em>viscoso</em>, con forza proporzionale alla velocità: $F_d = -b\dot{x}$. L'equazione del moto diventa:</p>
-    <div class="eq-box">
-      <div class="eq-label">Equazione del moto — oscillatore smorzato</div>
-      $$m\ddot{x} + b\dot{x} + kx = 0 \qquad \Longleftrightarrow \qquad \ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = 0$$
-    </div>
-    <p>dove si introduce il <strong>coefficiente di smorzamento</strong> $\gamma = b/(2m)$. Il comportamento del sistema dipende interamente dal confronto tra $\gamma$ e $\omega_0$, distinto in tre <strong>regimi</strong>:</p>
-    <p><strong>Sottosmorzato</strong> ($\gamma < \omega_0$): il sistema oscilla con ampiezza decrescente esponenzialmente. La pulsazione delle oscillazioni è $\omega_1 = \sqrt{\omega_0^2 - \gamma^2} < \omega_0$. La soluzione è $x(t) = Ce^{-\gamma t}\cos(\omega_1 t + \phi)$. L'energia decade come $E(t) \propto e^{-2\gamma t}$.</p>
-    <p><strong>Criticamente smorzato</strong> ($\gamma = \omega_0$): il sistema ritorna all'equilibrio nel minor tempo possibile senza oscillare. È il comportamento ottimale per molti sistemi ingegneristici (ammortizzatori, porte a chiusura automatica). La soluzione è $x(t) = (A + Bt)e^{-\gamma t}$.</p>
-    <p><strong>Sovrasmorzato</strong> ($\gamma > \omega_0$): il sistema torna all'equilibrio più lentamente del caso critico, ancora senza oscillare. La soluzione è somma di due esponenziali con costanti di tempo diverse.</p>
-    <div class="eq-box">
-      <div class="eq-label">Tre regimi in sintesi</div>
-      $$\Delta = \gamma^2 - \omega_0^2 \quad\begin{cases} < 0 & \text{sottosmorzato} \\ = 0 & \text{critico} \\ > 0 & \text{sovrasmorzato} \end{cases}$$
-    </div>
+    <p>La forza viscosa $F_d=-b\dot{x}$ porta a $\ddot{x}+2\gamma\dot{x}+\omega_0^2x=0$, con $\gamma=b/(2m)$. I tre regimi dipendono dal segno di $\Delta=\gamma^2-\omega_0^2$:</p>
+    <p><strong>Sottosmorzato</strong> ($\Delta<0$): oscillazioni con inviluppo $e^{-\gamma t}$, pulsazione $\omega_1=\sqrt{\omega_0^2-\gamma^2}$. <strong>Criticamente smorzato</strong> ($\Delta=0$): ritorno più rapido senza oscillare. <strong>Sovrasmorzato</strong> ($\Delta>0$): ritorno più lento, senza oscillazioni.</p>
   </div>
-
   <div class="theory-block">
     <h3>5. L'Oscillatore Forzato e la Risonanza</h3>
-    <p>Se al sistema smorzato si applica una forza esterna armonica $F(t) = F_0\cos(\omega t)$, l'equazione del moto diventa:</p>
-    <div class="eq-box">
-      <div class="eq-label">Equazione del moto — oscillatore forzato</div>
-      $$\ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = \frac{F_0}{m}\cos(\omega t)$$
-    </div>
-    <p>La soluzione generale è la somma del <em>transitorio</em> (soluzione omogenea, si esaurisce per $t \to \infty$ a causa dello smorzamento) e del <em>regime stazionario</em>. In regime stazionario il sistema oscilla esattamente alla frequenza del forzamento $\omega$, con ampiezza:</p>
-    <div class="eq-box">
-      <div class="eq-label">Ampiezza stazionaria</div>
-      $$A(\omega) = \frac{F_0/m}{\sqrt{(\omega_0^2 - \omega^2)^2 + 4\gamma^2\omega^2}}$$
-    </div>
-    <p>L'ampiezza è massima alla <strong>frequenza di risonanza</strong> $\omega_r = \sqrt{\omega_0^2 - 2\gamma^2}$ (leggermente inferiore a $\omega_0$ per smorzamento finito). Per piccolo smorzamento il picco di risonanza diventa molto pronunciato: $A_\text{max} \approx F_0/(2m\gamma\omega_0)$. La quantità adimensionale $Q = \omega_0/(2\gamma)$ è il <strong>fattore di qualità</strong> (o <em>Q-factor</em>): misura quanto è stretto e alto il picco di risonanza. Un valore alto di $Q$ indica un oscillatore con poca dissipazione.</p>
-    <p>La risonanza è un fenomeno centrale nella fisica: dalla meccanica quantistica (livelli energetici atomici) all'ingegneria civile (frequenze proprie degli edifici), dai circuiti LC (Induttore-Condensatore) alle cavità laser. Il crollo del ponte di Tacoma Narrows nel 1940 è uno degli esempi storici più noti di risonanza meccanica fuori controllo.</p>
-    <div class="eq-box">
-      <div class="eq-label">Fase e fattore di qualità</div>
-      $$\tan\phi = \frac{2\gamma\omega}{\omega_0^2 - \omega^2} \qquad Q = \frac{\omega_0}{2\gamma} = \frac{1}{2}\sqrt{\frac{m\,k}{\gamma^2}}$$
-    </div>
+    <p>Con forza esterna $F(t)=F_0\cos(\omega t)$, in regime stazionario l'ampiezza è:</p>
+    <div class="eq-box"><div class="eq-label">Ampiezza stazionaria</div>$$A(\omega) = \frac{F_0/m}{\sqrt{(\omega_0^2-\omega^2)^2+4\gamma^2\omega^2}}$$</div>
+    <p>Il massimo si raggiunge alla <strong>frequenza di risonanza</strong> $\omega_r=\sqrt{\omega_0^2-2\gamma^2}$. Il <strong>fattore di qualità</strong> (Q-factor) $Q=\omega_0/(2\gamma)$ misura la selettività del picco. Per piccolo smorzamento $A_\text{max}\approx QF_0/(m\omega_0^2)$.</p>
   </div>
-
-</div><!-- /theory-section -->
+</div>
 
 </main>
 
 <script>
-// ╔══════════════════════════════════════════════════════════╗
-//   UTILITÀ COMUNI
-// ╚══════════════════════════════════════════════════════════╝
-const INK        = '#1a1410';
-const INK_LIGHT  = '#6a5a50';
-const CREAM      = '#f5f0e8';
-const PARCHMENT  = '#ede6d4';
-const ACCENT     = '#8b3a2a';
-const ACCENT2    = '#2a5a8b';
-const ACCENT3    = '#2a7a4a';
-const WARM_MID   = '#d4c9b0';
-const BORDER     = '#c4b89a';
+/* ══════════════════════════════════════════════
+   TAB SYSTEM
+══════════════════════════════════════════════ */
+const tabCallbacks={};
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if(tabCallbacks[btn.dataset.tab]) tabCallbacks[btn.dataset.tab]();
+  });
+});
 
-function clearCanvas(ctx, w, h, bg = PARCHMENT) {
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
+/* ══════════════════════════════════════════════
+   COSTANTI COLORI
+══════════════════════════════════════════════ */
+const INK='#1a1410',INK_LIGHT='#6a5a50',ACCENT='#8b3a2a',ACCENT2='#2a5a8b',ACCENT3='#2a7a4a',WARM_MID='#d4c9b0',BORDER='#c4b89a';
+
+/* ══════════════════════════════════════════════
+   BUFFER CIRCOLARE
+══════════════════════════════════════════════ */
+class CB{
+  constructor(n){this.b=new Float32Array(n);this.n=n;this.h=0;this.c=0;}
+  push(v){this.b[this.h]=v;this.h=(this.h+1)%this.n;if(this.c<this.n)this.c++;}
+  get(i){return this.b[(this.h-this.c+i+this.n*2)%this.n];}
+  clear(){this.h=0;this.c=0;this.b.fill(0);}
 }
 
-// Plot circolare buffer
-class CircularBuffer {
-  constructor(n) { this.buf = new Float32Array(n); this.n = n; this.head = 0; this.count = 0; }
-  push(v) { this.buf[this.head] = v; this.head = (this.head + 1) % this.n; if (this.count < this.n) this.count++; }
-  get(i) { return this.buf[(this.head - this.count + i + this.n * 2) % this.n]; }
-  clear() { this.head = 0; this.count = 0; this.buf.fill(0); }
+/* ══════════════════════════════════════════════
+   FORMATTAZIONE NUMERI ASSE
+══════════════════════════════════════════════ */
+function fmtN(v,d){
+  if(Math.abs(v)<1e-9) return '0';
+  const a=Math.abs(v);
+  if(a>=100) return v.toFixed(0);
+  if(a>=10)  return v.toFixed(1);
+  return v.toFixed(d!=null?d:2);
 }
 
-function drawPlot(ctx, w, h, bufs, colors, yMin, yMax, label, yZero = true) {
-  ctx.fillStyle = '#faf7f2';
-  ctx.fillRect(0, 0, w, h);
-  ctx.strokeStyle = BORDER;
-  ctx.lineWidth = 0.5;
-  ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
+/* ══════════════════════════════════════════════
+   DRAW PLOT — con assi etichettati
+   opts: { yMin, yMax, yUnit, xDuration, xUnit, decimalsY, zero, legend }
+══════════════════════════════════════════════ */
+function drawPlot(ctx,w,h,bufs,colors,opts){
+  const yMin=opts.yMin, yMax=opts.yMax;
+  const zero = opts.zero!==false;
+  const xDur = opts.xDuration||null;
+  const yUnit= opts.yUnit||'';
+  const xUnit= opts.xUnit||'s';
+  const dY   = opts.decimalsY!=null?opts.decimalsY:2;
+  const legend=opts.legend||null; // [{label,color}]
 
-  const pad = { l: 6, r: 6, t: 8, b: 8 };
-  const pw = w - pad.l - pad.r;
-  const ph = h - pad.t - pad.b;
+  const p={l:40, r:6, t:10, b: xDur?20:8};
+  const pw=w-p.l-p.r, ph=h-p.t-p.b;
+  const rng=yMax-yMin;
 
-  if (yZero) {
-    const yz = pad.t + ph * (1 - (0 - yMin) / (yMax - yMin));
-    ctx.strokeStyle = BORDER;
-    ctx.lineWidth = 0.8;
-    ctx.setLineDash([4, 3]);
-    ctx.beginPath(); ctx.moveTo(pad.l, yz); ctx.lineTo(w - pad.r, yz); ctx.stroke();
+  ctx.fillStyle='#faf7f2'; ctx.fillRect(0,0,w,h);
+
+  // Asse Y
+  ctx.strokeStyle=BORDER; ctx.lineWidth=.9;
+  ctx.beginPath(); ctx.moveTo(p.l,p.t); ctx.lineTo(p.l,p.t+ph); ctx.stroke();
+  // Asse X
+  ctx.beginPath(); ctx.moveTo(p.l,p.t+ph); ctx.lineTo(p.l+pw,p.t+ph); ctx.stroke();
+
+  // Tick e griglia Y: max, mid (se non è zero), 0 (se nel range), min
+  const makeYTicks=()=>{
+    const ticks=new Set();
+    ticks.add(yMax); ticks.add(yMin);
+    const hasZero = yMin<-1e-9 && yMax>1e-9;
+    if(hasZero) ticks.add(0);
+    // Mid tick solo per grafici asimmetrici (es. energia 0..E), mai per grafici simmetrici ±A
+    const isSymmetric = Math.abs(yMax+yMin) < (yMax-yMin)*0.05;
+    if(!isSymmetric){
+      const mid=(yMax+yMin)/2;
+      // Non aggiungere mid se troppo vicino a un tick già presente
+      const farEnough = [...ticks].every(t=>Math.abs(t-mid)>(yMax-yMin)*0.12);
+      if(farEnough) ticks.add(mid);
+    }
+    return [...ticks].filter(v=>v>=yMin-1e-9&&v<=yMax+1e-9);
+  };
+
+  ctx.font='8px "IBM Plex Mono"';
+  makeYTicks().forEach(val=>{
+    const yp=p.t+ph*(1-(val-yMin)/rng);
+    // griglia
+    ctx.strokeStyle=BORDER; ctx.lineWidth=.4; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(p.l,yp); ctx.lineTo(p.l+pw,yp); ctx.stroke();
+    ctx.setLineDash([]);
+    // tick mark
+    ctx.strokeStyle=INK_LIGHT; ctx.lineWidth=.8;
+    ctx.beginPath(); ctx.moveTo(p.l-3,yp); ctx.lineTo(p.l,yp); ctx.stroke();
+    // etichetta
+    let lbl=fmtN(val,dY);
+    if(val===yMax && yUnit) lbl+=yUnit;
+    ctx.fillStyle=INK_LIGHT; ctx.textAlign='right';
+    ctx.fillText(lbl, p.l-5, yp+3);
+  });
+
+  // Linea zero marcata
+  if(zero && yMin<-1e-9 && yMax>1e-9){
+    const yz=p.t+ph*(1-(0-yMin)/rng);
+    ctx.strokeStyle='rgba(100,90,80,0.35)'; ctx.lineWidth=1; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(p.l,yz); ctx.lineTo(p.l+pw,yz); ctx.stroke();
     ctx.setLineDash([]);
   }
 
-  for (let bi = 0; bi < bufs.length; bi++) {
-    const buf = bufs[bi];
-    const n = buf.count;
-    if (n < 2) continue;
-    ctx.strokeStyle = colors[bi];
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for (let i = 0; i < n; i++) {
-      const x = pad.l + (i / (buf.n - 1)) * pw;
-      const v = Math.max(yMin, Math.min(yMax, buf.get(i)));
-      const y = pad.t + ph * (1 - (v - yMin) / (yMax - yMin));
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  // Tick e label X (tempo)
+  if(xDur&&xDur>0){
+    const nX=4;
+    ctx.font='8px "IBM Plex Mono"'; ctx.fillStyle=INK_LIGHT;
+    for(let i=0;i<=nX;i++){
+      const frac=i/nX, xp=p.l+frac*pw, tv=xDur*frac;
+      ctx.strokeStyle=INK_LIGHT; ctx.lineWidth=.8;
+      ctx.beginPath(); ctx.moveTo(xp,p.t+ph); ctx.lineTo(xp,p.t+ph+3); ctx.stroke();
+      ctx.textAlign='center';
+      const lbl=i===nX? fmtN(tv,1)+' '+xUnit : fmtN(tv,1);
+      ctx.fillText(lbl, xp, p.t+ph+12);
+    }
+    ctx.textAlign='left';
+  }
+
+  // Legenda
+  if(legend){
+    ctx.font='9px "IBM Plex Mono"';
+    legend.forEach((l,i)=>{ctx.fillStyle=l.color; ctx.fillText(l.label, p.l+6+i*36, p.t+10);});
+  }
+
+  // Curve
+  bufs.forEach((buf,bi)=>{
+    if(buf.c<2) return;
+    ctx.strokeStyle=colors[bi]; ctx.lineWidth=1.5; ctx.beginPath();
+    for(let i=0;i<buf.c;i++){
+      const x=p.l+(i/(buf.n-1))*pw;
+      const y=p.t+ph*(1-(Math.max(yMin,Math.min(yMax,buf.get(i)))-yMin)/rng);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     }
     ctx.stroke();
-  }
+  });
+  ctx.textAlign='left';
 }
 
-// ╔══════════════════════════════════════════════════════════╗
-//   1. PENDOLO SEMPLICE
-// ╚══════════════════════════════════════════════════════════╝
-(function() {
-  const cnv  = document.getElementById('pendCanvas');
-  const pCnv = document.getElementById('pendPlot');
-  const eCnv = document.getElementById('pendEnergy');
-  const ctx  = cnv.getContext('2d');
-  const pCtx = pCnv.getContext('2d');
-  const eCtx = eCnv.getContext('2d');
+function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
+  const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy);
+  if(l<2)return;
+  ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const a=Math.atan2(dy,dx),hs=Math.min(9,l*.4);
+  ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hs*Math.cos(a-.4),y2-hs*Math.sin(a-.4));
+  ctx.lineTo(x2-hs*Math.cos(a+.4),y2-hs*Math.sin(a+.4));
+  ctx.closePath();ctx.fill();
+}
 
-  const W = cnv.width, H = cnv.height;
-  const PW = pCnv.width, PH = pCnv.height;
-  const EW = eCnv.width, EH = eCnv.height;
+/* ══════════════════════════════════════════════
+   1. PENDOLO — scala Y fissa su ampiezza iniziale
+══════════════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('pendCanvas'),pc=document.getElementById('pendPlot'),ec=document.getElementById('pendEnergy');
+  const ctx=c.getContext('2d'),pCtx=pc.getContext('2d'),eCtx=ec.getContext('2d');
+  const W=c.width,H=c.height,PW=pc.width,PH=pc.height,EW=ec.width,EH=ec.height;
+  let L=1,m=1,g=9.8,th=0.5,om=0,paused=false,drag=false,simT=0;
+  let tScale=0.6,eScale=1;
+  const DT=1/120, BUF_N=600;
+  const xDuration = BUF_N*DT; // secondi visualizzati
 
-  let L = 1.0, m = 1.0, g = 9.8;
-  let theta = 0.5, omega = 0.0;
-  let paused = false;
-  let dragging = false;
-  let t = 0;
+  const tBuf=new CB(BUF_N),ekBuf=new CB(BUF_N),epBuf=new CB(BUF_N),etBuf=new CB(BUF_N);
+  const piv={x:W/2,y:48};const PPM=100;
 
-  const thetaBuf = new CircularBuffer(600);
-  const ekBuf    = new CircularBuffer(600);
-  const epBuf    = new CircularBuffer(600);
-  const etBuf    = new CircularBuffer(600);
+  // tScale sempre simmetrico: l'ampiezza angolare è |θ₀| (conservata per oscillatore libero)
+  // eScale: energia totale conservata = solo potenziale se v₀=0, altrimenti somma
+  function setScales(){
+    const thAmp=Math.sqrt(th*th+(om===0?0:0)); // se rilasciato da fermo, ampiezza = |θ₀|
+    tScale=Math.max(.06,Math.abs(th)); // |θ₀|, usato come ±tScale → grafico simmetrico
+    const Ek0=.5*m*(om*L)*(om*L), Ep0=m*g*L*(1-Math.cos(th));
+    eScale=Math.max(.01,Ek0+Ep0);
+  }
+  function info(){const w0=Math.sqrt(g/L),T=2*Math.PI/w0;document.getElementById('pendInfo').textContent=`ω₀ = ${w0.toFixed(3)} rad/s  |  T = ${T.toFixed(3)} s  |  θ₀ = ${(th*180/Math.PI).toFixed(1)}°`;}
+  function reset(){th=0.5;om=0;simT=0;tBuf.clear();ekBuf.clear();epBuf.clear();etBuf.clear();setScales();info();}
 
-  function reset() {
-    theta = 0.5; omega = 0; t = 0;
-    thetaBuf.clear(); ekBuf.clear(); epBuf.clear(); etBuf.clear();
-    updateInfo();
+  function rk4(a,b,dt){
+    const f1=[b,-(g/L)*Math.sin(a)];
+    const f2=[b+f1[1]*dt/2,-(g/L)*Math.sin(a+f1[0]*dt/2)];
+    const f3=[b+f2[1]*dt/2,-(g/L)*Math.sin(a+f2[0]*dt/2)];
+    const f4=[b+f3[1]*dt,-(g/L)*Math.sin(a+f3[0]*dt)];
+    return[a+dt/6*(f1[0]+2*f2[0]+2*f3[0]+f4[0]),b+dt/6*(f1[1]+2*f2[1]+2*f3[1]+f4[1])];
+  }
+  function mpx(){return{x:piv.x+L*PPM*Math.sin(th),y:piv.y+L*PPM*Math.cos(th)};}
+
+  function draw(){
+    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=INK;ctx.fillRect(piv.x-36,28,72,10);ctx.fillRect(piv.x-1,28,2,20);
+    const len=L*PPM;
+    ctx.save();ctx.globalAlpha=.13;ctx.strokeStyle=ACCENT2;ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(piv.x,piv.y,len,Math.PI/2-1.45,Math.PI/2+1.45);ctx.stroke();ctx.restore();
+    const pos=mpx();
+    ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(piv.x,piv.y);ctx.lineTo(pos.x,pos.y);ctx.stroke();
+    const r=13+m*2;
+    const gr=ctx.createRadialGradient(pos.x-3,pos.y-3,1,pos.x,pos.y,r);
+    gr.addColorStop(0,'#c8956a');gr.addColorStop(1,ACCENT);
+    ctx.beginPath();ctx.arc(pos.x,pos.y,r,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+    ctx.strokeStyle='#6a2a1a';ctx.lineWidth=1;ctx.stroke();
+    const vt=om*L*PPM;
+    arrow(ctx,pos.x,pos.y,pos.x+vt*.45*Math.cos(th),pos.y-vt*.45*Math.sin(th),ACCENT2,1.5);
+    ctx.beginPath();ctx.arc(piv.x,piv.y,4,0,Math.PI*2);ctx.fillStyle=INK;ctx.fill();
+    ctx.fillStyle=INK_LIGHT;ctx.font='11px "IBM Plex Mono"';
+    ctx.fillText(`θ = ${(th*180/Math.PI).toFixed(2)}°`,10,H-30);
+    ctx.fillText(`ω = ${om.toFixed(3)} rad/s`,10,H-14);
   }
 
-  function updateInfo() {
-    const omega0 = Math.sqrt(g / L);
-    const T = 2 * Math.PI / omega0;
-    document.getElementById('pendInfo').textContent =
-      `Freq. propria ω₀ = ${omega0.toFixed(3)} rad/s  |  Periodo T = ${T.toFixed(3)} s  |  θ₀ = ${(theta * 180 / Math.PI).toFixed(1)}°`;
-  }
+  function startDrag(mx,my){const p=mpx();if(Math.hypot(mx-p.x,my-p.y)<28){drag=true;paused=true;}}
+  function moveDrag(mx,my){if(!drag)return;th=Math.atan2(mx-piv.x,my-piv.y);th=Math.max(-1.45,Math.min(1.45,th));om=0;simT=0;tBuf.clear();ekBuf.clear();epBuf.clear();etBuf.clear();setScales();info();draw();}
+  function endDrag(){if(drag){drag=false;paused=false;}}
+  c.addEventListener('mousedown',e=>{const r=c.getBoundingClientRect();startDrag(e.clientX-r.left,e.clientY-r.top);});
+  c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();moveDrag(e.clientX-r.left,e.clientY-r.top);});
+  c.addEventListener('mouseup',endDrag);c.addEventListener('mouseleave',endDrag);
+  c.addEventListener('touchstart',e=>{e.preventDefault();const r=c.getBoundingClientRect(),t0=e.touches[0];startDrag(t0.clientX-r.left,t0.clientY-r.top);},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();const r=c.getBoundingClientRect(),t0=e.touches[0];moveDrag(t0.clientX-r.left,t0.clientY-r.top);},{passive:false});
+  c.addEventListener('touchend',endDrag);
 
-  // RK4 per pendolo esatto
-  function rk4Step(th, om, dt) {
-    const f = (a, b) => [-b, -(g / L) * Math.sin(a)]; // d(th)/dt = -om?? no:
-    // dθ/dt = ω,  dω/dt = -(g/L)sinθ
-    const k1 = [om,          -(g/L)*Math.sin(th)];
-    const k2 = [om+k1[1]*dt/2, -(g/L)*Math.sin(th+k1[0]*dt/2)];
-    const k3 = [om+k2[1]*dt/2, -(g/L)*Math.sin(th+k2[0]*dt/2)];
-    const k4 = [om+k3[1]*dt,   -(g/L)*Math.sin(th+k3[0]*dt)];
-    return [
-      th + dt/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]),
-      om + dt/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
-    ];
-  }
+  ['pendL','pendM','pendG'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+    L=+document.getElementById('pendL').value;m=+document.getElementById('pendM').value;g=+document.getElementById('pendG').value;
+    document.getElementById('pendLval').textContent=L.toFixed(2)+' m';
+    document.getElementById('pendMval').textContent=m.toFixed(1)+' kg';
+    document.getElementById('pendGval').textContent=g.toFixed(2)+' m/s²';
+    reset();
+  }));
+  document.getElementById('pendReset').addEventListener('click',reset);
+  document.getElementById('pendPause').addEventListener('click',()=>{paused=!paused;document.getElementById('pendPause').textContent=paused?'Riprendi':'Pausa';});
 
-  const pivot = { x: W/2, y: 45 };
-  const pixPerMeter = 100;
-
-  function pendPos() {
-    const len = L * pixPerMeter;
-    return { x: pivot.x + len * Math.sin(theta), y: pivot.y + len * Math.cos(theta) };
-  }
-
-  function drawPendulum() {
-    clearCanvas(ctx, W, H, '#faf7f2');
-
-    // Soffitto
-    ctx.fillStyle = INK;
-    ctx.fillRect(pivot.x - 30, 30, 60, 10);
-    ctx.fillRect(pivot.x - 1, 30, 2, 15);
-
-    const pos = pendPos();
-    const len = L * pixPerMeter;
-
-    // Ombra
-    ctx.save();
-    ctx.globalAlpha = 0.12;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(pivot.x+2, pivot.y+2); ctx.lineTo(pos.x+2, pos.y+2); ctx.stroke();
-    ctx.restore();
-
-    // Filo
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(pivot.x, pivot.y); ctx.lineTo(pos.x, pos.y); ctx.stroke();
-
-    // Traiettoria arco
-    ctx.save();
-    ctx.globalAlpha = 0.15;
-    ctx.strokeStyle = ACCENT2;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(pivot.x, pivot.y, len, Math.PI/2 - 1.2, Math.PI/2 + 1.2);
-    ctx.stroke();
-    ctx.restore();
-
-    // Massa
-    const r = 14 + m * 2.5;
-    const grad = ctx.createRadialGradient(pos.x - 3, pos.y - 3, 1, pos.x, pos.y, r);
-    grad.addColorStop(0, '#c8956a');
-    grad.addColorStop(1, ACCENT);
-    ctx.beginPath(); ctx.arc(pos.x, pos.y, r, 0, Math.PI*2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-    ctx.strokeStyle = '#6a2a1a';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Vettore velocità
-    const vx = omega * L * pixPerMeter * Math.cos(theta);
-    const vy = -omega * L * pixPerMeter * Math.sin(theta);
-    const vscale = 0.5;
-    ctx.save();
-    ctx.globalAlpha = 0.75;
-    drawArrow(ctx, pos.x, pos.y, pos.x + vx*vscale, pos.y + vy*vscale, ACCENT2, 1.5);
-    ctx.restore();
-
-    // Pivot
-    ctx.beginPath(); ctx.arc(pivot.x, pivot.y, 4, 0, Math.PI*2);
-    ctx.fillStyle = INK; ctx.fill();
-
-    // Label angolo
-    ctx.save();
-    ctx.font = '12px "IBM Plex Mono"';
-    ctx.fillStyle = INK_LIGHT;
-    ctx.fillText(`θ = ${(theta*180/Math.PI).toFixed(1)}°`, 10, H-12);
-    ctx.fillText(`ω = ${omega.toFixed(3)} rad/s`, 10, H-28);
-    ctx.restore();
-  }
-
-  function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
-    const dx = x2-x1, dy = y2-y1, len = Math.sqrt(dx*dx+dy*dy);
-    if (len < 2) return;
-    ctx.strokeStyle = color; ctx.lineWidth = lw;
-    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-    const ang = Math.atan2(dy, dx);
-    const hs = Math.min(10, len * 0.4);
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(x2, y2);
-    ctx.lineTo(x2 - hs*Math.cos(ang-0.4), y2 - hs*Math.sin(ang-0.4));
-    ctx.lineTo(x2 - hs*Math.cos(ang+0.4), y2 - hs*Math.sin(ang+0.4));
-    ctx.closePath(); ctx.fill();
-  }
-
-  // Drag
-  cnv.addEventListener('mousedown', e => {
-    const r = cnv.getBoundingClientRect();
-    const mx = e.clientX - r.left, my = e.clientY - r.top;
-    const pos = pendPos();
-    const d = Math.hypot(mx - pos.x, my - pos.y);
-    if (d < 28) { dragging = true; paused = true; }
-  });
-  cnv.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const r = cnv.getBoundingClientRect();
-    const mx = e.clientX - r.left, my = e.clientY - r.top;
-    theta = Math.atan2(mx - pivot.x, my - pivot.y);
-    theta = Math.max(-Math.PI*0.9, Math.min(Math.PI*0.9, theta));
-    omega = 0;
-    thetaBuf.clear(); ekBuf.clear(); epBuf.clear(); etBuf.clear();
-    updateInfo();
-    drawPendulum();
-  });
-  cnv.addEventListener('mouseup', () => { if (dragging) { dragging = false; paused = false; } });
-  cnv.addEventListener('mouseleave', () => { if (dragging) { dragging = false; paused = false; } });
-  // Touch
-  cnv.addEventListener('touchstart', e => {
-    e.preventDefault();
-    const r = cnv.getBoundingClientRect();
-    const t0 = e.touches[0];
-    const mx = t0.clientX - r.left, my = t0.clientY - r.top;
-    const pos = pendPos();
-    if (Math.hypot(mx-pos.x, my-pos.y) < 30) { dragging = true; paused = true; }
-  }, { passive: false });
-  cnv.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    e.preventDefault();
-    const r = cnv.getBoundingClientRect();
-    const t0 = e.touches[0];
-    const mx = t0.clientX - r.left, my = t0.clientY - r.top;
-    theta = Math.atan2(mx - pivot.x, my - pivot.y);
-    theta = Math.max(-Math.PI*0.9, Math.min(Math.PI*0.9, theta));
-    omega = 0;
-    thetaBuf.clear(); ekBuf.clear(); epBuf.clear(); etBuf.clear();
-    updateInfo();
-    drawPendulum();
-  }, { passive: false });
-  cnv.addEventListener('touchend', () => { if (dragging) { dragging = false; paused = false; } });
-
-  // Sliders
-  function readSliders() {
-    L = parseFloat(document.getElementById('pendL').value);
-    m = parseFloat(document.getElementById('pendM').value);
-    g = parseFloat(document.getElementById('pendG').value);
-    document.getElementById('pendLval').textContent = L.toFixed(2) + ' m';
-    document.getElementById('pendMval').textContent = m.toFixed(1) + ' kg';
-    document.getElementById('pendGval').textContent = g.toFixed(2) + ' m/s²';
-    updateInfo();
-  }
-  ['pendL','pendM','pendG'].forEach(id => document.getElementById(id).addEventListener('input', () => { readSliders(); reset(); }));
-  document.getElementById('pendReset').addEventListener('click', reset);
-  document.getElementById('pendPause').addEventListener('click', () => {
-    paused = !paused;
-    document.getElementById('pendPause').textContent = paused ? 'Riprendi' : 'Pausa';
-  });
-
-  const DT = 1/120;
-  let last = null;
-  function loop(ts) {
-    if (!last) last = ts;
-    const elapsed = (ts - last) / 1000;
-    last = ts;
-
-    if (!paused && !dragging) {
-      const steps = Math.round(elapsed / DT);
-      for (let i = 0; i < Math.min(steps, 6); i++) {
-        [theta, omega] = rk4Step(theta, omega, DT);
-        t += DT;
+  let last=null;
+  function loop(ts){
+    if(!last)last=ts;const el=(ts-last)/1000;last=ts;
+    if(!paused&&!drag){
+      const s=Math.min(Math.round(el/DT),6);
+      for(let i=0;i<s;i++){
+        [th,om]=rk4(th,om,DT);simT+=DT;
+        const Ek=.5*m*(om*L)*(om*L),Ep=m*g*L*(1-Math.cos(th));
+        tBuf.push(th);ekBuf.push(Ek);epBuf.push(Ep);etBuf.push(Ek+Ep);
       }
-      // Energia
-      const Ek = 0.5 * m * Math.pow(omega * L, 2);
-      const h  = L * (1 - Math.cos(theta));
-      const Ep = m * g * h;
-      thetaBuf.push(theta);
-      ekBuf.push(Ek); epBuf.push(Ep); etBuf.push(Ek + Ep);
     }
-
-    drawPendulum();
-
-    // Plot θ(t)
-    const amp = Math.abs(theta) + 0.1;
-    drawPlot(pCtx, PW, PH, [thetaBuf], [ACCENT], -amp*1.2, amp*1.2, 'θ');
-
-    // Plot energia
-    const Etot = 0.5 * m * Math.pow(omega * L, 2) + m * g * L * (1 - Math.cos(theta));
-    const eMax = Math.max(0.05, Etot * 1.25);
-    drawPlot(eCtx, EW, EH, [ekBuf, epBuf, etBuf], [ACCENT2, ACCENT3, ACCENT], 0, eMax, 'E', false);
-
-    // Legenda energia
-    eCtx.font = '10px "IBM Plex Mono"';
-    const labels = ['Eₖ','Eₚ','Etot'];
-    const cols   = [ACCENT2, ACCENT3, ACCENT];
-    labels.forEach((lb, i) => {
-      eCtx.fillStyle = cols[i];
-      eCtx.fillText(lb, 10 + i * 38, 16);
-    });
-
+    draw();
+    drawPlot(pCtx,PW,PH,[tBuf],[ACCENT],{yMin:-tScale*1.15,yMax:tScale*1.15,yUnit:' rad',xDuration:xDuration,xUnit:'s',decimalsY:2});
+    drawPlot(eCtx,EW,EH,[ekBuf,epBuf,etBuf],[ACCENT2,ACCENT3,ACCENT],{yMin:0,yMax:eScale*1.15,yUnit:' J',xDuration:xDuration,xUnit:'s',zero:false,decimalsY:2,legend:[{label:'Eₖ',color:ACCENT2},{label:'Eₚ',color:ACCENT3},{label:'E',color:ACCENT}]});
     requestAnimationFrame(loop);
   }
-  updateInfo();
-  requestAnimationFrame(loop);
+  setScales();info();requestAnimationFrame(loop);
 })();
 
+/* ══════════════════════════════════════════════
+   2. MASSA–MOLLA VERTICALE
+══════════════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('springCanvas'),pc=document.getElementById('springPlot'),phc=document.getElementById('phasePlot');
+  const ctx=c.getContext('2d'),pCtx=pc.getContext('2d'),phCtx=phc.getContext('2d');
+  const W=c.width,H=c.height,PW=pc.width,PH=pc.height,PHW=phc.width,PHH=phc.height;
+  let k=10,m=1,x=0.8,v=0,paused=false,drag=false;
+  let xScale=0.9;
+  const DT=1/120, BUF_N=600;
+  const xDuration=BUF_N*DT;
+  const xBuf=new CB(BUF_N),phPts=[];
+  const CEIL=38,EQY=H/2+15,PPM=78,MR=22;
+  function mPY(){return EQY+x*PPM;}
+  function setScale(){xScale=Math.max(.05,Math.abs(x)*1.12);}
+  function reset(){x=0.8;v=0;xBuf.clear();phPts.length=0;setScale();}
 
-// ╔══════════════════════════════════════════════════════════╗
-//   2. MASSA–MOLLA + SPAZIO DELLE FASI
-// ╚══════════════════════════════════════════════════════════╝
-(function() {
-  const cnv   = document.getElementById('springCanvas');
-  const pCnv  = document.getElementById('springPlot');
-  const phCnv = document.getElementById('phasePlot');
-  const ctx   = cnv.getContext('2d');
-  const pCtx  = pCnv.getContext('2d');
-  const phCtx = phCnv.getContext('2d');
-
-  const W = cnv.width, H = cnv.height;
-  const PW = pCnv.width, PH = pCnv.height;
-  const PHW = phCnv.width, PHH = phCnv.height;
-
-  let k = 10, m = 1.0;
-  let x = 1.0, v = 0;
-  let paused = false;
-  let dragging = false;
-
-  const xBuf    = new CircularBuffer(600);
-  const phaseBuf = []; // array di {x,v}
-
-  function reset() {
-    x = 1.0; v = 0;
-    xBuf.clear(); phaseBuf.length = 0;
+  function coil(ctx,cx,y1,y2,coils,amp){
+    const len=y2-y1,seg=len/(coils*2+2);
+    ctx.beginPath();ctx.moveTo(cx,y1);ctx.lineTo(cx,y1+seg);
+    for(let i=0;i<coils*2;i++){const py=y1+seg+(i+.5)*seg,px=cx+(i%2===0?amp:-amp);ctx.lineTo(px,py);}
+    ctx.lineTo(cx,y2);ctx.stroke();
   }
 
-  const wallX = 20, restX = 220;
-  const massW = 40, massH = 36;
-  const springY = H/2 - 10;
-
-  function massXpx() {
-    return restX + x * 60;
+  function draw(){
+    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    const cx=W/2,mpy=mPY();
+    ctx.fillStyle=INK;ctx.fillRect(cx-42,CEIL-10,84,10);
+    ctx.strokeStyle=BORDER;ctx.lineWidth=1;
+    for(let i=-38;i<42;i+=12){ctx.beginPath();ctx.moveTo(cx+i,CEIL-10);ctx.lineTo(cx+i+8,CEIL);ctx.stroke();}
+    ctx.strokeStyle=ACCENT3;ctx.lineWidth=1;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(cx-60,EQY);ctx.lineTo(cx+60,EQY);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=ACCENT3;ctx.font='9px "IBM Plex Mono"';ctx.textAlign='right';ctx.fillText('x=0 (eq.)',cx-62,EQY+4);ctx.textAlign='left';
+    if(Math.abs(x)>.01)arrow(ctx,cx+48,EQY,cx+48,EQY+x*PPM,ACCENT,1.5);
+    ctx.strokeStyle=INK;ctx.lineWidth=1.5;coil(ctx,cx,CEIL,mpy-MR,8,13);
+    const gr=ctx.createRadialGradient(cx-5,mpy-5,2,cx,mpy,MR);
+    gr.addColorStop(0,'#c8956a');gr.addColorStop(1,ACCENT);
+    ctx.beginPath();ctx.arc(cx,mpy,MR,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+    ctx.strokeStyle='#6a2a1a';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='white';ctx.font='12px "IBM Plex Sans"';ctx.textAlign='center';ctx.fillText('m',cx,mpy+5);ctx.textAlign='left';
+    if(Math.abs(v)>.01)arrow(ctx,cx+MR+5,mpy,cx+MR+5,mpy+v*PPM*.5,ACCENT2,1.5);
+    ctx.fillStyle=INK_LIGHT;ctx.font='10px "IBM Plex Mono"';
+    ctx.fillText(`x = ${x.toFixed(3)} m`,10,H-28);ctx.fillText(`v = ${v.toFixed(3)} m/s`,10,H-12);
+    const w0=Math.sqrt(k/m);ctx.fillText(`ω₀=${w0.toFixed(2)} rad/s  T=${(2*Math.PI/w0).toFixed(2)} s`,10,18);
   }
 
-  function drawSpring(ctx, x1, x2, y, coils = 10, amp = 8) {
-    const len = x2 - x1;
-    const seg = len / (coils * 2 + 2);
-    ctx.beginPath();
-    ctx.moveTo(x1, y);
-    ctx.lineTo(x1 + seg, y);
-    for (let i = 0; i < coils * 2; i++) {
-      const px = x1 + seg + (i + 0.5) * seg;
-      const py = y + (i % 2 === 0 ? -amp : amp);
-      ctx.lineTo(px, py);
+  function startDrag(mx,my){const mpy=mPY(),cx=W/2;if(Math.hypot(mx-cx,my-mpy)<MR+8){drag=true;paused=true;}}
+  function moveDrag(mx,my){if(!drag)return;x=(my-EQY)/PPM;x=Math.max(-1.9,Math.min(1.9,x));v=0;xBuf.clear();phPts.length=0;setScale();draw();}
+  function endDrag(){if(drag){drag=false;paused=false;}}
+  c.addEventListener('mousedown',e=>{const r=c.getBoundingClientRect();startDrag(e.clientX-r.left,e.clientY-r.top);});
+  c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();moveDrag(e.clientX-r.left,e.clientY-r.top);});
+  c.addEventListener('mouseup',endDrag);c.addEventListener('mouseleave',endDrag);
+  c.addEventListener('touchstart',e=>{e.preventDefault();const r=c.getBoundingClientRect(),t0=e.touches[0];startDrag(t0.clientX-r.left,t0.clientY-r.top);},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();const r=c.getBoundingClientRect(),t0=e.touches[0];moveDrag(t0.clientX-r.left,t0.clientY-r.top);},{passive:false});
+  c.addEventListener('touchend',endDrag);
+
+  ['springK','springM'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+    k=+document.getElementById('springK').value;m=+document.getElementById('springM').value;
+    document.getElementById('springKval').textContent=k.toFixed(1)+' N/m';
+    document.getElementById('springMval').textContent=m.toFixed(1)+' kg';
+    reset();
+  }));
+  document.getElementById('springReset').addEventListener('click',reset);
+  document.getElementById('springPause').addEventListener('click',()=>{paused=!paused;document.getElementById('springPause').textContent=paused?'Riprendi':'Pausa';});
+
+  function drawPhase(){
+    phCtx.fillStyle='#faf7f2';phCtx.fillRect(0,0,PHW,PHH);
+    const w0=Math.sqrt(k/m),A=Math.sqrt(x*x+(v/w0)*(v/w0)),sc=Math.max(.05,A*1.35);
+    const pad={l:38,r:8,t:10,b:20};
+    const pw=PHW-pad.l-pad.r,ph=PHH-pad.t-pad.b;
+    const cx=pad.l+pw/2,cy=pad.t+ph/2;
+    const sx=pw/2/sc,sv=ph/2/(sc*w0*1.1);
+    // Assi
+    ctx.strokeStyle=BORDER;ctx.lineWidth=.8;
+    phCtx.strokeStyle=BORDER;phCtx.lineWidth=.8;
+    phCtx.beginPath();phCtx.moveTo(pad.l,cy);phCtx.lineTo(pad.l+pw,cy);phCtx.stroke();
+    phCtx.beginPath();phCtx.moveTo(cx,pad.t);phCtx.lineTo(cx,pad.t+ph);phCtx.stroke();
+    // tick/label x
+    phCtx.font='8px "IBM Plex Mono"';phCtx.fillStyle=INK_LIGHT;
+    [[-sc,sc],[0,0],[sc,sc]].forEach(([val,abs])=>{
+      const px=pad.l+(val+sc)/(2*sc)*pw;
+      phCtx.strokeStyle=INK_LIGHT;phCtx.lineWidth=.8;
+      phCtx.beginPath();phCtx.moveTo(px,cy-3);phCtx.lineTo(px,cy+3);phCtx.stroke();
+      phCtx.textAlign='center';phCtx.fillText(fmtN(val,2),px,cy+12);
+    });
+    // tick/label y
+    [[-sc*w0,sc*w0],[0,0],[sc*w0,sc*w0]].forEach(([val])=>{
+      const py=pad.t+(sc*w0-val)/(2*sc*w0)*ph;
+      phCtx.strokeStyle=INK_LIGHT;phCtx.lineWidth=.8;
+      phCtx.beginPath();phCtx.moveTo(cx-3,py);phCtx.lineTo(cx+3,py);phCtx.stroke();
+      if(val!==0){phCtx.textAlign='right';phCtx.fillText(fmtN(val,2),cx-5,py+3);}
+    });
+    phCtx.textAlign='right';phCtx.fillText('x',pad.l+pw-2,cy-4);
+    phCtx.textAlign='left';phCtx.fillText('ẋ',cx+4,pad.t+10);
+    // ellisse teorica
+    phCtx.strokeStyle=WARM_MID;phCtx.lineWidth=1;phCtx.globalAlpha=.35;phCtx.beginPath();
+    for(let i=0;i<=120;i++){const a=2*Math.PI*i/120;phCtx.lineTo(cx+A*Math.cos(a)*sx,cy-A*w0*Math.sin(a)*sv);}
+    phCtx.closePath();phCtx.stroke();phCtx.globalAlpha=1;
+    // traiettoria storica
+    if(phPts.length>1){
+      phCtx.strokeStyle=ACCENT2;phCtx.lineWidth=1.3;phCtx.globalAlpha=.7;phCtx.beginPath();
+      phPts.forEach((p,i)=>{const px=cx+p.x*sx,py=cy-p.v*sv;i===0?phCtx.moveTo(px,py):phCtx.lineTo(px,py);});
+      phCtx.stroke();phCtx.globalAlpha=1;
     }
-    ctx.lineTo(x2, y);
-    ctx.stroke();
+    phCtx.beginPath();phCtx.arc(cx+x*sx,cy-v*sv,4.5,0,Math.PI*2);phCtx.fillStyle=ACCENT;phCtx.fill();
   }
 
-  function drawMass() {
-    clearCanvas(ctx, W, H, '#faf7f2');
-
-    // Pavimento e soffitto
-    ctx.fillStyle = INK;
-    ctx.fillRect(wallX - 10, 0, 10, H);
-    // hatching
-    ctx.strokeStyle = BORDER;
-    ctx.lineWidth = 1;
-    for (let y = 0; y < H; y += 14) {
-      ctx.beginPath(); ctx.moveTo(wallX-10, y); ctx.lineTo(wallX, y+10); ctx.stroke();
+  let last=null;
+  function loop(ts){
+    if(!last)last=ts;const el=(ts-last)/1000;last=ts;
+    if(!paused&&!drag){
+      const s=Math.min(Math.round(el/DT),6);
+      for(let i=0;i<s;i++){const ax=-(k/m)*x;v+=ax*DT;x+=v*DT;xBuf.push(x);if(phPts.length>=500)phPts.shift();phPts.push({x,v});}
     }
+    draw();
+    drawPlot(pCtx,PW,PH,[xBuf],[ACCENT],{yMin:-xScale,yMax:xScale,yUnit:' m',xDuration:xDuration,xUnit:'s',decimalsY:2});
+    drawPhase();
+    requestAnimationFrame(loop);
+  }
+  setScale();requestAnimationFrame(loop);
+})();
 
-    // Guida (rel al massa)
-    ctx.strokeStyle = BORDER;
-    ctx.lineWidth = 0.8;
-    ctx.setLineDash([4,3]);
-    ctx.beginPath(); ctx.moveTo(wallX, springY+massH/2+8); ctx.lineTo(W-10, springY+massH/2+8); ctx.stroke();
-    ctx.setLineDash([]);
+/* ══════════════════════════════════════════════
+   3. SMORZATO — auto-start al tab, auto-stop a equilibrio
+══════════════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('dampCanvas'),pc=document.getElementById('dampPlot'),ec=document.getElementById('dampEnergy');
+  const ctx=c.getContext('2d'),pCtx=pc.getContext('2d'),eCtx=ec.getContext('2d');
+  const W=c.width,H=c.height,PW=pc.width,PH=pc.height,EW=ec.width,EH=ec.height;
+  let k=10,m=1,b=0.5,x=1.5,v=0,paused=false,stopped=false;
+  const X0=1.5;
+  const DT=1/120, BUF_N=700;
+  const xDuration=BUF_N*DT;
+  const xBuf=new CB(BUF_N),eBuf=new CB(BUF_N);
 
-    // Posizione di riposo
-    ctx.strokeStyle = ACCENT3;
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3,3]);
-    ctx.beginPath(); ctx.moveTo(restX + massW/2, 20); ctx.lineTo(restX + massW/2, H - 20); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = ACCENT3;
-    ctx.font = '10px "IBM Plex Mono"';
-    ctx.fillText('x=0', restX, 15);
+  function E0(){return .5*k*X0*X0;}
+  function reset(){x=X0;v=0;stopped=false;paused=false;xBuf.clear();eBuf.clear();updateRegime();document.getElementById('dampPause').textContent='Pausa';}
 
-    // Molla
-    const mx = massXpx();
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 1.5;
-    drawSpring(ctx, wallX, mx, springY);
+  // Callback chiamato quando si entra nel tab smorzato
+  tabCallbacks['damp']=reset;
 
-    // Massa
-    const grad = ctx.createLinearGradient(mx, springY-massH/2, mx, springY+massH/2);
-    grad.addColorStop(0, '#c8956a');
-    grad.addColorStop(1, ACCENT);
-    ctx.fillStyle = grad;
-    ctx.strokeStyle = '#6a2a1a';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(mx, springY - massH/2, massW, massH, 4);
-    ctx.fill(); ctx.stroke();
+  function regime(){const w0=Math.sqrt(k/m),gm=b/(2*m),d=gm*gm-w0*w0;if(Math.abs(d)<.015*w0*w0)return'critico';return d<0?'sottosmorzato':'sovrasmorzato';}
+  function updateRegime(){const r=regime(),cols={'sottosmorzato':ACCENT2,'critico':ACCENT3,'sovrasmorzato':ACCENT};document.getElementById('dampDot').style.background=cols[r];document.getElementById('dampRegimeText').textContent='Regime: '+r;}
 
-    // Etichetta massa
-    ctx.fillStyle = 'white';
-    ctx.font = '11px "IBM Plex Sans"';
-    ctx.textAlign = 'center';
-    ctx.fillText('m', mx + massW/2, springY + 4);
-    ctx.textAlign = 'left';
+  const wallX=18,restX=165,mW=44,mH=36,sY=H/2-32,PPM=52;
+  function mPx(){return restX+x*PPM;}
+  function coilH(ctx,x1,x2,y,coils,amp){const len=Math.max(2,x2-x1),seg=len/(coils*2+2);ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x1+seg,y);for(let i=0;i<coils*2;i++){const px=x1+seg+(i+.5)*seg,py=y+(i%2===0?-amp:amp);ctx.lineTo(px,py);}ctx.lineTo(x2,y);ctx.stroke();}
+  function drawDamp(ctx,x1,x2,y){const hbw=18,hbh=13,mid=(x1+x2)/2;ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(mid-hbw,y);ctx.stroke();ctx.strokeRect(mid-hbw,y-hbh,hbw*2,hbh*2);ctx.strokeStyle=ACCENT;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mid,y-hbh+2);ctx.lineTo(mid,y+hbh-2);ctx.stroke();ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(mid+hbw,y);ctx.lineTo(x2,y);ctx.stroke();}
 
-    // Vettore velocità
-    const vscale = 20;
-    drawArrow2(ctx, mx + massW/2, springY - massH/2 - 6, mx + massW/2 + v*vscale, springY - massH/2 - 6, ACCENT2, 1.5);
+  function draw(){
+    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=INK;ctx.fillRect(wallX-10,0,10,H);ctx.strokeStyle=BORDER;ctx.lineWidth=1;
+    for(let y=0;y<H;y+=14){ctx.beginPath();ctx.moveTo(wallX-10,y);ctx.lineTo(wallX,y+10);ctx.stroke();}
+    const mx=mPx();
+    ctx.strokeStyle=INK;ctx.lineWidth=1.5;coilH(ctx,wallX,mx,sY,9,7);
+    drawDamp(ctx,wallX,mx+mW/2,sY+mH+18);
+    ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(mx+mW/2,sY+mH/2);ctx.lineTo(mx+mW/2,sY+mH+5);ctx.stroke();
+    ctx.strokeStyle=ACCENT3;ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(restX+mW/2,10);ctx.lineTo(restX+mW/2,H-10);ctx.stroke();ctx.setLineDash([]);
+    const gr=ctx.createLinearGradient(mx,sY-mH/2,mx,sY+mH/2);gr.addColorStop(0,'#c8956a');gr.addColorStop(1,ACCENT);
+    ctx.fillStyle=gr;ctx.strokeStyle='#6a2a1a';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(mx,sY-mH/2,mW,mH,4);ctx.fill();ctx.stroke();
+    ctx.fillStyle='white';ctx.font='11px "IBM Plex Sans"';ctx.textAlign='center';ctx.fillText('m',mx+mW/2,sY+4);ctx.textAlign='left';
+    const w0=Math.sqrt(k/m),gm=b/(2*m);
+    ctx.fillStyle=INK_LIGHT;ctx.font='10px "IBM Plex Mono"';
+    ctx.fillText(`x=${x.toFixed(4)} m`,10,H-28);ctx.fillText(`ω₀=${w0.toFixed(2)}, γ=${gm.toFixed(2)}`,10,H-12);
 
-    // Labels
-    ctx.fillStyle = INK_LIGHT;
-    ctx.font = '11px "IBM Plex Mono"';
-    ctx.fillText(`x = ${x.toFixed(3)} m`, 10, H-28);
-    ctx.fillText(`v = ${v.toFixed(3)} m/s`, 10, H-12);
+    // Overlay "sistema a riposo"
+    if(stopped){
+      ctx.save();
+      ctx.fillStyle='rgba(250,247,242,0.82)';
+      ctx.fillRect(0,H/2-28,W,56);
+      ctx.fillStyle=ACCENT3;
+      ctx.font='bold 13px "IBM Plex Sans"';ctx.textAlign='center';
+      ctx.fillText('Sistema a riposo — equilibrio raggiunto',W/2,H/2-6);
+      ctx.font='10px "IBM Plex Mono"';ctx.fillStyle=INK_LIGHT;
+      ctx.fillText('Modifica i parametri o premi Reset per ripartire',W/2,H/2+14);
+      ctx.restore();
+      ctx.textAlign='left';
+    }
   }
 
-  function drawArrow2(ctx, x1, y1, x2, y2, color, lw) {
-    const dx = x2-x1, dy = y2-y1, l = Math.sqrt(dx*dx+dy*dy);
-    if (l < 2) return;
-    ctx.strokeStyle = color; ctx.lineWidth = lw;
-    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-    const a = Math.atan2(dy,dx);
-    const hs = Math.min(8, l*0.4);
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(x2,y2);
-    ctx.lineTo(x2-hs*Math.cos(a-0.4), y2-hs*Math.sin(a-0.4));
-    ctx.lineTo(x2-hs*Math.cos(a+0.4), y2-hs*Math.sin(a+0.4));
-    ctx.closePath(); ctx.fill();
+  ['dampK','dampM','dampB'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+    k=+document.getElementById('dampK').value;m=+document.getElementById('dampM').value;b=+document.getElementById('dampB').value;
+    document.getElementById('dampKval').textContent=k.toFixed(1)+' N/m';
+    document.getElementById('dampMval').textContent=m.toFixed(1)+' kg';
+    document.getElementById('dampBval').textContent=b.toFixed(2)+' kg/s';
+    reset();
+  }));
+  document.getElementById('dampReset').addEventListener('click',reset);
+  document.getElementById('dampPause').addEventListener('click',()=>{
+    if(stopped){reset();return;}
+    paused=!paused;document.getElementById('dampPause').textContent=paused?'Riprendi':'Pausa';
+  });
+
+  let last=null;
+  function loop(ts){
+    if(!last)last=ts;const el=(ts-last)/1000;last=ts;
+    if(!paused&&!stopped){
+      const w0=Math.sqrt(k/m);
+      const xThr=X0*5e-4, vThr=X0*w0*5e-4; // soglie auto-stop
+      const s=Math.min(Math.round(el/DT),6);
+      for(let i=0;i<s;i++){
+        const ax=-(k/m)*x-(b/m)*v;
+        v+=ax*DT;x+=v*DT;
+        xBuf.push(x);eBuf.push(.5*m*v*v+.5*k*x*x);
+      }
+      if(Math.abs(x)<xThr&&Math.abs(v)<vThr){x=0;v=0;stopped=true;}
+    }
+    draw();
+    drawPlot(pCtx,PW,PH,[xBuf],[ACCENT],{yMin:-X0*1.1,yMax:X0*1.1,yUnit:' m',xDuration:xDuration,xUnit:'s',decimalsY:2});
+    drawPlot(eCtx,EW,EH,[eBuf],[ACCENT2],{yMin:0,yMax:E0()*1.12,yUnit:' J',xDuration:xDuration,xUnit:'s',zero:false,decimalsY:2});
+    requestAnimationFrame(loop);
   }
+  updateRegime();requestAnimationFrame(loop);
+})();
 
-  // Phase plot
-  function drawPhase() {
-    phCtx.fillStyle = '#faf7f2';
-    phCtx.fillRect(0, 0, PHW, PHH);
-    phCtx.strokeStyle = BORDER;
-    phCtx.lineWidth = 0.5;
-    phCtx.strokeRect(0.5, 0.5, PHW-1, PHH-1);
+/* ══════════════════════════════════════════════
+   4. FORZATO — scala adattiva + curva risonanza
+══════════════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('forceCanvas'),pc=document.getElementById('forcePlot'),rc=document.getElementById('resonancePlot');
+  const ctx=c.getContext('2d'),pCtx=pc.getContext('2d'),rCtx=rc.getContext('2d');
+  const W=c.width,H=c.height,PW=pc.width,PH=pc.height,RW=rc.width,RH=rc.height;
+  let omega0=3.16,omega=1.0,F0=1.0,gamma=0.4,x=0,v=0,t=0,paused=false;
+  let yScale=0.5;
+  const DT=1/240, BUF_N=700;
+  const xDuration=BUF_N*DT;
+  const xBuf=new CB(BUF_N);
 
-    const omega0 = Math.sqrt(k/m);
-    const A = Math.sqrt(x*x + (v/omega0)*(v/omega0));
-    const scale = Math.max(0.05, A * 1.3);
-    const cx = PHW/2, cy = PHH/2;
-    const sx = PHW/2 / scale;
-    const sv = PHH/2 / (scale * omega0 * 1.1);
+  function Ath(w){return F0/Math.sqrt((omega0*omega0-w*w)**2+4*gamma*gamma*w*w);}
+  function reset(){x=0;v=0;t=0;xBuf.clear();yScale=Math.max(.1,Ath(omega)*2.5);}
+
+  function drawRes(){
+    rCtx.fillStyle='#faf7f2';rCtx.fillRect(0,0,RW,RH);
+    const pad={l:42,r:8,t:10,b:24};
+    const pw=RW-pad.l-pad.r,ph=RH-pad.t-pad.b;
+    const wMax=Math.max(omega0*3.5,omega*1.3);
+    let Amax=.01;
+    for(let i=1;i<=600;i++){const w=i/600*wMax;Amax=Math.max(Amax,Ath(w));}
 
     // Assi
-    phCtx.strokeStyle = BORDER;
-    phCtx.lineWidth = 0.8;
-    phCtx.beginPath(); phCtx.moveTo(cx, 4); phCtx.lineTo(cx, PHH-4); phCtx.stroke();
-    phCtx.beginPath(); phCtx.moveTo(4, cy); phCtx.lineTo(PHW-4, cy); phCtx.stroke();
+    rCtx.strokeStyle=BORDER;rCtx.lineWidth=.9;
+    rCtx.beginPath();rCtx.moveTo(pad.l,pad.t);rCtx.lineTo(pad.l,pad.t+ph);rCtx.stroke();
+    rCtx.beginPath();rCtx.moveTo(pad.l,pad.t+ph);rCtx.lineTo(RW-pad.r,pad.t+ph);rCtx.stroke();
 
-    phCtx.fillStyle = INK_LIGHT;
-    phCtx.font = '9px "IBM Plex Mono"';
-    phCtx.fillText('x', PHW-12, cy-4);
-    phCtx.fillText('ẋ', cx+4, 12);
+    // Griglia Y orizzontale
+    rCtx.font='8px "IBM Plex Mono"';rCtx.fillStyle=INK_LIGHT;
+    const yTicks=[Amax, Amax/2, 0];
+    yTicks.forEach(val=>{
+      const yp=pad.t+ph*(1-val/Amax);
+      rCtx.strokeStyle=BORDER;rCtx.lineWidth=.35;rCtx.setLineDash([3,3]);
+      rCtx.beginPath();rCtx.moveTo(pad.l,yp);rCtx.lineTo(RW-pad.r,yp);rCtx.stroke();rCtx.setLineDash([]);
+      rCtx.strokeStyle=INK_LIGHT;rCtx.lineWidth=.8;
+      rCtx.beginPath();rCtx.moveTo(pad.l-3,yp);rCtx.lineTo(pad.l,yp);rCtx.stroke();
+      rCtx.textAlign='right';rCtx.fillText(fmtN(val,2)+(val===Amax?' m':''),pad.l-5,yp+3);
+    });
 
-    // Traiettoria
-    if (phaseBuf.length > 1) {
-      phCtx.strokeStyle = ACCENT2;
-      phCtx.lineWidth = 1.2;
-      phCtx.globalAlpha = 0.6;
-      phCtx.beginPath();
-      for (let i = 0; i < phaseBuf.length; i++) {
-        const px = cx + phaseBuf[i].x * sx;
-        const py = cy - phaseBuf[i].v * sv;
-        if (i === 0) phCtx.moveTo(px, py); else phCtx.lineTo(px, py);
-      }
-      phCtx.stroke();
-      phCtx.globalAlpha = 1;
-    }
+    // Tick X (frequenze ω₀/2, ω₀, 3ω₀/2)
+    const xTicks=[omega0/2,omega0,omega0*1.5];
+    xTicks.forEach(wt=>{
+      if(wt>wMax)return;
+      const xp=pad.l+(wt/wMax)*pw;
+      rCtx.strokeStyle=BORDER;rCtx.lineWidth=.4;rCtx.setLineDash([3,3]);
+      rCtx.beginPath();rCtx.moveTo(xp,pad.t);rCtx.lineTo(xp,pad.t+ph);rCtx.stroke();rCtx.setLineDash([]);
+      rCtx.strokeStyle=INK_LIGHT;rCtx.lineWidth=.8;
+      rCtx.beginPath();rCtx.moveTo(xp,pad.t+ph);rCtx.lineTo(xp,pad.t+ph+3);rCtx.stroke();
+      rCtx.textAlign='center';rCtx.fillText(fmtN(wt,1),xp,RH-5);
+    });
+    // Label "ω (rad/s)"
+    rCtx.textAlign='right';rCtx.fillText('ω (rad/s)',RW-pad.r,RH-5);
 
-    // Punto corrente
-    phCtx.fillStyle = ACCENT;
-    phCtx.beginPath();
-    phCtx.arc(cx + x*sx, cy - v*sv, 4, 0, Math.PI*2);
-    phCtx.fill();
-  }
+    // Linea ω₀
+    const x0=pad.l+(omega0/wMax)*pw;
+    rCtx.strokeStyle=ACCENT3;rCtx.lineWidth=1;rCtx.setLineDash([5,3]);
+    rCtx.beginPath();rCtx.moveTo(x0,pad.t);rCtx.lineTo(x0,pad.t+ph);rCtx.stroke();rCtx.setLineDash([]);
+    rCtx.fillStyle=ACCENT3;rCtx.font='9px "IBM Plex Mono"';rCtx.textAlign='center';
+    rCtx.fillText('ω₀',x0,pad.t+10);
 
-  // Drag sulla massa
-  cnv.addEventListener('mousedown', e => {
-    const r = cnv.getBoundingClientRect();
-    const mx = e.clientX - r.left, my = e.clientY - r.top;
-    const mpx = massXpx();
-    if (mx >= mpx && mx <= mpx + massW && Math.abs(my - springY) < 25) {
-      dragging = true; paused = true;
-    }
-  });
-  cnv.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const r = cnv.getBoundingClientRect();
-    const mx = e.clientX - r.left;
-    x = (mx - restX) / 60;
-    x = Math.max(-2.2, Math.min(2.2, x));
-    v = 0;
-    xBuf.clear(); phaseBuf.length = 0;
-    drawMass();
-  });
-  cnv.addEventListener('mouseup', () => { if (dragging) { dragging = false; paused = false; } });
-
-  ['springK','springM'].forEach(id => document.getElementById(id).addEventListener('input', () => {
-    k = parseFloat(document.getElementById('springK').value);
-    m = parseFloat(document.getElementById('springM').value);
-    document.getElementById('springKval').textContent = k.toFixed(1) + ' N/m';
-    document.getElementById('springMval').textContent = m.toFixed(1) + ' kg';
-    reset();
-  }));
-  document.getElementById('springReset').addEventListener('click', reset);
-  document.getElementById('springPause').addEventListener('click', () => {
-    paused = !paused;
-    document.getElementById('springPause').textContent = paused ? 'Riprendi' : 'Pausa';
-  });
-
-  const DT = 1/120;
-  let last = null;
-  const MAX_PHASE = 400;
-
-  function loop(ts) {
-    if (!last) last = ts;
-    const elapsed = (ts - last) / 1000;
-    last = ts;
-
-    if (!paused && !dragging) {
-      const steps = Math.round(elapsed / DT);
-      for (let i = 0; i < Math.min(steps, 6); i++) {
-        const ax = -(k/m)*x;
-        v += ax * DT;
-        x += v * DT;
-        xBuf.push(x);
-        if (phaseBuf.length >= MAX_PHASE) phaseBuf.shift();
-        phaseBuf.push({x, v});
-      }
-    }
-
-    drawMass();
-
-    const amp = Math.max(0.05, Math.sqrt(x*x + (v/Math.sqrt(k/m))*(v/Math.sqrt(k/m))));
-    drawPlot(pCtx, PW, PH, [xBuf], [ACCENT], -amp*1.3, amp*1.3, 'x');
-
-    drawPhase();
-
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-})();
-
-
-// ╔══════════════════════════════════════════════════════════╗
-//   3. OSCILLATORE SMORZATO
-// ╚══════════════════════════════════════════════════════════╝
-(function() {
-  const cnv  = document.getElementById('dampCanvas');
-  const pCnv = document.getElementById('dampPlot');
-  const eCnv = document.getElementById('dampEnergy');
-  const ctx  = cnv.getContext('2d');
-  const pCtx = pCnv.getContext('2d');
-  const eCtx = eCnv.getContext('2d');
-
-  const W = cnv.width, H = cnv.height;
-  const PW = pCnv.width, PH = pCnv.height;
-  const EW = eCnv.width, EH = eCnv.height;
-
-  let k = 10, m = 1.0, b = 0.5;
-  let x = 1.5, v = 0;
-  let paused = false;
-
-  const xBuf = new CircularBuffer(600);
-  const eBuf = new CircularBuffer(600);
-
-  function reset() { x = 1.5; v = 0; xBuf.clear(); eBuf.clear(); }
-
-  function regime() {
-    const omega0 = Math.sqrt(k/m);
-    const gamma  = b/(2*m);
-    const delta  = gamma*gamma - omega0*omega0;
-    if (Math.abs(delta) < 0.02 * omega0*omega0) return 'critico';
-    if (delta < 0) return 'sottosmorzato';
-    return 'sovrasmorzato';
-  }
-
-  function updateRegimeUI() {
-    const r = regime();
-    const dot = document.getElementById('dampDot');
-    const txt = document.getElementById('dampRegimeText');
-    const colors = { 'sottosmorzato': ACCENT2, 'critico': ACCENT3, 'sovrasmorzato': ACCENT };
-    dot.style.background = colors[r];
-    txt.textContent = 'Regime: ' + r;
-  }
-
-  const wallX = 20, restX = 200;
-  const massW = 44, massH = 36;
-  const springY = H/2 - 20;
-
-  function massXpx() { return restX + x * 55; }
-
-  function drawSpring(ctx, x1, x2, y, coils = 10, amp = 8) {
-    const len = x2 - x1;
-    const seg = len / (coils * 2 + 2);
-    ctx.beginPath();
-    ctx.moveTo(x1, y);
-    ctx.lineTo(x1 + seg, y);
-    for (let i = 0; i < coils * 2; i++) {
-      const px = x1 + seg + (i + 0.5) * seg;
-      const py = y + (i % 2 === 0 ? -amp : amp);
-      ctx.lineTo(px, py);
-    }
-    ctx.lineTo(x2, y);
-    ctx.stroke();
-  }
-
-  function drawDashpot(ctx, x1, x2, y) {
-    const cx = (x1 + x2) / 2;
-    const bh = 16, bw = 22;
-    ctx.strokeStyle = INK; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(cx - bw/2, y); ctx.stroke();
-    ctx.strokeRect(cx - bw/2, y - bh/2, bw, bh);
-    const piston = cx - bw/2 + (x2 - cx) * 0.5;
-    ctx.beginPath(); ctx.moveTo(piston, y - bh/2 + 3); ctx.lineTo(piston, y + bh/2 - 3);
-    ctx.strokeStyle = ACCENT; ctx.stroke();
-    ctx.strokeStyle = INK;
-    ctx.beginPath(); ctx.moveTo(cx + bw/2, y); ctx.lineTo(x2, y); ctx.stroke();
-  }
-
-  function drawScene() {
-    clearCanvas(ctx, W, H, '#faf7f2');
-
-    // Muro
-    ctx.fillStyle = INK;
-    ctx.fillRect(wallX - 10, 0, 10, H);
-    ctx.strokeStyle = BORDER; ctx.lineWidth = 1;
-    for (let y = 0; y < H; y += 14) {
-      ctx.beginPath(); ctx.moveTo(wallX-10, y); ctx.lineTo(wallX, y+10); ctx.stroke();
-    }
-
-    const mx = massXpx();
-
-    // Molla superiore
-    ctx.strokeStyle = INK; ctx.lineWidth = 1.5;
-    drawSpring(ctx, wallX, mx, springY);
-
-    // Smorzatore inferiore
-    drawDashpot(ctx, wallX, mx, springY + massH + 14);
-
-    // Connettori verticali
-    ctx.strokeStyle = INK; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(mx, springY + massH/2); ctx.lineTo(mx, springY + massH); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(mx, springY + massH + 14 + 10); ctx.lineTo(mx, springY + massH + 14 + 22); ctx.stroke();
-
-    // Massa
-    const grad = ctx.createLinearGradient(mx, springY-massH/2, mx, springY+massH/2);
-    grad.addColorStop(0, '#c8956a');
-    grad.addColorStop(1, ACCENT);
-    ctx.fillStyle = grad;
-    ctx.strokeStyle = '#6a2a1a'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.roundRect(mx, springY - massH/2, massW, massH, 4);
-    ctx.fill(); ctx.stroke();
-
-    ctx.fillStyle = 'white'; ctx.font = '11px "IBM Plex Sans"'; ctx.textAlign = 'center';
-    ctx.fillText('m', mx + massW/2, springY + 4);
-    ctx.textAlign = 'left';
-
-    // Posizione riposo
-    ctx.strokeStyle = ACCENT3; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
-    ctx.beginPath(); ctx.moveTo(restX + massW/2, 10); ctx.lineTo(restX + massW/2, H - 10); ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.fillStyle = INK_LIGHT; ctx.font = '10px "IBM Plex Mono"';
-    ctx.fillText(`x = ${x.toFixed(3)} m`, 10, H-12);
-    ctx.fillText(`v = ${v.toFixed(3)} m/s`, 10, H-26);
-    const omega0 = Math.sqrt(k/m), gamma = b/(2*m);
-    ctx.fillText(`ω₀=${omega0.toFixed(2)}, γ=${gamma.toFixed(2)}`, 10, H-42);
-  }
-
-  ['dampK','dampM','dampB'].forEach(id => document.getElementById(id).addEventListener('input', () => {
-    k = parseFloat(document.getElementById('dampK').value);
-    m = parseFloat(document.getElementById('dampM').value);
-    b = parseFloat(document.getElementById('dampB').value);
-    document.getElementById('dampKval').textContent = k.toFixed(1) + ' N/m';
-    document.getElementById('dampMval').textContent = m.toFixed(1) + ' kg';
-    document.getElementById('dampBval').textContent = b.toFixed(2) + ' kg/s';
-    reset();
-    updateRegimeUI();
-  }));
-  document.getElementById('dampReset').addEventListener('click', () => { reset(); updateRegimeUI(); });
-  document.getElementById('dampPause').addEventListener('click', () => {
-    paused = !paused;
-    document.getElementById('dampPause').textContent = paused ? 'Riprendi' : 'Pausa';
-  });
-
-  const DT = 1/120;
-  let last = null;
-
-  function loop(ts) {
-    if (!last) last = ts;
-    const elapsed = (ts - last) / 1000;
-    last = ts;
-
-    if (!paused) {
-      const steps = Math.round(elapsed / DT);
-      for (let i = 0; i < Math.min(steps, 6); i++) {
-        const ax = -(k/m)*x - (b/m)*v;
-        v += ax * DT;
-        x += v * DT;
-        xBuf.push(x);
-        const E = 0.5*m*v*v + 0.5*k*x*x;
-        eBuf.push(E);
-      }
-    }
-
-    drawScene();
-
-    const amp = Math.max(0.05, 1.6);
-    drawPlot(pCtx, PW, PH, [xBuf], [ACCENT], -amp, amp, 'x');
-
-    const initE = 0.5*k*1.5*1.5;
-    drawPlot(eCtx, EW, EH, [eBuf], [ACCENT2], 0, initE * 1.15, 'E', false);
-
-    requestAnimationFrame(loop);
-  }
-
-  updateRegimeUI();
-  requestAnimationFrame(loop);
-})();
-
-
-// ╔══════════════════════════════════════════════════════════╗
-//   4. OSCILLATORE FORZATO
-// ╚══════════════════════════════════════════════════════════╝
-(function() {
-  const cnv   = document.getElementById('forceCanvas');
-  const pCnv  = document.getElementById('forcePlot');
-  const rCnv  = document.getElementById('resonancePlot');
-  const ctx   = cnv.getContext('2d');
-  const pCtx  = pCnv.getContext('2d');
-  const rCtx  = rCnv.getContext('2d');
-
-  const W = cnv.width, H = cnv.height;
-  const PW = pCnv.width, PH = pCnv.height;
-  const RW = rCnv.width, RH = rCnv.height;
-
-  let omega0 = 3.16, omega = 1.0, F0 = 1.0, gamma = 0.4;
-  let x = 0, v = 0, t = 0;
-  let paused = false;
-
-  const xBuf = new CircularBuffer(700);
-
-  function reset() { x = 0; v = 0; t = 0; xBuf.clear(); }
-
-  function ampTheory(w) {
-    const denom = Math.sqrt((omega0*omega0 - w*w)**2 + 4*gamma*gamma*w*w);
-    return (F0 / 1.0) / denom; // massa = 1 per leggibilità
-  }
-
-  function drawResonanceCurve() {
-    rCtx.fillStyle = '#faf7f2';
-    rCtx.fillRect(0, 0, RW, RH);
-    rCtx.strokeStyle = BORDER;
-    rCtx.lineWidth = 0.5;
-    rCtx.strokeRect(0.5, 0.5, RW-1, RH-1);
-
-    const pad = { l: 30, r: 10, t: 10, b: 22 };
-    const pw = RW - pad.l - pad.r;
-    const ph = RH - pad.t - pad.b;
-
-    const wMax = omega0 * 3.2;
-    let Amax = 0;
-    for (let i = 0; i <= 200; i++) {
-      const w = (i / 200) * wMax;
-      Amax = Math.max(Amax, ampTheory(w));
-    }
-    Amax = Math.min(Amax, ampTheory(omega0) * 1.5 + 0.1);
-    Amax = Math.max(0.1, Amax);
-
-    // Griglia Y
-    rCtx.strokeStyle = BORDER; rCtx.lineWidth = 0.4; rCtx.setLineDash([2,3]);
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + ph * (i/4);
-      rCtx.beginPath(); rCtx.moveTo(pad.l, y); rCtx.lineTo(RW-pad.r, y); rCtx.stroke();
-    }
-    rCtx.setLineDash([]);
-
-    // Asse X
-    rCtx.strokeStyle = BORDER; rCtx.lineWidth = 0.8;
-    rCtx.beginPath(); rCtx.moveTo(pad.l, pad.t+ph); rCtx.lineTo(RW-pad.r, pad.t+ph); rCtx.stroke();
-
-    // Linea omega0
-    const xOm0 = pad.l + (omega0 / wMax) * pw;
-    rCtx.strokeStyle = ACCENT3; rCtx.lineWidth = 1; rCtx.setLineDash([4,3]);
-    rCtx.beginPath(); rCtx.moveTo(xOm0, pad.t); rCtx.lineTo(xOm0, pad.t+ph); rCtx.stroke();
-    rCtx.setLineDash([]);
-    rCtx.fillStyle = ACCENT3; rCtx.font = '9px "IBM Plex Mono"'; rCtx.textAlign = 'center';
-    rCtx.fillText('ω₀', xOm0, RH - 4);
-    rCtx.textAlign = 'left';
+    // Linea ω corrente
+    const xw=pad.l+(omega/wMax)*pw;
+    rCtx.strokeStyle=ACCENT;rCtx.lineWidth=.8;rCtx.setLineDash([2,2]);
+    rCtx.beginPath();rCtx.moveTo(xw,pad.t);rCtx.lineTo(xw,pad.t+ph);rCtx.stroke();rCtx.setLineDash([]);
 
     // Curva A(ω)
-    rCtx.strokeStyle = ACCENT2; rCtx.lineWidth = 2;
-    rCtx.beginPath();
-    for (let i = 0; i <= 300; i++) {
-      const w = (i / 300) * wMax;
-      const a = Math.min(ampTheory(w), Amax * 1.1);
-      const px = pad.l + (w / wMax) * pw;
-      const py = pad.t + ph * (1 - a / Amax);
-      if (i === 0) rCtx.moveTo(px, py); else rCtx.lineTo(px, py);
+    rCtx.strokeStyle=ACCENT2;rCtx.lineWidth=2;rCtx.beginPath();let fp=true;
+    for(let i=1;i<=600;i++){
+      const w=i/600*wMax,a=Math.min(Ath(w),Amax);
+      const px=pad.l+(w/wMax)*pw,py=pad.t+ph*(1-a/Amax);
+      fp?(rCtx.moveTo(px,py),fp=false):rCtx.lineTo(px,py);
     }
     rCtx.stroke();
 
-    // Punto corrente omega
-    const curA = Math.min(ampTheory(omega), Amax * 1.05);
-    const cpx = pad.l + (omega / wMax) * pw;
-    const cpy = pad.t + ph * (1 - curA / Amax);
-    rCtx.beginPath(); rCtx.arc(cpx, cpy, 5, 0, Math.PI*2);
-    rCtx.fillStyle = ACCENT; rCtx.fill();
-    rCtx.strokeStyle = 'white'; rCtx.lineWidth = 1.5; rCtx.stroke();
-
-    // Labels
-    rCtx.fillStyle = INK_LIGHT; rCtx.font = '9px "IBM Plex Mono"';
-    rCtx.fillText('A', 4, pad.t + 4);
-    rCtx.fillText('ω →', RW - 24, pad.t + ph + 14);
+    // Punto corrente
+    const cA=Math.min(Ath(omega),Amax),cpy=pad.t+ph*(1-cA/Amax);
+    rCtx.fillStyle=ACCENT;rCtx.globalAlpha=.14;rCtx.fillRect(xw-3,cpy,6,pad.t+ph-cpy);rCtx.globalAlpha=1;
+    rCtx.beginPath();rCtx.arc(xw,cpy,5.5,0,Math.PI*2);rCtx.fillStyle=ACCENT;rCtx.fill();
+    rCtx.strokeStyle='white';rCtx.lineWidth=1.5;rCtx.stroke();
+    // Label ω
+    rCtx.fillStyle=ACCENT;rCtx.font='9px "IBM Plex Mono"';rCtx.textAlign='center';
+    rCtx.fillText('ω',xw,pad.t+ph+14);rCtx.textAlign='left';
   }
 
-  const wallX = 20, restX = 190;
-  const massW = 44, massH = 36;
-  const springY = H/2 - 15;
-
-  function massXpx() { return restX + x * 45; }
-
-  function drawSpring(ctx, x1, x2, y, coils = 9, amp = 7) {
-    const len = Math.max(2, x2 - x1);
-    const seg = len / (coils * 2 + 2);
-    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x1 + seg, y);
-    for (let i = 0; i < coils * 2; i++) {
-      const px = x1 + seg + (i + 0.5) * seg;
-      const py = y + (i % 2 === 0 ? -amp : amp);
-      ctx.lineTo(px, py);
+  const wX=18,rX=175,mW=44,mH=36,sY=H/2-18,PPM=36;
+  function mPx(){return rX+x*PPM;}
+  function coilH(ctx,x1,x2,y,coils,amp){const len=Math.max(2,x2-x1),seg=len/(coils*2+2);ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x1+seg,y);for(let i=0;i<coils*2;i++){const px=x1+seg+(i+.5)*seg,py=y+(i%2===0?-amp:amp);ctx.lineTo(px,py);}ctx.lineTo(x2,y);ctx.stroke();}
+  function drawScene(){
+    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=INK;ctx.fillRect(wX-10,0,10,H);ctx.strokeStyle=BORDER;ctx.lineWidth=1;
+    for(let y=0;y<H;y+=14){ctx.beginPath();ctx.moveTo(wX-10,y);ctx.lineTo(wX,y+10);ctx.stroke();}
+    const mx=mPx();
+    ctx.strokeStyle=INK;ctx.lineWidth=1.5;coilH(ctx,wX,mx,sY,9,7);
+    const dy=sY+mH+16,dc=(wX+mx+mW/2)/2;
+    ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(wX,dy);ctx.lineTo(dc-15,dy);ctx.stroke();
+    ctx.strokeRect(dc-15,dy-12,30,24);ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(dc,dy-10);ctx.lineTo(dc,dy+10);ctx.stroke();
+    ctx.strokeStyle=INK;ctx.beginPath();ctx.moveTo(dc+15,dy);ctx.lineTo(mx+mW/2,dy);ctx.stroke();
+    const F=F0*Math.cos(omega*t),fs=26,fx1=mx+mW+4,fx2=fx1+F*fs;
+    if(Math.abs(F)>.05){
+      const aF=F>0?0:Math.PI,hs=8;
+      ctx.strokeStyle=ACCENT3;ctx.fillStyle=ACCENT3;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx1,sY);ctx.lineTo(fx2,sY);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(fx2,sY);ctx.lineTo(fx2-hs*Math.cos(aF-.4),sY-hs*Math.sin(aF-.4));ctx.lineTo(fx2-hs*Math.cos(aF+.4),sY-hs*Math.sin(aF+.4));ctx.closePath();ctx.fill();
+      ctx.font='9px "IBM Plex Mono"';ctx.textAlign='center';ctx.fillText('F(t)',fx1+(fx2-fx1)/2,sY-12);ctx.textAlign='left';
     }
-    ctx.lineTo(x2, y); ctx.stroke();
+    const gr=ctx.createLinearGradient(mx,sY-mH/2,mx,sY+mH/2);gr.addColorStop(0,'#c8956a');gr.addColorStop(1,ACCENT);
+    ctx.fillStyle=gr;ctx.strokeStyle='#6a2a1a';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(mx,sY-mH/2,mW,mH,4);ctx.fill();ctx.stroke();
+    ctx.fillStyle='white';ctx.font='11px "IBM Plex Sans"';ctx.textAlign='center';ctx.fillText('m',mx+mW/2,sY+4);ctx.textAlign='left';
+    ctx.strokeStyle=ACCENT3;ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(rX+mW/2,10);ctx.lineTo(rX+mW/2,H-10);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=INK_LIGHT;ctx.font='10px "IBM Plex Mono"';
+    ctx.fillText(`x=${x.toFixed(3)} m`,10,H-28);ctx.fillText(`ω/ω₀=${(omega/omega0).toFixed(3)}`,10,H-12);
+    if(Math.abs(omega/omega0-1)<.07){ctx.fillStyle=ACCENT;ctx.font='bold 11px "IBM Plex Sans"';ctx.fillText('⚡ RISONANZA',W/2-44,22);}
   }
 
-  function drawScene() {
-    clearCanvas(ctx, W, H, '#faf7f2');
+  ['forceOmega0','forceOmega','forceF0','forceGamma'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+    omega0=+document.getElementById('forceOmega0').value;omega=+document.getElementById('forceOmega').value;
+    F0=+document.getElementById('forceF0').value;gamma=+document.getElementById('forceGamma').value;
+    document.getElementById('forceOmega0val').textContent=`ω₀ = ${omega0.toFixed(2)} rad/s`;
+    document.getElementById('forceOmegaval').textContent=`ω = ${omega.toFixed(2)} rad/s`;
+    document.getElementById('forceF0val').textContent=`${F0.toFixed(1)} N`;
+    document.getElementById('forceGammaval').textContent=`γ = ${gamma.toFixed(2)} s⁻¹`;
+    reset();
+  }));
+  document.getElementById('forceReset').addEventListener('click',reset);
+  document.getElementById('forcePause').addEventListener('click',()=>{paused=!paused;document.getElementById('forcePause').textContent=paused?'Riprendi':'Pausa';});
 
-    ctx.fillStyle = INK; ctx.fillRect(wallX-10, 0, 10, H);
-    ctx.strokeStyle = BORDER; ctx.lineWidth = 1;
-    for (let y = 0; y < H; y += 14) {
-      ctx.beginPath(); ctx.moveTo(wallX-10, y); ctx.lineTo(wallX, y+10); ctx.stroke();
+  let last=null;
+  function loop(ts){
+    if(!last)last=ts;const el=(ts-last)/1000;last=ts;
+    if(!paused){
+      const s=Math.min(Math.round(el/DT),12);
+      for(let i=0;i<s;i++){const Fext=F0*Math.cos(omega*t),ax=-(omega0*omega0)*x-2*gamma*v+Fext;v+=ax*DT;x+=v*DT;t+=DT;xBuf.push(x);}
+      // Scala Y: massimo reale nel buffer (non teorico), con margine 15% e smoothing lento
+      let bufMax=0.05;
+      for(let i=0;i<xBuf.c;i++) bufMax=Math.max(bufMax,Math.abs(xBuf.get(i)));
+      const tgt=bufMax*1.18;
+      // Sale subito se il dato supera la scala; scende lentamente se i dati si riducono
+      if(tgt>yScale) yScale=tgt;
+      else yScale+=(tgt-yScale)*0.02; // scende con smoothing visibile ma non istantaneo
     }
-
-    const mx = massXpx();
-
-    // Molla
-    ctx.strokeStyle = INK; ctx.lineWidth = 1.5;
-    drawSpring(ctx, wallX, mx, springY);
-
-    // Smorzatore
-    const dlen = 40, dy2 = springY + massH + 16;
-    const dcx = (wallX + mx) / 2;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(wallX, dy2); ctx.lineTo(dcx - 15, dy2); ctx.stroke();
-    ctx.strokeRect(dcx - 15, dy2 - 12, 30, 24);
-    ctx.strokeStyle = ACCENT; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(dcx, dy2 - 10); ctx.lineTo(dcx, dy2 + 10); ctx.stroke();
-    ctx.strokeStyle = INK;
-    ctx.beginPath(); ctx.moveTo(dcx + 15, dy2); ctx.lineTo(mx + massW/2, dy2); ctx.stroke();
-
-    // Forza esterna (freccia animata)
-    const F = F0 * Math.cos(omega * t);
-    const fscale = 30;
-    const fx1 = mx + massW + 5;
-    const fx2 = fx1 + F * fscale;
-    if (Math.abs(F) > 0.05) {
-      ctx.strokeStyle = ACCENT3; ctx.fillStyle = ACCENT3; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(fx1, springY); ctx.lineTo(fx2, springY); ctx.stroke();
-      const a = F > 0 ? 0 : Math.PI;
-      const hs = 8;
-      ctx.beginPath();
-      ctx.moveTo(fx2, springY);
-      ctx.lineTo(fx2 - hs*Math.cos(a-0.4), springY - hs*Math.sin(a-0.4));
-      ctx.lineTo(fx2 - hs*Math.cos(a+0.4), springY - hs*Math.sin(a+0.4));
-      ctx.closePath(); ctx.fill();
-    }
-
-    // Massa
-    const grad = ctx.createLinearGradient(mx, springY-massH/2, mx, springY+massH/2);
-    grad.addColorStop(0, '#c8956a');
-    grad.addColorStop(1, ACCENT);
-    ctx.fillStyle = grad; ctx.strokeStyle = '#6a2a1a'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.roundRect(mx, springY-massH/2, massW, massH, 4);
-    ctx.fill(); ctx.stroke();
-
-    ctx.fillStyle = 'white'; ctx.font = '11px "IBM Plex Sans"'; ctx.textAlign = 'center';
-    ctx.fillText('m', mx + massW/2, springY + 4);
-    ctx.textAlign = 'left';
-
-    // Equilibrio
-    ctx.strokeStyle = ACCENT3; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
-    ctx.beginPath(); ctx.moveTo(restX + massW/2, 10); ctx.lineTo(restX + massW/2, H-10); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Info
-    ctx.fillStyle = INK_LIGHT; ctx.font = '10px "IBM Plex Mono"';
-    ctx.fillText(`x=${x.toFixed(3)} m`, 10, H-26);
-    ctx.fillText(`ω/ω₀=${(omega/omega0).toFixed(3)}`, 10, H-12);
-
-    // Indicatore risonanza
-    const ratio = omega / omega0;
-    if (Math.abs(ratio - 1) < 0.08) {
-      ctx.fillStyle = ACCENT;
-      ctx.font = '11px "IBM Plex Sans"';
-      ctx.fillText('⚡ RISONANZA', W/2 - 40, 24);
-    }
-  }
-
-  ['forceOmega0','forceOmega','forceF0','forceGamma'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-      omega0 = parseFloat(document.getElementById('forceOmega0').value);
-      omega  = parseFloat(document.getElementById('forceOmega').value);
-      F0     = parseFloat(document.getElementById('forceF0').value);
-      gamma  = parseFloat(document.getElementById('forceGamma').value);
-      document.getElementById('forceOmega0val').textContent = `ω₀ = ${omega0.toFixed(2)} rad/s`;
-      document.getElementById('forceOmegaval').textContent  = `ω = ${omega.toFixed(2)} rad/s`;
-      document.getElementById('forceF0val').textContent     = `${F0.toFixed(1)} N`;
-      document.getElementById('forceGammaval').textContent  = `γ = ${gamma.toFixed(2)} s⁻¹`;
-      reset();
-    });
-  });
-  document.getElementById('forceReset').addEventListener('click', reset);
-  document.getElementById('forcePause').addEventListener('click', () => {
-    paused = !paused;
-    document.getElementById('forcePause').textContent = paused ? 'Riprendi' : 'Pausa';
-  });
-
-  const DT = 1/240;
-  let last = null;
-
-  function loop(ts) {
-    if (!last) last = ts;
-    const elapsed = (ts - last) / 1000;
-    last = ts;
-
-    if (!paused) {
-      const steps = Math.round(elapsed / DT);
-      for (let i = 0; i < Math.min(steps, 12); i++) {
-        const F = F0 * Math.cos(omega * t);
-        const ax = -(omega0*omega0)*x - 2*gamma*v + F;
-        v += ax * DT;
-        x += v * DT;
-        t += DT;
-        xBuf.push(x);
-      }
-    }
-
     drawScene();
-
-    const Astat = ampTheory(omega);
-    const yAmp = Math.max(0.1, Astat * 2.2);
-    drawPlot(pCtx, PW, PH, [xBuf], [ACCENT], -yAmp, yAmp, 'x');
-
-    drawResonanceCurve();
-
+    drawPlot(pCtx,PW,PH,[xBuf],[ACCENT],{yMin:-yScale,yMax:yScale,yUnit:' m',xDuration:xDuration,xUnit:'s',decimalsY:2});
+    drawRes();
     requestAnimationFrame(loop);
   }
-
-  requestAnimationFrame(loop);
+  reset();requestAnimationFrame(loop);
 })();
 </script>
 </body>

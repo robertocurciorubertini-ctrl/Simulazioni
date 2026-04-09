@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Effetto fotoelettrico"
+  "description": "da fare",
+  "category": "Meccanica quantistica"
+  "icon": "bho",
+  "order": 1,
+  "tags": ["effetto fotoelettrico"],
+  "level": "avanzato"
+};
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Effetto Fotoelettrico</title>
+<meta name="description" content="Simulazione interattiva dell'effetto fotoelettrico: emissione di fotoelettroni da una superficie metallica irradiata da luce. Controllo di frequenza, lunghezza d'onda e intensità. Teoria completa con equazioni di Einstein.">
+<meta name="keywords" content="effetto fotoelettrico, fotoni, lavoro di estrazione, Einstein, fisica quantistica, fotoelettroni, liceo scientifico">
+<meta name="author" content="Simulazioni di Fisica">
+<meta name="category" content="Fisica Moderna / Fisica Quantistica">
+<meta name="level" content="Liceo Scientifico, Università (primo anno)">
+<meta name="topics" content="Effetto fotoelettrico, Quantizzazione dell'energia, Fotone, Funzione lavoro, Equazione di Einstein, Corrente di saturazione, Potenziale di arresto">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[
+    {left:'$$',right:'$$',display:true},
+    {left:'$',right:'$',display:false}
+  ]})"></script>
+
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --cream-dark: #ede7d9;
+    --ink: #1a1612;
+    --ink-light: #3d3530;
+    --accent: #8b3a1e;
+    --accent-light: #c4622d;
+    --accent-pale: #f0ddd4;
+    --gold: #a07830;
+    --gold-light: #c9a85c;
+    --blue: #1e4d8b;
+    --blue-light: #2e6bb5;
+    --green: #2d6b3a;
+    --border: #c8bfb0;
+    --shadow: rgba(26,22,18,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 2.5rem 3rem 2rem;
+    border-bottom: 3px solid var(--accent);
+  }
+  header .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 0.6rem;
+  }
+  header h1 {
+    font-family: 'EB Garamond', serif;
+    font-size: 2.6rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  header p.subtitle {
+    margin-top: 0.5rem;
+    color: #b0a898;
+    font-size: 0.92rem;
+    font-weight: 300;
+    max-width: 680px;
+  }
+  .meta-row {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: #888078;
+    letter-spacing: 0.05em;
+  }
+  .meta-item span { color: var(--gold-light); }
+
+  /* ── LAYOUT ── */
+  main { max-width: 1260px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+  section.card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2.2rem 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+  h2 {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--ink-light);
+    margin: 1.4rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.85rem; color: var(--ink-light); }
+
+  .formula-block {
+    background: var(--cream);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.5rem;
+    margin: 1.2rem 0;
+    border-radius: 0 2px 2px 0;
+    font-size: 1.05rem;
+  }
+  .formula-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .highlight-box {
+    background: var(--accent-pale);
+    border: 1px solid #d4a090;
+    border-radius: 3px;
+    padding: 1rem 1.4rem;
+    margin: 1rem 0;
+  }
+  .highlight-box.blue {
+    background: #dde8f5;
+    border-color: #9bb4d6;
+  }
+  .highlight-box.green {
+    background: #ddf0e2;
+    border-color: #8bbf95;
+  }
+
+  /* ── SIMULATION ── */
+  #sim-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.8rem;
+    align-items: start;
+  }
+
+  #canvas-wrap {
+    position: relative;
+    background: #0a0a12;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #333;
+  }
+  #simCanvas { display: block; width: 100%; }
+
+  /* ── CONTROLS ── */
+  #controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .ctrl-group {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1.1rem 1.3rem;
+  }
+  .ctrl-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--ink-light);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .ctrl-group label .val {
+    font-size: 0.88rem;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    height: 4px;
+    cursor: pointer;
+  }
+  .ctrl-sub {
+    font-size: 0.72rem;
+    color: #888;
+    margin-top: 0.35rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Material selector */
+  .mat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .mat-btn {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.45rem 0.5rem;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-align: center;
+    transition: all 0.15s;
+    color: var(--ink-light);
+    line-height: 1.3;
+  }
+  .mat-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mat-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .mat-btn .phi { display: block; font-size: 0.65rem; opacity: 0.75; }
+
+  /* ── READOUTS ── */
+  #readouts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+  }
+  .readout {
+    background: var(--ink);
+    border-radius: 3px;
+    padding: 0.75rem 1rem;
+    color: var(--cream);
+  }
+  .readout .r-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+    margin-bottom: 0.2rem;
+  }
+  .readout .r-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .readout .r-val.ok { color: #6ecf7a; }
+  .readout .r-val.no { color: #e07070; }
+  .readout .r-val.gold { color: var(--gold-light); }
+
+  /* ── STATUS BANNER ── */
+  #status-banner {
+    margin-top: 1rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 3px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-align: center;
+    letter-spacing: 0.04em;
+    transition: background 0.3s, color 0.3s;
+  }
+  #status-banner.emit { background: #1a3a1f; color: #7ee882; border: 1px solid #3a6a3f; }
+  #status-banner.noemit { background: #3a1a1a; color: #e87878; border: 1px solid #6a3a3a; }
+
+  /* ── GRAFICO V-I ── */
+  #iv-canvas { display: block; width: 100%; border-radius: 3px; background: #0d1117; }
+
+  /* ── ENERGY DIAGRAM ── */
+  #energy-canvas { display: block; width: 100%; border-radius: 3px; background: #0d1117; }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 0.8rem;
+  }
+  th {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.6rem 1rem;
+    text-align: left;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-light);
+  }
+  tr:nth-child(even) td { background: var(--cream); }
+  tr.active-row td { background: var(--accent-pale); color: var(--accent); font-weight: 500; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    #sim-layout { grid-template-columns: 1fr; }
+    header { padding: 1.5rem 1.2rem 1.2rem; }
+    header h1 { font-size: 1.8rem; }
+    main { padding: 1.2rem 1rem 3rem; }
+    section.card { padding: 1.4rem 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Fisica Moderna · Simulazione Interattiva</div>
+  <h1>Effetto Fotoelettrico</h1>
+  <p class="subtitle">Emissione di elettroni da una superficie metallica per assorbimento di fotoni. Analisi quantitativa con equazione di Einstein, funzione lavoro, potenziale di arresto e corrente di saturazione.</p>
+  <div class="meta-row">
+    <div class="meta-item">Argomento: <span>Fisica Quantistica</span></div>
+    <div class="meta-item">Livello: <span>Liceo Scientifico / Primo anno universitario</span></div>
+    <div class="meta-item">Costanti: <span>h, e, c</span></div>
+    <div class="meta-item">Anno: <span>2025</span></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════ TEORIA ═══════════════════ -->
+<section class="card">
+  <h2>Teoria — L'Effetto Fotoelettrico</h2>
+
+  <h3>Il contesto storico e il problema classico</h3>
+  <p>
+    L'effetto fotoelettrico — ovvero l'emissione di elettroni da una superficie metallica quando questa viene irradiata da luce — fu osservato per la prima volta da Heinrich Hertz nel 1887 e studiato sistematicamente da Philipp Lenard nei primi anni del Novecento. I risultati sperimentali erano in netto contrasto con le previsioni della fisica classica ondulatoria, che descriveva la luce come un'onda elettromagnetica continua.
+  </p>
+  <p>
+    Secondo la fisica classica, aumentando l'intensità dell'onda luminosa avremmo dovuto aumentare l'energia ceduta alla superficie e quindi, superata una certa soglia di energia accumulata, estrarre gli elettroni dal metallo. In particolare la fisica classica prevedeva: (1) che con luce sufficientemente intensa si potesse sempre estrarre elettroni, indipendentemente dalla frequenza; (2) che la velocità massima degli elettroni emessi dipendesse dall'intensità della luce; (3) che vi fosse un ritardo temporale tra l'inizio dell'illuminazione e la prima emissione, necessario ad "accumulare" energia sufficiente.
+  </p>
+
+  <div class="highlight-box">
+    <p style="margin:0"><strong>Nessuna di queste previsioni classiche è confermata dall'esperimento.</strong> Esiste una frequenza di soglia $\nu_0$ al di sotto della quale, per qualunque intensità, non avviene alcuna emissione. La velocità massima degli elettroni dipende dalla frequenza, non dall'intensità. L'emissione è istantanea (&lt; 10⁻⁹ s) anche con luce debolissima.</p>
+  </div>
+
+  <h3>La spiegazione di Einstein (1905)</h3>
+  <p>
+    Nel 1905 Albert Einstein pubblicò, insieme ai lavori sulla relatività ristretta, un articolo intitolato <em>Über einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt</em> ("Su un punto di vista euristico riguardante la produzione e la trasformazione della luce"), per il quale avrebbe ricevuto il Premio Nobel nel 1921. Einstein riprese l'ipotesi dei quanti di Planck (formulata nel 1900 per spiegare lo spettro del corpo nero) e la portò alle sue conseguenze logiche: la luce stessa è composta da quanti di energia discreti, i <strong>fotoni</strong>.
+  </p>
+  <p>
+    Ogni fotone trasporta un'energia proporzionale alla sua frequenza $\nu$:
+  </p>
+
+  <div class="formula-block">
+    <div class="formula-label">Energia del fotone</div>
+    $$E_{\text{fotone}} = h\nu = \frac{hc}{\lambda}$$
+    dove $h = 6{,}626 \times 10^{-34}$ J·s è la costante di Planck, $\nu$ è la frequenza, $c = 3 \times 10^8$ m/s è la velocità della luce nel vuoto e $\lambda$ la lunghezza d'onda.
+  </div>
+
+  <p>
+    Nell'interazione con il metallo, ciascun fotone interagisce con <em>un solo elettrone</em> (interazione uno-a-uno), cedendo tutta la propria energia. Una parte di questa energia viene spesa per vincere la forza di legame che trattiene l'elettrone all'interno del metallo: questa energia minima richiesta è chiamata <strong>funzione lavoro</strong> (o lavoro di estrazione) $\Phi$, ed è una proprietà caratteristica del materiale.
+  </p>
+  <p>
+    L'energia cinetica massima degli elettroni emessi è dunque:
+  </p>
+
+  <div class="formula-block">
+    <div class="formula-label">Equazione di Einstein per l'effetto fotoelettrico</div>
+    $$E_{k,\max} = h\nu - \Phi = \frac{1}{2}m_e v_{\max}^2$$
+    dove $m_e = 9{,}109 \times 10^{-31}$ kg è la massa dell'elettrone e $v_{\max}$ la sua velocità massima.
+  </div>
+
+  <p>
+    L'emissione avviene solo se $h\nu \geq \Phi$, cioè solo se l'energia del singolo fotone supera la funzione lavoro. Questo definisce la <strong>frequenza di soglia</strong>:
+  </p>
+
+  <div class="formula-block">
+    <div class="formula-label">Frequenza di soglia e lunghezza d'onda di soglia</div>
+    $$\nu_0 = \frac{\Phi}{h} \qquad \lambda_0 = \frac{hc}{\Phi}$$
+  </div>
+
+  <p>
+    Per frequenze $\nu < \nu_0$, per quanto intensa sia la luce, nessun elettrone viene emesso perché nessun fotone possiede energia sufficiente per estrarre un elettrone dal metallo.
+  </p>
+
+  <h3>Il ruolo dell'intensità luminosa</h3>
+  <p>
+    L'intensità della luce determina il numero di fotoni per unità di tempo e di superficie (flusso fotonico $\Phi_{\text{fot}} = I / (h\nu)$, dove $I$ è l'irradianza in W/m²). Poiché ogni fotone può estrarre al massimo un elettrone, l'intensità controlla il <strong>numero di fotoelettroni emessi per unità di tempo</strong>, ovvero la corrente fotoelettrica $I_{\text{foto}}$, ma <em>non</em> la loro energia cinetica massima.
+  </p>
+
+  <div class="formula-block">
+    <div class="formula-label">Corrente fotoelettrica di saturazione</div>
+    $$I_{\text{sat}} = \eta \cdot e \cdot \frac{I \cdot A}{h\nu}$$
+    dove $\eta$ è l'efficienza quantica della superficie (frazione di fotoni che producono effettivamente un elettrone emesso), $e = 1{,}602 \times 10^{-19}$ C è la carica dell'elettrone, $I$ l'irradianza, $A$ l'area illuminata.
+  </div>
+
+  <h3>Il potenziale di arresto</h3>
+  <p>
+    Per misurare l'energia cinetica massima degli elettroni si applica un <strong>potenziale di arresto</strong> (o potenziale di frenamento) $V_0$, cioè una differenza di potenziale che frena gli elettroni fino ad arrestare anche quelli più veloci. In questo caso il lavoro del campo elettrico eguaglia l'energia cinetica massima:
+  </p>
+
+  <div class="formula-block">
+    <div class="formula-label">Potenziale di arresto</div>
+    $$eV_0 = E_{k,\max} = h\nu - \Phi \quad \Rightarrow \quad V_0 = \frac{h\nu - \Phi}{e} = \frac{h}{e}\nu - \frac{\Phi}{e}$$
+  </div>
+
+  <p>
+    $V_0$ è proporzionale alla frequenza $\nu$ con coefficiente angolare $h/e \approx 4{,}136 \times 10^{-15}$ V·s (questo è uno dei metodi sperimentali per misurare $h$). Il potenziale di arresto è <em>indipendente dall'intensità</em>: raddoppiando l'intensità raddoppia la corrente di saturazione, ma $V_0$ rimane invariato.
+  </p>
+
+  <h3>La caratteristica corrente-tensione (curva I-V)</h3>
+  <p>
+    Nella cella fotoelettrica si misura la corrente al variare della tensione applicata tra anodo e catodo. Per tensioni positive (che accelerano gli elettroni) la corrente cresce fino alla saturazione $I_{\text{sat}}$, determinata dal flusso fotonico. Per tensioni negative la corrente diminuisce fino ad annullarsi a $V = -V_0$. L'intensità della luce modifica $I_{\text{sat}}$ ma non $V_0$; la frequenza modifica $V_0$ e $I_{\text{sat}}$ (tramite $h\nu$ al denominatore del flusso fotonico).
+  </p>
+
+  <h3>Importanza storica e concettuale</h3>
+  <p>
+    L'effetto fotoelettrico fu il primo fenomeno che impose la quantizzazione della luce, aprendo la strada alla meccanica quantistica. Dimostrò che la luce ha un comportamento <em>corpuscolare</em> in questa interazione (dualismo onda-corpuscolo), e che l'energia non viene trasferita in modo continuo ma in pacchetti discreti. Applicazioni pratiche derivanti da questo effetto includono le celle fotovoltaiche, i fotomoltiplicatori, i rivelatori a semiconduttore e le fotocamere digitali (sensori CCD e CMOS).
+  </p>
+
+  <div class="highlight-box blue">
+    <p style="margin:0"><strong>Riepilogo delle previsioni quantistiche:</strong> Emissione solo se $h\nu \geq \Phi$ — $E_{k,\max}$ dipende solo da $\nu$ — Intensità controlla solo la corrente fotoelettrica — Emissione istantanea perché l'energia è concentrata nel fotone e non diluita su tutta l'onda.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════ SIMULAZIONE ═══════════════════ -->
+<section class="card">
+  <h2>Simulazione Interattiva</h2>
+
+  <div id="sim-layout">
+    <div>
+      <div id="canvas-wrap">
+        <canvas id="simCanvas" width="720" height="400"></canvas>
+      </div>
+      <div id="status-banner" class="noemit">Nessuna emissione — frequenza inferiore alla soglia</div>
+      <div id="readouts" style="margin-top:1rem;">
+        <div class="readout">
+          <div class="r-label">Energia fotone</div>
+          <div class="r-val gold" id="rd-ephoton">—</div>
+        </div>
+        <div class="readout">
+          <div class="r-label">Funzione lavoro Φ</div>
+          <div class="r-val gold" id="rd-phi">—</div>
+        </div>
+        <div class="readout">
+          <div class="r-label">E<sub>k,max</sub></div>
+          <div class="r-val" id="rd-ek">—</div>
+        </div>
+        <div class="readout">
+          <div class="r-label">V₀ (potenz. arresto)</div>
+          <div class="r-val" id="rd-v0">—</div>
+        </div>
+        <div class="readout">
+          <div class="r-label">Frequenza ν</div>
+          <div class="r-val gold" id="rd-freq">—</div>
+        </div>
+        <div class="readout">
+          <div class="r-label">λ (lungh. d'onda)</div>
+          <div class="r-val gold" id="rd-lambda">—</div>
+        </div>
+        <div class="readout">
+          <div class="r-label">ν₀ soglia</div>
+          <div class="r-val" id="rd-nu0">—</div>
+        </div>
+        <div class="readout">
+          <div class="r-label">Corrente relativa</div>
+          <div class="r-val" id="rd-current">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <!-- MATERIALE -->
+      <div class="ctrl-group">
+        <label style="text-transform:uppercase;letter-spacing:0.08em;font-size:0.7rem;color:var(--ink-light);margin-bottom:0.6rem;display:block;">Materiale del catodo</label>
+        <div class="mat-grid" id="mat-grid"></div>
+      </div>
+
+      <!-- FREQUENZA -->
+      <div class="ctrl-group">
+        <label>Frequenza ν <span class="val" id="lbl-freq">—</span></label>
+        <input type="range" id="sl-freq" min="3.0" max="12.0" step="0.05" value="6.5">
+        <div class="ctrl-sub" id="lbl-lambda-sub">λ = —</div>
+        <div class="ctrl-sub" id="lbl-color-sub">Colore: —</div>
+      </div>
+
+      <!-- INTENSITÀ -->
+      <div class="ctrl-group">
+        <label>Intensità I <span class="val" id="lbl-int">50%</span></label>
+        <input type="range" id="sl-int" min="0" max="100" step="1" value="50">
+        <div class="ctrl-sub">Controlla numero di fotoni/s e corrente</div>
+      </div>
+
+      <!-- TENSIONE APPLICATA -->
+      <div class="ctrl-group">
+        <label>Tensione applicata V <span class="val" id="lbl-volt">0.0 V</span></label>
+        <input type="range" id="sl-volt" min="-5" max="5" step="0.05" value="0">
+        <div class="ctrl-sub">Negativa = frenante; −V₀ → corrente nulla</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ GRAFICI ═══════════════════ -->
+<section class="card">
+  <h2>Diagrammi Energetici e Curva I-V</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;">
+    <div>
+      <h3 style="margin-top:0">Diagramma energia — livelli</h3>
+      <canvas id="energy-canvas" width="500" height="280"></canvas>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;font-family:'IBM Plex Mono',monospace;">Confronto visivo tra energia del fotone, funzione lavoro Φ e energia cinetica massima $E_{k,\max}$.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Caratteristica I-V</h3>
+      <canvas id="iv-canvas" width="500" height="280"></canvas>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;font-family:'IBM Plex Mono',monospace;">Corrente fotoelettrica in funzione della tensione applicata. Il punto $V = -V_0$ indica l'intercetta con l'asse delle tensioni.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ TABELLA MATERIALI ═══════════════════ -->
+<section class="card">
+  <h2>Dati dei Materiali</h2>
+  <p>La funzione lavoro $\Phi$ è una costante caratteristica del metallo che dipende dalla struttura elettronica del solido (in particolare dalla profondità del livello di Fermi rispetto al vuoto). I valori riportati sono quelli comunemente misurati per superfici pulite in alto vuoto.</p>
+  <table id="mat-table">
+    <thead>
+      <tr>
+        <th>Materiale</th>
+        <th>Φ (eV)</th>
+        <th>Φ (J × 10⁻¹⁹)</th>
+        <th>ν₀ (× 10¹⁴ Hz)</th>
+        <th>λ₀ (nm)</th>
+        <th>Regione spettrale</th>
+      </tr>
+    </thead>
+    <tbody id="mat-tbody"></tbody>
+  </table>
+  <p style="font-size:0.78rem;color:#888;margin-top:0.8rem;">I valori di Φ sono tipicamente nell'ordine di pochi eV, il che significa che sono necessari fotoni nell'ultravioletto o nel visibile (alta frequenza) per estrarre elettroni dalla maggior parte dei metalli.</p>
+</section>
+
+<!-- ═══════════════════ APPROFONDIMENTO ═══════════════════ -->
+<section class="card">
+  <h2>Approfondimento: Misura di h con l'effetto fotoelettrico</h2>
+  <p>
+    Una delle applicazioni metrologically più significative dell'effetto fotoelettrico è la determinazione sperimentale della costante di Planck $h$. Dall'equazione del potenziale di arresto:
+  </p>
+  <div class="formula-block">
+    <div class="formula-label">Potenziale di arresto vs frequenza</div>
+    $$V_0 = \frac{h}{e}\,\nu - \frac{\Phi}{e}$$
+  </div>
+  <p>
+    Misurando $V_0$ per diverse frequenze $\nu$ e riportando i punti su un grafico $V_0$-$\nu$, si ottiene una retta con pendenza $h/e$. Conoscendo $e$ (dalla misura di Millikan), si ricava $h$. Il valore sperimentale così ottenuto concorda con quello teorico entro meno dell'1%, confermando la validità della teoria corpuscolare della luce.
+  </p>
+  <p>
+    Inoltre, l'intercetta sull'asse delle ascisse dà direttamente la frequenza di soglia $\nu_0 = \Phi/h$, e dall'intercetta sull'asse delle ordinate (negativa) si ricava $-\Phi/e$, ovvero la funzione lavoro del materiale in volt (unità eV).
+  </p>
+
+  <h3>Efficienza quantica e corrente reale</h3>
+  <p>
+    Non ogni fotone assorbito dal metallo produce un elettrone libero rilevabile esternamente. L'efficienza quantica $\eta$ dipende dal materiale, dalla frequenza della luce e dalla qualità della superficie. Per metalli tipici $\eta$ è dell'ordine di $10^{-4}$–$10^{-3}$; per semiconduttori appositamente progettati (come nei fotomoltiplicatori moderni) può raggiungere il 30–40%. Nella simulazione $\eta$ è assorbita nel fattore di proporzionalità della corrente.
+  </p>
+
+  <h3>Differenza tra fotone e onda: il dualismo onda-corpuscolo</h3>
+  <p>
+    L'effetto fotoelettrico mostra il comportamento <em>corpuscolare</em> della luce: l'energia è quantizzata in pacchetti $h\nu$ localizzati nello spazio. Il comportamento <em>ondulatorio</em> emerge invece nei fenomeni di interferenza e diffrazione. La meccanica quantistica moderna (de Broglie, 1924; Schrödinger, Born, Heisenberg, 1925-26) unifica i due aspetti nella funzione d'onda e nella relazione di indeterminazione di Heisenberg: $\Delta x \cdot \Delta p \geq \hbar/2$. Il fotone è una particella elementare di spin 1, bosone di gauge del campo elettromagnetico, con massa a riposo nulla e impulso $p = h\nu/c = h/\lambda$.
+  </p>
+
+  <div class="highlight-box green">
+    <p style="margin:0"><strong>Equazione di de Broglie per l'elettrone emesso:</strong> anche il fotoelettrone ha una lunghezza d'onda associata $\lambda_{dB} = h/p = h/(m_e v)$. Per $E_k = 1$ eV si ha $\lambda_{dB} \approx 1.23$ nm — nella regione dei raggi X molli, utilizzabile in microscopia elettronica.</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ════════════════════════════════════════════════
+//  COSTANTI FISICHE
+// ════════════════════════════════════════════════
+const h_J   = 6.626e-34;   // costante di Planck (J·s)
+const e_C   = 1.602e-19;   // carica elettrone (C)
+const c_ms  = 3e8;         // velocità luce (m/s)
+const me_kg = 9.109e-31;   // massa elettrone (kg)
+const h_eV  = 4.136e-15;   // costante di Planck (eV·s)
+
+// ════════════════════════════════════════════════
+//  MATERIALI  (Φ in eV)
+// ════════════════════════════════════════════════
+const materials = [
+  { name: 'Cesio',   sym:'Cs', phi: 2.10 },
+  { name: 'Potassio',sym:'K',  phi: 2.30 },
+  { name: 'Sodio',   sym:'Na', phi: 2.75 },
+  { name: 'Alluminio',sym:'Al',phi: 4.08 },
+  { name: 'Rame',    sym:'Cu', phi: 4.65 },
+  { name: 'Oro',     sym:'Au', phi: 5.10 },
+  { name: 'Platino', sym:'Pt', phi: 5.65 },
+  { name: 'Nichel',  sym:'Ni', phi: 5.15 },
+];
+
+// ════════════════════════════════════════════════
+//  COLORI SPETTRALI
+// ════════════════════════════════════════════════
+function wavelengthToRGB(nm) {
+  let r=0,g=0,b=0;
+  if(nm<380||nm>780) return [180,180,255]; // UV/oltre rosso → bianco-bluastro
+  if(nm<440){r=(440-nm)/60; g=0; b=1;}
+  else if(nm<490){r=0; g=(nm-440)/50; b=1;}
+  else if(nm<510){r=0; g=1; b=(510-nm)/20;}
+  else if(nm<580){r=(nm-510)/70; g=1; b=0;}
+  else if(nm<645){r=1; g=(645-nm)/65; b=0;}
+  else{r=1; g=0; b=0;}
+  const factor = nm<420?(0.3+0.7*(nm-380)/40):nm>700?(0.3+0.7*(780-nm)/80):1;
+  return [Math.round(r*255*factor), Math.round(g*255*factor), Math.round(b*255*factor)];
+}
+
+function freqToLabel(nu_e14) {
+  const nm = c_ms/(nu_e14*1e14)*1e9;
+  if(nm<380) return 'Ultravioletto (UV)';
+  if(nm<450) return 'Violetto';
+  if(nm<495) return 'Blu / Indaco';
+  if(nm<570) return 'Verde';
+  if(nm<590) return 'Giallo';
+  if(nm<620) return 'Arancione';
+  if(nm<750) return 'Rosso';
+  return 'Infrarosso (IR)';
+}
+
+// ════════════════════════════════════════════════
+//  STATO
+// ════════════════════════════════════════════════
+let state = {
+  matIdx: 0,
+  nuE14: 6.5,    // frequenza in unità di 10^14 Hz
+  intensity: 50, // 0-100
+  voltage: 0.0,  // V applicata
+};
+
+// ════════════════════════════════════════════════
+//  COSTRUISCI UI
+// ════════════════════════════════════════════════
+const matGrid = document.getElementById('mat-grid');
+materials.forEach((m,i) => {
+  const btn = document.createElement('button');
+  btn.className = 'mat-btn' + (i===0?' active':'');
+  btn.innerHTML = `<strong>${m.sym}</strong> — ${m.name}<span class="phi">Φ = ${m.phi} eV</span>`;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.matIdx = i;
+    update();
+  });
+  matGrid.appendChild(btn);
+});
+
+// Tabella materiali
+const tbody = document.getElementById('mat-tbody');
+materials.forEach((m,i) => {
+  const nu0 = (m.phi * e_C) / h_J / 1e14;
+  const lam0 = c_ms / (nu0*1e14) * 1e9;
+  let region = lam0<380?'Ultravioletto':lam0<750?'Visibile':'Infrarosso';
+  const tr = document.createElement('tr');
+  tr.id = `mrow-${i}`;
+  tr.innerHTML = `<td>${m.name} (${m.sym})</td><td>${m.phi.toFixed(2)}</td>
+    <td>${(m.phi*e_C/1e-19).toFixed(3)}</td>
+    <td>${nu0.toFixed(2)}</td>
+    <td>${Math.round(lam0)}</td>
+    <td>${region}</td>`;
+  tbody.appendChild(tr);
+});
+
+// Slider
+const slFreq = document.getElementById('sl-freq');
+const slInt  = document.getElementById('sl-int');
+const slVolt = document.getElementById('sl-volt');
+slFreq.addEventListener('input', () => { state.nuE14=parseFloat(slFreq.value); update(); });
+slInt.addEventListener('input',  () => { state.intensity=parseFloat(slInt.value); update(); });
+slVolt.addEventListener('input', () => { state.voltage=parseFloat(slVolt.value); update(); });
+
+// ════════════════════════════════════════════════
+//  CALCOLA FISICA
+// ════════════════════════════════════════════════
+function physics() {
+  const mat = materials[state.matIdx];
+  const nu  = state.nuE14 * 1e14;          // Hz
+  const Ephoton_J = h_J * nu;              // J
+  const Ephoton_eV = Ephoton_J / e_C;     // eV
+  const Phi_J = mat.phi * e_C;            // J
+  const Phi_eV = mat.phi;
+  const Ek_J = Math.max(0, Ephoton_J - Phi_J);
+  const Ek_eV = Ek_J / e_C;
+  const emits = Ephoton_J >= Phi_J;
+  const V0 = emits ? Ek_eV : 0;           // potenziale di arresto (V)
+  const lambda_nm = c_ms / nu * 1e9;
+  const nu0_e14 = Phi_J / h_J / 1e14;
+  // Corrente normalizzata (0-1) tenendo conto della tensione frenante
+  let currentFrac = 0;
+  if(emits) {
+    const voltFrac = state.voltage < -V0 ? 0
+                   : state.voltage > 0   ? 1
+                   : (state.voltage + V0) / (V0 + 0.001);
+    currentFrac = (state.intensity/100) * Math.min(1, voltFrac);
+  }
+  return { mat, nu, nu0_e14, Ephoton_eV, Phi_eV, Ek_eV, emits, V0, lambda_nm, currentFrac };
+}
+
+// ════════════════════════════════════════════════
+//  PARTICELLE (fotoni e fotoelettroni)
+// ════════════════════════════════════════════════
+const photons = [];
+const electrons = [];
+let frameCount = 0;
+
+function spawnPhoton(p) {
+  const [r,g,b] = wavelengthToRGB(p.lambda_nm);
+  const col = `rgb(${r},${g},${b})`;
+  photons.push({
+    x: 60 + Math.random()*20,
+    y: 60 + Math.random()*280,
+    vx: 3.2 + Math.random()*0.8,
+    color: col,
+    size: 3.5,
+    alpha: 1,
+  });
+}
+
+function spawnElectron(p, canH) {
+  const speed = 2.5 + p.Ek_eV * 0.8 + Math.random();
+  const ang = -Math.PI*0.5 + (Math.random()-0.5)*Math.PI*0.6;
+  electrons.push({
+    x: 400 + Math.random()*10,
+    y: 80 + Math.random()*(canH-160),
+    vx: Math.cos(ang)*speed*0.5,
+    vy: Math.sin(ang)*speed,
+    alpha: 1,
+    size: 2.8,
+    color: '#6ecf7a',
+    age: 0,
+  });
+}
+
+// ════════════════════════════════════════════════
+//  CANVAS PRINCIPALE
+// ════════════════════════════════════════════════
+const canv = document.getElementById('simCanvas');
+const ctx  = canv.getContext('2d');
+
+function drawSim(p) {
+  const W = canv.width, H = canv.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Sfondo
+  const bg = ctx.createLinearGradient(0,0,W,0);
+  bg.addColorStop(0,'#080810');
+  bg.addColorStop(1,'#0d1520');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // ── Sorgente luminosa a sinistra ──
+  ctx.save();
+  const [r,g,b] = wavelengthToRGB(p.lambda_nm);
+  const srcGrad = ctx.createRadialGradient(30,H/2,0,30,H/2,55);
+  srcGrad.addColorStop(0,`rgba(${r},${g},${b},0.95)`);
+  srcGrad.addColorStop(0.5,`rgba(${r},${g},${b},0.3)`);
+  srcGrad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = srcGrad;
+  ctx.fillRect(0,0,W,H);
+  // Corpo lampada
+  ctx.fillStyle = '#e8e8e8';
+  ctx.beginPath();
+  ctx.roundRect(8, H/2-25, 38, 50, 5);
+  ctx.fill();
+  ctx.fillStyle = `rgba(${r},${g},${b},0.9)`;
+  ctx.beginPath();
+  ctx.ellipse(27, H/2, 12, 20, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
+  // Etichetta sorgente
+  ctx.font = '10px IBM Plex Mono';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('SORGENTE', 5, H/2+38);
+
+  // ── Catodo (lastra metallica) ──
+  const catX = 390, catW = 22, catH = H-60;
+  const catGrad = ctx.createLinearGradient(catX,0,catX+catW,0);
+  catGrad.addColorStop(0,'#bbb');
+  catGrad.addColorStop(0.4,'#e8e8e8');
+  catGrad.addColorStop(1,'#999');
+  ctx.fillStyle = catGrad;
+  ctx.fillRect(catX, 30, catW, catH);
+  // Lucentezza
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillRect(catX+3, 30, 5, catH);
+  // Etichetta
+  ctx.save();
+  ctx.translate(catX+catW/2, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.font = 'bold 11px IBM Plex Mono';
+  ctx.fillStyle = '#333';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${p.mat.name.toUpperCase()} (Φ=${p.mat.phi} eV)`, 0, 0);
+  ctx.restore();
+
+  // ── Anodo ──
+  const anoX = 640, anoW = 14;
+  ctx.fillStyle = 'rgba(100,160,220,0.6)';
+  ctx.fillRect(anoX, 50, anoW, H-100);
+  ctx.font = '10px IBM Plex Mono';
+  ctx.fillStyle = 'rgba(100,180,255,0.8)';
+  ctx.fillText('ANODO', anoX-2, H-35);
+
+  // ── Fascio luminoso (raggio) ──
+  const beamAlpha = 0.08 + 0.12*(state.intensity/100);
+  ctx.save();
+  const beamGrad = ctx.createLinearGradient(55, 0, catX, 0);
+  beamGrad.addColorStop(0, `rgba(${r},${g},${b},${beamAlpha*2})`);
+  beamGrad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+  ctx.fillStyle = beamGrad;
+  ctx.fillRect(55, 30, catX-55, H-60);
+  ctx.restore();
+
+  // ── Fotoni ──
+  photons.forEach(ph => {
+    ctx.save();
+    ctx.globalAlpha = ph.alpha;
+    ctx.beginPath();
+    ctx.arc(ph.x, ph.y, ph.size, 0, Math.PI*2);
+    ctx.fillStyle = ph.color;
+    ctx.shadowColor = ph.color;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // ── Fotoelettroni ──
+  electrons.forEach(el => {
+    ctx.save();
+    ctx.globalAlpha = el.alpha;
+    ctx.beginPath();
+    ctx.arc(el.x, el.y, el.size, 0, Math.PI*2);
+    ctx.fillStyle = el.color;
+    ctx.shadowColor = el.color;
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    // Scia
+    ctx.globalAlpha = el.alpha * 0.25;
+    ctx.beginPath();
+    ctx.arc(el.x - el.vx*4, el.y - el.vy*4, el.size*0.6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // ── Labels ──
+  ctx.font = '11px IBM Plex Mono';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(`ν = ${state.nuE14.toFixed(2)} × 10¹⁴ Hz`, 10, 20);
+  ctx.fillStyle = `rgba(${r},${g},${b},0.9)`;
+  ctx.fillText(`λ = ${Math.round(p.lambda_nm)} nm`, 10, 34);
+
+  if(p.emits) {
+    ctx.fillStyle = 'rgba(110,207,122,0.85)';
+    ctx.fillText(`Eₖ,max = ${p.Ek_eV.toFixed(3)} eV`, catX+catW+8, 22);
+    ctx.fillText(`V₀ = ${p.V0.toFixed(3)} V`, catX+catW+8, 38);
+  } else {
+    ctx.fillStyle = 'rgba(230,120,120,0.85)';
+    ctx.fillText('Nessuna emissione', catX+catW+8, 22);
+    ctx.fillText(`Δ = ${(p.Phi_eV - p.Ephoton_eV).toFixed(3)} eV mancanti`, catX+catW+8, 38);
+  }
+
+  // Corrente
+  if(p.currentFrac > 0) {
+    ctx.strokeStyle = 'rgba(100,180,255,0.6)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,6]);
+    ctx.beginPath();
+    ctx.moveTo(anoX+anoW, H/2);
+    ctx.lineTo(W-10, H/2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = '10px IBM Plex Mono';
+    ctx.fillStyle = 'rgba(100,180,255,0.8)';
+    ctx.fillText(`I = ${(p.currentFrac*100).toFixed(1)}%`, W-60, H/2-6);
+  }
+}
+
+// ════════════════════════════════════════════════
+//  CANVAS DIAGRAMMA ENERGIA
+// ════════════════════════════════════════════════
+const ecanv = document.getElementById('energy-canvas');
+const ectx  = ecanv.getContext('2d');
+
+function drawEnergy(p) {
+  const W = ecanv.width, H = ecanv.height;
+  ectx.clearRect(0,0,W,H);
+  ectx.fillStyle = '#0d1117';
+  ectx.fillRect(0,0,W,H);
+
+  const maxE = Math.max(p.Ephoton_eV * 1.25, p.Phi_eV * 1.4, 1);
+  const barW = 70;
+  const baseY = H - 30;
+  const scaleY = (H - 50) / maxE;
+
+  const cols = ['#c4a020','#c43030','#30b050'];
+  const labels = ['hν (fotone)', 'Φ (lavoro)', 'Eₖ,max'];
+  const values = [p.Ephoton_eV, p.Phi_eV, p.emits ? p.Ek_eV : 0];
+  const xs = [50, 190, 330];
+
+  xs.forEach((x,i) => {
+    const barH = values[i] * scaleY;
+    const grad = ectx.createLinearGradient(x, baseY - barH, x, baseY);
+    grad.addColorStop(0, cols[i]);
+    grad.addColorStop(1, cols[i]+'44');
+    ectx.fillStyle = grad;
+    ectx.fillRect(x, baseY - barH, barW, barH);
+
+    // Valore
+    ectx.font = 'bold 12px IBM Plex Mono';
+    ectx.fillStyle = cols[i];
+    ectx.textAlign = 'center';
+    ectx.fillText(values[i].toFixed(3) + ' eV', x + barW/2, baseY - barH - 6);
+
+    // Etichetta
+    ectx.font = '10px IBM Plex Mono';
+    ectx.fillStyle = '#aaa';
+    ectx.fillText(labels[i], x + barW/2, baseY + 14);
+  });
+
+  // Linea soglia emissione
+  const phiY = baseY - p.Phi_eV * scaleY;
+  ectx.strokeStyle = 'rgba(200,80,80,0.5)';
+  ectx.lineWidth = 1;
+  ectx.setLineDash([5,5]);
+  ectx.beginPath();
+  ectx.moveTo(0, phiY);
+  ectx.lineTo(W, phiY);
+  ectx.stroke();
+  ectx.setLineDash([]);
+  ectx.font = '10px IBM Plex Mono';
+  ectx.fillStyle = 'rgba(200,80,80,0.7)';
+  ectx.textAlign = 'right';
+  ectx.fillText('soglia emissione', W-8, phiY-4);
+
+  // Asse Y
+  ectx.fillStyle = '#555';
+  ectx.textAlign = 'right';
+  ectx.font = '9px IBM Plex Mono';
+  for(let ev=0; ev<=Math.ceil(maxE); ev++) {
+    const y = baseY - ev * scaleY;
+    if(y < 10) continue;
+    ectx.fillStyle = '#444';
+    ectx.beginPath();
+    ectx.moveTo(0, y);
+    ectx.lineTo(W, y);
+    ectx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ectx.lineWidth = 1;
+    ectx.stroke();
+    ectx.fillStyle = '#666';
+    ectx.fillText(ev + ' eV', 42, y + 3);
+  }
+}
+
+// ════════════════════════════════════════════════
+//  CANVAS CURVA I-V
+// ════════════════════════════════════════════════
+const ivcanv = document.getElementById('iv-canvas');
+const ivctx  = ivcanv.getContext('2d');
+
+function drawIV(p) {
+  const W = ivcanv.width, H = ivcanv.height;
+  ivctx.clearRect(0,0,W,H);
+  ivctx.fillStyle = '#0d1117';
+  ivctx.fillRect(0,0,W,H);
+
+  const Vmin = -5, Vmax = 5;
+  const pad = {l:48, r:20, t:20, b:36};
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+
+  const vToX = v => pad.l + (v - Vmin)/(Vmax-Vmin) * plotW;
+  const iToY = i => pad.t + (1 - i) * plotH;
+
+  // Griglia
+  ivctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ivctx.lineWidth = 1;
+  for(let v=Vmin; v<=Vmax; v++) {
+    ivctx.beginPath();
+    ivctx.moveTo(vToX(v), pad.t);
+    ivctx.lineTo(vToX(v), pad.t+plotH);
+    ivctx.stroke();
+  }
+  for(let i=0; i<=4; i++) {
+    const y = iToY(i/4);
+    ivctx.beginPath();
+    ivctx.moveTo(pad.l, y);
+    ivctx.lineTo(pad.l+plotW, y);
+    ivctx.stroke();
+  }
+
+  // Assi
+  ivctx.strokeStyle = '#555';
+  ivctx.lineWidth = 1.5;
+  ivctx.beginPath();
+  ivctx.moveTo(pad.l, pad.t);
+  ivctx.lineTo(pad.l, pad.t+plotH);
+  ivctx.moveTo(pad.l, pad.t+plotH);
+  ivctx.lineTo(pad.l+plotW, pad.t+plotH);
+  ivctx.stroke();
+
+  // Etichette assi
+  ivctx.font = '9px IBM Plex Mono';
+  ivctx.fillStyle = '#666';
+  ivctx.textAlign = 'center';
+  for(let v=Vmin; v<=Vmax; v+=1) {
+    ivctx.fillText(v, vToX(v), pad.t+plotH+14);
+  }
+  ivctx.fillStyle = '#888';
+  ivctx.fillText('V (volt)', pad.l+plotW/2, H-2);
+  ivctx.save();
+  ivctx.translate(12, pad.t+plotH/2);
+  ivctx.rotate(-Math.PI/2);
+  ivctx.fillText('I (norm.)', 0, 0);
+  ivctx.restore();
+
+  // Curva I-V
+  if(p.emits) {
+    const Isat = state.intensity/100;
+    const V0 = p.V0;
+
+    ivctx.beginPath();
+    ivctx.strokeStyle = '#4a9fff';
+    ivctx.lineWidth = 2.2;
+    let first = true;
+    for(let vv=Vmin; vv<=Vmax; vv+=0.05) {
+      let ii;
+      if(vv < -V0) ii = 0;
+      else if(vv < 0) ii = Isat * (vv + V0) / (V0 + 0.001);
+      else ii = Isat;
+      const x = vToX(vv), y = iToY(ii);
+      if(first) { ivctx.moveTo(x,y); first=false; } else ivctx.lineTo(x,y);
+    }
+    ivctx.stroke();
+
+    // Punti chiave
+    // -V0
+    ivctx.fillStyle = '#e07070';
+    ivctx.beginPath();
+    ivctx.arc(vToX(-V0), iToY(0), 5, 0, Math.PI*2);
+    ivctx.fill();
+    ivctx.font = '9px IBM Plex Mono';
+    ivctx.fillStyle = '#e07070';
+    ivctx.textAlign = 'center';
+    ivctx.fillText(`-V₀=${(-V0).toFixed(2)}`, vToX(-V0), iToY(0)-10);
+
+    // Isat
+    ivctx.fillStyle = '#6ecf7a';
+    ivctx.beginPath();
+    ivctx.arc(vToX(4), iToY(Isat), 5, 0, Math.PI*2);
+    ivctx.fill();
+    ivctx.fillStyle = '#6ecf7a';
+    ivctx.fillText(`Iₛₐₜ=${(Isat*100).toFixed(0)}%`, vToX(4), iToY(Isat)-10);
+
+  } else {
+    // Nessuna emissione
+    ivctx.strokeStyle = 'rgba(200,80,80,0.5)';
+    ivctx.lineWidth = 1.5;
+    ivctx.setLineDash([6,5]);
+    ivctx.beginPath();
+    ivctx.moveTo(pad.l, iToY(0));
+    ivctx.lineTo(pad.l+plotW, iToY(0));
+    ivctx.stroke();
+    ivctx.setLineDash([]);
+    ivctx.font = '11px IBM Plex Mono';
+    ivctx.fillStyle = 'rgba(200,80,80,0.8)';
+    ivctx.textAlign = 'center';
+    ivctx.fillText('Nessuna fotoemissione (hν < Φ)', pad.l+plotW/2, pad.t+plotH/2);
+  }
+
+  // Tensione corrente
+  const curV = state.voltage;
+  ivctx.strokeStyle = 'rgba(255,220,60,0.7)';
+  ivctx.lineWidth = 1;
+  ivctx.setLineDash([4,4]);
+  ivctx.beginPath();
+  ivctx.moveTo(vToX(curV), pad.t);
+  ivctx.lineTo(vToX(curV), pad.t+plotH);
+  ivctx.stroke();
+  ivctx.setLineDash([]);
+  ivctx.font = '9px IBM Plex Mono';
+  ivctx.fillStyle = 'rgba(255,220,60,0.9)';
+  ivctx.textAlign = 'center';
+  ivctx.fillText(`V=${curV.toFixed(1)}`, vToX(curV), pad.t-4);
+}
+
+// ════════════════════════════════════════════════
+//  UPDATE READOUTS
+// ════════════════════════════════════════════════
+function updateReadouts(p) {
+  document.getElementById('rd-ephoton').textContent = p.Ephoton_eV.toFixed(3) + ' eV';
+  document.getElementById('rd-phi').textContent = p.Phi_eV.toFixed(2) + ' eV';
+
+  const ekEl = document.getElementById('rd-ek');
+  if(p.emits) {
+    ekEl.textContent = p.Ek_eV.toFixed(3) + ' eV';
+    ekEl.className = 'r-val ok';
+  } else {
+    ekEl.textContent = '0 (no emiss.)';
+    ekEl.className = 'r-val no';
+  }
+
+  const v0El = document.getElementById('rd-v0');
+  v0El.textContent = p.emits ? p.V0.toFixed(3) + ' V' : '—';
+  v0El.className = p.emits ? 'r-val ok' : 'r-val no';
+
+  document.getElementById('rd-freq').textContent = state.nuE14.toFixed(2) + ' × 10¹⁴ Hz';
+  document.getElementById('rd-lambda').textContent = Math.round(p.lambda_nm) + ' nm';
+  document.getElementById('rd-nu0').textContent = p.nu0_e14.toFixed(2) + ' × 10¹⁴ Hz';
+
+  const curEl = document.getElementById('rd-current');
+  curEl.textContent = (p.currentFrac*100).toFixed(1) + '%';
+  curEl.className = p.currentFrac > 0 ? 'r-val ok' : 'r-val no';
+
+  const banner = document.getElementById('status-banner');
+  if(p.emits) {
+    banner.textContent = `✓ Emissione attiva — Eₖ,max = ${p.Ek_eV.toFixed(3)} eV — V₀ = ${p.V0.toFixed(3)} V`;
+    banner.className = 'emit';
+  } else {
+    banner.textContent = `✗ Nessuna emissione — mancano ${(p.Phi_eV - p.Ephoton_eV).toFixed(3)} eV per superare la funzione lavoro`;
+    banner.className = 'noemit';
+  }
+
+  // Labels slider
+  document.getElementById('lbl-freq').textContent = state.nuE14.toFixed(2) + ' × 10¹⁴ Hz';
+  document.getElementById('lbl-int').textContent = state.intensity + '%';
+  document.getElementById('lbl-volt').textContent = (state.voltage >= 0 ? '+' : '') + state.voltage.toFixed(2) + ' V';
+  document.getElementById('lbl-lambda-sub').textContent = 'λ = ' + Math.round(p.lambda_nm) + ' nm';
+  document.getElementById('lbl-color-sub').textContent = 'Regione: ' + freqToLabel(state.nuE14);
+
+  // Tabella materiali — riga attiva
+  document.querySelectorAll('[id^="mrow-"]').forEach(r=>r.classList.remove('active-row'));
+  document.getElementById(`mrow-${state.matIdx}`)?.classList.add('active-row');
+}
+
+// ════════════════════════════════════════════════
+//  MAIN UPDATE
+// ════════════════════════════════════════════════
+function update() {
+  const p = physics();
+  drawEnergy(p);
+  drawIV(p);
+  updateReadouts(p);
+}
+
+// ════════════════════════════════════════════════
+//  ANIMATION LOOP
+// ════════════════════════════════════════════════
+function loop() {
+  requestAnimationFrame(loop);
+  frameCount++;
+
+  const p = physics();
+
+  // Spawna fotoni
+  const photonRate = Math.ceil((state.intensity/100) * 1.8);
+  if(frameCount % Math.max(1, Math.round(4/photonRate)) === 0) {
+    spawnPhoton(p);
+  }
+
+  // Spawna elettroni se emissione
+  if(p.emits && p.currentFrac > 0) {
+    const eRate = p.currentFrac;
+    if(frameCount % Math.max(1, Math.round(5/(eRate+0.01))) === 0) {
+      spawnElectron(p, canv.height);
+    }
+  }
+
+  // Aggiorna fotoni
+  for(let i=photons.length-1; i>=0; i--) {
+    const ph = photons[i];
+    ph.x += ph.vx;
+    if(ph.x > 395) {
+      photons.splice(i,1);
+    }
+  }
+
+  // Aggiorna elettroni
+  for(let i=electrons.length-1; i>=0; i--) {
+    const el = electrons[i];
+    el.x += el.vx;
+    el.y += el.vy;
+    el.age++;
+    el.alpha = Math.max(0, 1 - el.age/80);
+    if(el.alpha <= 0 || el.x > canv.width + 20) {
+      electrons.splice(i,1);
+    }
+  }
+
+  drawSim(p);
+}
+
+// Init
+update();
+loop();
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <script>
 window.SIM_METADATA = {
   title: "Principi della Dinamica",
-  description: "Esplorazione delle leggi della dinamica con forze applicate, massa e variazione del moto dei corpi.",
+  description: "Esplorazione interattiva delle tre leggi di Newton: inerzia, forza e massa, azione e reazione.",
   category: "Meccanica",
   icon: "➡️⬅️",
   order: 50,
@@ -15,117 +15,356 @@ window.SIM_METADATA = {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le tre leggi di Newton — Simulatore interattivo</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]})"></script>
+
 <style>
+/* ── Reset & base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:   #faf8f3;
+  --ink:     #1c1a16;
+  --ink2:    #3d3a32;
+  --ink3:    #6b6659;
+  --rule:    #e2ddd5;
+  --rule2:   #cec9c0;
+  --accent:  #185FA5;
+  --accent2: #0f6e56;
+  --warm:    #c85a1a;
+  --card:    #f4f1eb;
+  --card2:   #ffffff;
+  --shadow:  rgba(28,26,22,0.07);
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  background: #ffffff; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2.5rem 1rem 4rem;
+  line-height: 1.6;
 }
-.page { max-width: 760px; margin: 0 auto; }
-h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
-.subtitle { font-size: 14px; color: #666; margin-bottom: 1.5rem; }
-.tab-bar { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+.page { max-width: 780px; margin: 0 auto; }
+
+/* ── Header ── */
+.page-header { margin-bottom: 2rem; border-bottom: 1px solid var(--rule); padding-bottom: 1.2rem; }
+.page-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: 6px;
+}
+.page-title {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 32px; font-weight: 500; line-height: 1.15;
+  color: var(--ink); margin-bottom: 6px;
+}
+.page-subtitle { font-size: 14px; color: var(--ink3); font-style: italic; }
+
+/* ── Tab bar ── */
+.tab-bar {
+  display: flex; gap: 6px; margin-bottom: 2rem; flex-wrap: wrap;
+  border-bottom: 1px solid var(--rule); padding-bottom: 0;
+}
 .tab {
-  padding: 8px 16px; border: 1px solid #d0d0d0; border-radius: 8px;
-  font-size: 14px; cursor: pointer; background: #fff; color: #555; transition: all 0.15s;
+  padding: 8px 18px;
+  border: 1px solid transparent; border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px; font-weight: 400;
+  cursor: pointer; background: transparent; color: var(--ink3);
+  transition: all 0.15s; position: relative; bottom: -1px;
 }
-.tab:hover { background: #f5f5f5; }
-.tab.active { background: #f0f0f0; color: #1a1a1a; border-color: #999; font-weight: 500; }
+.tab:hover { background: var(--card); color: var(--ink); }
+.tab.active {
+  background: var(--cream); color: var(--ink);
+  border-color: var(--rule); border-bottom-color: var(--cream);
+  font-weight: 500;
+}
+
+/* ── Panel structure ── */
 .panel { display: none; }
 .panel.active { display: block; }
-.law-label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
-.law-title { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
-.law-formula { font-family: 'Courier New', monospace; font-size: 14px; color: #185FA5; margin-bottom: 1rem; }
-canvas { display: block; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; background: #fff; }
+
+/* ── Law header ── */
+.law-header { margin-bottom: 1.4rem; }
+.law-number {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: 4px;
+}
+.law-title {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 26px; font-weight: 500; color: var(--ink);
+  margin-bottom: 10px;
+}
+.law-formula-box {
+  display: inline-block;
+  background: var(--card); border: 1px solid var(--rule2);
+  border-radius: 8px; padding: 10px 18px;
+  font-size: 15px; color: var(--accent);
+}
+
+/* ── Canvas ── */
+canvas {
+  display: block; width: 100%;
+  border: 1px solid var(--rule2); border-radius: 10px;
+  background: var(--card2);
+}
 .canvas-stack { position: relative; }
-.canvas-overlay-controls { position: absolute; left: 12px; top: 12px; display: flex; gap: 8px; z-index: 3; }
-button.canvas-action { padding: 6px 10px; border: 1px solid rgba(0,0,0,0.14); border-radius: 999px; font-size: 12px; cursor: pointer; background: rgba(255,255,255,0.92); color: #444; backdrop-filter: blur(4px); transition: background 0.12s, border-color 0.12s; }
-button.canvas-action:hover { background: rgba(245,245,245,0.98); border-color: rgba(0,0,0,0.24); }
-button.canvas-action.active { background: #fdf0ea; color: #993C1D; border-color: #F5C4B3; }
-.controls { margin-top: 1rem; display: flex; flex-direction: column; gap: 10px; }
-.control-row { display: flex; align-items: center; gap: 10px; }
-.control-row label { font-size: 13px; color: #444; min-width: 210px; }
-.control-row input[type=range] { flex: 1; accent-color: #185FA5; cursor: pointer; }
-.val { font-size: 13px; font-weight: 500; min-width: 80px; text-align: right; color: #1a1a1a; }
-.btn-row { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
-button.action {
-  padding: 7px 16px; border: 1px solid #d0d0d0; border-radius: 8px;
-  font-size: 13px; cursor: pointer; background: #fff; color: #1a1a1a; transition: background 0.12s;
+.canvas-overlay-controls {
+  position: absolute; left: 12px; top: 12px;
+  display: flex; flex-direction: column; gap: 8px; z-index: 3;
 }
-button.action:hover { background: #f0f0f0; }
-button.action:active { transform: scale(0.98); }
-.info-box {
-  margin-top: 1rem; padding: 12px 16px; background: #f5f5f5;
-  border-radius: 8px; border: 1px solid #e8e8e8; font-size: 13px; color: #555; line-height: 1.7;
+.canvas-action {
+  padding: 6px 11px;
+  border: 1px solid rgba(28,26,22,0.15); border-radius: 7px;
+  background: rgba(250,248,243,0.92); color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;
+  cursor: pointer; box-shadow: 0 2px 8px var(--shadow); transition: all 0.12s;
 }
-.info-box strong { color: #1a1a1a; font-weight: 500; }
-.section-sep { margin: 1.8rem 0; border: none; border-top: 1px solid #e8e8e8; }
-.section-title { font-size: 12px; font-weight: 500; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 6px 0 8px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
-.legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-.legend-line { width: 20px; height: 2px; flex-shrink: 0; }
+.canvas-action:hover { background: var(--card); }
+.canvas-action.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── Status bar ── */
 .status-bar {
-  margin-bottom: 8px; padding: 8px 14px; border-radius: 6px;
+  margin-bottom: 8px; padding: 8px 14px; border-radius: 7px;
   font-size: 13px; font-weight: 500; text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
   transition: background 0.3s, color 0.3s;
 }
-.s-move  { background: #f0f0f0; color: #444; border: 1px solid #ddd; }
-.s-slow  { background: #fdf5e0; color: #7a5200; border: 1px solid #FAC775; }
-.s-stop  { background: #e8f0fb; color: #0C447C; border: 1px solid #B5D4F4; }
-.s-noninertial { background: #fdf0ea; color: #993C1D; border: 1px solid #F5C4B3; }
-.s-inertial-cf { background: #e8f7f2; color: #0F6E56; border: 1px solid #9FE1CB; }
-.s-rotating-cf { background: #fdf0ea; color: #993C1D; border: 1px solid #F5C4B3; }
+.s-move         { background: #f0ede8; color: var(--ink2); border: 1px solid var(--rule2); }
+.s-slow         { background: #fdf5e0; color: #7a5200;      border: 1px solid #fac775; }
+.s-stop         { background: #e8f0fb; color: #0c447c;      border: 1px solid #b5d4f4; }
+.s-noninertial  { background: #fdf0ea; color: #993c1d;      border: 1px solid #f5c4b3; }
+.s-inertial-cf  { background: #e8f7f2; color: #0f6e56;      border: 1px solid #9fe1cb; }
+.s-rotating-cf  { background: #fdf0ea; color: #993c1d;      border: 1px solid #f5c4b3; }
 
-/* ── Panel 3 space theme ── */
-#p3-canvas {
-  border-radius: 10px;
-  border: 1px solid #333;
-  cursor: crosshair;
+/* ── Legend ── */
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 8px 0 10px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink3); }
+.legend-dot  { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.legend-line { width: 22px; height: 2px; flex-shrink: 0; }
+
+/* ── Controls ── */
+.controls { margin-top: 1.1rem; display: flex; flex-direction: column; gap: 10px; }
+.control-row { display: flex; align-items: center; gap: 10px; }
+.control-row label {
+  font-size: 13px; color: var(--ink2); min-width: 210px;
+  font-family: 'IBM Plex Sans', sans-serif;
 }
+.control-row input[type=range] { flex: 1; accent-color: var(--accent); cursor: pointer; }
+.val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; font-weight: 500; min-width: 84px; text-align: right;
+  color: var(--ink);
+}
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+button.action {
+  padding: 7px 16px;
+  border: 1px solid var(--rule2); border-radius: 8px;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 13px;
+  cursor: pointer; background: var(--card2); color: var(--ink);
+  transition: background 0.12s, border-color 0.12s;
+}
+button.action:hover { background: var(--card); border-color: var(--rule2); }
+button.action:active { transform: scale(0.98); }
+
+/* ── Section separator ── */
+.section-sep { margin: 2rem 0; border: none; border-top: 1px solid var(--rule); }
+.section-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 500; color: var(--ink3);
+  margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+/* ── Info / theory boxes ── */
+.info-box {
+  margin-top: 1.1rem; padding: 14px 18px;
+  background: var(--card); border: 1px solid var(--rule);
+  border-radius: 10px; font-size: 13.5px; color: var(--ink2); line-height: 1.75;
+}
+.info-box strong { color: var(--ink); font-weight: 500; }
+
+/* ── Theory section (shared) ── */
+.theory-section {
+  margin-top: 1.6rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 1.4rem;
+}
+.theory-section h3 {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 20px; font-weight: 500; color: var(--ink);
+  margin-bottom: 0.9rem;
+}
+.theory-section p {
+  font-size: 14px; color: var(--ink2); line-height: 1.8;
+  margin-bottom: 0.9rem;
+}
+.theory-section p:last-child { margin-bottom: 0; }
+
+.theory-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  margin: 1rem 0;
+}
+.theory-card {
+  padding: 14px 16px; border: 1px solid var(--rule);
+  border-radius: 10px; background: var(--card2);
+}
+.theory-card .tc-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink3); margin-bottom: 8px;
+}
+.theory-card .tc-formula {
+  font-size: 15px; color: var(--accent);
+  margin: 6px 0 10px;
+}
+.theory-card p {
+  font-size: 13px; color: var(--ink2); line-height: 1.7; margin-bottom: 0;
+}
+
+.example-strip {
+  margin-top: 1rem;
+  padding: 14px 18px;
+  background: #f0f7f4; border: 1px solid #b8ddd1; border-radius: 10px;
+}
+.example-strip .ex-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: #0f6e56; margin-bottom: 8px; font-weight: 500;
+}
+.example-strip p { font-size: 13px; color: var(--ink2); line-height: 1.75; margin-bottom: 6px; }
+.example-strip p:last-child { margin-bottom: 0; }
+
+.warning-strip {
+  margin-top: 1rem; padding: 12px 16px;
+  background: #fdf5e6; border: 1px solid #f0d090; border-radius: 10px;
+  font-size: 13px; color: #6b4c0a; line-height: 1.7;
+}
+.warning-strip strong { color: #4a3000; }
+
+/* ── Panel 2 live display ── */
+.law2-live {
+  display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;
+}
+.law2-chip {
+  flex: 1; min-width: 120px;
+  padding: 10px 14px; border-radius: 9px;
+  border: 1px solid var(--rule); background: var(--card2); text-align: center;
+}
+.law2-chip .chip-label { font-size: 11px; color: var(--ink3); margin-bottom: 3px; }
+.law2-chip .chip-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px; font-weight: 500; color: var(--ink);
+}
+.law2-chip.highlight { background: #e8f0fb; border-color: #b5d4f4; }
+.law2-chip.highlight .chip-val { color: var(--accent); }
+
+/* ── Panel 3 ── */
+#p3-canvas { border-radius: 12px; border: 1px solid #243244; }
+.p3-mode-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 1rem 0; }
+.p3-mode-btn {
+  padding: 7px 16px;
+  border: 1px solid var(--rule2); border-radius: 999px;
+  background: var(--card2); font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px; color: var(--ink2); cursor: pointer; transition: all 0.15s;
+}
+.p3-mode-btn:hover { background: var(--card); }
+.p3-mode-btn.active { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
 .p3-controls {
-  margin-top: 1rem; display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 24px;
+  margin-top: 1.1rem; display: grid;
+  grid-template-columns: 1fr 1fr; gap: 10px 24px;
 }
 .p3-col-title {
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
-  color: #888; margin-bottom: 4px; grid-column: span 1;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink3); margin-bottom: 5px;
 }
+.p3-wide { grid-column: span 2; }
 .p3-btn-row { display: flex; gap: 8px; flex-wrap: wrap; grid-column: span 2; margin-top: 4px; }
+
 .p3-stat {
-  margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
 }
 .p3-stat-card {
-  padding: 8px 12px; border-radius: 8px; border: 1px solid #e8e8e8;
-  background: #fafafa; font-size: 12px; color: #555; line-height: 1.6;
+  padding: 11px 14px; border-radius: 10px;
+  border: 1px solid var(--rule); background: var(--card2);
+  font-size: 12px; color: var(--ink3); line-height: 1.6;
 }
-.p3-stat-card strong { display: block; font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 2px; }
+.p3-stat-card strong {
+  display: block; font-family: 'IBM Plex Mono', monospace;
+  font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 2px;
+}
+.p3-stat-card.full { grid-column: span 2; background: #e8f0fb; border-color: #b5d4f4; }
+.p3-stat-card.full strong { color: var(--accent); }
+
+.p3-info-strip {
+  margin-top: 10px; padding: 11px 14px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--rule);
+  font-size: 13px; line-height: 1.7; color: var(--ink2);
+  font-style: italic;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .page-title { font-size: 24px; }
+  .theory-grid, .p3-controls, .p3-stat { grid-template-columns: 1fr; }
+  .p3-wide, .p3-btn-row, .p3-stat-card.full { grid-column: span 1; }
+  .control-row label { min-width: 150px; }
+  .law2-live { flex-direction: column; }
+  .tab { font-size: 12px; padding: 7px 12px; }
+}
 </style>
 </head>
 <body>
 <div class="page">
-  <h1>Le tre leggi di Newton</h1>
-  <p class="subtitle">Simulatore interattivo — seleziona una legge e modifica i parametri</p>
 
-  <div class="tab-bar">
-    <button class="tab active" onclick="showTab(0)">1° legge — inerzia e sistemi di rif.</button>
-    <button class="tab" onclick="showTab(1)">2° legge — F = ma</button>
-    <button class="tab" onclick="showTab(2)">3° legge — azione e reazione</button>
+  <div class="page-header">
+    <div class="page-eyebrow">Meccanica — Dinamica</div>
+    <h1 class="page-title">Le tre leggi di Newton</h1>
+    <p class="page-subtitle">Simulatore interattivo — seleziona una legge, modifica i parametri, osserva il moto</p>
   </div>
 
-  <!-- ===================== PANEL 1 ===================== -->
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab(0)">I — Inerzia e sistemi di rif.</button>
+    <button class="tab" onclick="showTab(1)">II — Legge fondamentale</button>
+    <button class="tab" onclick="showTab(2)">III — Azione e reazione</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PANEL 1 — PRIMA LEGGE
+  ════════════════════════════════════════════════════════ -->
   <div class="panel active" id="panel0">
-    <div class="law-label">Prima legge di Newton</div>
-    <div class="law-title">Principio di inerzia e sistemi di riferimento</div>
-    <div class="law-formula">Se &Sigma;F = 0 &rarr; v = costante &nbsp;(in qualunque sistema inerziale)</div>
+
+    <div class="law-header">
+      <div class="law-number">Prima legge di Newton — Principio di inerzia</div>
+      <h2 class="law-title">Un corpo in moto rimane in moto</h2>
+      <div class="law-formula-box">
+        \(\displaystyle \sum \vec{F} = 0 \;\Longrightarrow\; \vec{v} = \text{costante}\)
+      </div>
+    </div>
+
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Oggetto</div>
-      <div class="legend-item"><div class="legend-line" style="background:#cfcfcf"></div>Sfondo S (laboratorio)</div>
-      <div class="legend-item"><div class="legend-line" style="background:rgba(29,158,117,0.5)"></div>Griglia S′ (osservatore)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Forza apparente</div>
+      <div class="legend-item"><div class="legend-line" style="background:#ccc"></div>Griglia S (lab.)</div>
+      <div class="legend-item"><div class="legend-line" style="background:rgba(29,158,117,0.6)"></div>Griglia S′</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Forza fittizia</div>
     </div>
-    <div class="status-bar s-move" id="statusBar">L'oggetto si muove a v_rel = +2.0 m/s nel sistema S′</div>
+    <div class="status-bar s-move" id="statusBar">Vista da S′  |  v&#x1D63;&#x2091;&#x2097; = +2.0 m/s — porta v&#x209B;&#x2032; → v&#x2092;b&#x2C7C; per fermare l'oggetto</div>
     <div class="canvas-stack">
       <canvas id="c1" height="240"></canvas>
       <div class="canvas-overlay-controls">
@@ -133,9 +372,10 @@ button.action:active { transform: scale(0.98); }
         <button class="canvas-action" id="pulseBoostBtn" onclick="sr_triggerPulse(2.6)">Spinta breve</button>
       </div>
     </div>
+
     <div class="controls">
       <div class="control-row">
-        <label>Velocità oggetto v<sub>obj</sub> (m/s)</label>
+        <label>Velocità oggetto \(v_\text{obj}\) (m/s)</label>
         <input type="range" min="-5" max="5" step="0.1" value="2.0" id="vObj" oninput="sr_update()">
         <span class="val" id="vObjVal">+2.0 m/s</span>
       </div>
@@ -145,39 +385,69 @@ button.action:active { transform: scale(0.98); }
         <span class="val" id="vRefVal">0.0 m/s</span>
       </div>
       <div class="control-row">
-        <label>Accelerazione S′ — a′ (m/s²)</label>
+        <label>Accelerazione S′ — \(a'\) (m/s²)</label>
         <input type="range" min="-4" max="4" step="0.1" value="0.0" id="aRef" oninput="sr_update()">
         <span class="val" id="aRefVal">0.0 m/s²</span>
       </div>
     </div>
+
     <div class="info-box">
-      La canvas mostra la scena <strong>dal punto di vista di S′</strong>. Man mano che porti la velocità di S′ uguale a quella dell'oggetto, <strong>l'oggetto rallenta e si ferma visivamente</strong> — non perché agisca una forza, ma perché cambia sistema di osservazione. Quando v′ = v<sub>obj</sub>, l'oggetto è fermo in S′ pur non essendolo in S. Aggiungi a′ ≠ 0 per rendere S′ non inerziale: compare la <strong>forza apparente fittizia</strong> F = −m·a′. I pulsanti sul canvas applicano invece un <strong>impulso breve</strong>: per poco tempo S′ accelera o frena, poi torna automaticamente alla velocità iniziale.
+      La simulazione mostra la scena <strong>dal punto di vista di S′</strong>. Avvicina la velocità di S′ a quella dell'oggetto: l'oggetto rallenta e si ferma visivamente, <em>non</em> perché agisca una forza, ma perché cambia il sistema di osservazione. Quando \(v_{S'} = v_\text{obj}\) l'oggetto è fermo in S′ pur muovendosi in S. Se imposti \(a' \neq 0\) il sistema S′ diventa <strong>non inerziale</strong> e compare la forza fittizia \(\vec{F}_\text{app} = -m\,a'\).
+    </div>
+
+    <!-- Theory 1A -->
+    <div class="theory-section">
+      <h3>Teoria — Sistemi di riferimento inerziali</h3>
+      <p>La prima legge afferma che esiste una classe privilegiata di sistemi di riferimento, detti <strong>inerziali</strong>, nei quali un corpo non soggetto a forze si muove di moto rettilineo uniforme (o rimane in quiete). Tutti i sistemi in moto rettilineo uniforme rispetto a un sistema inerziale sono anch'essi inerziali.</p>
+
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-label">Velocità relativa</div>
+          <div class="tc-formula">\(\vec{v}_\text{rel} = \vec{v}_\text{obj} - \vec{v}_{S'}\)</div>
+          <p>La velocità di un oggetto misurata da S′ è la differenza tra la velocità dell'oggetto nel sistema di riferimento assoluto S e la velocità di S′ rispetto a S. Non esiste una velocità "assoluta" — ogni misura dipende dall'osservatore.</p>
+        </div>
+        <div class="theory-card">
+          <div class="tc-label">Forza fittizia (sistema non inerziale)</div>
+          <div class="tc-formula">\(\vec{F}_\text{app} = -m\,\vec{a}'\)</div>
+          <p>Quando S′ accelera con \(a'\), un osservatore solidale con esso vede l'oggetto accelerare in direzione opposta senza causa apparente. Per "spiegare" il moto deve introdurre una forza fittizia, che non ha però contropartita reale: non c'è nessun corpo che esercita questa forza.</p>
+        </div>
+      </div>
+
+      <div class="example-strip">
+        <div class="ex-label">Esempi fisici</div>
+        <p><strong>Treno che frena.</strong> Un passeggero su un treno che decelera bruscamente vede gli oggetti sul tavolo scivolare in avanti. Nel sistema di riferimento del treno (non inerziale) sembra agire una forza verso il muso; per un osservatore a terra è semplicemente l'inerzia degli oggetti che tende a conservare la velocità originaria.</p>
+        <p><strong>Auto in curva.</strong> Il passeggero sente di essere "spinto" verso l'esterno della curva: è la forza centrifuga fittizia, che compare solo perché il sistema auto è in rotazione (accelerazione centripeta). La forza reale è quella del sedile che spinge il passeggero verso l'interno della curva.</p>
+        <p><strong>Spazio profondo.</strong> Un'astronave che si muove a velocità costante lontano da qualsiasi campo gravitazionale è il sistema inerziale più vicino all'ideale: al suo interno ogni oggetto lasciato libero rimane fermo rispetto alla navicella.</p>
+      </div>
     </div>
 
     <hr class="section-sep">
+
+    <!-- 1B Centrifugal -->
     <div class="section-title">Forza centrifuga — sistema di riferimento rotante</div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Oggetto</div>
-      <div class="legend-item"><div class="legend-line" style="background:#ddd"></div>Griglia S inerziale</div>
-      <div class="legend-item"><div class="legend-line" style="background:rgba(29,158,117,0.4)"></div>Griglia S′ rotante</div>
+      <div class="legend-item"><div class="legend-line" style="background:#ccc"></div>Griglia S inerziale</div>
+      <div class="legend-item"><div class="legend-line" style="background:rgba(29,158,117,0.5)"></div>Griglia S′ rotante</div>
       <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>F centripeta (reale)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>F centrifuga (fittizia)</div>
     </div>
     <div class="status-bar s-inertial-cf" id="statusCF">S inerziale — oggetto in orbita, solo forza centripeta reale</div>
     <canvas id="c1b" height="310"></canvas>
+
     <div class="controls">
       <div class="control-row">
-        <label>Velocità angolare &omega; (rad/s)</label>
+        <label>Velocità angolare \(\omega\) (rad/s)</label>
         <input type="range" min="0.2" max="3" step="0.05" value="1.0" id="omega" oninput="cf_update()">
         <span class="val" id="omegaVal">1.00 rad/s</span>
       </div>
       <div class="control-row">
-        <label>Raggio orbita r (m)</label>
+        <label>Raggio orbita \(r\) (m)</label>
         <input type="range" min="30" max="110" step="1" value="80" id="radius" oninput="cf_update()">
         <span class="val" id="radiusVal">80 m</span>
       </div>
       <div class="control-row">
-        <label>Massa oggetto m (kg)</label>
+        <label>Massa oggetto \(m\) (kg)</label>
         <input type="range" min="1" max="20" step="1" value="5" id="massCF" oninput="cf_update()">
         <span class="val" id="massCFVal">5 kg</span>
       </div>
@@ -185,110 +455,266 @@ button.action:active { transform: scale(0.98); }
         <button class="action" id="btnRotRef" onclick="toggleRotRef()">Entra in S′ rotante</button>
       </div>
     </div>
-    <div class="info-box">
-      In <strong>S inerziale</strong> l'oggetto orbita e la forza centripeta lo curva verso il centro. Premendo il pulsante entri in <strong>S′ rotante</strong>: l'oggetto appare fermo mentre la griglia di S ruota attorno a lui. Per spiegare l'equilibrio statico apparente serve la <strong>forza centrifuga fittizia</strong> F<sub>cf</sub> = m·ω²·r. Forza attuale: <strong id="fcfDisplay">400 N</strong>.
-    </div>
-  </div>
 
-  <!-- ===================== PANEL 2 ===================== -->
+    <div class="info-box">
+      In <strong>S inerziale</strong> l'oggetto orbita: la forza centripeta reale (tensione, gravità, normale…) lo curva verso il centro. Premendo il pulsante entri in <strong>S′ rotante</strong>: l'oggetto appare fermo e devi introdurre la <strong>forza centrifuga fittizia</strong> \(F_{cf} = m\omega^2 r\) per spiegare l'equilibrio. Forza attuale: <strong id="fcfDisplay">400 N</strong>.
+    </div>
+
+    <div class="theory-section">
+      <h3>Teoria — Sistemi rotanti e forze fittizie</h3>
+      <p>Un sistema di riferimento rotante con velocità angolare \(\omega\) è <em>non inerziale</em>: ogni corpo al suo interno sperimenta due forze fittizie aggiuntive. La <strong>forza centrifuga</strong> \(\vec{F}_{cf} = m\omega^2\vec{r}\) punta radialmente verso l'esterno; la <strong>forza di Coriolis</strong> \(\vec{F}_{Cor} = -2m\,\vec{\omega}\times\vec{v}'\) dipende dalla velocità del corpo <em>nel sistema rotante</em> e risulta perpendicolare ad essa.</p>
+
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-label">Forza centripeta (reale)</div>
+          <div class="tc-formula">\(F_c = m\omega^2 r = \dfrac{mv^2}{r}\)</div>
+          <p>È la forza <em>reale</em> che mantiene il corpo in orbita circolare nel sistema inerziale. Può essere esercitata dalla tensione di un filo, dalla forza gravitazionale, dalla reazione normale di una superficie curva.</p>
+        </div>
+        <div class="theory-card">
+          <div class="tc-label">Forza centrifuga (fittizia)</div>
+          <div class="tc-formula">\(F_{cf} = m\omega^2 r\)</div>
+          <p>Ha lo stesso modulo della forza centripeta ma verso opposto (verso l'esterno). È fittizia: non deriva da un'interazione con un altro corpo. Nel sistema S′ rotante la sua introduzione trasforma un problema dinamico in uno statico.</p>
+        </div>
+      </div>
+
+      <div class="example-strip">
+        <div class="ex-label">Esempi fisici</div>
+        <p><strong>Lavatrice in centrifuga.</strong> I vestiti tendono a muoversi verso l'esterno del cestello: nel sistema rotante della lavatrice sembra agire una forza centrifuga. Nel sistema del laboratorio i vestiti seguono semplicemente l'inerzia: senza una parete che li vincoli, andrebbero in linea retta.</p>
+        <p><strong>Venti e cicloni.</strong> La forza di Coriolis, prodotta dalla rotazione terrestre, devia i venti verso destra nell'emisfero nord e verso sinistra nell'emisfero sud. È la causa della forma a spirale dei cicloni e degli anticicloni.</p>
+        <p><strong>Pendolo di Foucault.</strong> Il piano di oscillazione di un pendolo libero ruota lentamente rispetto al suolo con periodo \(T = 24\,\text{h}/\sin\varphi\) (dove \(\varphi\) è la latitudine). È la prova più elegante che la Terra è un sistema non inerziale in rotazione.</p>
+      </div>
+    </div>
+
+  </div><!-- /panel0 -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       PANEL 2 — SECONDA LEGGE
+  ════════════════════════════════════════════════════════ -->
   <div class="panel" id="panel1">
-    <div class="law-label">Seconda legge di Newton</div>
-    <div class="law-title">Legge fondamentale della dinamica</div>
-    <div class="law-formula">ΣF = m &middot; a &nbsp;&rarr;&nbsp; a = (F<sub>1</sub> - F<sub>2</sub>) / m</div>
+
+    <div class="law-header">
+      <div class="law-number">Seconda legge di Newton — Legge fondamentale della dinamica</div>
+      <h2 class="law-title">La forza produce accelerazione</h2>
+      <div class="law-formula-box">
+        \(\displaystyle \sum \vec{F} = m\,\vec{a} \;\;\Longleftrightarrow\;\; \vec{a} = \frac{\sum\vec{F}}{m}\)
+      </div>
+    </div>
+
     <canvas id="c2" height="220"></canvas>
+
     <div class="controls">
       <div class="control-row">
-        <label>Forza F<sub>1</sub> verso destra (N)</label>
+        <label>Forza \(F_1\) verso destra (N)</label>
         <input type="range" min="0" max="200" step="1" value="80" id="force1" oninput="updateLaw2Controls()">
         <span class="val" id="force1Val">80 N</span>
       </div>
       <div class="control-row">
-        <label>Forza F<sub>2</sub> verso sinistra (N)</label>
+        <label>Forza \(F_2\) verso sinistra (N)</label>
         <input type="range" min="0" max="200" step="1" value="30" id="force2" oninput="updateLaw2Controls()">
         <span class="val" id="force2Val">30 N</span>
       </div>
       <div class="control-row">
-        <label>Massa (kg)</label>
+        <label>Massa \(m\) (kg)</label>
         <input type="range" min="1" max="30" step="1" value="8" id="mass" oninput="updateLaw2Controls()">
         <span class="val" id="massVal">8 kg</span>
       </div>
       <div class="btn-row">
-        <button class="action" onclick="startLaw2()">Avvia</button>
-        <button class="action" onclick="resetLaw2()">Reset</button>
+        <button class="action" onclick="startLaw2()">▶ Avvia</button>
+        <button class="action" onclick="resetLaw2()">↻ Reset</button>
       </div>
     </div>
-    <div class="info-box">
-      Forza risultante: <strong id="netForceDisplay">50 N</strong>. Accelerazione calcolata: <strong id="accDisplay">6.3 m/s²</strong>. Qui conta la <strong>somma vettoriale</strong> delle forze: se F<sub>1</sub> e F<sub>2</sub> hanno verso opposto, la risultante vale ΣF = F<sub>1</sub> - F<sub>2</sub>.
-    </div>
-  </div>
 
-  <!-- ===================== PANEL 3 ===================== -->
+    <div class="law2-live">
+      <div class="law2-chip">
+        <div class="chip-label">Forza risultante \(\sum F\)</div>
+        <div class="chip-val" id="netForceDisplay">+50 N</div>
+      </div>
+      <div class="law2-chip highlight">
+        <div class="chip-label">Accelerazione \(a\)</div>
+        <div class="chip-val" id="accDisplay">+6.3 m/s²</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      La forza risultante è la <strong>somma vettoriale</strong> di tutte le forze: \(\sum F = F_1 - F_2\) (con il segno corretto). Se le forze si bilanciano (\(\sum F = 0\)) il corpo mantiene la velocità che aveva (prima legge). A parità di forza, una massa maggiore produce un'accelerazione minore: la massa è la misura dell'<strong>inerzia</strong> del corpo.
+    </div>
+
+    <!-- Theory 2 -->
+    <div class="theory-section">
+      <h3>Teoria — La seconda legge in profondità</h3>
+      <p>La seconda legge è il cuore della dinamica classica: stabilisce una relazione <em>causale</em> tra forza e variazione del moto. Nella sua forma più generale, valida anche quando la massa varia, si scrive come variazione della <strong>quantità di moto</strong> \(\vec{p} = m\vec{v}\):</p>
+
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-label">Forma con quantità di moto</div>
+          <div class="tc-formula">\(\displaystyle \sum\vec{F} = \frac{d\vec{p}}{dt} = \frac{d(m\vec{v})}{dt}\)</div>
+          <p>Questa formulazione è più generale: se la massa è costante si riduce a \(F = ma\), ma è valida anche per sistemi a massa variabile (razzi, pioggia che cade in un carro).</p>
+        </div>
+        <div class="theory-card">
+          <div class="tc-label">Impulso e variazione di moto</div>
+          <div class="tc-formula">\(\vec{J} = \int_{t_1}^{t_2}\!\vec{F}\,dt = \Delta\vec{p}\)</div>
+          <p>L'impulso \(\vec{J}\) di una forza è uguale alla variazione di quantità di moto che produce. Questo spiega perché un airbag riduce le lesioni: aumenta il tempo di collisione, riducendo la forza media pur mantenendo lo stesso \(\Delta\vec{p}\).</p>
+        </div>
+      </div>
+
+      <p>Una conseguenza importante: l'<strong>accelerazione è sempre istantanea e proporzionale alla forza in quell'istante</strong>. Se la forza cambia nel tempo, cambia anche l'accelerazione — la traiettoria si calcola integrando nel tempo.</p>
+
+      <div class="example-strip">
+        <div class="ex-label">Esempi e ordini di grandezza</div>
+        <p><strong>Automobile in accelerazione.</strong> Un'auto da 1 200 kg con motore da 120 kW che eroga una spinta di 4 000 N (attrito trascurato) accelera di \(a = 4000/1200 \approx 3{,}3\;\text{m/s}^2\), raggiungendo 100 km/h in circa 8 s.</p>
+        <p><strong>Pallone da calcio.</strong> Un calciatore colpisce il pallone (0,43 kg) con una forza media di circa 1 500 N per 8 ms. L'impulso è \(J = 1500 \times 0{,}008 = 12\;\text{N·s}\), che corrisponde a una velocità di partenza di \(v = 12/0{,}43 \approx 28\;\text{m/s}\) (≈ 100 km/h).</p>
+        <p><strong>Gravità sulla Luna.</strong> La stessa massa pesa circa 1/6 sulla Luna (\(g_{Luna} \approx 1{,}6\;\text{m/s}^2\)) ma ha identica <em>inerzia</em>. Un astronauta che spinge un sasso di 10 kg con 10 N ottiene la stessa accelerazione (\(a = 1\;\text{m/s}^2\)) sia sulla Terra che sulla Luna.</p>
+      </div>
+
+      <div class="warning-strip">
+        <strong>Attenzione — Un errore comune.</strong> La seconda legge non dice che un corpo in moto ha sempre una forza applicata. Un oggetto che scivola su un piano perfettamente privo di attrito si muove <em>senza forze orizzontali</em> (prima legge). La forza è necessaria solo per <em>cambiare</em> il moto, non per mantenerlo.
+      </div>
+    </div>
+
+  </div><!-- /panel1 -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       PANEL 3 — TERZA LEGGE
+  ════════════════════════════════════════════════════════ -->
   <div class="panel" id="panel2">
-    <div class="law-label">Terza legge di Newton — nello spazio</div>
-    <div class="law-title">Azione e reazione</div>
-    <div class="law-formula">F&#8321;&#8322; = &minus;F&#8322;&#8321; &nbsp;&nbsp; (impulso conservato: m&#8321;v&#8321; + m&#8322;v&#8322; = cost.)</div>
+
+    <div class="law-header">
+      <div class="law-number">Terza legge di Newton — Principio di azione e reazione</div>
+      <h2 class="law-title">Ad ogni azione corrisponde una reazione uguale e contraria</h2>
+      <div class="law-formula-box">
+        \(\vec{F}_{A \to B} = -\vec{F}_{B \to A}\)
+        &nbsp;&nbsp;—&nbsp;&nbsp;
+        stesso modulo, verso opposto, su corpi <em>diversi</em>
+      </div>
+    </div>
+
+    <div class="p3-mode-row">
+      <button class="p3-mode-btn active" id="p3mode-skaters" onclick="p3_setScenario('skaters')">🧊 Pattinatori</button>
+      <button class="p3-mode-btn" id="p3mode-rocket" onclick="p3_setScenario('rocket')">🚀 Razzo e gas</button>
+      <button class="p3-mode-btn" id="p3mode-gravity" onclick="p3_setScenario('gravity')">🌍 Gravità</button>
+    </div>
 
     <canvas id="p3-canvas" height="380"></canvas>
 
     <div class="p3-controls">
       <div>
-        <div class="p3-col-title" style="color:#5DCAA5">&#9679; Corpo A</div>
+        <div class="p3-col-title" style="color:#127c61">Corpo A</div>
         <div class="control-row">
-          <label style="min-width:100px">Massa A (kg)</label>
-          <input type="range" min="1" max="30" step="1" value="8" id="p3mA" oninput="p3_update()">
+          <label style="min-width:110px">Massa A (kg)</label>
+          <input type="range" min="1" max="40" step="1" value="8" id="p3mA" oninput="p3_updateControls()">
           <span class="val" id="p3mAVal">8 kg</span>
         </div>
       </div>
       <div>
-        <div class="p3-col-title" style="color:#F0997B">&#9679; Corpo B</div>
+        <div class="p3-col-title" style="color:#c25a33">Corpo B</div>
         <div class="control-row">
-          <label style="min-width:100px">Massa B (kg)</label>
-          <input type="range" min="1" max="30" step="1" value="16" id="p3mB" oninput="p3_update()">
+          <label style="min-width:110px" id="p3massBLabel">Massa B (kg)</label>
+          <input type="range" min="1" max="40" step="1" value="16" id="p3mB" oninput="p3_updateControls()">
           <span class="val" id="p3mBVal">16 kg</span>
         </div>
       </div>
-      <div class="control-row" style="grid-column:span 2">
-        <label>Intensità impulso (N·s)</label>
-        <input type="range" min="5" max="100" step="5" value="40" id="p3impulse" oninput="p3_update()">
-        <span class="val" id="p3impulseVal">40 N·s</span>
+      <div class="control-row p3-wide">
+        <label id="p3strengthLabel">Intensità interazione</label>
+        <input type="range" min="10" max="120" step="1" value="55" id="p3strength" oninput="p3_updateControls()">
+        <span class="val" id="p3strengthVal">55 N</span>
       </div>
-      <div class="control-row" style="grid-column:span 2">
-        <label>Direzione spinta (°)</label>
-        <input type="range" min="0" max="360" step="1" value="0" id="p3angle" oninput="p3_update()">
-        <span class="val" id="p3angleVal">0°</span>
+      <div class="control-row p3-wide">
+        <label id="p3distanceLabel">Distanza iniziale</label>
+        <input type="range" min="40" max="220" step="1" value="130" id="p3distance" oninput="p3_updateControls()">
+        <span class="val" id="p3distanceVal">130 px</span>
+      </div>
+      <div class="control-row p3-wide">
+        <label id="p3timeLabel">Durata dell'azione</label>
+        <input type="range" min="0.3" max="2.5" step="0.1" value="1.0" id="p3duration" oninput="p3_updateControls()">
+        <span class="val" id="p3durationVal">1.0 s</span>
       </div>
       <div class="p3-btn-row">
-        <button class="action" onclick="p3_push()">&#9654; Applica spinta</button>
-        <button class="action" onclick="p3_reset()">&#8635; Reset</button>
+        <button class="action" onclick="p3_trigger()">▶ Avvia interazione</button>
+        <button class="action" onclick="p3_reset()">↻ Reset</button>
         <button class="action" id="p3trailBtn" onclick="p3_toggleTrail()">Tracce: ON</button>
       </div>
     </div>
 
     <div class="p3-stat">
       <div class="p3-stat-card">
-        <strong id="p3momA">p&#8321; = 0 kg·m/s</strong>
-        Quantità di moto A
+        <strong id="p3forceA">0 N</strong>
+        Forza su A ← da B
       </div>
       <div class="p3-stat-card">
-        <strong id="p3momB">p&#8322; = 0 kg·m/s</strong>
-        Quantità di moto B
+        <strong id="p3forceB">0 N</strong>
+        Forza su B ← da A
       </div>
-      <div class="p3-stat-card" style="grid-column:span 2; background:#f0f7ff; border-color:#B5D4F4">
-        <strong id="p3momTot">p_tot = 0 kg·m/s</strong>
-        Quantità di moto totale (si conserva)
+      <div class="p3-stat-card">
+        <strong id="p3accA">0 m/s²</strong>
+        Accelerazione di A
+      </div>
+      <div class="p3-stat-card">
+        <strong id="p3accB">0 m/s²</strong>
+        Accelerazione di B
+      </div>
+      <div class="p3-stat-card full">
+        <strong id="p3momTot">p_tot = (0.00, 0.00) kg·m/s</strong>
+        Quantità di moto totale del sistema (si conserva)
       </div>
     </div>
 
-    <div class="info-box" style="margin-top:1rem">
-      Nello spazio non c'è attrito. I due corpi sono inizialmente fermi. Premi <strong>Applica spinta</strong>: i due corpi si respingono con forze uguali e opposte. La freccia mostra la direzione della spinta su A (su B è identica ma invertita). Modifica le masse e osserva: il corpo più leggero acquista velocità maggiore per lo stesso impulso, perché a = F/m. La <strong>quantità di moto totale</strong> rimane zero prima e dopo — la terza legge è la radice della conservazione della quantità di moto.
+    <div class="p3-info-strip" id="p3scenarioText">
+      Due pattinatori si spingono su una superficie priva di attrito. Le forze sono uguali e opposte; le accelerazioni no, perché dipendono dalle masse.
     </div>
-  </div>
-</div>
 
+    <!-- Theory 3 -->
+    <div class="theory-section">
+      <h3>Teoria — La terza legge e le coppie di interazione</h3>
+
+      <p>La terza legge non parla di forze qualsiasi: parla di <strong>coppie di interazione</strong>. Le due forze \(\vec{F}_{A\to B}\) e \(\vec{F}_{B\to A}\) formano sempre una coppia: hanno lo stesso modulo, verso opposto, la stessa retta d'azione e — aspetto cruciale — agiscono su <em>corpi diversi</em>. Per questo non si cancellano mai nel calcolo del moto di un singolo corpo.</p>
+
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-label">Velocità dopo la spinta (pattinatori)</div>
+          <div class="tc-formula">\(m_A\,v_A = -m_B\,v_B\)</div>
+          <p>Con quantità di moto iniziale nulla, i momenti finali si bilanciano. Il pattinatore più leggero acquisisce velocità maggiore in modulo: \(|v_A|/|v_B| = m_B/m_A\).</p>
+        </div>
+        <div class="theory-card">
+          <div class="tc-label">Legge di gravitazione universale</div>
+          <div class="tc-formula">\(F = G\,\dfrac{m_A\,m_B}{r^2}\)</div>
+          <p>La Terra attrae la Luna con la stessa forza con cui la Luna attrae la Terra. Le accelerazioni sono enormemente diverse: \(a_{Terra}/a_{Luna} = m_{Luna}/m_{Terra} \approx 10^{-2}\).</p>
+        </div>
+      </div>
+
+      <div class="example-strip">
+        <div class="ex-label">Esempi e applicazioni</div>
+        <p><strong>Pattinatori sul ghiaccio.</strong> Due pattinatori fermi che si spingono acquisiscono velocità uguali e opposte in quantità di moto. Se \(m_A = 50\;\text{kg}\) e \(m_B = 80\;\text{kg}\), e B si allontana a 2 m/s, la conservazione del momento impone \(v_A = 80 \times 2/50 = 3{,}2\;\text{m/s}\).</p>
+        <p><strong>Razzo nello spazio.</strong> Il razzo non "spinge sull'aria" — funziona anche nel vuoto. Il propellente espulso all'indietro con velocità \(v_e\) rispetto al razzo fa accelerare il razzo secondo l'<em>equazione di Tsiolkovsky</em>: \(\Delta v = v_e \ln(m_0/m_f)\). Maggiore la velocità di espulsione, maggiore il \(\Delta v\) ottenibile.</p>
+        <p><strong>Camminare.</strong> Quando cammini, il tuo piede spinge il suolo all'indietro; il suolo (tramite attrito) spinge il tuo piede in avanti — questa è la forza che ti propella. Senza attrito (ghiaccio liscio) non riesci a camminare perché il suolo non può esercitare la forza di reazione orizzontale.</p>
+        <p><strong>Cannone e rinculo.</strong> Il proiettile di una vecchia cannone (5 kg) viene sparato a 400 m/s: la variazione di quantità di moto è \(5 \times 400 = 2000\;\text{N·s}\). Il cannone (800 kg) riceve la stessa variazione in verso opposto e rincula a \(2000/800 = 2{,}5\;\text{m/s}\).</p>
+      </div>
+
+      <div class="warning-strip">
+        <strong>L'errore più frequente.</strong> Le due forze di una coppia di interazione agiscono su corpi diversi — non si cancellano mai tra loro. Se si vuole capire se un corpo accelera, bisogna sommare tutte le forze che agiscono <em>su quel corpo</em> (compresa la reazione del terzo principio dell'altro corpo, se esiste), non mescolare forze su corpi diversi.
+      </div>
+    </div>
+
+  </div><!-- /panel2 -->
+
+</div><!-- /page -->
 <script>
 // ═══════════════════════════════════════════════════════════════════
 //  UTILITY
 // ═══════════════════════════════════════════════════════════════════
+// Polyfill roundRect per browser senza supporto nativo (Safari < 15.4)
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    r = Math.min(r, w/2, h/2);
+    this.beginPath();
+    this.moveTo(x+r, y);
+    this.lineTo(x+w-r, y); this.arcTo(x+w,y, x+w,y+r, r);
+    this.lineTo(x+w, y+h-r); this.arcTo(x+w,y+h, x+w-r,y+h, r);
+    this.lineTo(x+r, y+h); this.arcTo(x,y+h, x,y+h-r, r);
+    this.lineTo(x, y+r); this.arcTo(x,y, x+r,y, r);
+    this.closePath();
+  };
+}
+
 function drawArrow(ctx, x1, y1, x2, y2, color, lw, label, lox, loy) {
   const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
   if(len<5)return;
@@ -309,42 +735,58 @@ function drawArrow(ctx, x1, y1, x2, y2, color, lw, label, lox, loy) {
   ctx.restore();
 }
 
+// Disegna testo con pedice su canvas.
+// parts: array di {text, sub?}  — es. [{text:'v'},{text:'rel',sub:false}]
+// Uso: [{text:'v',sub:'rel'},{text:' = 1.2 m/s'}]
+function drawSubLabel(ctx, x, y, parts, color, mainSize){
+  mainSize = mainSize || 11;
+  const subSize = Math.round(mainSize * 0.72);
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.textAlign = 'left';
+  let cx = x;
+  for(const p of parts){
+    ctx.font = mainSize + 'px sans-serif';
+    ctx.fillText(p.text, cx, y);
+    cx += ctx.measureText(p.text).width;
+    if(p.sub){
+      ctx.font = subSize + 'px sans-serif';
+      ctx.fillText(p.sub, cx, y + 2);
+      cx += ctx.measureText(p.sub).width + 0.5;
+    }
+  }
+  ctx.restore();
+}
+
 // ═══════════════════════════════════════════════════════════════════
 //  PANEL 1A — SISTEMA DI RIFERIMENTO LINEARE
 // ═══════════════════════════════════════════════════════════════════
 let vObj=2.0, vRef=0.0, aRef=0.0, vRefLive=0.0;
 let objX=0, gridOffS=0, mountainOff=0;
-let srPulseActive=false, srPulseAmp=0.0, srPulseT=0.0, srPulseDuration=1.8, srPulseBaseVRef=0.0, srPulseLabel='';
 const SCALE=60, GRID=60, BALL_R=20;
 let p1RAF=null, lastTs=null;
+let srPulseActive=false, srPulseT=0.0, srPulseDuration=1.25, srPulseAmp=0.0, srPulseBaseVRef=0.0, srPulseLabel='';
 
 function sr_initPos(){
   const c=document.getElementById('c1');
   objX=(c.offsetWidth||700)/2; gridOffS=0; mountainOff=0; vRefLive=vRef;
-  srPulseActive=false; srPulseAmp=0.0; srPulseT=0.0; srPulseBaseVRef=vRef; srPulseLabel='';
-  const b1=document.getElementById('pulseBrakeBtn');
-  const b2=document.getElementById('pulseBoostBtn');
-  if(b1) b1.classList.remove('active');
-  if(b2) b2.classList.remove('active');
 }
 function sr_update(){
   vObj=parseFloat(document.getElementById('vObj').value);
   vRef=parseFloat(document.getElementById('vRef').value);
   aRef=parseFloat(document.getElementById('aRef').value);
-  if(!srPulseActive){
-    vRefLive=vRef;
-  }
+  if(!srPulseActive) vRefLive=vRef;
   document.getElementById('vObjVal').textContent=(vObj>=0?'+':'')+vObj.toFixed(1)+' m/s';
   document.getElementById('vRefVal').textContent=(vRef>=0?'+':'')+vRef.toFixed(1)+' m/s';
   document.getElementById('aRefVal').textContent=(aRef>=0?'+':'')+aRef.toFixed(1)+' m/s²';
+  if(!p1RAF) drawSR(0.016);
 }
 function sr_triggerPulse(amp){
   srPulseActive=true;
-  srPulseAmp=amp;
   srPulseT=0.0;
+  srPulseAmp=amp;
   srPulseBaseVRef=vRef;
-  vRefLive=vRef;
-  srPulseLabel=amp<0 ? 'frenata breve' : 'spinta breve';
+  srPulseLabel=amp>0?'Spinta breve':'Frenata breve';
   const b1=document.getElementById('pulseBrakeBtn');
   const b2=document.getElementById('pulseBoostBtn');
   if(b1) b1.classList.toggle('active', amp<0);
@@ -354,7 +796,7 @@ function drawSR(dt){
   const c=document.getElementById('c1');
   if(!c.offsetWidth)return;
   const W=c.offsetWidth;
-  if(c.width!==W){c.width=W;objX=W/2;gridOffS=0; mountainOff=0;}
+  if(c.width!==W){c.width=W; c.height=c.height||240; objX=W/2;gridOffS=0;}
   const ctx=c.getContext('2d'), H=c.height;
   let aEff=aRef;
   let aShown=aRef;
@@ -393,8 +835,6 @@ function drawSR(dt){
   objX+=vRel*SCALE*dt;
   if(objX>W+BALL_R) objX-=W+BALL_R*2;
   if(objX<-BALL_R)  objX+=W+BALL_R*2;
-  gridOffS-=vRefLive*SCALE*dt;
-  gridOffS=((gridOffS%GRID)+GRID)%GRID;
   mountainOff+=vRefLive*SCALE*dt;
   ctx.clearRect(0,0,W,H);
 
@@ -437,11 +877,9 @@ function drawSR(dt){
   ctx.strokeStyle='rgba(29,158,117,0.2)'; ctx.lineWidth=1;
   for(let x=0;x<W+GRID;x+=GRID){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=GRID;y<H;y+=GRID){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-
   ctx.font='11px sans-serif'; ctx.fillStyle='#bdbdbd'; ctx.fillText('S',10,16);
   ctx.font='bold 11px sans-serif'; ctx.fillStyle='#1D9E75';
   ctx.textAlign='right'; ctx.fillText("S′ (osservatore)",W-8,14); ctx.textAlign='left';
-
   ctx.strokeStyle='#ccc'; ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(0,groundY);ctx.lineTo(W,groundY);ctx.stroke();
   const ox=28,oy=groundY-10;
@@ -451,20 +889,27 @@ function drawSR(dt){
   ctx.font='bold 10px sans-serif';ctx.fillStyle='#1D9E75';ctx.fillText("O′",ox+4,oy+12);
   if(Math.abs(vRefLive)>0.05){
     const vRefPx=Math.sign(vRefLive)*Math.min(Math.abs(vRefLive)*20,80);
-    drawArrow(ctx,W/2,H-22,W/2+vRefPx,H-22,'#1D9E75',2,"v_S′="+vRefLive.toFixed(1),3,-3);
+    drawArrow(ctx,W/2,H-22,W/2+vRefPx,H-22,'#1D9E75',2,null,3,-3);
+    drawSubLabel(ctx, W/2+vRefPx+(vRefLive>0?5:-52), H-26,
+      [{text:'v',sub:'S\u2032'},{text:' = '+vRefLive.toFixed(1)+' m/s'}],
+      '#1D9E75', 11);
   }
   const ballY=groundY-BALL_R;
   const isNI=Math.abs(aShown)>0.05;
   const stopped=Math.abs(vRel)<0.08&&!isNI;
   if(!stopped){
     const vRelPx=Math.sign(vRel)*Math.min(Math.abs(vRel)*20,100);
-    drawArrow(ctx,objX,ballY-BALL_R-5,objX+vRelPx,ballY-BALL_R-5,
-      '#185FA5',2.5,"v_rel="+(vRel>=0?'+':'')+vRel.toFixed(1)+" m/s",4,-3);
+    drawArrow(ctx,objX,ballY-BALL_R-5,objX+vRelPx,ballY-BALL_R-5,'#185FA5',2.5,null,4,-3);
+    drawSubLabel(ctx, objX+vRelPx+(vRel>=0?5:-60), ballY-BALL_R-16,
+      [{text:'v',sub:'rel'},{text:' = '+(vRel>=0?'+':'')+vRel.toFixed(1)+' m/s'}],
+      '#185FA5', 11);
   }
   if(isNI){
     const fPx=Math.sign(-aShown)*Math.min(Math.abs(aShown)*22,90);
-    drawArrow(ctx,objX,ballY+6,objX+fPx,ballY+6,
-      '#D85A30',2.5,"F_app="+(-aShown).toFixed(1)+"·m N",4,-2);
+    drawArrow(ctx,objX,ballY+6,objX+fPx,ballY+6,'#D85A30',2.5,null,4,-2);
+    drawSubLabel(ctx, objX+fPx+(fPx>0?5:-72), ballY+3,
+      [{text:'F',sub:'app'},{text:' = '+(-aShown).toFixed(1)+'\u00b7m N'}],
+      '#D85A30', 11);
   }
   const ballColor=stopped?'#0C447C':(isNI?'#993C1D':'#185FA5');
   ctx.beginPath();ctx.arc(objX,ballY,BALL_R,0,Math.PI*2);
@@ -479,17 +924,19 @@ function drawSR(dt){
   if(isNI){
     sb.className='status-bar s-noninertial';
     if(srPulseActive){
-      sb.textContent = pulseReturnPhase ? '↺ Rientro al moto iniziale di S′ — correzione interna non mostrata come forza fittizia' : '⚠ Impulso in corso: '+srPulseLabel+' — a′ istantanea = '+aShown.toFixed(1)+' m/s²';
+      sb.textContent = pulseReturnPhase
+        ? '↺ Rientro al moto iniziale di S\u2032 — correzione interna'
+        : '\u26a0 Impulso in corso: '+srPulseLabel+' — a\u2032 = '+aShown.toFixed(1)+' m/s\u00b2';
     } else {
-      sb.textContent='⚠ S′ non inerziale (a′='+aRef.toFixed(1)+' m/s²) — forza apparente F=−m·a′';
+      sb.textContent='\u26a0 S\u2032 non inerziale (a\u2032 = '+aRef.toFixed(1)+' m/s\u00b2) — forza fittizia F = \u2212m\u00b7a\u2032';
     }
   } else if(stopped){
     sb.className='status-bar s-stop';
-    sb.textContent="✓ v_S′ = v_obj — l'oggetto è FERMO in S′ pur senza forze: 1ª legge verificata";
+    sb.textContent='\u2713 v\u209b\u2032 = v\u2092b\u2c7c — oggetto FERMO in S\u2032 senza forze: 1\u00aa legge verificata';
   } else {
     const pct=Math.min(Math.abs(vRel)/Math.max(Math.abs(vObj),0.1),1);
     sb.className=pct<0.4?'status-bar s-slow':'status-bar s-move';
-    sb.textContent='Vista da S′  |  v_rel='+(vRel>=0?'+':'')+vRel.toFixed(1)+" m/s — avvicina v_S′ a v_obj per fermare l'oggetto";
+    sb.textContent='Vista da S\u2032  |  v\u1d63\u2091\u2097 = '+(vRel>=0?'+':'')+vRel.toFixed(1)+' m/s — porta v\u209b\u2032 \u2192 v\u2092b\u2c7c per fermare l\u2019oggetto';
   }
 }
 
@@ -517,7 +964,7 @@ function toggleRotRef(){
 function drawCF(dt){
   const c=document.getElementById('c1b');
   if(!c.offsetWidth)return;
-  if(c.width!==c.offsetWidth)c.width=c.offsetWidth;
+  if(c.width!==c.offsetWidth){ c.width=c.offsetWidth; }
   const ctx=c.getContext('2d'),W=c.width,H=c.height;
   ctx.clearRect(0,0,W,H);
   cfAngle+=cfOmega*dt;
@@ -622,7 +1069,7 @@ function drawForceArrow(ctx,x1,y,x2,color,label,labelDx,labelDy){
   ctx.lineTo(x2-10*dir,y+5);
   ctx.closePath();ctx.fill();
   ctx.font='12px sans-serif';
-  ctx.fillText(label,x2+(labelDx??(dir>0?6:-58)),y+(labelDy??-8));
+  if(label) ctx.fillText(label,x2+(labelDx??(dir>0?6:-58)),y+(labelDy??-8));
 }
 function drawLaw2(){
   const ctx=getCtx2('c2');const W=ctx.canvas.width,H=ctx.canvas.height;
@@ -676,255 +1123,575 @@ function animateLaw2(){
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  PANEL 3 — TERZA LEGGE: SPAZIO 2D
+//  PANEL 3 — TERZA LEGGE: SCENARI MULTIPLI, FISICA RIPULITA
 // ═══════════════════════════════════════════════════════════════════
-
-// Stelle (generate una sola volta)
-const STARS = [];
-for(let i=0;i<120;i++){
-  STARS.push({
-    x: Math.random(),
-    y: Math.random(),
-    r: Math.random()*1.4+0.3,
-    a: Math.random()*0.6+0.3   // alpha
-  });
-}
-
-// Stato simulazione
-let p3 = null;    // oggetto stato
-let p3RAF = null;
-let p3LastTs = null;
-let p3ShowTrail = true;
-
-// Parametri slider
-let p3mA=8, p3mB=16, p3impulse=40, p3angleRad=0;
-
-function p3_update(){
-  p3mA=parseFloat(document.getElementById('p3mA').value);
-  p3mB=parseFloat(document.getElementById('p3mB').value);
-  p3impulse=parseFloat(document.getElementById('p3impulse').value);
-  p3angleRad=parseFloat(document.getElementById('p3angle').value)*Math.PI/180;
-  document.getElementById('p3mAVal').textContent=p3mA+' kg';
-  document.getElementById('p3mBVal').textContent=p3mB+' kg';
-  document.getElementById('p3impulseVal').textContent=p3impulse+' N·s';
-  document.getElementById('p3angleVal').textContent=parseFloat(document.getElementById('p3angle').value)+'°';
-  // Aggiorna live se non ancora spinti
-  if(p3 && !p3.pushed){
-    p3.A.m=p3mA; p3.B.m=p3mB;
-    const rA=p3_radius(p3mA), rB=p3_radius(p3mB);
-    const half=(rA+rB)/2+2;
-    p3.A.x=p3.W/2-half; p3.A.y=p3.H/2;
-    p3.B.x=p3.W/2+half; p3.B.y=p3.H/2;
+const P3_SCENARIOS = {
+  skaters: {
+    title: 'Pattinatori',
+    bg: 'ice',
+    strengthLabel: 'Forza media di spinta',
+    strengthUnit: 'N',
+    distanceLabel: 'Distanza iniziale',
+    distanceUnit: 'px',
+    timeLabel: 'Durata della spinta',
+    text: 'Due pattinatori si spingono su una superficie priva di attrito. Durante il contatto la forza di A su B e quella di B su A hanno sempre lo stesso modulo e verso opposto. Terminata la spinta i due corpi proseguono per inerzia a velocità costante.'
+  },
+  rocket: {
+    title: 'Razzo e gas espulsi',
+    bg: 'space',
+    strengthLabel: 'Spinta interna media',
+    strengthUnit: 'N',
+    distanceLabel: 'Separazione iniziale',
+    distanceUnit: 'px',
+    timeLabel: 'Durata dell\'espulsione',
+    text: 'Il corpo A rappresenta il razzo; il corpo B un pacchetto di gas espulso. Il gas spinge il razzo in avanti e il razzo spinge il gas all\'indietro. Esaurita la spinta il razzo continua di moto rettilineo uniforme.'
+  },
+  gravity: {
+    title: 'Interazione gravitazionale',
+    bg: 'space',
+    strengthLabel: 'Costante efficace k_g',
+    strengthUnit: 'N·m²/kg²',
+    distanceLabel: 'Distanza iniziale',
+    distanceUnit: 'px',
+    timeLabel: 'Tempo di osservazione',
+    text: 'Le due masse si attraggono lungo la congiungente dei centri. Le forze gravitazionali sono uguali e opposte in ogni istante. La simulazione si arresta automaticamente alla collisione.'
   }
-  p3_updateStats();
+};
+
+let p3 = null, p3cfg = null, p3RAF = null, p3LastTs = null, p3ShowTrail = true;
+const P3_PX_PER_M = 18;
+const P3_STARFIELD = Array.from({length: 60}, (_,i)=>({
+  x: (37*i % 997)/997,
+  y: (83*i % 991)/991,
+  r: 0.8 + (i%4)*0.35,
+  a: 0.18 + (i%7)*0.08
+}));
+
+function p3_radius(m){ return 12 + 1.1*Math.sqrt(Math.max(m,0)); }
+function p3_fmt(x,u,dec=2){ return `${Number(x).toFixed(dec)} ${u}`; }
+function p3_vecFmt(x,y,u){ return `(${x.toFixed(2)}, ${y.toFixed(2)}) ${u}`; }
+function p3_smoothPulse(t,d){
+  if(d<=0 || t<0 || t>d) return 0;
+  const s=t/d;
+  return Math.sin(Math.PI*s)**2;
+}
+// La camera segue il centro di massa per tenere sempre i corpi visibili.
+// p3.camX è la coordinata mondo puntata dal centro del canvas.
+function p3_worldToCanvasX(W,x){ return W*0.5 + (x - (p3 ? p3.camX : 0))*P3_PX_PER_M; }
+function p3_worldToCanvasY(H,y){ return H*0.58 - y*P3_PX_PER_M; }
+
+function p3_readControls(){
+  return {
+    scenario: Object.keys(P3_SCENARIOS).find(k=>document.getElementById('p3mode-'+k)?.classList.contains('active')) || 'skaters',
+    mA: parseFloat(document.getElementById('p3mA').value),
+    mB: parseFloat(document.getElementById('p3mB').value),
+    strength: parseFloat(document.getElementById('p3strength').value),
+    distance: parseFloat(document.getElementById('p3distance').value),
+    duration: parseFloat(document.getElementById('p3duration').value)
+  };
 }
 
-function p3_initState(){
-  const c=document.getElementById('p3-canvas');
-  const W=c.offsetWidth||700, H=c.height;
-  const rA=p3_radius(p3mA), rB=p3_radius(p3mB);
-  const gap=2; // pixel di separazione (quasi a contatto)
-  const totalHalf=(rA+rB)/2+gap;
+function p3_updateLabels(){
+  const cfg = P3_SCENARIOS[p3cfg.scenario];
+  document.getElementById('p3strengthLabel').textContent = cfg.strengthLabel;
+  document.getElementById('p3distanceLabel').textContent = cfg.distanceLabel;
+  document.getElementById('p3timeLabel').textContent = cfg.timeLabel;
+  document.getElementById('p3scenarioText').textContent = cfg.text;
+  document.getElementById('p3massBLabel').textContent = (p3cfg.scenario==='rocket') ? 'Massa gas (kg)' : 'Massa B (kg)';
+}
+
+function p3_updateControls(){
+  p3cfg = p3_readControls();
+  const cfg = P3_SCENARIOS[p3cfg.scenario];
+  document.getElementById('p3mAVal').textContent = `${p3cfg.mA.toFixed(0)} kg`;
+  document.getElementById('p3mBVal').textContent = `${p3cfg.mB.toFixed(0)} kg`;
+  document.getElementById('p3strengthVal').textContent = `${p3cfg.strength.toFixed(p3cfg.scenario==='gravity'?1:0)} ${cfg.strengthUnit}`;
+  document.getElementById('p3distanceVal').textContent = `${p3cfg.distance.toFixed(1)} ${cfg.distanceUnit}`;
+  document.getElementById('p3durationVal').textContent = `${p3cfg.duration.toFixed(1)} s`;
+  p3_updateLabels();
+  if(!p3 || !p3.active) {
+    p3 = p3_makeState();
+    p3_updateStats();
+    p3_draw();
+  }
+}
+
+function p3_setScenario(name){
+  document.querySelectorAll('.p3-mode-btn').forEach(btn=>btn.classList.remove('active'));
+  document.getElementById('p3mode-'+name).classList.add('active');
+  p3_updateControls();
+  p3_reset();
+}
+
+function p3_makeState(){
+  const c = document.getElementById('p3-canvas');
+  const W = c.offsetWidth || c.width || 700;
+  const H = c.height || 400;
+  // Il controllo 'distance' esprime la separazione iniziale in pixel di schermo;
+  // convertiamo in coordinate mondo dividendo per P3_PX_PER_M.
+  const d = p3cfg.distance / P3_PX_PER_M;
+  const A = {m:p3cfg.mA, x:-d*0.5, y:0, vx:0, vy:0, ax:0, ay:0, trail:[]};
+  const B = {m:p3cfg.mB, x:+d*0.5, y:0, vx:0, vy:0, ax:0, ay:0, trail:[]};
+
+  if(p3cfg.scenario==='rocket'){
+    A.x = -1.0;
+    B.x = -1.0;
+    A.y = 0; B.y = 0;
+  }
+
+  // camX: coordinata mondo del centro della camera (segue il CM durante il moto)
+  const camX0 = (A.m*A.x + B.m*B.x)/(A.m+B.m);
+
   return {
     W, H,
-    A: { x:W/2-totalHalf, y:H/2, vx:0, vy:0, m:p3mA, trail:[] },
-    B: { x:W/2+totalHalf, y:H/2, vx:0, vy:0, m:p3mB, trail:[] },
-    pushed: false,
-    t: 0
+    A, B,
+    time: 0,
+    active: false,
+    everTriggered: false,
+    collided: false,
+    force: {x:0,y:0,mag:0},
+    gasParticles: [],
+    comTrail: [],
+    camX: camX0
   };
 }
 
 function p3_reset(){
-  if(p3RAF){cancelAnimationFrame(p3RAF);p3RAF=null;}
-  p3LastTs=null;
-  p3={...p3_initState()};
+  if(!p3cfg) p3cfg = p3_readControls();
+  p3 = p3_makeState();
   p3_updateStats();
   p3_draw();
-  p3RAF=requestAnimationFrame(p3_loop);
 }
 
-function p3_push(){
-  if(!p3)return;
-  if(!p3.pushed){
-    // A spinge B: B si muove verso +ax,+ay (direzione freccia teal)
-    // Reazione: A si muove verso -ax,-ay (direzione freccia corallo)
-    const J=p3impulse;
-    const ax=Math.cos(p3angleRad), ay=Math.sin(p3angleRad);
-    p3.B.vx+= J/p3.B.m*ax;  p3.B.vy+= J/p3.B.m*ay;
-    p3.A.vx+=-J/p3.A.m*ax;  p3.A.vy+=-J/p3.A.m*ay;
-    p3.pushed=true;
-  }
+function p3_trigger(){
+  if(!p3) p3 = p3_makeState();
+  p3.active = true;
+  p3.everTriggered = true;
+  p3.collided = false;
+  p3.time = 0;
+  p3.A.vx = p3.A.vy = p3.B.vx = p3.B.vy = 0;
+  p3.A.ax = p3.A.ay = p3.B.ax = p3.B.ay = 0;
+  p3.A.trail = []; p3.B.trail = []; p3.comTrail = []; p3.gasParticles = [];
+  p3.camX = (p3.A.m*p3.A.x + p3.B.m*p3.B.x)/(p3.A.m+p3.B.m);
 }
 
 function p3_toggleTrail(){
-  p3ShowTrail=!p3ShowTrail;
-  document.getElementById('p3trailBtn').textContent='Tracce: '+(p3ShowTrail?'ON':'OFF');
+  p3ShowTrail = !p3ShowTrail;
+  document.getElementById('p3trailBtn').textContent = 'Tracce: ' + (p3ShowTrail ? 'ON' : 'OFF');
+  p3_draw();
+}
+
+function p3_forceLaw(){
+  const A = p3.A, B = p3.B;
+  // nx,ny: versore da A verso B
+  const dx = B.x - A.x, dy = B.y - A.y;
+  const r = Math.max(0.35, Math.hypot(dx,dy));
+  const nx = dx/r, ny = dy/r;
+  let Fx = 0, Fy = 0;
+  // Convenzione: (Fx,Fy) = forza su A dovuta a B. Forza su B = (−Fx, −Fy).
+
+  if(p3cfg.scenario==='skaters'){
+    // Forza repulsiva di contatto, attiva solo durante la spinta
+    const F = p3.active ? p3cfg.strength * p3_smoothPulse(p3.time, p3cfg.duration) : 0;
+    Fx = -F*nx; Fy = -F*ny;
+
+  } else if(p3cfg.scenario==='gravity'){
+    // Forza attrattiva continua (sempre attiva una volta avviata)
+    const kg = p3cfg.strength;
+    const F = Math.min(300, kg * A.m * B.m / (r*r));
+    Fx = +F*nx; Fy = +F*ny;
+
+  } else if(p3cfg.scenario==='rocket'){
+    // Spinta costante durante la combustione; zero dopo
+    const F = p3.active ? p3cfg.strength : 0;
+    Fx = +F; Fy = 0;
+  }
+
+  p3.force = {x:Fx, y:Fy, mag:Math.hypot(Fx,Fy)};
+}
+
+function p3_stepPhysics(dt){
+  const A = p3.A, B = p3.B;
+
+  // ── fine spinta per skaters/rocket ──────────────────────────────
+  if(p3.active && p3cfg.scenario !== 'gravity' && p3.time >= p3cfg.duration){
+    p3.active = false;
+    p3.force = {x:0,y:0,mag:0};
+    A.ax = A.ay = B.ax = B.ay = 0;
+    // i corpi continuano con le velocità acquisite (MRU — moto rettilineo uniforme)
+  }
+
+  p3_forceLaw();
+
+  A.ax =  p3.force.x / A.m;  A.ay =  p3.force.y / A.m;
+  B.ax = -p3.force.x / B.m;  B.ay = -p3.force.y / B.m;
+
+  // Integra sempre le velocità (anche post-spinta: accelerazione zero → MRU)
+  A.vx += A.ax * dt; A.vy += A.ay * dt;
+  B.vx += B.ax * dt; B.vy += B.ay * dt;
+  A.x  += A.vx * dt; A.y  += A.vy * dt;
+  B.x  += B.vx * dt; B.y  += B.vy * dt;
+
+  // ── collisione gravitazionale ────────────────────────────────────
+  if(p3cfg.scenario === 'gravity'){
+    const rA = p3_radius(A.m)/P3_PX_PER_M;
+    const rB = p3_radius(B.m)/P3_PX_PER_M;
+    const dist = Math.hypot(B.x-A.x, B.y-A.y);
+    if(dist <= rA + rB){
+      p3.force = {x:0,y:0,mag:0};
+      A.ax = A.ay = B.ax = B.ay = 0;
+      A.vx = A.vy = B.vx = B.vy = 0;
+      p3.collided = true;
+      return; // stop fisico
+    }
+  }
+
+  // ── particelle fumo vicino all'ugello ────────────────────────────
+  if(p3cfg.scenario==='rocket' && p3.active){
+    if(Math.random() < 0.55){
+      p3.gasParticles.push({
+        x: p3.A.x - 1.5 - Math.random()*0.4,   // vicino all'ugello
+        y: (Math.random()-0.5)*0.3,
+        vx: -(0.4 + Math.random()*0.6),          // deriva lenta verso sinistra
+        vy: (Math.random()-0.5)*0.25,
+        life: 1.0
+      });
+    }
+  }
+  for(const q of p3.gasParticles){
+    q.x += q.vx*dt; q.y += q.vy*dt; q.life -= 0.7*dt;
+  }
+  p3.gasParticles = p3.gasParticles.filter(q=>q.life>0);
+
+  // ── tracce ──────────────────────────────────────────────────────
+  if(p3ShowTrail){
+    if(!p3._trailAcc) p3._trailAcc = 0;
+    p3._trailAcc += dt;
+    if(p3._trailAcc > 0.035){
+      p3._trailAcc = 0;
+      p3.A.trail.push({x:A.x,y:A.y});
+      p3.B.trail.push({x:B.x,y:B.y});
+      const mx = (A.m*A.x + B.m*B.x)/(A.m+B.m);
+      const my = (A.m*A.y + B.m*B.y)/(A.m+B.m);
+      p3.comTrail.push({x:mx,y:my});
+      if(p3.A.trail.length>180) p3.A.trail.shift();
+      if(p3.B.trail.length>180) p3.B.trail.shift();
+      if(p3.comTrail.length>180) p3.comTrail.shift();
+    }
+  }
+
+  // ── camera segue CM con lerp ─────────────────────────────────────
+  const comX = (A.m*A.x + B.m*B.x)/(A.m+B.m);
+  p3.camX += (comX - p3.camX) * Math.min(1, 6*dt);
+}
+
+function p3_drawBackground(ctx,W,H){
+  const bg = P3_SCENARIOS[p3cfg.scenario].bg;
+  if(bg==='space'){
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#06111f'); g.addColorStop(1,'#102038');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    for(const s of P3_STARFIELD){
+      ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+      ctx.beginPath(); ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2); ctx.fill();
+    }
+    return;
+  }
+  if(bg==='ice'){
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#f6fbff'); g.addColorStop(1,'#e6f0f8');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#dbe8f2'; ctx.fillRect(0,H*0.72,W,H*0.28);
+    ctx.strokeStyle = 'rgba(125,155,180,0.22)'; ctx.lineWidth = 1;
+    for(let x=0;x<W;x+=34){ ctx.beginPath(); ctx.moveTo(x,H*0.72); ctx.lineTo(x+28,H); ctx.stroke(); }
+    return;
+  }
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#f7fbff'); g.addColorStop(1,'#ebf2fa');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#dbe7f3'; ctx.fillRect(0,H*0.72,W,H*0.28);
+}
+
+function p3_drawPolylineWorld(ctx, pts, color, width, alphaMax=0.7){
+  if(!p3ShowTrail || pts.length < 2) return;
+  for(let i=1;i<pts.length;i++){
+    const a = alphaMax * i / pts.length;
+    ctx.strokeStyle = color.replace('ALPHA', a.toFixed(3));
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(p3_worldToCanvasX(p3.W, pts[i-1].x), p3_worldToCanvasY(p3.H, pts[i-1].y));
+    ctx.lineTo(p3_worldToCanvasX(p3.W, pts[i].x), p3_worldToCanvasY(p3.H, pts[i].y));
+    ctx.stroke();
+  }
+}
+
+function p3_drawBody(ctx, body, label, colors, outline){
+  const cx = p3_worldToCanvasX(p3.W, body.x);
+  const cy = p3_worldToCanvasY(p3.H, body.y);
+  const R = p3_radius(body.m);
+  const g = ctx.createRadialGradient(cx-R*0.25,cy-R*0.3,R*0.18,cx,cy,R);
+  g.addColorStop(0, colors[0]); g.addColorStop(1, colors[1]);
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(label, cx, cy+4); ctx.textAlign = 'left';
+}
+
+function p3_drawRope(ctx){
+  const ax = p3_worldToCanvasX(p3.W,p3.A.x), ay = p3_worldToCanvasY(p3.H,p3.A.y);
+  const bx = p3_worldToCanvasX(p3.W,p3.B.x), by = p3_worldToCanvasY(p3.H,p3.B.y);
+  ctx.strokeStyle = '#667688'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+}
+
+function p3_drawVectors(ctx){
+  const A = p3.A, B = p3.B;
+  const Apx = p3_worldToCanvasX(p3.W,A.x), Apy = p3_worldToCanvasY(p3.H,A.y);
+  const Bpx = p3_worldToCanvasX(p3.W,B.x), Bpy = p3_worldToCanvasY(p3.H,B.y);
+  const F = p3.force.mag;
+  if(F > 0.02){
+    // force = forza su A (direzione force.x, force.y)
+    // reazione = forza su B (direzione -force.x, -force.y)
+    const fx = p3.force.x/F, fy = p3.force.y/F;
+    const fl = Math.min(105, 30 + 0.65*F);
+    // Freccia forza su A: parte dal centro di A, punta nella direzione della forza
+    drawArrow(ctx, Apx, Apy, Apx + fx*fl, Apy - fy*fl, '#127c61', 2.8, 'F su A', 8, -10);
+    // Freccia forza su B: parte dal centro di B, punta nella direzione opposta
+    drawArrow(ctx, Bpx, Bpy, Bpx - fx*fl, Bpy + fy*fl, '#c25a33', 2.8, 'F su B', 8, -10);
+  }
+  const vScale = 14;
+  if(Math.hypot(A.vx,A.vy) > 0.03) drawArrow(ctx, Apx, Apy, Apx + A.vx*vScale, Apy - A.vy*vScale, '#1d9e75', 2.0, 'v_A', 7, 14);
+  if(Math.hypot(B.vx,B.vy) > 0.03) drawArrow(ctx, Bpx, Bpy, Bpx + B.vx*vScale, Bpy - B.vy*vScale, '#d85a30', 2.0, 'v_B', 7, 14);
+}
+
+function p3_drawDecorations(ctx){
+  if(p3cfg.scenario==='gravity'){
+    const ax = p3_worldToCanvasX(p3.W,p3.A.x), ay = p3_worldToCanvasY(p3.H,p3.A.y);
+    const bx = p3_worldToCanvasX(p3.W,p3.B.x), by = p3_worldToCanvasY(p3.H,p3.B.y);
+    ctx.setLineDash([5,5]); ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke(); ctx.setLineDash([]);
+  }
+  if(p3cfg.scenario==='rocket'){
+    const rx = p3_worldToCanvasX(p3.W,p3.A.x), ry = p3_worldToCanvasY(p3.H,p3.A.y);
+
+    // ── Fiamma di scarico (disegnata PRIMA del corpo così sta dietro) ──
+    if(p3.active){
+      ctx.save();
+      // Flicker: la fiamma varia leggermente ad ogni frame usando il tempo
+      const flicker = 0.85 + 0.15 * Math.sin(p3.time * 47.3);
+      const flicker2 = 0.9 + 0.1 * Math.cos(p3.time * 61.7);
+      const fLen = (38 + 18 * flicker) * flicker2;   // lunghezza fiamma
+      const fW   = (11 + 4  * flicker) * flicker2;   // semilarghezza alla base
+
+      // Strato esterno: arancione/rosso
+      const gOuter = ctx.createRadialGradient(rx - 10, ry, 0, rx - 10, ry, fLen);
+      gOuter.addColorStop(0,   'rgba(255,100,20,0.95)');
+      gOuter.addColorStop(0.4, 'rgba(255,60,10,0.7)');
+      gOuter.addColorStop(1,   'rgba(200,30,0,0)');
+      ctx.beginPath();
+      ctx.moveTo(rx - 20, ry - fW);
+      ctx.quadraticCurveTo(rx - 20 - fLen * 0.6, ry - fW * 0.5, rx - 20 - fLen, ry);
+      ctx.quadraticCurveTo(rx - 20 - fLen * 0.6, ry + fW * 0.5, rx - 20, ry + fW);
+      ctx.closePath();
+      ctx.fillStyle = gOuter;
+      ctx.fill();
+
+      // Strato medio: giallo
+      const fLen2 = fLen * 0.65, fW2 = fW * 0.6;
+      const gMid = ctx.createRadialGradient(rx - 12, ry, 0, rx - 12, ry, fLen2);
+      gMid.addColorStop(0,   'rgba(255,230,50,0.95)');
+      gMid.addColorStop(0.5, 'rgba(255,160,20,0.75)');
+      gMid.addColorStop(1,   'rgba(255,80,0,0)');
+      ctx.beginPath();
+      ctx.moveTo(rx - 20, ry - fW2);
+      ctx.quadraticCurveTo(rx - 20 - fLen2 * 0.55, ry - fW2 * 0.4, rx - 20 - fLen2, ry);
+      ctx.quadraticCurveTo(rx - 20 - fLen2 * 0.55, ry + fW2 * 0.4, rx - 20, ry + fW2);
+      ctx.closePath();
+      ctx.fillStyle = gMid;
+      ctx.fill();
+
+      // Nucleo: bianco/giallo brillante
+      const fLen3 = fLen * 0.3, fW3 = fW * 0.3;
+      const gCore = ctx.createRadialGradient(rx - 20, ry, 0, rx - 20, ry, fLen3);
+      gCore.addColorStop(0,   'rgba(255,255,220,1.0)');
+      gCore.addColorStop(0.6, 'rgba(255,240,100,0.8)');
+      gCore.addColorStop(1,   'rgba(255,180,20,0)');
+      ctx.beginPath();
+      ctx.moveTo(rx - 20, ry - fW3);
+      ctx.quadraticCurveTo(rx - 20 - fLen3 * 0.5, ry, rx - 20 - fLen3, ry);
+      ctx.quadraticCurveTo(rx - 20 - fLen3 * 0.5, ry, rx - 20, ry + fW3);
+      ctx.closePath();
+      ctx.fillStyle = gCore;
+      ctx.fill();
+
+      // Particelle di fumo che salgono e si allontanano
+      for(const q of p3.gasParticles){
+        const px = p3_worldToCanvasX(p3.W, q.x);
+        const py = p3_worldToCanvasY(p3.H, q.y);
+        const a = Math.max(0, q.life) * 0.45;
+        const r = 3 + (1 - q.life) * 7;
+        const gSmoke = ctx.createRadialGradient(px, py, 0, px, py, r);
+        gSmoke.addColorStop(0,   `rgba(180,180,180,${a})`);
+        gSmoke.addColorStop(1,   `rgba(120,120,120,0)`);
+        ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2);
+        ctx.fillStyle = gSmoke; ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // ── Corpo del razzo ─────────────────────────────────────────────
+    ctx.save();
+    // Fusoliera
+    const bodyGrad = ctx.createLinearGradient(rx-20, ry-12, rx+8, ry+12);
+    bodyGrad.addColorStop(0, '#c8d8e8');
+    bodyGrad.addColorStop(0.5, '#8fa8bf');
+    bodyGrad.addColorStop(1, '#3e5164');
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.roundRect(rx-20, ry-11, 28, 22, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#2a3a4a'; ctx.lineWidth = 1; ctx.stroke();
+
+    // Ogiva (cono anteriore)
+    const noseGrad = ctx.createLinearGradient(rx+8, ry-11, rx+26, ry);
+    noseGrad.addColorStop(0, '#e8f0f8');
+    noseGrad.addColorStop(1, '#6a8fa8');
+    ctx.fillStyle = noseGrad;
+    ctx.beginPath();
+    ctx.moveTo(rx+8, ry-11); ctx.lineTo(rx+26, ry); ctx.lineTo(rx+8, ry+11);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#2a3a4a'; ctx.lineWidth = 1; ctx.stroke();
+
+    // Oblò
+    ctx.beginPath(); ctx.arc(rx+2, ry, 5, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(180,220,255,0.7)'; ctx.fill();
+    ctx.strokeStyle = '#4a6a80'; ctx.lineWidth = 1; ctx.stroke();
+
+    // Alette posteriori
+    ctx.fillStyle = '#2e4255';
+    ctx.beginPath(); ctx.moveTo(rx-20, ry-11); ctx.lineTo(rx-28, ry-20); ctx.lineTo(rx-20, ry-4); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(rx-20, ry+11); ctx.lineTo(rx-28, ry+20); ctx.lineTo(rx-20, ry+4); ctx.closePath(); ctx.fill();
+
+    // Ugello di scarico (piccolo tronco di cono posteriore)
+    ctx.fillStyle = '#1a2a38';
+    ctx.beginPath();
+    ctx.moveTo(rx-20, ry-6); ctx.lineTo(rx-26, ry-8); ctx.lineTo(rx-26, ry+8); ctx.lineTo(rx-20, ry+6);
+    ctx.closePath(); ctx.fill();
+
+    // Label "A"
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('A', rx - 6, ry + 4);
+    ctx.restore();
+  }
+}
+
+function p3_drawCOM(ctx){
+  const mx = (p3.A.m*p3.A.x + p3.B.m*p3.B.x)/(p3.A.m+p3.B.m);
+  const my = (p3.A.m*p3.A.y + p3.B.m*p3.B.y)/(p3.A.m+p3.B.m);
+  const x = p3_worldToCanvasX(p3.W,mx), y = p3_worldToCanvasY(p3.H,my);
+  ctx.strokeStyle = '#294c7a'; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(x-6,y); ctx.lineTo(x+6,y); ctx.moveTo(x,y-6); ctx.lineTo(x,y+6); ctx.stroke();
+  ctx.fillStyle = '#294c7a'; ctx.font='11px sans-serif'; ctx.fillText('CM', x+8, y-8);
+}
+
+function p3_draw(){
+  const c = document.getElementById('p3-canvas');
+  if(!c.offsetWidth) return;
+  if(c.width !== c.offsetWidth){ c.width = c.offsetWidth; }
+  if(!p3cfg) p3cfg = p3_readControls();
+  if(!p3){ p3 = p3_makeState(); }
+  p3.W = c.width; p3.H = c.height;
+  const ctx = c.getContext('2d');
+  p3_drawBackground(ctx,p3.W,p3.H);
+
+  p3_drawPolylineWorld(ctx,p3.A.trail,'rgba(29,158,117,ALPHA)',2.1,0.65);
+  p3_drawPolylineWorld(ctx,p3.B.trail,'rgba(216,90,48,ALPHA)',2.1,0.65);
+  p3_drawPolylineWorld(ctx,p3.comTrail,'rgba(41,76,122,ALPHA)',1.4,0.45);
+
+  p3_drawDecorations(ctx);
+  // Per il razzo: A è già disegnato nella decorazione con grafica dettagliata.
+  // B (gas espulso) viene mostrato come pallina solo dopo la fine della spinta.
+  if(p3cfg.scenario !== 'rocket'){
+    p3_drawBody(ctx,p3.A,'A',['#9fe1cb','#0f6e56'],'#1d9e75');
+    p3_drawBody(ctx,p3.B,'B',['#f5c4b3','#993c1d'],'#d85a30');
+  } else {
+    // Durante la spinta il gas è la fiamma; dopo la spinta mostriamo la pallina gas
+    if(!p3.active && p3.everTriggered){
+      p3_drawBody(ctx,p3.B,'gas',['#f5c4b3','#993c1d'],'#d85a30');
+    }
+  }
+  p3_drawVectors(ctx);
+  p3_drawCOM(ctx);
+
+  ctx.fillStyle='rgba(24,32,44,0.78)'; ctx.font='12px sans-serif';
+  const scTitle = P3_SCENARIOS[p3cfg.scenario].title;
+  ctx.fillText(`${scTitle} — F_{A→B} = −F_{B→A}`, 12, 20);
+  ctx.fillText('Forze uguali e opposte su corpi diversi; a = F/m per ciascuno.', 12, 38);
+
+  // Banner collisione gravitazionale
+  if(p3.collided){
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.52)';
+    ctx.fillRect(0, p3.H/2 - 32, p3.W, 64);
+    ctx.fillStyle = '#ffd97a';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('💥 IMPATTO — simulazione arrestata', p3.W/2, p3.H/2 + 7);
+    ctx.restore();
+  }
+
+  // Indicatore camera
+  ctx.fillStyle='rgba(24,32,44,0.45)'; ctx.font='10px sans-serif';
+  ctx.textAlign='right';
+  ctx.fillText('📷 vista segue CM', p3.W - 10, p3.H - 10);
+  ctx.textAlign='left';
 }
 
 function p3_updateStats(){
   if(!p3) return;
-  const pAx=p3.A.m*p3.A.vx, pAy=p3.A.m*p3.A.vy;
-  const pBx=p3.B.m*p3.B.vx, pBy=p3.B.m*p3.B.vy;
-  const pA=Math.hypot(pAx,pAy), pB=Math.hypot(pBx,pBy);
-  const pTx=pAx+pBx, pTy=pAy+pBy, pT=Math.hypot(pTx,pTy);
-  document.getElementById('p3momA').textContent='p₁ = '+pA.toFixed(1)+' kg·m/s';
-  document.getElementById('p3momB').textContent='p₂ = '+pB.toFixed(1)+' kg·m/s';
-  document.getElementById('p3momTot').textContent='p_tot = '+pT.toFixed(1)+' kg·m/s  (≈ 0 — conservata)';
-}
-
-// Raggio proporzionale alla massa
-function p3_radius(m){ return Math.max(6, Math.min(16, 3+m*0.6)); }
-
-function p3_draw(){
-  const c=document.getElementById('p3-canvas');
-  if(!c.offsetWidth)return;
-  if(c.width!==c.offsetWidth){c.width=c.offsetWidth;if(p3){p3.W=c.width;}}
-  const ctx=c.getContext('2d');
-  const W=c.width, H=c.height;
-
-  // ── sfondo spazio ──────────────────────────────────────────────
-  ctx.fillStyle='#08090f'; ctx.fillRect(0,0,W,H);
-
-  // Stelle
-  STARS.forEach(s=>{
-    ctx.beginPath();
-    ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
-    ctx.fillStyle=`rgba(255,255,255,${s.a})`;
-    ctx.fill();
-  });
-
-  if(!p3)return;
-
-  // ── tracce ─────────────────────────────────────────────────────
-  if(p3ShowTrail){
-    // Trail A (verde/teal)
-    if(p3.A.trail.length>1){
-      ctx.beginPath();
-      ctx.moveTo(p3.A.trail[0].x, p3.A.trail[0].y);
-      for(let i=1;i<p3.A.trail.length;i++){
-        ctx.lineTo(p3.A.trail[i].x, p3.A.trail[i].y);
-        ctx.strokeStyle=`rgba(93,202,165,${i/p3.A.trail.length*0.7})`;
-        ctx.lineWidth=1.5; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(p3.A.trail[i].x, p3.A.trail[i].y);
-      }
-    }
-    // Trail B (corallo)
-    if(p3.B.trail.length>1){
-      ctx.beginPath();
-      ctx.moveTo(p3.B.trail[0].x, p3.B.trail[0].y);
-      for(let i=1;i<p3.B.trail.length;i++){
-        ctx.lineTo(p3.B.trail[i].x, p3.B.trail[i].y);
-        ctx.strokeStyle=`rgba(240,153,123,${i/p3.B.trail.length*0.7})`;
-        ctx.lineWidth=1.5; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(p3.B.trail[i].x, p3.B.trail[i].y);
-      }
-    }
-  }
-
-  // ── frecce velocità ────────────────────────────────────────────
-  const vscale=18;
-  if(p3.pushed){
-    const vA=Math.hypot(p3.A.vx,p3.A.vy);
-    const vB=Math.hypot(p3.B.vx,p3.B.vy);
-    if(vA>0.05){
-      const lA=Math.min(vA*vscale,100);
-      const ux=p3.A.vx/vA, uy=p3.A.vy/vA;
-      drawArrow(ctx,p3.A.x,p3.A.y,p3.A.x+ux*lA,p3.A.y+uy*lA,
-        '#F0997B',2.5,'v_A='+vA.toFixed(1),-4,-12);
-    }
-    if(vB>0.05){
-      const lB=Math.min(vB*vscale,100);
-      const ux=p3.B.vx/vB, uy=p3.B.vy/vB;
-      drawArrow(ctx,p3.B.x,p3.B.y,p3.B.x+ux*lB,p3.B.y+uy*lB,
-        '#5DCAA5',2.5,'v_B='+vB.toFixed(1),4,-12);
-    }
-  }
-
-  // ── freccia direzione spinta (prima della spinta) ──────────────
-  if(!p3.pushed){
-    const ax=Math.cos(p3angleRad), ay=Math.sin(p3angleRad);
-    const preLen=58;
-    // Freccia teal (colore di A) applicata su B: forza che A esercita su B → B si muoverà in questa direzione
-    drawArrow(ctx, p3.B.x, p3.B.y, p3.B.x+ax*preLen, p3.B.y+ay*preLen,
-      '#5DCAA5', 2.5, 'F su B (da A)', 4, -12);
-    // Freccia corallo (colore di B) applicata su A: reazione di B su A → A si muoverà in questa direzione
-    drawArrow(ctx, p3.A.x, p3.A.y, p3.A.x-ax*preLen, p3.A.y-ay*preLen,
-      '#F0997B', 2.5, 'F su A (da B)', -preLen-68, -12);
-    // Testo guida
-    ctx.font='13px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.textAlign='center';
-    ctx.fillText('Premi "Applica spinta" per avviare',W/2,H-16);
-    ctx.textAlign='left';
-  }
-
-  // ── corpi ──────────────────────────────────────────────────────
-  const rA=p3_radius(p3.A.m), rB=p3_radius(p3.B.m);
-
-  // Corpo A (teal)
-  const gradA=ctx.createRadialGradient(p3.A.x-rA*0.3,p3.A.y-rA*0.3,rA*0.1,p3.A.x,p3.A.y,rA);
-  gradA.addColorStop(0,'#9FE1CB'); gradA.addColorStop(1,'#0F6E56');
-  ctx.beginPath();ctx.arc(p3.A.x,p3.A.y,rA,0,Math.PI*2);
-  ctx.fillStyle=gradA; ctx.fill();
-  ctx.strokeStyle='#5DCAA5'; ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.arc(p3.A.x,p3.A.y,rA,0,Math.PI*2);ctx.stroke();
-  ctx.font='bold '+Math.min(rA-2,13)+'px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';
-  ctx.fillText('A '+p3.A.m+'kg',p3.A.x,p3.A.y+4);
-
-  // Corpo B (corallo)
-  const gradB=ctx.createRadialGradient(p3.B.x-rB*0.3,p3.B.y-rB*0.3,rB*0.1,p3.B.x,p3.B.y,rB);
-  gradB.addColorStop(0,'#F5C4B3'); gradB.addColorStop(1,'#993C1D');
-  ctx.beginPath();ctx.arc(p3.B.x,p3.B.y,rB,0,Math.PI*2);
-  ctx.fillStyle=gradB; ctx.fill();
-  ctx.strokeStyle='#F0997B'; ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.arc(p3.B.x,p3.B.y,rB,0,Math.PI*2);ctx.stroke();
-  ctx.font='bold '+Math.min(rB-2,13)+'px sans-serif';ctx.fillStyle='#fff';
-  ctx.fillText('B '+p3.B.m+'kg',p3.B.x,p3.B.y+4);
-  ctx.textAlign='left';
-
-  // ── info HUD ───────────────────────────────────────────────────
-  ctx.font='12px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
-  ctx.fillText('Nessuna forza esterna — p_tot conservata', 10, 18);
+  document.getElementById('p3forceA').textContent = p3_fmt(p3.force.mag,'N');
+  document.getElementById('p3forceB').textContent = p3_fmt(p3.force.mag,'N');
+  document.getElementById('p3accA').textContent = p3_fmt(Math.hypot(p3.A.ax,p3.A.ay),'m/s²');
+  document.getElementById('p3accB').textContent = p3_fmt(Math.hypot(p3.B.ax,p3.B.ay),'m/s²');
+  const pTx = p3.A.m*p3.A.vx + p3.B.m*p3.B.vx;
+  const pTy = p3.A.m*p3.A.vy + p3.B.m*p3.B.vy;
+  document.getElementById('p3momTot').textContent = 'p_tot = ' + p3_vecFmt(pTx,pTy,'kg·m/s');
 }
 
 function p3_loop(ts){
-  if(!p3){p3LastTs=ts;p3RAF=requestAnimationFrame(p3_loop);return;}
-  const dt=p3LastTs?Math.min((ts-p3LastTs)/1000,0.05):0.016;
-  p3LastTs=ts;
-  const SPD=30; // fattore velocità visiva
+  if(!p3cfg) p3cfg = p3_readControls();
+  if(!p3) p3 = p3_makeState();
+  const dt = p3LastTs ? Math.min(0.03, (ts - p3LastTs)/1000) : 0.016;
+  p3LastTs = ts;
+  p3.time += dt;
 
-  if(p3.pushed){
-    // aggiorna posizioni
-    p3.A.x+=p3.A.vx*dt*SPD;
-    p3.A.y+=p3.A.vy*dt*SPD;
-    p3.B.x+=p3.B.vx*dt*SPD;
-    p3.B.y+=p3.B.vy*dt*SPD;
+  // Esegui la fisica se: gravità sempre attiva, oppure la simulazione è stata avviata
+  // (active=true durante la spinta, ma continuiamo anche dopo per il MRU)
+  const shouldStep = p3cfg.scenario === 'gravity'
+    ? (p3.active && !p3.collided)
+    : p3.everTriggered && !p3.collided;
 
-    // trail (ogni ~3 frame)
-    p3.t++;
-    if(p3.t%3===0){
-      p3.A.trail.push({x:p3.A.x,y:p3.A.y});
-      p3.B.trail.push({x:p3.B.x,y:p3.B.y});
-      if(p3.A.trail.length>80) p3.A.trail.shift();
-      if(p3.B.trail.length>80) p3.B.trail.shift();
-    }
-
+  if(shouldStep){
+    p3_stepPhysics(dt);
     p3_updateStats();
   }
-
   p3_draw();
-  p3RAF=requestAnimationFrame(p3_loop);
+  p3RAF = requestAnimationFrame(p3_loop);
 }
 
 function startPanel3(){
-  if(!p3) p3=p3_initState();
-  if(p3RAF)cancelAnimationFrame(p3RAF);
-  p3LastTs=null;
-  p3RAF=requestAnimationFrame(p3_loop);
-}
-function stopPanel3(){
-  if(p3RAF){cancelAnimationFrame(p3RAF);p3RAF=null;}
-  p3LastTs=null;
+  if(p3RAF) cancelAnimationFrame(p3RAF);
+  p3LastTs = null;
+  p3cfg = p3_readControls();
+  p3_updateLabels();
+  if(!p3) p3 = p3_makeState();
+  p3_updateStats();
+  p3RAF = requestAnimationFrame(p3_loop);
 }
 
+function stopPanel3(){
+  if(p3RAF){ cancelAnimationFrame(p3RAF); p3RAF = null; }
+  p3LastTs = null;
+}
 // ═══════════════════════════════════════════════════════════════════
 //  TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════════
@@ -934,18 +1701,36 @@ function showTab(idx){
   if(idx===0){stopPanel3();setTimeout(startPanel1,30);}
   else{stopPanel1();}
   if(idx===1){stopPanel3();setTimeout(()=>{updateLaw2Controls();drawLaw2();},30);}
-  if(idx===2){setTimeout(startPanel3,30);}
+  if(idx===2){setTimeout(()=>{startPanel3(); p3_draw();},30);}
 }
 
 window.addEventListener('load',()=>{
-  sr_update(); sr_initPos(); cf_update(); p3_update();
-  updateLaw2Controls(); drawLaw2();
-  p3=p3_initState();
-  startPanel1();
+  // Double rAF ensures the browser has completed layout before we read offsetWidth
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      sr_initPos();
+      sr_update();
+      cf_update();
+      updateLaw2Controls();
+      p3_updateControls();
+      p3cfg = p3_readControls();
+      p3 = p3_makeState();
+      p3_draw();
+      drawSR(0.016);
+      drawCF(0.016);
+      drawLaw2();
+      startPanel1();
+    });
+  });
 });
 window.addEventListener('resize',()=>{
+  if(document.getElementById('panel0').classList.contains('active')){ drawSR(0.016); drawCF(0.016); }
   if(document.getElementById('panel1').classList.contains('active'))drawLaw2();
+  if(document.getElementById('panel2').classList.contains('active')){ if(!p3) p3 = p3_makeState(); p3_draw(); }
 });
 </script>
+</body>
+</html>
+
 </body>
 </html>

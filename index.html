@@ -483,30 +483,17 @@
       flex-shrink: 0;
     }
 
-.category-left {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  min-width: 0;
-  flex: 1;
-}
-
-.category-text {
-  min-width: 0;
-  flex: 1;
-}
-
     .category-desc {
-  margin: 6px 0 0;
-  font-size: 0.82rem;
-  color: var(--text-dim);
-  line-height: 1.55;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
-  max-width: 700px;
-  word-break: normal;
-}
+      margin: 3px 0 0;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 600px;
+    }
+
     .category-right {
       display: flex;
       align-items: center;
@@ -705,37 +692,36 @@
     .error-state { color: var(--rose); }
 
     /* ── Footer ──────────────────────────────────────────────────────── */
-    .footer {
-      margin-top: 56px;
-      padding: 18px 4px 0;
-      border-top: none;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
+   .footer {
+  margin-top: 56px;
+  padding: 18px 4px 0;
+  border-top: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
 
-    .footer-author {
-      text-align: right;
-    }
+.footer-author {
+  text-align: right;
+}
 
-    .footer-author a {
-      font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
-      font-size: 1.35rem;
-      font-style: italic;
-      letter-spacing: 0.01em;
-      color: var(--text-dim);
-      text-decoration: none;
-      border-bottom: none;
-      opacity: 0.78;
-      transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    }
+.footer-author a {
+  font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
+  font-size: 1.35rem;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: var(--text-dim);
+  text-decoration: none;
+  border-bottom: none;
+  opacity: 0.78;
+  transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
 
-    .footer-author a:hover {
-      color: var(--text-soft);
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-
+.footer-author a:hover {
+  color: var(--text-soft);
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
     .footer-note {
       font-family: var(--mono);
       font-size: 0.68rem;
@@ -757,7 +743,7 @@
       .filter-group { flex-direction: column; }
       .grid { grid-template-columns: 1fr; }
       .category-desc { display: none; }
-      .footer { justify-content: flex-end; text-align: right; }
+      .footer { flex-direction: column; text-align: center; }
     }
 
     /* ── Utility ─────────────────────────────────────────────────────── */
@@ -793,20 +779,7 @@
       <p class="hero-subtitle">
         Esplora la fisica attraverso simulazioni interattive, dai fondamenti della meccanica alle frontiere della meccanica quantistica e della relatività.
       </p>
-      <div class="hero-stats" id="heroStats" aria-label="Statistiche catalogo">
-        <div class="hero-stat">
-          <span class="hero-stat-n" id="statTotal">—</span>
-          <span class="hero-stat-label">Simulazioni</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-n" id="statCats">—</span>
-          <span class="hero-stat-label">Categorie</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-n" id="statWip">—</span>
-          <span class="hero-stat-label">In sviluppo</span>
-        </div>
-      </div>
+
     </section>
 
     <!-- Filter panel -->
@@ -852,10 +825,8 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <div class="footer-author">
-       <a href="https://github.com/robertocurciorubertini-ctrl/Simulazioni" target="_blank" rel="noopener">Roberto Curcio Rubertini</a>
-      </div>
-    </footer>
+  <div class="footer-author">Roberto Curcio Rubertini</div>
+</footer>
   </div>
 
   <script>

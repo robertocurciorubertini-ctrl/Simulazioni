@@ -47,7 +47,7 @@
       "order": 60,
       "color": "#f0e060",
       "icon": "◈",
-      "description": "La luce viaggia in linea retta, si piega, si divide nei colori, interferisce con se stessa. L'ottica esplora i comportamenti della radiazione elettromagnetica visibile"
+      "description": "La luce viaggia in linea retta, si piega, si divide nei colori, interferisce con se stessa. L'ottica esplora i comportamenti della radiazione elettromagnetica visibile."
     },
     {
       "name": "Elettromagnetismo",
@@ -75,7 +75,7 @@
       "order": 100,
       "color": "#e879f9",
       "icon": "✦",
-      "description": "Stelle che collassano in punti di densità infinita, galassie che si allontanano più veloce della luce, forme di energia e materia a noi sconosciute che rappresentano la maggioranza di cio che esiste nell'universo. Questa è l'astrofisica"
+      "description": "Stelle che collassano in punti di densità infinita, galassie che si allontanano più veloce della luce, forme di energia e materia a noi sconosciute che rappresentano la maggioranza di cio che esiste nell'universo. Questa è l'astrofisica."
     },
     {
       "name": "Fisica nucleare",
@@ -85,11 +85,11 @@
       "description": "Nel nucleo di ogni atomo sono compresse forze enormi tenute in equilibrio instabile. Capire come si formano, decadono e reagiscono i nuclei ha prodotto le applicazioni più potenti che la fisica abbia mai generato."
     },
     {
-       "name": "Matematica per la Fisica",
-       "order": 9999,
-       "color": "#67e8a0",
-       "description": "Gli strumenti matematici spesso utilizzati nello studio della fisica",
-       "icon": "∑"
+      "name": "Matematica per la Fisica",
+      "order": 9999,
+      "color": "#67e8a0",
+      "description": "Gli strumenti matematici spesso utilizzati nello studio della fisica.",
+      "icon": "∑"
     },
     {
       "name": "WIP",
@@ -106,7 +106,12 @@
       "category": "Elettromagnetismo",
       "icon": "⚡",
       "order": 10,
-      "tags": ["cariche elettriche","campo elettrico","forza elettrica","legge di Coulomb"],
+      "tags": [
+        "cariche elettriche",
+        "campo elettrico",
+        "forza elettrica",
+        "legge di Coulomb"
+      ],
       "level": "intermedio",
       "file": "elettro-magnetismo/elettrostatica.html",
       "isWip": false
@@ -117,7 +122,15 @@
       "category": "Fondamenti",
       "icon": "📏",
       "order": 0,
-      "tags": ["grandezze fisiche","unità di misura","SI","prefissi metrici","conversioni","barn","jansky"],
+      "tags": [
+        "grandezze fisiche",
+        "unità di misura",
+        "SI",
+        "prefissi metrici",
+        "conversioni",
+        "barn",
+        "jansky"
+      ],
       "level": "base",
       "file": "fondamenti/grandezze-fondamentali.html",
       "isWip": false
@@ -128,7 +141,13 @@
       "category": "Fondamenti",
       "icon": "↗️",
       "order": 1,
-      "tags": ["vettori","componenti","somma vettoriale","modulo","direzione"],
+      "tags": [
+        "vettori",
+        "componenti",
+        "somma vettoriale",
+        "modulo",
+        "direzione"
+      ],
       "level": "base",
       "file": "fondamenti/vettori.html",
       "isWip": false
@@ -139,7 +158,16 @@
       "category": "Fondamenti",
       "icon": "📘",
       "order": 2,
-      "tags": ["costanti fisiche","SI","Sistema Internazionale","fisica","costanti fondamentali","costanti derivate","NIST","CODATA"],
+      "tags": [
+        "costanti fisiche",
+        "SI",
+        "Sistema Internazionale",
+        "fisica",
+        "costanti fondamentali",
+        "costanti derivate",
+        "NIST",
+        "CODATA"
+      ],
       "level": "base",
       "file": "fondamenti/costanti-fisiche.html",
       "isWip": false
@@ -150,7 +178,13 @@
       "category": "Gravitazione",
       "icon": "🪐",
       "order": 10,
-      "tags": ["gravità","forza gravitazionale","masse","orbite","legge di gravitazione universale"],
+      "tags": [
+        "gravità",
+        "forza gravitazionale",
+        "masse",
+        "orbite",
+        "legge di gravitazione universale"
+      ],
       "level": "intermedio",
       "file": "gravitazione/gravità.html",
       "isWip": false
@@ -161,14 +195,20 @@
       "category": "Meccanica",
       "icon": "➡️",
       "order": 1,
-      "tags": ["moto rettilineo","velocità costante","legge oraria","grafico posizione-tempo","cinematica"],
+      "tags": [
+        "moto rettilineo",
+        "velocità costante",
+        "legge oraria",
+        "grafico posizione-tempo",
+        "cinematica"
+      ],
       "level": "base",
       "file": "meccanica/moto-rettilineo-uniforme.html",
       "isWip": false
     },
     {
       "title": "Moto uniformemente accelerato",
-      "description": "Simulazione interattiva del moto uniformemente accelerato in una dimensione, con visualizzazione sincronizzata del moto dell'oggetto e dei grafici posizione-tempo e velocità-tempo.",
+      "description": "Simulazione interattiva del moto uniformemente accelerato in una dimensione, con visualizzazione sincronizzata del moto dell’oggetto e dei grafici posizione-tempo e velocità-tempo.",
       "icon": "📈",
       "order": 5,
       "category": "Meccanica",
@@ -179,11 +219,17 @@
     },
     {
       "title": "Indipendenza dei moti",
-      "description": "Esplora l'indipendenza dei moti simultanei.",
+      "description": "Esplora l’indipendenza dei moti simultanei.",
       "category": "Meccanica",
       "icon": "↔️↕️",
       "order": 10,
-      "tags": ["moti simultanei","moto orizzontale","moto verticale","composizione dei moti","cinematica"],
+      "tags": [
+        "moti simultanei",
+        "moto orizzontale",
+        "moto verticale",
+        "composizione dei moti",
+        "cinematica"
+      ],
       "level": "base",
       "file": "meccanica/indipendenza-moti.html",
       "isWip": false
@@ -194,7 +240,13 @@
       "category": "Meccanica",
       "icon": "➶",
       "order": 20,
-      "tags": ["moto parabolico","lancio di proiettili","gittata","tempo di volo","composizione dei moti"],
+      "tags": [
+        "moto parabolico",
+        "lancio di proiettili",
+        "gittata",
+        "tempo di volo",
+        "composizione dei moti"
+      ],
       "level": "base",
       "file": "meccanica/moto-parabolico.html",
       "isWip": false
@@ -205,7 +257,13 @@
       "category": "Meccanica",
       "icon": "◯",
       "order": 30,
-      "tags": ["moto circolare uniforme","velocità angolare","accelerazione centripeta","periodo","traiettoria"],
+      "tags": [
+        "moto circolare uniforme",
+        "velocità angolare",
+        "accelerazione centripeta",
+        "periodo",
+        "traiettoria"
+      ],
       "level": "base",
       "file": "meccanica/moto-circolare.html",
       "isWip": false
@@ -216,7 +274,13 @@
       "category": "Meccanica",
       "icon": "∿",
       "order": 40,
-      "tags": ["moto armonico semplice","oscillazioni","periodo","frequenza","ampiezza"],
+      "tags": [
+        "moto armonico semplice",
+        "oscillazioni",
+        "periodo",
+        "frequenza",
+        "ampiezza"
+      ],
       "level": "intermedio",
       "file": "meccanica/moto-armonico.html",
       "isWip": false
@@ -227,7 +291,13 @@
       "category": "Meccanica",
       "icon": "➡️⬅️",
       "order": 50,
-      "tags": ["dinamica","forza","massa","inerzia","leggi di Newton"],
+      "tags": [
+        "dinamica",
+        "forza",
+        "massa",
+        "inerzia",
+        "leggi di Newton"
+      ],
       "level": "base",
       "file": "meccanica/dinamica.html",
       "isWip": false
@@ -238,18 +308,30 @@
       "category": "Meccanica",
       "icon": "📐",
       "order": 60,
-      "tags": ["piano inclinato","forze","attrito","accelerazione","seconda legge di Newton"],
+      "tags": [
+        "piano inclinato",
+        "forze",
+        "attrito",
+        "accelerazione",
+        "seconda legge di Newton"
+      ],
       "level": "base",
       "file": "meccanica/piano-inclinato.html",
       "isWip": false
     },
     {
       "title": "Momento di una forza",
-      "description": "Esplorazione del momento di una forza e dell'equilibrio delle leve variando intensità della forza, posizione del fulcro e lunghezza del braccio.",
+      "description": "Esplorazione del momento di una forza e dell’equilibrio delle leve variando intensità della forza, posizione del fulcro e lunghezza del braccio.",
       "category": "Meccanica",
       "icon": "⚖",
       "order": 70,
-      "tags": ["momento di una forza","leve","equilibrio","fulcro","braccio della forza"],
+      "tags": [
+        "momento di una forza",
+        "leve",
+        "equilibrio",
+        "fulcro",
+        "braccio della forza"
+      ],
       "level": "base",
       "file": "meccanica/momento-di-una-forza.html",
       "isWip": false
@@ -260,7 +342,10 @@
       "category": "Meccanica",
       "icon": "♻️",
       "order": 80,
-      "tags": ["energia","energia cinetica"],
+      "tags": [
+        "energia",
+        "energia cinetica"
+      ],
       "level": "base",
       "file": "meccanica/conservazione-energia.html",
       "isWip": false
@@ -271,18 +356,33 @@
       "category": "Onde",
       "icon": "🔊",
       "order": 5,
-      "tags": ["suono","forme d'onda","frequenza","lunghezza d'onda","PWM","FFT","ADSR","armoniche"],
+      "tags": [
+        "suono",
+        "forme d'onda",
+        "frequenza",
+        "lunghezza d'onda",
+        "PWM",
+        "FFT",
+        "ADSR",
+        "armoniche"
+      ],
       "level": "intermedio",
       "file": "onde/suono.html",
       "isWip": false
     },
     {
       "title": "Effetto Doppler",
-      "description": "Esplora come la frequenza osservata di un'onda cambia quando la sorgente e/o l'osservatore sono in movimento.",
+      "description": "Esplora come la frequenza osservata di un’onda cambia quando la sorgente e/o l’osservatore sono in movimento.",
       "category": "Onde",
       "icon": "🚑",
       "order": 10,
-      "tags": ["onde","frequenza","sorgente in moto","osservatore in moto","suono"],
+      "tags": [
+        "onde",
+        "frequenza",
+        "sorgente in moto",
+        "osservatore in moto",
+        "suono"
+      ],
       "level": "intermedio",
       "file": "onde/effetto-doppler.html",
       "isWip": false
@@ -293,7 +393,14 @@
       "category": "Onde",
       "icon": "≈",
       "order": 20,
-      "tags": ["interferenza","diffrazione","sovrapposizione","onde","interferenza costruttiva","interferenza distruttiva"],
+      "tags": [
+        "interferenza",
+        "diffrazione",
+        "sovrapposizione",
+        "onde",
+        "interferenza costruttiva",
+        "interferenza distruttiva"
+      ],
       "level": "intermedio",
       "file": "onde/Interferenza-onde.html",
       "isWip": false
@@ -304,7 +411,14 @@
       "category": "Onde",
       "icon": "〰️",
       "order": 30,
-      "tags": ["figure di Chladni","onde stazionarie","modi normali","risonanza","piastre vibranti","linee nodali"],
+      "tags": [
+        "figure di Chladni",
+        "onde stazionarie",
+        "modi normali",
+        "risonanza",
+        "piastre vibranti",
+        "linee nodali"
+      ],
       "level": "intermedio",
       "file": "onde/chladni.html",
       "isWip": false
@@ -315,7 +429,13 @@
       "category": "Ottica",
       "icon": "↘",
       "order": 10,
-      "tags": ["rifrazione","luce","indice di rifrazione","legge di Snell","ottica geometrica"],
+      "tags": [
+        "rifrazione",
+        "luce",
+        "indice di rifrazione",
+        "legge di Snell",
+        "ottica geometrica"
+      ],
       "level": "base",
       "file": "ottica/rifrazione.html",
       "isWip": false
@@ -326,7 +446,13 @@
       "category": "Ottica",
       "icon": "🔍",
       "order": 20,
-      "tags": ["specchi","lenti","immagini","fuoco","ottica geometrica"],
+      "tags": [
+        "specchi",
+        "lenti",
+        "immagini",
+        "fuoco",
+        "ottica geometrica"
+      ],
       "level": "base",
       "file": "ottica/specchi-e-lenti.html",
       "isWip": false
@@ -337,18 +463,31 @@
       "category": "WIP",
       "icon": "⚫",
       "order": 1,
-      "tags": ["buco nero rotante","metrica di Kerr","relatività generale","geodetiche nulle","frame dragging"],
+      "tags": [
+        "buco nero rotante",
+        "metrica di Kerr",
+        "relatività generale",
+        "geodetiche nulle",
+        "frame dragging"
+      ],
       "level": "avanzato",
       "file": "WIP/curvatura_spazio-tempo/shell.html",
       "isWip": true
     },
     {
       "title": "Decadimento radioattivo",
-      "description": "Visualizza il decadimento statistico di un campione radioattivo, l'andamento esponenziale del numero di nuclei non decaduti e l'evoluzione temporale dell'attività.",
+      "description": "Visualizza il decadimento statistico di un campione radioattivo, l’andamento esponenziale del numero di nuclei non decaduti e l’evoluzione temporale dell’attività.",
       "category": "WIP",
       "icon": "☢️",
       "order": 1,
-      "tags": ["decadimento radioattivo","fisica nucleare","attività","tempo di dimezzamento","legge esponenziale","nuclei instabili"],
+      "tags": [
+        "decadimento radioattivo",
+        "fisica nucleare",
+        "attività",
+        "tempo di dimezzamento",
+        "legge esponenziale",
+        "nuclei instabili"
+      ],
       "level": "base",
       "file": "WIP/decadimento_radioattivo.html",
       "isWip": true
@@ -359,7 +498,13 @@
       "category": "WIP",
       "icon": "🌊",
       "order": 1,
-      "tags": ["fluidi","Bernoulli","continuità","flusso","pressione"],
+      "tags": [
+        "fluidi",
+        "Bernoulli",
+        "continuità",
+        "flusso",
+        "pressione"
+      ],
       "level": "intermedio",
       "file": "WIP/fluidodinamica.html",
       "isWip": true
@@ -370,7 +515,12 @@
       "category": "WIP",
       "icon": "🧬",
       "order": 1,
-      "tags": ["funzione d'onda","probabilità","quantistica","particelle"],
+      "tags": [
+        "funzione d'onda",
+        "probabilità",
+        "quantistica",
+        "particelle"
+      ],
       "level": "avanzato",
       "file": "WIP/meccanica_quantistica.html",
       "isWip": true
@@ -381,7 +531,13 @@
       "category": "WIP",
       "icon": "⚛️",
       "order": 1,
-      "tags": ["orbitali atomici","funzione d'onda","atomo idrogenoide","numeri quantici","meccanica quantistica"],
+      "tags": [
+        "orbitali atomici",
+        "funzione d'onda",
+        "atomo idrogenoide",
+        "numeri quantici",
+        "meccanica quantistica"
+      ],
       "level": "avanzato",
       "file": "WIP/orbitali.html",
       "isWip": true
@@ -392,18 +548,30 @@
       "category": "WIP",
       "icon": "⏱️",
       "order": 1,
-      "tags": ["relatività ristretta","dilatazione dei tempi","contrazione delle lunghezze","trasformazioni di Lorentz"],
+      "tags": [
+        "relatività ristretta",
+        "dilatazione dei tempi",
+        "contrazione delle lunghezze",
+        "trasformazioni di Lorentz"
+      ],
       "level": "avanzato",
       "file": "WIP/relativita_ristretta.html",
       "isWip": true
     },
     {
       "title": "Turbolenza e instabilità nei fluidi",
-      "description": "Esplora il passaggio da regimi laminari a regimi instabili e turbolenti, visualizzando l'evoluzione del flusso, la formazione di vortici e la crescita delle perturbazioni fluidodinamiche.",
+      "description": "Esplora il passaggio da regimi laminari a regimi instabili e turbolenti, visualizzando l’evoluzione del flusso, la formazione di vortici e la crescita delle perturbazioni fluidodinamiche.",
       "category": "WIP",
       "icon": "🌀",
       "order": 1,
-      "tags": ["fluidodinamica","turbolenza","instabilità","vortici","numero di Reynolds","flussi"],
+      "tags": [
+        "fluidodinamica",
+        "turbolenza",
+        "instabilità",
+        "vortici",
+        "numero di Reynolds",
+        "flussi"
+      ],
       "level": "avanzato",
       "file": "WIP/turbolenza-e-instabilita/old/turbolenza-e-instbilita.html",
       "isWip": true
@@ -414,7 +582,12 @@
       "category": "WIP",
       "icon": "🌀",
       "order": 2,
-      "tags": ["spazio-tempo","gravità","curvatura","geodetiche"],
+      "tags": [
+        "spazio-tempo",
+        "gravità",
+        "curvatura",
+        "geodetiche"
+      ],
       "level": "avanzato",
       "file": "WIP/relativita_generale.html",
       "isWip": true
@@ -425,7 +598,13 @@
       "category": "WIP",
       "icon": "💥",
       "order": 6,
-      "tags": ["urti","quantità di moto","energia","collisioni","dinamica"],
+      "tags": [
+        "urti",
+        "quantità di moto",
+        "energia",
+        "collisioni",
+        "dinamica"
+      ],
       "level": "intermedio",
       "file": "WIP/urti.html",
       "isWip": true
@@ -436,7 +615,12 @@
       "category": "WIP",
       "icon": "🪢",
       "order": 7,
-      "tags": ["tensione","forze vincolari","equilibrio","dinamica"],
+      "tags": [
+        "tensione",
+        "forze vincolari",
+        "equilibrio",
+        "dinamica"
+      ],
       "level": "intermedio",
       "file": "WIP/tensione.html",
       "isWip": true
@@ -447,7 +631,16 @@
       "category": "WIP",
       "icon": "🔥",
       "order": 10,
-      "tags": ["calore","capacità termica","calore specifico","calorimetria","temperatura","teoria cinetica","Maxwell-Boltzmann","Q = mcΔT"],
+      "tags": [
+        "calore",
+        "capacità termica",
+        "calore specifico",
+        "calorimetria",
+        "temperatura",
+        "teoria cinetica",
+        "Maxwell-Boltzmann",
+        "Q = mcΔT"
+      ],
       "level": "intermedio",
       "file": "WIP/termodinamica/calore.html",
       "isWip": true
@@ -458,7 +651,13 @@
       "category": "WIP",
       "icon": "✦",
       "order": 10,
-      "tags": ["collasso gravitazionale","SPH","supernova","stella di neutroni","astrofisica"],
+      "tags": [
+        "collasso gravitazionale",
+        "SPH",
+        "supernova",
+        "stella di neutroni",
+        "astrofisica"
+      ],
       "level": "avanzato",
       "file": "WIP/collasso_stellare/collasso-stellare.html",
       "isWip": true
@@ -469,7 +668,16 @@
       "category": "WIP",
       "icon": "☢️",
       "order": 10,
-      "tags": ["trasporto di particelle","monte carlo","neutroni","fotoni","elettroni","dose","fluenza","interazioni radiazione-materia"],
+      "tags": [
+        "trasporto di particelle",
+        "monte carlo",
+        "neutroni",
+        "fotoni",
+        "elettroni",
+        "dose",
+        "fluenza",
+        "interazioni radiazione-materia"
+      ],
       "level": "avanzato",
       "file": "WIP/trasporto-particelle/transport.html",
       "isWip": true
@@ -480,29 +688,53 @@
       "category": "WIP",
       "icon": "💡",
       "order": 20,
-      "tags": ["circuiti","corrente","condensatore","resistenza","equivalente"],
+      "tags": [
+        "circuiti",
+        "corrente",
+        "condensatore",
+        "resistenza",
+        "equivalente"
+      ],
       "level": "intermedio",
       "file": "WIP/circuiti.html",
       "isWip": true
     },
     {
       "title": "Trasformazioni cicliche",
-      "description": "Simulazione dei principali cicli termodinamici, con animazione nel diagramma pressione-volume (P-V) e calcolo di rendimento e coefficienti di prestazione.",
+      "description": "Simulazione dei principali cicli termodinamici, con animazione nel diagramma pressione-volume e calcolo di rendimento e coefficienti di prestazione.",
       "category": "WIP",
       "icon": "♻️",
       "order": 20,
-      "tags": ["cicli termodinamici","ciclo di Carnot","ciclo Otto","ciclo Diesel","frigorifero","pompa di calore","rendimento","diagramma PV"],
+      "tags": [
+        "cicli termodinamici",
+        "ciclo di Carnot",
+        "ciclo Otto",
+        "ciclo Diesel",
+        "frigorifero",
+        "pompa di calore",
+        "rendimento",
+        "diagramma PV"
+      ],
       "level": "avanzato",
       "file": "WIP/termodinamica/trasformazioni cicliche.html",
       "isWip": true
     },
     {
       "title": "Entropia",
-      "description": "Esplora l'entropia dal punto di vista microscopico attraverso espansione libera, miscelamento di gas, distribuzione di Maxwell-Boltzmann e modello a microstati.",
+      "description": "Esplora l’entropia dal punto di vista microscopico attraverso espansione libera, miscelamento di gas, distribuzione di Maxwell-Boltzmann e modello a microstati.",
       "category": "WIP",
       "icon": "🎲",
       "order": 30,
-      "tags": ["entropia","secondo principio","microstati","Boltzmann","Maxwell-Boltzmann","miscelamento","espansione libera","irreversibilità"],
+      "tags": [
+        "entropia",
+        "secondo principio",
+        "microstati",
+        "Boltzmann",
+        "Maxwell-Boltzmann",
+        "miscelamento",
+        "espansione libera",
+        "irreversibilità"
+      ],
       "level": "avanzato",
       "file": "WIP/termodinamica/entropia.html",
       "isWip": true
@@ -513,7 +745,16 @@
       "category": "WIP",
       "icon": "〰️",
       "order": 111,
-      "tags": ["onde gravitazionali","relatività generale","LIGO","Virgo","buchi neri","stelle di neutroni","ringdown","chirp"],
+      "tags": [
+        "onde gravitazionali",
+        "relatività generale",
+        "LIGO",
+        "Virgo",
+        "buchi neri",
+        "stelle di neutroni",
+        "ringdown",
+        "chirp"
+      ],
       "level": "avanzato",
       "file": "WIP/onde_gravitazionali.html",
       "isWip": true

@@ -286,6 +286,25 @@
       "isWip": false
     },
     {
+      "title": "Oscillatore armonico",
+      "description": "Esplora il moto oscillatorio in diversi regimi, includendo pendolo semplice, sistema massa-molla, oscillatore smorzato e oscillatore forzato con risonanza.",
+      "category": "Meccanica",
+      "icon": "∿",
+      "order": 45,
+      "tags": [
+        "oscillatore armonico",
+        "moto armonico",
+        "pendolo",
+        "massa-molla",
+        "smorzamento",
+        "risonanza",
+        "oscillatore forzato"
+      ],
+      "level": "intermedio",
+      "file": "meccanica/oscillatore_armonico.html",
+      "isWip": false
+    },
+    {
       "title": "Principi della Dinamica",
       "description": "Esplorazione interattiva delle tre leggi di Newton, inerzia, forza, massa, azione e reazione.",
       "category": "Meccanica",

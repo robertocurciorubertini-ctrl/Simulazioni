@@ -921,7 +921,6 @@
     const CATALOG_PATH = "simulations.json";
 
     const results       = document.getElementById("results");
-    const resultsCount  = document.getElementById("resultsCount");
     const searchInput   = document.getElementById("searchInput");
     const categoryFilter = document.getElementById("categoryFilter");
     const levelFilter   = document.getElementById("levelFilter");
@@ -1075,6 +1074,8 @@
     }
 
     function updateResultsCount(sims) {
+      const resultsCount = document.getElementById("resultsCount");
+      if (!resultsCount) return;
       const n = sims.length;
       resultsCount.innerHTML = n === 0
         ? "Nessun risultato"

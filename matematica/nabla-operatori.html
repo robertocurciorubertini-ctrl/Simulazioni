@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Gradiente, divergenza e rotore",
+  "description": "Visualizzazione didattica delle principali operazioni differenziali del nabla su campi scalari e vettoriali, con interpretazione geometrica locale.",
+  "category": "Matematica per la fisica",
+  "icon": "∇",
+  "order": 5,
+  "tags": ["nabla", "gradiente", "divergenza", "rotore", "campi scalari", "campi vettoriali", "operatori differenziali", "flusso", "circolazione"],
+  "level": "intermedio"
+};
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradiente, Divergenza e Rotore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+:root{
+  --bg:#f5f0e8;
+  --bg2:#ece4d7;
+  --bg3:#e3d8c8;
+  --panel:#fbf8f3;
+  --ink:#1e1812;
+  --ink2:#5b4f43;
+  --ink3:#877867;
+  --accent:#9e3d18;
+  --accent2:#1f6a8a;
+  --accent3:#2f7b47;
+  --accent4:#7a3f95;
+  --border:#c9baa6;
+  --mono:'IBM Plex Mono', monospace;
+  --sans:'IBM Plex Sans', sans-serif;
+  --serif:'EB Garamond', Georgia, serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.6;
+}
+header{
+  background:var(--ink);
+  color:var(--bg);
+  padding:2.2rem 2.6rem 1.8rem;
+  border-bottom:3px solid var(--accent);
+}
+header h1{
+  font-family:var(--serif);
+  font-size:2.5rem;
+  font-weight:500;
+  line-height:1.05;
+}
+header p{
+  margin-top:.55rem;
+  color:#d9ccbd;
+  max-width:920px;
+  font-size:.98rem;
+}
+.page{
+  max-width:1320px;
+  margin:0 auto;
+  padding:2rem 1.6rem 3rem;
+}
+.tabs{
+  display:flex;
+  gap:.7rem;
+  flex-wrap:wrap;
+  margin-bottom:1.3rem;
+}
+.tab-btn{
+  border:1.5px solid var(--border);
+  background:var(--panel);
+  color:var(--ink2);
+  border-radius:999px;
+  padding:.72rem 1.15rem;
+  cursor:pointer;
+  font-family:var(--sans);
+  font-size:.85rem;
+  font-weight:600;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  transition:.18s ease;
+}
+.tab-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tab-btn.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+}
+.screen{display:none}
+.screen.active{display:block}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;
+  gap:1.2rem;
+  align-items:start;
+}
+.canvas-card,.side-card,.theory-card,.formula-card{
+  background:var(--panel);
+  border:1.5px solid var(--border);
+  border-radius:6px;
+  box-shadow:0 10px 24px rgba(30,24,18,.05);
+}
+.canvas-card{overflow:hidden}
+.canvas-head{
+  padding:1rem 1.1rem .85rem;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,var(--panel),var(--bg2));
+}
+.canvas-head h2{
+  font-family:var(--serif);
+  font-weight:500;
+  font-size:1.5rem;
+}
+.canvas-head p{
+  margin-top:.35rem;
+  color:var(--ink2);
+  font-size:.92rem;
+}
+.canvas-wrap{
+  position:relative;
+  background:#efe6d7;
+  min-height:620px;
+}
+canvas{
+  display:block;
+  width:100%;
+  height:620px;
+}
+.canvas-note{
+  position:absolute;
+  right:12px;
+  bottom:10px;
+  font-family:var(--mono);
+  font-size:.68rem;
+  color:rgba(30,24,18,.72);
+  background:rgba(251,248,243,.82);
+  padding:.25rem .5rem;
+  border:1px solid rgba(120,100,80,.18);
+  border-radius:3px;
+}
+.sidebar{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+.side-card{
+  padding:1rem 1rem 1.05rem;
+}
+.card-title{
+  font-family:var(--mono);
+  font-size:.72rem;
+  color:var(--ink3);
+  text-transform:uppercase;
+  letter-spacing:.11em;
+  margin-bottom:.9rem;
+  padding-bottom:.45rem;
+  border-bottom:1px solid var(--border);
+}
+.control{
+  margin-bottom:.95rem;
+}
+.control:last-child{margin-bottom:0}
+.control label{
+  display:flex;
+  justify-content:space-between;
+  gap:.8rem;
+  align-items:baseline;
+  margin-bottom:.32rem;
+  font-size:.81rem;
+  color:var(--ink2);
+}
+.control label span{
+  font-family:var(--mono);
+  color:var(--accent);
+  font-size:.75rem;
+}
+input[type=range],select{
+  width:100%;
+}
+input[type=range]{
+  accent-color:var(--accent);
+  cursor:pointer;
+}
+select{
+  background:var(--bg);
+  border:1.5px solid var(--border);
+  border-radius:4px;
+  padding:.5rem .65rem;
+  color:var(--ink);
+  font-family:var(--sans);
+}
+.readout{
+  display:grid;
+  gap:.55rem;
+}
+.read{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:.68rem .8rem;
+}
+.read .k{
+  font-family:var(--mono);
+  font-size:.63rem;
+  color:var(--ink3);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:.28rem;
+}
+.read .v{
+  font-family:var(--serif);
+  font-size:1.15rem;
+  color:var(--ink);
+}
+.read .s{
+  margin-top:.18rem;
+  color:var(--ink2);
+  font-size:.82rem;
+}
+.badge-row{
+  display:flex;
+  gap:.5rem;
+  flex-wrap:wrap;
+}
+.badge{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:.35rem .65rem;
+  font-size:.75rem;
+  background:var(--bg2);
+  color:var(--ink2);
+}
+.theory-zone{
+  margin-top:1.15rem;
+  display:grid;
+  grid-template-columns:1.6fr .95fr;
+  gap:1.1rem;
+}
+.theory-card,.formula-card{
+  padding:1.15rem 1.2rem 1.2rem;
+}
+.theory-card h3,.formula-card h3{
+  font-family:var(--serif);
+  font-size:1.45rem;
+  font-weight:500;
+  margin-bottom:.9rem;
+}
+.theory-card p,.theory-card li,.formula-card p,.formula-card li{
+  font-size:.97rem;
+  color:var(--ink2);
+  line-height:1.72;
+}
+.theory-card p + p{margin-top:.75rem}
+.formula-box{
+  background:var(--bg2);
+  border-left:3px solid var(--accent2);
+  padding:.8rem 1rem;
+  margin:.85rem 0;
+  overflow:auto;
+}
+ul.clean{
+  padding-left:1.2rem;
+}
+ul.clean li+li{margin-top:.4rem}
+.small{
+  font-size:.84rem;
+  color:var(--ink3);
+}
+.preset-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.45rem;
+}
+.preset-btn{
+  border:1.5px solid var(--border);
+  background:var(--bg2);
+  padding:.48rem .55rem;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:.76rem;
+  color:var(--ink2);
+  transition:.15s ease;
+}
+.preset-btn:hover{
+  border-color:var(--accent2);
+  color:var(--accent2);
+}
+.legend-list{
+  display:grid;
+  gap:.45rem;
+  font-size:.8rem;
+  color:var(--ink2);
+}
+.legend-item{
+  display:flex;
+  gap:.55rem;
+  align-items:center;
+}
+.legend-swatch{
+  width:16px;
+  height:16px;
+  border-radius:3px;
+  border:1px solid rgba(30,24,18,.18);
+  flex-shrink:0;
+}
+@media (max-width:1080px){
+  .layout{grid-template-columns:1fr}
+  .theory-zone{grid-template-columns:1fr}
+  canvas,.canvas-wrap{height:560px;min-height:560px}
+}
+@media (max-width:760px){
+  header{padding:1.5rem 1.1rem 1.25rem}
+  header h1{font-size:2rem}
+  .page{padding:1rem .85rem 2rem}
+  canvas,.canvas-wrap{height:480px;min-height:480px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Gradiente, divergenza e rotore</h1>
+  <p>
+    Visualizzazione interattiva delle principali operazioni costruite con l'operatore $\nabla$.
+    L'obiettivo non è solo mostrare formule, ma rendere intuitivo il significato locale di ciascuna operazione:
+    in quale direzione cresce di più un campo scalare, quando un campo vettoriale “esce” o “entra” in una regione,
+    e quando induce una tendenza alla rotazione.
+  </p>
+</header>
+
+<div class="page">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="grad">Gradiente</button>
+    <button class="tab-btn" data-tab="div">Divergenza</button>
+    <button class="tab-btn" data-tab="curl">Rotore</button>
+  </div>
+
+  <section class="screen active" id="screen-grad">
+    <div class="layout">
+      <div class="canvas-card">
+        <div class="canvas-head">
+          <h2>Gradiente di un campo scalare</h2>
+          <p>Una mappa di colore e linee di livello mostrano il campo scalare $f(x,y)$. Il vettore $\nabla f$ nel punto selezionato indica la direzione di massima crescita locale di $f$.</p>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="gradCanvas" width="900" height="620"></canvas>
+          <div class="canvas-note">trascina il punto bianco</div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="side-card">
+          <div class="card-title">Campo scalare</div>
+          <div class="control">
+            <label>Preset <span>f(x,y)</span></label>
+            <select id="gradPreset">
+              <option value="hill">Collina gaussiana</option>
+              <option value="tilted">Piano inclinato + ondulazione</option>
+              <option value="saddle">Sella</option>
+              <option value="rings">Pozzo con ondulazioni radiali</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Scala freccia <span id="gradScaleVal">1.0</span></label>
+            <input id="gradScale" type="range" min="0.4" max="2.4" step="0.1" value="1.0">
+          </div>
+          <div class="control">
+            <label>Numero curve di livello <span id="gradLevelsVal">10</span></label>
+            <input id="gradLevels" type="range" min="5" max="18" step="1" value="10">
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="card-title">Valori locali</div>
+          <div class="readout">
+            <div class="read">
+              <div class="k">Punto</div>
+              <div class="v" id="gradPoint">(0.00, 0.00)</div>
+              <div class="s">Coordinate del punto di osservazione.</div>
+            </div>
+            <div class="read">
+              <div class="k">Valore del campo</div>
+              <div class="v" id="gradF">0.000</div>
+              <div class="s">Qui $f(x,y)$ è il valore dello scalare nel punto selezionato.</div>
+            </div>
+            <div class="read">
+              <div class="k">Gradiente</div>
+              <div class="v" id="gradVec">(0.000, 0.000)</div>
+              <div class="s">Le componenti sono $\partial f/\partial x$ e $\partial f/\partial y$.</div>
+            </div>
+            <div class="read">
+              <div class="k">Modulo del gradiente</div>
+              <div class="v" id="gradMag">0.000</div>
+              <div class="s">Misura quanto rapidamente varia il campo intorno al punto.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="card-title">Chiave di lettura</div>
+          <div class="badge-row">
+            <div class="badge">$\nabla f$ è perpendicolare alle linee di livello</div>
+            <div class="badge">punta verso i valori crescenti</div>
+            <div class="badge">se $\nabla f=0$, il punto è stazionario</div>
+          </div>
+        </div>
+        <div class="side-card">
+          <div class="card-title">Legenda</div>
+          <div class="legend-list">
+            <div class="legend-item"><span class="legend-swatch" style="background:linear-gradient(90deg,rgb(51,98,154),rgb(239,232,219),rgb(179,93,56))"></span> mappa colore: da valori più bassi a valori più alti di $f(x,y)$</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:rgba(30,24,18,0.38)"></span> curve di livello: punti con uguale valore del campo scalare</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#fff7ee"></span> freccia chiara: vettore gradiente $\nabla f$</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:rgba(32,106,138,0.85)"></span> componente lungo $x$ del gradiente</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:rgba(47,123,71,0.85)"></span> componente lungo $y$ del gradiente</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="theory-zone">
+      <article class="theory-card">
+        <h3>Significato fisico e geometrico del gradiente</h3>
+        <p>
+          Il gradiente agisce su un <strong>campo scalare</strong> $f(x,y,z)$, cioè su una funzione che associa ad ogni punto dello spazio un numero reale.
+          Esempi fisici importanti sono la temperatura $T(\mathbf{r})$, il potenziale elettrico $V(\mathbf{r})$ e la pressione $p(\mathbf{r})$.
+          Il risultato dell'operazione è un <strong>campo vettoriale</strong>:
+        </p>
+        <div class="formula-box">
+          $$\nabla f = \left(\frac{\partial f}{\partial x},\frac{\partial f}{\partial y},\frac{\partial f}{\partial z}\right)$$
+        </div>
+        <p>
+          Il vettore $\nabla f$ ha una doppia interpretazione. Da un lato, la sua direzione è quella lungo cui il campo scalare cresce più rapidamente.
+          Dall'altro, il suo modulo $|\nabla f|$ è il massimo tasso di incremento per unità di lunghezza.
+          In due dimensioni, le curve $f(x,y)=\text{costante}$ sono linee di livello: il gradiente risulta ortogonale a tali curve.
+        </p>
+        <p>
+          Questo è il motivo per cui, ad esempio, in una carta topografica il gradiente dell'altitudine punta nella direzione di salita più ripida.
+          Analogamente, in termodinamica il calore diffonde tipicamente dalle zone a temperatura più alta verso quelle più basse; dunque il flusso termico è collegato a $-\nabla T$, non a $\nabla T$.
+        </p>
+      </article>
+
+      <article class="formula-card">
+        <h3>Esempi locali sul gradiente</h3>
+        <div class="formula-box">
+          $$f(x,y)=x^2+y^2 \quad \Rightarrow \quad \nabla f=(2x,2y)$$
+        </div>
+        <p>
+          In questo caso il gradiente dipende esplicitamente dalla posizione. Nel punto $(1,0)$ vale $(2,0)$, quindi punta verso destra; nel punto $(0,1)$ vale $(0,2)$, quindi punta verso l'alto; nell'origine $(0,0)$ è nullo.
+          Questo mostra bene che il gradiente non è una proprietà globale del campo, ma una quantità locale.
+        </p>
+        <div class="formula-box">
+          $$f(x,y)=ax+by \quad \Rightarrow \quad \nabla f=(a,b)$$
+        </div>
+        <p>
+          Se invece il campo è lineare, il gradiente è costante e ha lo stesso valore in ogni punto dello spazio.
+        </p>
+      </article>
+
+      <article class="formula-card">
+        <h3>Formulario essenziale</h3>
+        <div class="formula-box">
+          $$df = \nabla f \cdot d\mathbf{r}$$
+        </div>
+        <p>
+          Qui $df$ è la variazione infinitesima del campo scalare e $d\mathbf{r}$ è lo spostamento infinitesimo.
+          Se ci si muove nella direzione di $\nabla f$, l'incremento è massimo.
+        </p>
+        <div class="formula-box">
+          $$D_{\hat{\mathbf{u}}}f = \nabla f \cdot \hat{\mathbf{u}}$$
+        </div>
+        <p>
+          $D_{\hat{\mathbf{u}}}f$ è la derivata direzionale lungo il versore $\hat{\mathbf{u}}$.
+          Essa rappresenta la variazione del campo quando ci si sposta in una direzione arbitraria.
+        </p>
+        <p class="small">
+          Variabili: $f$ campo scalare; $\mathbf{r}$ vettore posizione; $d\mathbf{r}$ spostamento infinitesimo; $\hat{\mathbf{u}}$ versore di direzione.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-div">
+    <div class="layout">
+      <div class="canvas-card">
+        <div class="canvas-head">
+          <h2>Divergenza di un campo vettoriale</h2>
+          <p>Le frecce rappresentano il campo $\mathbf{F}(x,y)$. Il riquadro mobile misura visivamente se, localmente, il flusso uscente prevale su quello entrante.</p>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="divCanvas" width="900" height="620"></canvas>
+          <div class="canvas-note">trascina il quadrato bianco</div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="side-card">
+          <div class="card-title">Campo vettoriale</div>
+          <div class="control">
+            <label>Preset <span>$\mathbf{F}(x,y)$</span></label>
+            <select id="divPreset">
+              <option value="source">Sorgente radiale</option>
+              <option value="sink">Pozzo radiale</option>
+              <option value="shear">Shear puro</option>
+              <option value="compress">Compressione / espansione</option>
+              <option value="varying">Divergenza variabile</option>
+              <option value="uniform">Campo uniforme</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Dimensione cella <span id="divBoxVal">1.20</span></label>
+            <input id="divBox" type="range" min="0.6" max="2.0" step="0.1" value="1.2">
+          </div>
+          <div class="control">
+            <label>Scala frecce <span id="divScaleVal">1.0</span></label>
+            <input id="divScale" type="range" min="0.5" max="2.2" step="0.1" value="1.0">
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="card-title">Valori locali</div>
+          <div class="readout">
+            <div class="read">
+              <div class="k">Punto centrale</div>
+              <div class="v" id="divPoint">(0.00, 0.00)</div>
+              <div class="s">Centro del piccolo volume di controllo.</div>
+            </div>
+            <div class="read">
+              <div class="k">Campo nel centro</div>
+              <div class="v" id="divField">(0.000, 0.000)</div>
+              <div class="s">Valore locale del campo $\mathbf{F}$.</div>
+            </div>
+            <div class="read">
+              <div class="k">Divergenza</div>
+              <div class="v" id="divVal">0.000</div>
+              <div class="s">Somma delle derivate parziali $\partial F_x/\partial x + \partial F_y/\partial y$.</div>
+            </div>
+            <div class="read">
+              <div class="k">Interpretazione</div>
+              <div class="v" id="divType">Neutra</div>
+              <div class="s" id="divTypeDesc">Nessuna prevalenza netta di flusso uscente o entrante.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="card-title">Da osservare</div>
+          <div class="legend-list">
+            <div class="legend-item"><span class="legend-swatch" style="background:#d57e60"></span> positivo: il campo tende a uscire dalla regione</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#6e8fb8"></span> negativo: il campo tende a entrare nella regione</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#d7d0c6"></span> nullo: entrata e uscita si compensano</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="theory-zone">
+      <article class="theory-card">
+        <h3>La divergenza come misura di sorgenti e pozzi</h3>
+        <p>
+          La divergenza si applica a un <strong>campo vettoriale</strong> $\mathbf{F}=(F_x,F_y,F_z)$ e restituisce uno <strong>scalare</strong>:
+        </p>
+        <div class="formula-box">
+          $$\nabla\cdot\mathbf{F} = \frac{\partial F_x}{\partial x}+\frac{\partial F_y}{\partial y}+\frac{\partial F_z}{\partial z}$$
+        </div>
+        <p>
+          Essa quantifica quanto il campo tenda localmente a “uscire” da un piccolo volume.
+          Se il flusso uscente netto è positivo, la divergenza è positiva e il punto si comporta come una sorgente.
+          Se il flusso entrante netto è maggiore di quello uscente, la divergenza è negativa e si ha un comportamento di pozzo.
+        </p>
+        <p>
+          In fluidodinamica, se $\mathbf{v}$ è il campo di velocità di un fluido, allora $\nabla\cdot\mathbf{v}$ misura localmente l'espansione o la compressione del fluido.
+          Per un fluido incomprimibile vale tipicamente $\nabla\cdot\mathbf{v}=0$.
+          In elettrostatica, la divergenza del campo elettrico è collegata alla densità di carica tramite una legge locale di Gauss.
+        </p>
+      </article>
+
+      <article class="formula-card">
+        <h3>Esempi locali sulla divergenza</h3>
+        <div class="formula-box">
+          $$\mathbf{F}(x,y)=(x,y) \quad \Rightarrow \quad \nabla\cdot\mathbf{F}=2$$
+        </div>
+        <p>
+          Il campo si comporta come una sorgente uniforme: la divergenza è positiva e uguale in ogni punto.
+        </p>
+        <div class="formula-box">
+          $$\mathbf{F}(x,y)=(-x,-y) \quad \Rightarrow \quad \nabla\cdot\mathbf{F}=-2$$
+        </div>
+        <p>
+          Qui il campo converge verso l'interno: la divergenza è negativa in tutto il piano.
+        </p>
+        <div class="formula-box">
+          $$\mathbf{F}(x,y)=(xy,0) \quad \Rightarrow \quad \nabla\cdot\mathbf{F}=y$$
+        </div>
+        <p>
+          In questo terzo esempio il valore cambia da punto a punto: sopra l'asse $x$ la divergenza è positiva, sotto l'asse $x$ è negativa, e sull'asse $x$ è nulla.
+        </p>
+      </article>
+
+      <article class="formula-card">
+        <h3>Formulario essenziale</h3>
+        <div class="formula-box">
+          $$\nabla\cdot\mathbf{F} = \lim_{\Delta V\to 0}\frac{1}{\Delta V}\oint_{\partial(\Delta V)} \mathbf{F}\cdot d\mathbf{S}$$
+        </div>
+        <p>
+          La divergenza è il flusso uscente per unità di volume nel limite di un volume infinitesimo.
+          Nella visualizzazione, il piccolo quadrato serve proprio a suggerire questa definizione.
+        </p>
+        <div class="formula-box">
+          $$\mathbf{F}=(F_x,F_y), \qquad \nabla\cdot\mathbf{F}=\frac{\partial F_x}{\partial x}+\frac{\partial F_y}{\partial y}$$
+        </div>
+        <p class="small">
+          Variabili: $\mathbf{F}$ campo vettoriale; $F_x,F_y,F_z$ componenti del campo; $d\mathbf{S}$ elemento vettoriale di superficie; $\Delta V$ piccolo volume.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-curl">
+    <div class="layout">
+      <div class="canvas-card">
+        <div class="canvas-head">
+          <h2>Rotore di un campo vettoriale</h2>
+          <p>La rotellina locale mostra la tendenza del campo a mettere in rotazione un piccolo corpo. In 2D si visualizza la componente lungo l'asse $z$ del rotore.</p>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="curlCanvas" width="900" height="620"></canvas>
+          <div class="canvas-note">trascina la rotellina</div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="side-card">
+          <div class="card-title">Campo vettoriale</div>
+          <div class="control">
+            <label>Preset <span>$\mathbf{F}(x,y)$</span></label>
+            <select id="curlPreset">
+              <option value="solid">Rotazione rigida</option>
+              <option value="cw">Rotazione opposta</option>
+              <option value="shear">Shear con rotazione locale</option>
+              <option value="uniform">Campo uniforme</option>
+              <option value="varying">Rotore variabile</option>
+              <option value="vortex">Vortice smussato</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Raggio rotellina <span id="curlWheelVal">0.55</span></label>
+            <input id="curlWheel" type="range" min="0.3" max="0.9" step="0.05" value="0.55">
+          </div>
+          <div class="control">
+            <label>Scala frecce <span id="curlScaleVal">1.0</span></label>
+            <input id="curlScale" type="range" min="0.5" max="2.0" step="0.1" value="1.0">
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="card-title">Valori locali</div>
+          <div class="readout">
+            <div class="read">
+              <div class="k">Punto centrale</div>
+              <div class="v" id="curlPoint">(0.00, 0.00)</div>
+              <div class="s">Centro della rotellina ideale.</div>
+            </div>
+            <div class="read">
+              <div class="k">Campo nel centro</div>
+              <div class="v" id="curlField">(0.000, 0.000)</div>
+              <div class="s">Valore locale di $\mathbf{F}$.</div>
+            </div>
+            <div class="read">
+              <div class="k">Rotore $(\nabla\times\mathbf{F})_z$</div>
+              <div class="v" id="curlVal">0.000</div>
+              <div class="s">In 2D la componente rilevante è $\partial F_y/\partial x-\partial F_x/\partial y$.</div>
+            </div>
+            <div class="read">
+              <div class="k">Verso di rotazione</div>
+              <div class="v" id="curlType">Assente</div>
+              <div class="s" id="curlTypeDesc">Il campo non induce rotazione locale apprezzabile.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="card-title">Idea chiave</div>
+          <div class="badge-row">
+            <div class="badge">rotore positivo $\rightarrow$ antiorario</div>
+            <div class="badge">rotore negativo $\rightarrow$ orario</div>
+            <div class="badge">rotore nullo $\rightarrow$ nessuna tendenza rotazionale locale</div>
+          </div>
+        </div>
+        <div class="side-card">
+          <div class="card-title">Nota interpretativa</div>
+          <p class="small">
+            La velocità di rotazione della rotellina è usata come indicatore qualitativo del segno e dell'intensità del rotore.
+            Non rappresenta un valore fisico assoluto di velocità angolare.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="theory-zone">
+      <article class="theory-card">
+        <h3>Il rotore come misura della circolazione locale</h3>
+        <p>
+          Il rotore si applica a un campo vettoriale e restituisce ancora un campo vettoriale. In tre dimensioni:
+        </p>
+        <div class="formula-box">
+          $$\nabla\times\mathbf{F}=
+          \left(
+          \frac{\partial F_z}{\partial y}-\frac{\partial F_y}{\partial z},
+          \frac{\partial F_x}{\partial z}-\frac{\partial F_z}{\partial x},
+          \frac{\partial F_y}{\partial x}-\frac{\partial F_x}{\partial y}
+          \right)$$
+        </div>
+        <p>
+          Nel caso piano $(x,y)$, se il campo non ha componente $z$, l'unica parte non nulla del rotore è quella lungo l'asse $z$.
+          Questa quantità misura la tendenza del campo a far ruotare un piccolo elemento materiale.
+          Per questo motivo nella simulazione compare una rotellina: se il campo esercita una diversa azione tangenziale sui suoi lati, la ruota tende a girare.
+        </p>
+        <p>
+          In fluidodinamica il rotore del campo di velocità è collegato alla vorticità.
+          In elettromagnetismo compare nelle equazioni di Maxwell: ad esempio il rotore del campo elettrico è collegato alla variazione temporale del campo magnetico.
+        </p>
+      </article>
+
+      <article class="formula-card">
+        <h3>Esempi locali sul rotore</h3>
+        <div class="formula-box">
+          $$\mathbf{F}(x,y)=(-y,x) \quad \Rightarrow \quad (\nabla\times\mathbf{F})_z = 2$$
+        </div>
+        <p>
+          Si tratta di una rotazione rigida antioraria: il rotore è positivo e costante.
+        </p>
+        <div class="formula-box">
+          $$\mathbf{F}(x,y)=(y,0) \quad \Rightarrow \quad (\nabla\times\mathbf{F})_z = -1$$
+        </div>
+        <p>
+          Anche uno shear può produrre rotazione locale. Questo è importante perché non basta guardare “frecce curve” per capire il rotore: serve confrontare come varia il campo nello spazio.
+        </p>
+        <div class="formula-box">
+          $$\mathbf{F}(x,y)=(-xy,xy) \quad \Rightarrow \quad (\nabla\times\mathbf{F})_z = x+y$$
+        </div>
+        <p>
+          In questo caso il rotore cambia con la posizione: lungo la retta $x+y=0$ è nullo, in una regione è positivo e in un'altra negativo.
+        </p>
+      </article>
+
+      <article class="formula-card">
+        <h3>Formulario essenziale</h3>
+        <div class="formula-box">
+          $$\left(\nabla\times\mathbf{F}\right)_z=\frac{\partial F_y}{\partial x}-\frac{\partial F_x}{\partial y}$$
+        </div>
+        <p>
+          Questa è la formula usata nella visualizzazione 2D. Se il valore è positivo, la rotazione locale è antioraria; se è negativo, è oraria.
+        </p>
+        <div class="formula-box">
+          $$\left(\nabla\times\mathbf{F}\right)\cdot\hat{\mathbf{n}}
+          =
+          \lim_{\Delta A\to 0}
+          \frac{1}{\Delta A}
+          \oint_{\partial(\Delta A)} \mathbf{F}\cdot d\mathbf{l}$$
+        </div>
+        <p>
+          Qui $\hat{\mathbf{n}}$ è il versore normale alla superficie, $\Delta A$ è una piccola area e $d\mathbf{l}$ è l'elemento di linea lungo il contorno.
+          Il rotore è dunque la circolazione per unità di area nel limite locale.
+        </p>
+        <p class="small">
+          Variabili: $\mathbf{F}$ campo vettoriale; $d\mathbf{l}$ elemento di linea orientato; $\hat{\mathbf{n}}$ versore normale; $\Delta A$ piccola area.
+        </p>
+      </article>
+    </div>
+  </section>
+</div>
+
+<script>
+const DOMAIN = {xmin:-4, xmax:4, ymin:-3.2, ymax:3.2};
+function lerp(a,b,t){ return a + (b-a)*t; }
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+function hypot2(x,y){ return Math.hypot(x,y); }
+
+function makeMapper(canvas){
+  const w = canvas.width, h = canvas.height;
+  return {
+    xToPx: x => (x - DOMAIN.xmin) / (DOMAIN.xmax - DOMAIN.xmin) * w,
+    yToPx: y => h - (y - DOMAIN.ymin) / (DOMAIN.ymax - DOMAIN.ymin) * h,
+    pxToX: px => DOMAIN.xmin + px / w * (DOMAIN.xmax - DOMAIN.xmin),
+    pxToY: py => DOMAIN.ymin + (h - py) / h * (DOMAIN.ymax - DOMAIN.ymin)
+  };
+}
+
+function sampleScalar(name, x, y){
+  if(name === 'hill'){
+    return 2.2*Math.exp(-0.38*(x*x + 1.1*y*y)) + 0.15*x - 0.08*y;
+  }
+  if(name === 'tilted'){
+    return 0.65*x + 0.25*y + 0.55*Math.sin(1.3*x)*Math.cos(1.1*y);
+  }
+  if(name === 'saddle'){
+    return 0.22*(x*x - y*y) + 0.12*x*y;
+  }
+  if(name === 'rings'){
+    const r = Math.hypot(x+0.6, y-0.2);
+    return -0.42*r*r + 0.55*Math.cos(3.0*r);
+  }
+  return 0;
+}
+function gradScalar(name, x, y){
+  const h = 1e-3;
+  const fx = (sampleScalar(name, x+h, y) - sampleScalar(name, x-h, y))/(2*h);
+  const fy = (sampleScalar(name, x, y+h) - sampleScalar(name, x, y-h))/(2*h);
+  return {gx:fx, gy:fy};
+}
+
+function sampleVectorDiv(name, x, y){
+  if(name === 'source') return {fx:0.85*x, fy:0.85*y};
+  if(name === 'sink') return {fx:-0.85*x, fy:-0.85*y};
+  if(name === 'shear') return {fx:1.15*y, fy:0};
+  if(name === 'compress') return {fx:0.9*x, fy:-0.9*y};
+  if(name === 'varying') return {fx:x*y, fy:0};
+  if(name === 'uniform') return {fx:1.2, fy:0.35};
+  return {fx:0, fy:0};
+}
+function divergence(name, x, y){
+  if(name === 'source') return 1.7;
+  if(name === 'sink') return -1.7;
+  if(name === 'shear') return 0;
+  if(name === 'compress') return 0;
+  if(name === 'varying') return y;
+  if(name === 'uniform') return 0;
+  return 0;
+}
+
+function sampleVectorCurl(name, x, y){
+  if(name === 'solid') return {fx:-0.85*y, fy:0.85*x};
+  if(name === 'cw') return {fx:0.85*y, fy:-0.85*x};
+  if(name === 'shear') return {fx:0.95*y, fy:0};
+  if(name === 'uniform') return {fx:1.25, fy:0.2};
+  if(name === 'varying') return {fx:-x*y, fy:x*y};
+  if(name === 'vortex'){
+    const r2 = x*x + y*y + 0.5;
+    return {fx:-1.8*y/r2, fy:1.8*x/r2};
+  }
+  return {fx:0, fy:0};
+}
+function curlZ(name, x, y){
+  const h = 1e-3;
+  const f1 = sampleVectorCurl(name, x+h, y);
+  const f2 = sampleVectorCurl(name, x-h, y);
+  const f3 = sampleVectorCurl(name, x, y+h);
+  const f4 = sampleVectorCurl(name, x, y-h);
+  return (f1.fy - f2.fy)/(2*h) - (f3.fx - f4.fx)/(2*h);
+}
+
+function drawAxes(ctx, m, w, h){
+  ctx.save();
+  ctx.strokeStyle = 'rgba(90,79,67,0.35)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, m.yToPx(0)); ctx.lineTo(w, m.yToPx(0));
+  ctx.moveTo(m.xToPx(0), 0); ctx.lineTo(m.xToPx(0), h);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(90,79,67,0.8)';
+  ctx.font = '12px IBM Plex Mono';
+  ctx.fillText('x', w-16, m.yToPx(0)-8);
+  ctx.fillText('y', m.xToPx(0)+8, 14);
+  ctx.restore();
+}
+function drawGrid(ctx, m, w, h){
+  ctx.save();
+  ctx.strokeStyle = 'rgba(120,108,93,0.12)';
+  ctx.lineWidth = 1;
+  for(let x = Math.ceil(DOMAIN.xmin); x <= DOMAIN.xmax; x++){
+    ctx.beginPath();
+    ctx.moveTo(m.xToPx(x), 0);
+    ctx.lineTo(m.xToPx(x), h);
+    ctx.stroke();
+  }
+  for(let y = Math.ceil(DOMAIN.ymin); y <= DOMAIN.ymax; y++){
+    ctx.beginPath();
+    ctx.moveTo(0, m.yToPx(y));
+    ctx.lineTo(w, m.yToPx(y));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawArrow(ctx, x1, y1, x2, y2, color, width=2.2){
+  const dx = x2-x1, dy = y2-y1;
+  const L = Math.hypot(dx,dy);
+  if(L < 1e-6) return;
+  const ux = dx/L, uy = dy/L;
+  const ah = 9 + width*1.4;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - ah*ux + 0.42*ah*uy, y2 - ah*uy - 0.42*ah*ux);
+  ctx.lineTo(x2 - ah*ux - 0.42*ah*uy, y2 - ah*uy + 0.42*ah*ux);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+const grad = {
+  canvas: document.getElementById('gradCanvas'),
+  preset: document.getElementById('gradPreset'),
+  scaleInput: document.getElementById('gradScale'),
+  levelsInput: document.getElementById('gradLevels'),
+  point:{x:1.2,y:0.7},
+  dragging:false
+};
+const div = {
+  canvas: document.getElementById('divCanvas'),
+  preset: document.getElementById('divPreset'),
+  boxInput: document.getElementById('divBox'),
+  scaleInput: document.getElementById('divScale'),
+  point:{x:0.3,y:0.4},
+  dragging:false
+};
+const curl = {
+  canvas: document.getElementById('curlCanvas'),
+  preset: document.getElementById('curlPreset'),
+  wheelInput: document.getElementById('curlWheel'),
+  scaleInput: document.getElementById('curlScale'),
+  point:{x:1.0,y:-0.35},
+  dragging:false,
+  phase:0
+};
+
+function fieldColor(t){
+  const c1 = [51,98,154];
+  const c2 = [239,232,219];
+  const c3 = [179,93,56];
+  t = clamp(t,0,1);
+  if(t < 0.5){
+    const u = t/0.5;
+    return [
+      Math.round(lerp(c1[0], c2[0], u)),
+      Math.round(lerp(c1[1], c2[1], u)),
+      Math.round(lerp(c1[2], c2[2], u)),
+    ];
+  }
+  const u = (t-0.5)/0.5;
+  return [
+    Math.round(lerp(c2[0], c3[0], u)),
+    Math.round(lerp(c2[1], c3[1], u)),
+    Math.round(lerp(c2[2], c3[2], u)),
+  ];
+}
+
+function renderGradient(){
+  const c = grad.canvas, ctx = c.getContext('2d'), w = c.width, h = c.height;
+  const m = makeMapper(c);
+  ctx.clearRect(0,0,w,h);
+
+  let fmin = Infinity, fmax = -Infinity;
+  const field = new Float32Array(w*h);
+
+  for(let py=0; py<h; py++){
+    const y = m.pxToY(py + 0.5);
+    for(let px=0; px<w; px++){
+      const x = m.pxToX(px + 0.5);
+      const v = sampleScalar(grad.preset.value, x, y);
+      field[py*w + px] = v;
+      if(v < fmin) fmin = v;
+      if(v > fmax) fmax = v;
+    }
+  }
+
+  const img = ctx.createImageData(w, h);
+  const data = img.data;
+  for(let py=0; py<h; py++){
+    for(let px=0; px<w; px++){
+      const v = field[py*w + px];
+      const t = (v - fmin)/(fmax - fmin + 1e-12);
+      const col = fieldColor(t);
+      const idx = 4*(py*w + px);
+      data[idx] = col[0];
+      data[idx+1] = col[1];
+      data[idx+2] = col[2];
+      data[idx+3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+
+  drawGrid(ctx,m,w,h);
+  drawAxes(ctx,m,w,h);
+
+  const levels = parseInt(grad.levelsInput.value,10);
+  const nx = 150, ny = 106;
+  const vals = new Array(nx*ny);
+  for(let j=0;j<ny;j++){
+    const y = lerp(DOMAIN.ymax, DOMAIN.ymin, j/(ny-1));
+    for(let i=0;i<nx;i++){
+      const x = lerp(DOMAIN.xmin, DOMAIN.xmax, i/(nx-1));
+      vals[j*nx+i] = sampleScalar(grad.preset.value, x, y);
+    }
+  }
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(30,24,18,0.38)';
+  ctx.lineWidth = 1;
+  for(let L=1; L<=levels; L++){
+    const level = fmin + (fmax-fmin)*(L/(levels+1));
+    for(let j=0;j<ny-1;j++){
+      const yTop = lerp(DOMAIN.ymax, DOMAIN.ymin, j/(ny-1));
+      const yBot = lerp(DOMAIN.ymax, DOMAIN.ymin, (j+1)/(ny-1));
+      for(let i=0;i<nx-1;i++){
+        const xL = lerp(DOMAIN.xmin, DOMAIN.xmax, i/(nx-1));
+        const xR = lerp(DOMAIN.xmin, DOMAIN.xmax, (i+1)/(nx-1));
+        const idx = j*nx+i;
+        const v00 = vals[idx], v10 = vals[idx+1], v01 = vals[idx+nx], v11 = vals[idx+nx+1];
+        const pts = [];
+        function interp(vA,vB,xA,yA,xB,yB){
+          if((vA-level)*(vB-level) > 0 || Math.abs(vA-vB) < 1e-12) return;
+          const t = (level-vA)/(vB-vA);
+          pts.push({x:lerp(xA,xB,t), y:lerp(yA,yB,t)});
+        }
+        interp(v00,v10,xL,yTop,xR,yTop);
+        interp(v10,v11,xR,yTop,xR,yBot);
+        interp(v11,v01,xR,yBot,xL,yBot);
+        interp(v01,v00,xL,yBot,xL,yTop);
+        if(pts.length === 2){
+          ctx.beginPath();
+          ctx.moveTo(m.xToPx(pts[0].x), m.yToPx(pts[0].y));
+          ctx.lineTo(m.xToPx(pts[1].x), m.yToPx(pts[1].y));
+          ctx.stroke();
+        }else if(pts.length === 4){
+          ctx.beginPath();
+          ctx.moveTo(m.xToPx(pts[0].x), m.yToPx(pts[0].y));
+          ctx.lineTo(m.xToPx(pts[1].x), m.yToPx(pts[1].y));
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(m.xToPx(pts[2].x), m.yToPx(pts[2].y));
+          ctx.lineTo(m.xToPx(pts[3].x), m.yToPx(pts[3].y));
+          ctx.stroke();
+        }
+      }
+    }
+  }
+  ctx.restore();
+
+  const p = grad.point;
+  const g = gradScalar(grad.preset.value, p.x, p.y);
+  const scale = 58*parseFloat(grad.scaleInput.value);
+  const px = m.xToPx(p.x), py = m.yToPx(p.y);
+
+  drawArrow(ctx, px, py, px + g.gx*scale, py - g.gy*scale, '#fff7ee', 3.4);
+  drawArrow(ctx, px, py, px + g.gx*scale, py, 'rgba(32,106,138,0.85)', 2);
+  drawArrow(ctx, px, py, px, py - g.gy*scale, 'rgba(47,123,71,0.85)', 2);
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,247,238,0.85)';
+  ctx.setLineDash([5,4]);
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.lineTo(px + g.gx*scale, py);
+  ctx.lineTo(px + g.gx*scale, py - g.gy*scale);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#1e1812';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.arc(px, py, 6.5, 0, Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.font = '13px IBM Plex Mono';
+  ctx.fillStyle = '#1e1812';
+  ctx.fillText('P', px + 10, py - 10);
+  ctx.fillText('∇f', px + g.gx*scale + 8, py - g.gy*scale - 6);
+  ctx.restore();
+
+  const fv = sampleScalar(grad.preset.value, p.x, p.y);
+  const mag = Math.hypot(g.gx,g.gy);
+  document.getElementById('gradScaleVal').textContent = parseFloat(grad.scaleInput.value).toFixed(1);
+  document.getElementById('gradLevelsVal').textContent = levels;
+  document.getElementById('gradPoint').textContent = `(${p.x.toFixed(2)}, ${p.y.toFixed(2)})`;
+  document.getElementById('gradF').textContent = fv.toFixed(3);
+  document.getElementById('gradVec').textContent = `(${g.gx.toFixed(3)}, ${g.gy.toFixed(3)})`;
+  document.getElementById('gradMag').textContent = mag.toFixed(3);
+}
+
+function divergenceType(val){
+  if(val > 0.25) return ['Sorgente locale', 'In questa regione il flusso uscente netto è positivo.'];
+  if(val < -0.25) return ['Pozzo locale', 'In questa regione il flusso netto è entrante.'];
+  return ['Neutra', 'Entrata e uscita si compensano localmente.'];
+}
+
+function renderDivergence(){
+  const c = div.canvas, ctx = c.getContext('2d'), w = c.width, h = c.height;
+  const m = makeMapper(c);
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#efe6d7';
+  ctx.fillRect(0,0,w,h);
+  drawGrid(ctx,m,w,h);
+  drawAxes(ctx,m,w,h);
+
+  const scale = 26*parseFloat(div.scaleInput.value);
+  for(let x=-3.6;x<=3.6;x+=0.5){
+    for(let y=-2.8;y<=2.8;y+=0.5){
+      const F = sampleVectorDiv(div.preset.value, x, y);
+      const px = m.xToPx(x), py = m.yToPx(y);
+      drawArrow(ctx, px, py, px + F.fx*scale, py - F.fy*scale, 'rgba(31,106,138,0.82)', 1.7);
+    }
+  }
+
+  const p = div.point;
+  const box = parseFloat(div.boxInput.value);
+  const left = p.x - box/2, right = p.x + box/2, bottom = p.y - box/2, top = p.y + box/2;
+  const L = m.xToPx(left), R = m.xToPx(right), T = m.yToPx(top), B = m.yToPx(bottom);
+
+  const divVal = divergence(div.preset.value, p.x, p.y);
+  let fill = 'rgba(215,208,198,0.25)';
+  if(divVal > 0.2) fill = 'rgba(213,126,96,0.18)';
+  if(divVal < -0.2) fill = 'rgba(110,143,184,0.18)';
+
+  ctx.save();
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = '#fffef8';
+  ctx.lineWidth = 2.2;
+  ctx.fillRect(L,T,R-L,B-T);
+  ctx.strokeRect(L,T,R-L,B-T);
+  ctx.restore();
+
+  const fluxSampleCount = 5;
+  function boundaryArrows(side){
+    for(let i=0;i<fluxSampleCount;i++){
+      const s = (i+0.5)/fluxSampleCount;
+      let x,y,nx,ny;
+      if(side==='right'){ x=right; y=lerp(bottom,top,s); nx=1; ny=0; }
+      if(side==='left'){ x=left; y=lerp(bottom,top,s); nx=-1; ny=0; }
+      if(side==='top'){ x=lerp(left,right,s); y=top; nx=0; ny=1; }
+      if(side==='bottom'){ x=lerp(left,right,s); y=bottom; nx=0; ny=-1; }
+      const F = sampleVectorDiv(div.preset.value,x,y);
+      const flux = F.fx*nx + F.fy*ny;
+      const cx = m.xToPx(x), cy = m.yToPx(y);
+      const len = clamp(Math.abs(flux)*16, 4, 24);
+      const col = flux >= 0 ? 'rgba(158,61,24,0.95)' : 'rgba(31,106,138,0.95)';
+      const sgn = flux >= 0 ? 1 : -1;
+      drawArrow(ctx, cx, cy, cx + sgn*nx*len, cy - sgn*ny*len, col, 1.8);
+    }
+  }
+  ['right','left','top','bottom'].forEach(boundaryArrows);
+
+  const F0 = sampleVectorDiv(div.preset.value, p.x, p.y);
+  const px = m.xToPx(p.x), py = m.yToPx(p.y);
+  drawArrow(ctx, px, py, px + F0.fx*scale*1.25, py - F0.fy*scale*1.25, '#7a3f95', 3.1);
+
+  ctx.save();
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#1e1812';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.arc(px, py, 5.8, 0, Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.font = '13px IBM Plex Mono';
+  ctx.fillStyle = '#1e1812';
+  ctx.fillText('P', px + 10, py - 9);
+  ctx.restore();
+
+  const [label,desc] = divergenceType(divVal);
+  document.getElementById('divBoxVal').textContent = box.toFixed(2);
+  document.getElementById('divScaleVal').textContent = parseFloat(div.scaleInput.value).toFixed(1);
+  document.getElementById('divPoint').textContent = `(${p.x.toFixed(2)}, ${p.y.toFixed(2)})`;
+  document.getElementById('divField').textContent = `(${F0.fx.toFixed(3)}, ${F0.fy.toFixed(3)})`;
+  document.getElementById('divVal').textContent = divVal.toFixed(3);
+  document.getElementById('divType').textContent = label;
+  document.getElementById('divTypeDesc').textContent = desc;
+}
+
+function curlType(val){
+  if(val > 0.2) return ['Antioraria', 'Il campo induce una rotazione locale in verso antiorario.'];
+  if(val < -0.2) return ['Oraria', 'Il campo induce una rotazione locale in verso orario.'];
+  return ['Assente', 'Il campo non induce rotazione locale apprezzabile.'];
+}
+
+function renderCurl(){
+  const c = curl.canvas, ctx = c.getContext('2d'), w = c.width, h = c.height;
+  const m = makeMapper(c);
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#efe6d7';
+  ctx.fillRect(0,0,w,h);
+  drawGrid(ctx,m,w,h);
+  drawAxes(ctx,m,w,h);
+
+  const scale = 24*parseFloat(curl.scaleInput.value);
+  for(let x=-3.6;x<=3.6;x+=0.55){
+    for(let y=-2.8;y<=2.8;y+=0.55){
+      const F = sampleVectorCurl(curl.preset.value, x, y);
+      const px = m.xToPx(x), py = m.yToPx(y);
+      drawArrow(ctx, px, py, px + F.fx*scale, py - F.fy*scale, 'rgba(31,106,138,0.82)', 1.7);
+    }
+  }
+
+  const p = curl.point;
+  const cz = curlZ(curl.preset.value, p.x, p.y);
+  const F0 = sampleVectorCurl(curl.preset.value, p.x, p.y);
+  const px = m.xToPx(p.x), py = m.yToPx(p.y);
+
+  drawArrow(ctx, px, py, px + F0.fx*scale*1.3, py - F0.fy*scale*1.3, '#7a3f95', 3.1);
+
+  const rWorld = parseFloat(curl.wheelInput.value);
+  const rx = Math.abs(m.xToPx(p.x + rWorld) - px);
+  const ry = Math.abs(m.yToPx(p.y + rWorld) - py);
+  const rr = (rx+ry)/2;
+
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.strokeStyle = '#fffef8';
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = 2.3;
+  ctx.beginPath();
+  ctx.arc(0,0,rr,0,Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+
+  const bladeAngle = curl.phase + Math.sign(cz || 0.0001)*Math.min(Math.abs(cz)*0.018, 0.12);
+  ctx.rotate(bladeAngle);
+  for(let i=0;i<4;i++){
+    ctx.rotate(Math.PI/2);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(rr*0.82,0);
+    ctx.strokeStyle = 'rgba(255,247,238,0.95)';
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(rr*0.84, 0, rr*0.16, -Math.PI/2, Math.PI/2);
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.fillStyle = '#1e1812';
+  ctx.arc(0,0,4.6,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#1e1812';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.arc(px, py, 4.8, 0, Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.font = '13px IBM Plex Mono';
+  ctx.fillStyle = '#1e1812';
+  ctx.fillText('P', px + 10, py - 9);
+  ctx.restore();
+
+  const signCol = cz > 0.2 ? 'rgba(47,123,71,0.92)' : (cz < -0.2 ? 'rgba(158,61,24,0.92)' : 'rgba(90,79,67,0.82)');
+  ctx.save();
+  ctx.strokeStyle = signCol;
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  ctx.arc(px, py, rr+16, Math.PI*0.22, Math.PI*1.62, cz>=0);
+  ctx.stroke();
+  const ang = cz>=0 ? Math.PI*1.62 : Math.PI*0.22;
+  const ex = px + (rr+16)*Math.cos(ang), ey = py + (rr+16)*Math.sin(ang);
+  const tx = ex + (cz>=0 ? -7 : 7), ty = ey + (cz>=0 ? -10 : 10);
+  drawArrow(ctx, tx, ty, ex, ey, signCol, 2.6);
+
+  const [label,desc] = curlType(cz);
+  document.getElementById('curlWheelVal').textContent = rWorld.toFixed(2);
+  document.getElementById('curlScaleVal').textContent = parseFloat(curl.scaleInput.value).toFixed(1);
+  document.getElementById('curlPoint').textContent = `(${p.x.toFixed(2)}, ${p.y.toFixed(2)})`;
+  document.getElementById('curlField').textContent = `(${F0.fx.toFixed(3)}, ${F0.fy.toFixed(3)})`;
+  document.getElementById('curlVal').textContent = cz.toFixed(3);
+  document.getElementById('curlType').textContent = label;
+  document.getElementById('curlTypeDesc').textContent = desc;
+}
+
+function updateAll(){
+  renderGradient();
+  renderDivergence();
+  renderCurl();
+}
+
+function eventPoint(canvas, ev){
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width;
+  const sy = canvas.height / rect.height;
+  return {x:(ev.clientX-rect.left)*sx, y:(ev.clientY-rect.top)*sy};
+}
+function attachDrag(obj, renderFn, radiusPx=18){
+  const c = obj.canvas;
+  const m = () => makeMapper(c);
+  c.addEventListener('pointerdown', ev => {
+    const p = eventPoint(c,ev);
+    const px = m().xToPx(obj.point.x), py = m().yToPx(obj.point.y);
+    if(Math.hypot(p.x-px,p.y-py) <= radiusPx){ obj.dragging = true; c.setPointerCapture(ev.pointerId); }
+  });
+  c.addEventListener('pointermove', ev => {
+    if(!obj.dragging) return;
+    const p = eventPoint(c,ev);
+    const map = m();
+    obj.point.x = clamp(map.pxToX(p.x), DOMAIN.xmin, DOMAIN.xmax);
+    obj.point.y = clamp(map.pxToY(p.y), DOMAIN.ymin, DOMAIN.ymax);
+    renderFn();
+  });
+  const stop = () => obj.dragging = false;
+  c.addEventListener('pointerup', stop);
+  c.addEventListener('pointercancel', stop);
+  c.addEventListener('pointerleave', stop);
+}
+attachDrag(grad, renderGradient, 18);
+attachDrag(div, renderDivergence, 26);
+attachDrag(curl, renderCurl, 30);
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`screen-${btn.dataset.tab}`).classList.add('active');
+  });
+});
+
+[
+  grad.preset, grad.scaleInput, grad.levelsInput,
+  div.preset, div.boxInput, div.scaleInput,
+  curl.preset, curl.wheelInput, curl.scaleInput
+].forEach(el => el.addEventListener('input', updateAll));
+
+function animate(){
+  const cz = curlZ(curl.preset.value, curl.point.x, curl.point.y);
+  curl.phase += clamp(cz*0.012, -0.08, 0.08);
+  renderCurl();
+  requestAnimationFrame(animate);
+}
+
+updateAll();
+animate();
+</script>
+</body>
+</html>

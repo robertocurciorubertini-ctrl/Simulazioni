@@ -1,33 +1,6 @@
 #!/usr/bin/env python3
 """
 generate_sim.py
-
-Scansiona ricorsivamente una cartella di file HTML, cerca un blocco statico del tipo:
-
-<head>
-  <script>
-  window.SIM_METADATA = {
-    "title": "Conservazione dell'energia",
-    "description": "Visualizza le trasformazioni tra energia cinetica e potenziale.",
-    "icon": "♻️",
-    "order": 8,
-    "tags": ["energia", "energia cinetica"],
-    "level": "base"
-  };
-  </script>
-</head>
-
-e aggiorna la sezione "simulations" di un file JSON esistente,
-preservando "categories" e qualsiasi altra chiave già presente.
-
-Inoltre può aggiornare un file di configurazione testuale, sostituendo solo
-la sezione finale che parte dal marcatore "Simulazioni:", senza toccare
-il contenuto precedente. In quella sezione viene scritto un indice gerarchico
-per categorie del tipo:
-
-Meccanica:
-- Moto rettilineo uniforme
-- Moto uniformemente accelerato
 """
 
 from __future__ import annotations
@@ -94,7 +67,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-
 def find_html_files(root: Path) -> list[Path]:
     html_files = []
     excluded_dirs = {"theory"}
@@ -115,7 +87,6 @@ def find_html_files(root: Path) -> list[Path]:
     return sorted(html_files)
 
 
-
 def extract_metadata_block(text: str) -> str | None:
     match = METADATA_REGEX.search(text)
     if not match:
@@ -123,20 +94,154 @@ def extract_metadata_block(text: str) -> str | None:
     return "{" + match.group("body") + "}"
 
 
-
-def js_object_to_json(js_text: str) -> str:
-    js_text = re.sub(r"//.*?$", "", js_text, flags=re.MULTILINE)
+def strip_js_comments(js_text: str) -> str:
     js_text = re.sub(r"/\*.*?\*/", "", js_text, flags=re.DOTALL)
-
-    js_text = re.sub(
-        r'([\{\s,])([A-Za-z_][A-Za-z0-9_\-]*)\s*:',
-        r'\1"\2":',
-        js_text,
-    )
-
-    js_text = re.sub(r",(\s*[}\]])", r"\1", js_text)
+    js_text = re.sub(r"//.*?$", "", js_text, flags=re.MULTILINE)
     return js_text
 
+
+def quote_unquoted_keys(js_text: str) -> str:
+    """
+    Converte chiavi JavaScript non quotate in chiavi JSON quotate,
+    senza alterare testo interno alle stringhe.
+    Esempio:
+      { title: "abc", order: 2 }
+    ->
+      { "title": "abc", "order": 2 }
+    """
+    out = []
+    i = 0
+    n = len(js_text)
+    in_string = False
+    string_delim = ""
+    escape = False
+
+    while i < n:
+        ch = js_text[i]
+
+        if in_string:
+            out.append(ch)
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == string_delim:
+                in_string = False
+            i += 1
+            continue
+
+        if ch in ('"', "'"):
+            in_string = True
+            string_delim = ch
+            out.append(ch)
+            i += 1
+            continue
+
+        if ch.isalpha() or ch == "_":
+            j = i + 1
+            while j < n and (js_text[j].isalnum() or js_text[j] in "_-"):
+                j += 1
+
+            k = j
+            while k < n and js_text[k].isspace():
+                k += 1
+
+            prev_nonspace_idx = len(out) - 1
+            while prev_nonspace_idx >= 0 and out[prev_nonspace_idx].isspace():
+                prev_nonspace_idx -= 1
+            prev_nonspace = out[prev_nonspace_idx] if prev_nonspace_idx >= 0 else ""
+
+            token = js_text[i:j]
+
+            if k < n and js_text[k] == ":" and prev_nonspace in {"", "{", ",", "\n"}:
+                out.append(f'"{token}"')
+                i = j
+                continue
+
+        out.append(ch)
+        i += 1
+
+    return "".join(out)
+
+
+def normalize_single_quoted_strings(js_text: str) -> str:
+    """
+    Converte stringhe delimitate da apici singoli in stringhe JSON con doppi apici,
+    lasciando inalterate quelle già con doppi apici.
+    """
+    out = []
+    i = 0
+    n = len(js_text)
+    in_string = False
+    string_delim = ""
+    escape = False
+
+    while i < n:
+        ch = js_text[i]
+
+        if not in_string:
+            if ch == '"':
+                in_string = True
+                string_delim = '"'
+                out.append(ch)
+            elif ch == "'":
+                in_string = True
+                string_delim = "'"
+                out.append('"')
+            else:
+                out.append(ch)
+            i += 1
+            continue
+
+        if escape:
+            if string_delim == "'":
+                if ch == '"':
+                    out.append('\\"')
+                else:
+                    out.append(ch)
+            else:
+                out.append(ch)
+            escape = False
+            i += 1
+            continue
+
+        if ch == "\\":
+            escape = True
+            out.append(ch)
+            i += 1
+            continue
+
+        if ch == string_delim:
+            out.append('"' if string_delim == "'" else ch)
+            in_string = False
+            i += 1
+            continue
+
+        if string_delim == "'" and ch == '"':
+            out.append('\\"')
+        else:
+            out.append(ch)
+        i += 1
+
+    return "".join(out)
+
+
+def js_object_to_json(js_text: str) -> str:
+    js_text = strip_js_comments(js_text)
+
+    # Primo tentativo: se è già JSON valido o quasi valido, preservalo il più possibile
+    candidate = re.sub(r",(\s*[}\]])", r"\1", js_text).strip()
+    try:
+        json.loads(candidate)
+        return candidate
+    except json.JSONDecodeError:
+        pass
+
+    # Fallback: conversione da object literal JS a JSON
+    js_text = normalize_single_quoted_strings(js_text)
+    js_text = quote_unquoted_keys(js_text)
+    js_text = re.sub(r",(\s*[}\]])", r"\1", js_text)
+    return js_text.strip()
 
 
 def normalize_order(value: Any, path: Path) -> int | float:
@@ -155,11 +260,9 @@ def normalize_order(value: Any, path: Path) -> int | float:
         raise ValueError(f"Il campo 'order' deve essere numerico in '{path}'.") from exc
 
 
-
 def title_case_from_slug(value: str) -> str:
     text = value.replace("-", " ").replace("_", " ").strip()
     return " ".join(word[:1].upper() + word[1:] for word in text.split())
-
 
 
 def infer_category_from_path(relative_path: Path) -> str:
@@ -169,11 +272,9 @@ def infer_category_from_path(relative_path: Path) -> str:
     return title_case_from_slug(parts[0])
 
 
-
 def is_wip_path(relative_path: Path) -> bool:
     parts = [part.casefold() for part in relative_path.parts]
     return len(parts) > 1 and parts[0] == "wip"
-
 
 
 def choose_category(raw: dict[str, Any], relative_path: Path, mode: str) -> str:
@@ -188,7 +289,6 @@ def choose_category(raw: dict[str, Any], relative_path: Path, mode: str) -> str:
     if mode == "metadata":
         return from_metadata or from_folder
     return from_metadata or from_folder
-
 
 
 def load_metadata_from_html(path: Path, root: Path, category_source: str) -> dict[str, Any] | None:
@@ -230,7 +330,6 @@ def load_metadata_from_html(path: Path, root: Path, category_source: str) -> dic
     return result
 
 
-
 def load_existing_json(json_path: Path) -> dict[str, Any]:
     if not json_path.exists():
         return {"categories": [], "simulations": []}
@@ -259,10 +358,8 @@ def load_existing_json(json_path: Path) -> dict[str, Any]:
     )
 
 
-
 def _norm_title(value: Any) -> str:
     return str(value).strip().casefold()
-
 
 
 def merge_simulations(existing: list[dict[str, Any]], extracted: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -322,7 +419,6 @@ def merge_simulations(existing: list[dict[str, Any]], extracted: list[dict[str, 
     return sorted(dedup_by_title.values(), key=sort_key)
 
 
-
 def ensure_wip_category(data: dict[str, Any]) -> None:
     categories = data.get("categories", [])
     if not isinstance(categories, list):
@@ -342,13 +438,11 @@ def ensure_wip_category(data: dict[str, Any]) -> None:
         })
 
 
-
 def write_json(data: dict[str, Any], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="\n") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
         f.write("\n")
-
 
 
 def category_order_map(data: dict[str, Any]) -> dict[str, tuple[int | float, str]]:
@@ -436,11 +530,11 @@ def update_config_file(config_path: Path, simulations: list[dict[str, Any]], dat
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_text(updated, encoding="utf-8", newline="\n")
 
+
 def main() -> int:
     args = parse_args()
     input_dir = Path(args.input).resolve()
     json_path = Path(args.json).resolve()
-    config_path = Path(args.config).resolve()
     config_path = Path(args.config).resolve()
 
     if not input_dir.exists() or not input_dir.is_dir():

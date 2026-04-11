@@ -204,6 +204,27 @@
       "isWip": false
     },
     {
+      "title": "Gradiente, divergenza e rotore",
+      "description": "Visualizzazione didattica delle principali operazioni differenziali del nabla su campi scalari e vettoriali, con interpretazione geometrica locale.",
+      "category": "Matematica per la fisica",
+      "icon": "∇",
+      "order": 5,
+      "tags": [
+        "nabla",
+        "gradiente",
+        "divergenza",
+        "rotore",
+        "campi scalari",
+        "campi vettoriali",
+        "operatori differenziali",
+        "flusso",
+        "circolazione"
+      ],
+      "level": "intermedio",
+      "file": "matematica/nabla-operatori.html",
+      "isWip": false
+    },
+    {
       "title": "Moto rettilineo uniforme",
       "description": "Visualizza il moto di uno o due corpi con velocità costante e osserva la relazione lineare tra posizione e tempo attraverso grafici sincronizzati.",
       "category": "Meccanica",

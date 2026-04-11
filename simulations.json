@@ -206,7 +206,7 @@
     {
       "title": "Gradiente, divergenza e rotore",
       "description": "Visualizzazione didattica delle principali operazioni differenziali del nabla su campi scalari e vettoriali, con interpretazione geometrica locale.",
-      "category": "Matematica per la fisica",
+      "category": "Matematica per la Fisica",
       "icon": "∇",
       "order": 5,
       "tags": [

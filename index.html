@@ -1196,9 +1196,26 @@
     results.addEventListener("click", e => {
       const toggle = e.target.closest(".category-toggle");
       if (!toggle || hasActiveFilters()) return;
+
+      const block = toggle.closest(".category-block");
+      const content = block?.querySelector(".category-content");
+      if (!block || !content) return;
+
+      const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+
+      results.querySelectorAll(".category-toggle[aria-expanded='true']").forEach(btn => {
+        if (btn === toggle) return;
+        btn.setAttribute("aria-expanded", "false");
+        const otherContent = btn.closest(".category-block")?.querySelector(".category-content");
+        if (otherContent) otherContent.hidden = true;
+      });
+
+      const nextExpanded = !isExpanded;
+      toggle.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
+      content.hidden = !nextExpanded;
+
       const key = getCategoryKey(toggle.dataset.category || "");
-      expandedCategoryKey = expandedCategoryKey === key ? null : key;
-      render();
+      expandedCategoryKey = nextExpanded ? key : null;
     });
 
     loadCatalog();

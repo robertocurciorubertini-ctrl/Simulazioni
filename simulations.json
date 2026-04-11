@@ -165,6 +165,28 @@
       "isWip": false
     },
     {
+      "title": "Campi scalari e vettoriali",
+      "description": "Visualizzazione interattiva di campi scalari e vettoriali: mappe di colore, isolinee, gradienti e linee di campo per esplorare la struttura dei campi.",
+      "category": "Fondamenti",
+      "icon": "↗️",
+      "order": 35,
+      "tags": [
+        "campi scalari",
+        "campi vettoriali",
+        "gradiente",
+        "linee di campo",
+        "isolinee",
+        "equipotenziali",
+        "potenziale",
+        "campo elettrico",
+        "divergenza",
+        "rotore"
+      ],
+      "level": "intermedio",
+      "file": "fondamenti/campi_scalari_vettoriali.html",
+      "isWip": false
+    },
+    {
       "title": "Gravità",
       "description": "Simulazione dell'interazione gravitazionale tra masse con visualizzazione delle forze e del moto risultante secondo la legge di gravitazione universale.",
       "category": "Gravitazione",
@@ -504,6 +526,25 @@
       "isWip": true
     },
     {
+      "title": "Effetto fotoelettrico",
+      "description": "Simulazione interattiva dell’effetto fotoelettrico basata sull’equazione di Einstein.",
+      "category": "WIP",
+      "icon": "⚛️",
+      "order": 1,
+      "tags": [
+        "effetto fotoelettrico",
+        "fotoni",
+        "funzione lavoro",
+        "potenziale di arresto",
+        "einstein",
+        "fisica quantistica",
+        "fotoelettroni"
+      ],
+      "level": "avanzato",
+      "file": "WIP/fotoelettrico.html",
+      "isWip": true
+    },
+    {
       "title": "Fluidodinamica",
       "description": "Esplorazione del moto dei fluidi, delle linee di flusso, dell'equazione di continuità e del principio di Bernoulli.",
       "category": "WIP",
@@ -518,6 +559,25 @@
       ],
       "level": "intermedio",
       "file": "WIP/fluidodinamica.html",
+      "isWip": true
+    },
+    {
+      "title": "Macchina fotografica",
+      "description": "Simulazione interattiva di ottica geometrica tramite la visualizzazione della propagazione dei raggi luminosi.",
+      "category": "WIP",
+      "icon": "📷",
+      "order": 1,
+      "tags": [
+        "ottica geometrica",
+        "lente convergente",
+        "fuoco",
+        "diaframma",
+        "raggi luminosi",
+        "formazione dell'immagine",
+        "fotocamera"
+      ],
+      "level": "intermedio",
+      "file": "WIP/fotocamera.html",
       "isWip": true
     },
     {

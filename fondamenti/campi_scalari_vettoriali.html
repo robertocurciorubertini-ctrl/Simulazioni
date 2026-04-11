@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<script>
+window.SIM_METADATA = {
+  "title": "Campi scalari e vettoriali",
+  "description": "Visualizzazione interattiva di campi scalari e vettoriali: mappe di colore, isolinee, gradienti e linee di campo per esplorare la struttura dei campi.",
+  "category": "Fondamenti",
+  "icon": "↗️",
+  "order": 35,
+  "tags": [
+    "campi scalari",
+    "campi vettoriali",
+    "gradiente",
+    "linee di campo",
+    "isolinee",
+    "equipotenziali",
+    "potenziale",
+    "campo elettrico",
+    "divergenza",
+    "rotore"
+  ],
+  "level": "intermedio"
+};
+</script><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campi Scalari e Vettoriali</title>
+<meta name="description" content="Simulazione interattiva per la visualizzazione di campi scalari e vettoriali. Esplora mappe di isopotenziale, gradienti e linee di campo con interazione in tempo reale.">
+<meta name="keywords" content="campo scalare, campo vettoriale, gradiente, isopotenziale, linee di campo, fisica, simulazione interattiva, liceo scientifico">
+<meta name="author" content="Simulazioni di Fisica — Liceo Scientifico">
+<meta name="subject" content="Fisica — Matematica">
+<meta name="topic" content="Campi scalari e vettoriali">
+<meta name="category" content="Matematica e Fisica di base">
+<meta name="language" content="it">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+
+<style>
+:root {
+  --cream: #f5f0e8;
+  --ink: #1a1a1a;
+  --warm-mid: #c8b89a;
+  --accent: #8b4513;
+  --accent-light: #d4956a;
+  --muted: #6b5c4c;
+  --border: #d4c9b8;
+  --panel: #ede8df;
+  --scalar-a: #1a3a6b;
+  --scalar-b: #e8f4f8;
+  --vector-a: #2d5a27;
+  --highlight: #b34a00;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 2rem 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.site-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+header h1 {
+  font-family: 'EB Garamond', serif;
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+header .subtitle {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin: 0 3rem;
+  margin-top: 2rem;
+}
+
+.tab-btn {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.1rem;
+  padding: 0.7rem 2rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-btn.active {
+  color: var(--ink);
+  border-bottom: 2px solid var(--accent);
+}
+
+.tab-btn:hover:not(.active) { color: var(--ink); }
+
+/* ── PANELS ── */
+.tab-panel { display: none; padding: 2rem 3rem 0; }
+.tab-panel.active { display: block; }
+
+/* ── SIMULATION LAYOUT ── */
+.sim-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.canvas-wrap {
+  position: relative;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.canvas-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: rgba(0,0,0,0.45);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ── SIDE PANEL ── */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.info-box {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 1rem 1.1rem;
+  border-radius: 2px;
+}
+
+.info-box h3 {
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.4rem;
+}
+
+.readout {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink);
+  line-height: 1.9;
+}
+
+.readout span.val {
+  color: var(--highlight);
+  font-weight: 500;
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.ctrl-group label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+
+.ctrl-group select,
+.ctrl-group input[type=range] {
+  width: 100%;
+}
+
+select {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.5rem;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+}
+
+input[type=range] {
+  accent-color: var(--accent);
+}
+
+.toggle-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.toggle-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.toggle-btn.on {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── COLOR LEGEND ── */
+.color-bar-wrap {
+  margin-top: 0.3rem;
+}
+.color-bar {
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #1a3a6b, #2166ac, #4393c3, #92c5de, #d1e5f0, #f7f7f7, #fddbc7, #f4a582, #d6604d, #b2182b);
+}
+.color-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+
+/* ── THEORY ── */
+.theory {
+  margin: 2.5rem 3rem 0;
+  border-top: 1px solid var(--border);
+  padding-top: 2rem;
+}
+
+.theory-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.theory-block h3 {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.theory-block p {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: #333;
+  margin-bottom: 0.8rem;
+}
+
+.formula-block {
+  background: var(--panel);
+  border-left: 3px solid var(--accent-light);
+  padding: 0.7rem 1rem;
+  margin: 0.8rem 0;
+  font-size: 0.9rem;
+  border-radius: 0 2px 2px 0;
+}
+
+footer {
+  margin-top: 3rem;
+  border-top: 1px solid var(--border);
+  padding: 1.2rem 3rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 900px) {
+  .sim-layout { grid-template-columns: 1fr; }
+  #tab-combined .sim-layout { grid-template-columns: 1fr; }
+  #tab-combined .side-panel-combined { grid-template-columns: 1fr; }
+  .theory-grid { grid-template-columns: 1fr; }
+  header, .tab-bar, .tab-panel, .theory, footer { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .tab-bar { margin-left: 1.2rem; margin-right: 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-label">Simulazioni di Fisica — Liceo Scientifico</div>
+  <h1>Campi Scalari e Vettoriali</h1>
+  <div class="subtitle">Visualizzazione interattiva di funzioni di campo — sposta il cursore sul canvas per esplorare</div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="scalar">Campo Scalare</button>
+  <button class="tab-btn" data-tab="vector">Campo Vettoriale</button>
+</div>
+
+<!-- ═══════════════ TAB: CAMPO SCALARE ═══════════════ -->
+<div id="tab-scalar" class="tab-panel active">
+  <div class="sim-layout">
+    <div>
+      <div class="canvas-wrap" style="position:relative">
+        <canvas id="scalarCanvas" width="660" height="500"></canvas>
+        <div class="canvas-label" id="scalarCanvasLabel">T(x, y) — temperatura [°C]</div>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-box">
+        <h3>Lettura nel punto</h3>
+        <div class="readout" id="scalarReadout" style="line-height:2">
+          —<br>
+          <span style="color:var(--muted);font-size:0.7rem">sposta il cursore sulla mappa</span>
+        </div>
+      </div>
+      <div class="info-box" id="scalarZoneBox" style="display:none">
+        <h3>Zona</h3>
+        <div class="readout" id="scalarZone" style="line-height:1.8"></div>
+      </div>
+      <div class="info-box" id="gradReadoutBox" style="display:none">
+        <h3>Gradiente nel punto</h3>
+        <div class="readout" id="gradReadout" style="line-height:1.9">
+          ∂φ/∂x = —<br>∂φ/∂y = —<br>|∇φ| = —
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>Scenario</h3>
+        <div class="controls">
+          <div class="ctrl-group">
+            <label>Campo scalare</label>
+            <select id="scalarType">
+              <option value="meteo">Mappa meteorologica — T(x,y)</option>
+              <option value="pressure">Carta isobarica — p(x,y)</option>
+              <option value="potential">Potenziale elettrico — V(x,y)</option>
+              <option value="saddle">Campo a sella — φ = xy</option>
+              <option value="wave">Onda stazionaria 2D</option>
+            </select>
+          </div>
+          <div class="toggle-row">
+            <button class="toggle-btn on" id="toggleIso">Isolinee etichettate</button>
+            <button class="toggle-btn on" id="toggleColor">Mappa colore</button>
+            <button class="toggle-btn" id="toggleGrad">∇φ — campo gradiente</button>
+          </div>
+        </div>
+      </div>
+      <div class="info-box" id="scalarLegendBox">
+        <h3>Legenda</h3>
+        <canvas id="legendCanvas" width="240" height="22" style="width:100%;border-radius:2px;display:block"></canvas>
+        <div class="color-bar-labels" id="legendLabels" style="margin-top:0.2rem">
+          <span id="legendMin">—</span><span id="legendMid">—</span><span id="legendMax">—</span>
+        </div>
+        <div id="legendNote" style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:0.4rem;line-height:1.6"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB: CAMPO VETTORIALE ═══════════════ -->
+<div id="tab-vector" class="tab-panel">
+  <div class="sim-layout">
+    <div>
+      <div class="canvas-wrap">
+        <canvas id="vectorCanvas" width="600" height="480"></canvas>
+        <div class="canvas-label">campo vettoriale F(x, y)</div>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-box">
+        <h3>Vettore nel punto</h3>
+        <div class="readout" id="vectorReadout">
+          x = —<br>
+          y = —<br>
+          Fx = —<br>
+          Fy = —<br>
+          |F| = —<br>
+          θ = —
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>Campo</h3>
+        <div class="controls">
+          <div class="ctrl-group">
+            <label>Tipo di campo</label>
+            <select id="vectorType">
+              <option value="coulomb">Campo elettrico (1/r²)</option>
+              <option value="uniform">Campo uniforme</option>
+              <option value="vortex">Campo vorticoso</option>
+              <option value="dipole_v">Dipolo vettoriale</option>
+              <option value="gravity">Campo gravitazionale</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label>Densità frecce</label>
+            <input type="range" id="arrowDensity" min="6" max="20" value="12">
+          </div>
+          <div class="toggle-row">
+            <button class="toggle-btn on" id="toggleStreamlines">Linee di campo</button>
+            <button class="toggle-btn on" id="toggleArrows">Frecce</button>
+            <button class="toggle-btn on" id="toggleIntensity">Intensità per colore</button>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>Proprietà</h3>
+        <div class="readout" id="vectorProps">
+          div F = —<br>
+          rot F = —
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ TEORIA ═══════════════ -->
+<section class="theory" id="theory-section">
+  <h2 style="font-family:'EB Garamond',serif;font-size:1.7rem;font-weight:500">Descrizione teorica</h2>
+  <div class="theory-grid">
+    <div class="theory-block">
+      <h3>Campo scalare</h3>
+      <p>
+        Un <strong>campo scalare</strong> è una funzione che associa a ogni punto dello spazio (o del piano) un unico numero reale, detto valore del campo in quel punto. Formalmente, se lo spazio è bidimensionale, si scrive $\varphi: \mathbb{R}^2 \to \mathbb{R}$, cioè $\varphi = \varphi(x, y)$. In tre dimensioni, $\varphi = \varphi(x, y, z)$.
+      </p>
+      <p>
+        Esempi fisici fondamentali sono la <em>temperatura</em> $T(x,y,z)$ in un solido, la <em>pressione</em> $p(x,y,z)$ in un fluido, il <em>potenziale elettrico</em> $V(x,y,z)$ generato da una distribuzione di cariche, e l'energia potenziale gravitazionale $U(x,y,z) = -G M m / r$.
+      </p>
+      <div class="formula-block">
+        Potenziale di una carica puntiforme: $\displaystyle V(x,y) = \frac{kq}{r} = \frac{kq}{\sqrt{x^2+y^2}}$
+      </div>
+      <p>
+        La rappresentazione grafica di un campo scalare bidimensionale si ottiene tramite la <strong>mappa cromatica</strong> (ogni colore corrisponde a un valore) e le <strong>curve di livello</strong>, o <em>isolinee</em>, luoghi geometrici dei punti in cui il campo assume lo stesso valore. Nel caso del potenziale elettrico le isolinee si chiamano <em>superfici equipotenziali</em> (in 2D sono curve equipotenziali). Queste linee sono sempre perpendicolari al campo vettoriale associato (il gradiente).
+      </p>
+    </div>
+    <div class="theory-block">
+      <h3>Campo vettoriale</h3>
+      <p>
+        Un <strong>campo vettoriale</strong> è una funzione che associa a ogni punto dello spazio un <em>vettore</em>. In due dimensioni, $\mathbf{F}: \mathbb{R}^2 \to \mathbb{R}^2$, cioè $\mathbf{F}(x,y) = F_x(x,y)\,\hat{x} + F_y(x,y)\,\hat{y}$. Ogni punto del piano ha quindi una direzione e un modulo associati.
+      </p>
+      <p>
+        Esempi fisici includono il <em>campo elettrico</em> $\mathbf{E}(\mathbf{r})$, il <em>campo gravitazionale</em> $\mathbf{g}(\mathbf{r})$, il campo delle velocità in un fluido $\mathbf{v}(\mathbf{r})$, e il campo magnetico $\mathbf{B}(\mathbf{r})$.
+      </p>
+      <div class="formula-block">
+        Campo elettrico di una carica: $\displaystyle \mathbf{E} = \frac{kq}{r^2}\hat{r} = \frac{kq}{(x^2+y^2)}\,\frac{(x,y)}{r}$
+      </div>
+      <p>
+        Due quantità descrivono il comportamento locale di un campo vettoriale: la <strong>divergenza</strong> $\nabla \cdot \mathbf{F}$, misura di quanto il campo "sorge" o "converge" in un punto (per il campo elettrico è proporzionale alla densità di carica, per Gauss: $\nabla \cdot \mathbf{E} = \rho/\varepsilon_0$); e il <strong>rotore</strong> $\nabla \times \mathbf{F}$, misura della vorticità locale. Un campo con rotore nullo si dice <em>irrotazionale</em> (e in quel caso è sempre scrivibile come gradiente di un potenziale).
+      </p>
+    </div>
+    <div class="theory-block">
+      <h3>Il gradiente: dal campo scalare al vettoriale</h3>
+      <p>
+        Il legame più profondo tra i due tipi di campo è il <strong>gradiente</strong>. Dato un campo scalare differenziabile $\varphi(x, y)$, il suo gradiente è il campo vettoriale:
+      </p>
+      <div class="formula-block">
+        $\displaystyle \nabla\varphi = \frac{\partial \varphi}{\partial x}\,\hat{x} + \frac{\partial \varphi}{\partial y}\,\hat{y}$
+      </div>
+      <p>
+        Il vettore $\nabla\varphi$ punta nella <em>direzione di massima crescita</em> del campo scalare e il suo modulo misura la "ripidità" della variazione. La derivata direzionale di $\varphi$ nella direzione $\hat{u}$ vale $D_{\hat{u}}\,\varphi = \nabla\varphi \cdot \hat{u}$: è massima proprio quando $\hat{u} = \nabla\varphi / |\nabla\varphi|$.
+      </p>
+      <p>
+        In fisica, il campo elettrico è il <em>negativo</em> del gradiente del potenziale: $\mathbf{E} = -\nabla V$. Il segno meno indica che il campo punta verso valori decrescenti di $V$, cioè dalla carica positiva verso quella negativa. Lo stesso vale per il campo gravitazionale: $\mathbf{g} = -\nabla U / m$.
+      </p>
+    </div>
+    <div class="theory-block">
+      <h3>Linee di campo e curve equipotenziali</h3>
+      <p>
+        Le <strong>linee di campo</strong> (o linee di flusso) di un campo vettoriale $\mathbf{F}$ sono le curve tangenti in ogni punto al vettore $\mathbf{F}$. La loro equazione differenziale è:
+      </p>
+      <div class="formula-block">
+        $\displaystyle \frac{dx}{F_x} = \frac{dy}{F_y}$
+      </div>
+      <p>
+        Le curve equipotenziali (isolinee del campo scalare) sono <em>sempre perpendicolari</em> alle linee di campo. Questo si dimostra subito: se $\mathbf{F} = -\nabla\varphi$, lungo una curva equipotenziale $d\varphi = 0$, cioè $\nabla\varphi \cdot d\mathbf{r} = 0$, il che significa che il gradiente (e quindi il campo) è ortogonale alla curva. Questa proprietà è visibile nella simulazione: le frecce del gradiente sono sempre perpendicolari alle isolinee.
+      </p>
+      <p>
+        Nella vista combinata è possibile verificarlo direttamente: il canvas di sinistra mostra le equipotenziali del campo scalare, quello di destra mostra le frecce del gradiente che nascono esattamente perpendicolari ad esse.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Campi Scalari e Vettoriali — Simulazione interattiva</span>
+  <span>Liceo Scientifico — Fisica e Matematica</span>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════
+   UTILITÀ COMUNI
+════════════════════════════════════════════ */
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+/* ═══════════════════════════════════════════
+   COLORMAP PER CAMPO SCALARE (dipende dallo scenario)
+════════════════════════════════════════════ */
+function colormapMeteo(t) {
+  // viola/blu freddo → azzurro → verde → giallo → arancione → rosso caldo
+  const stops = [
+    [0.20, 0.00, 0.40],  // viola scuro (−10°C)
+    [0.00, 0.15, 0.70],  // blu
+    [0.05, 0.45, 0.85],  // azzurro
+    [0.10, 0.75, 0.75],  // ciano
+    [0.30, 0.85, 0.40],  // verde acqua
+    [0.60, 0.90, 0.20],  // giallo-verde
+    [0.95, 0.85, 0.10],  // giallo
+    [1.00, 0.55, 0.05],  // arancione
+    [0.90, 0.20, 0.05],  // rosso
+    [0.60, 0.05, 0.05],  // rosso scuro (38°C)
+  ];
+  const idx = clamp(t * (stops.length - 1), 0, stops.length - 1.001);
+  const lo = Math.floor(idx), hi = lo + 1, f = idx - lo;
+  const c = stops[lo].map((v, i) => v + f * (stops[hi][i] - v));
+  return [Math.round(c[0]*255), Math.round(c[1]*255), Math.round(c[2]*255)];
+}
+
+function colormapPressure(t) {
+  // blu (bassa pressione) → bianco → rosso (alta pressione)
+  const stops = [
+    [0.05, 0.10, 0.55],
+    [0.20, 0.40, 0.80],
+    [0.60, 0.78, 0.95],
+    [0.92, 0.92, 0.92],
+    [0.98, 0.78, 0.55],
+    [0.88, 0.35, 0.18],
+    [0.55, 0.05, 0.05],
+  ];
+  const idx = clamp(t * (stops.length - 1), 0, stops.length - 1.001);
+  const lo = Math.floor(idx), hi = lo + 1, f = idx - lo;
+  const c = stops[lo].map((v, i) => v + f * (stops[hi][i] - v));
+  return [Math.round(c[0]*255), Math.round(c[1]*255), Math.round(c[2]*255)];
+}
+
+/* ═══════════════════════════════════════════
+   DEFINIZIONE DEI CAMPI SCALARI
+════════════════════════════════════════════ */
+
+// Mappa meteorologica: somma di gaussiane con struttura realistica
+// coordinate in [-1,1]×[-1,1], T in °C
+function meteoField(x, y) {
+  // Alta pressione calda: centro-sud, anticilone mediterraneo
+  const hotCenters = [
+    { cx:  0.15, cy: -0.35, A: 20, sx: 0.55, sy: 0.45 },  // anticiclone mediterraneo
+    { cx:  0.70, cy: -0.10, A: 14, sx: 0.35, sy: 0.40 },  // zona calda est
+    { cx: -0.60, cy:  0.55, A:  8, sx: 0.30, sy: 0.28 },  // residuo caldo ovest
+  ];
+  // Fronti freddi
+  const coldCenters = [
+    { cx: -0.25, cy:  0.68, A: -18, sx: 0.40, sy: 0.32 }, // fronte freddo nord
+    { cx:  0.55, cy:  0.72, A: -12, sx: 0.35, sy: 0.28 }, // depressione nord-est
+    { cx: -0.80, cy: -0.20, A:  -8, sx: 0.28, sy: 0.38 }, // freddo ovest
+  ];
+  const all = [...hotCenters, ...coldCenters];
+  let T = 14; // temperatura di sfondo (primavera europea)
+  for (const c of all) {
+    const dx = x - c.cx, dy = y - c.cy;
+    T += c.A * Math.exp(-(dx*dx/(2*c.sx*c.sx) + dy*dy/(2*c.sy*c.sy)));
+  }
+  return T;
+}
+
+// Carta isobarica: pressione in hPa intorno a 1013
+function pressureField(x, y) {
+  const centers = [
+    { cx: -0.30, cy:  0.55, A: -28, sx: 0.42, sy: 0.38 }, // ciclone (bassa)
+    { cx:  0.55, cy: -0.30, A:  32, sx: 0.50, sy: 0.45 }, // anticiclone (alta)
+    { cx: -0.65, cy: -0.50, A:  18, sx: 0.35, sy: 0.32 }, // alta secondaria
+    { cx:  0.70, cy:  0.60, A: -15, sx: 0.32, sy: 0.30 }, // bassa secondaria
+  ];
+  let p = 1013;
+  for (const c of centers) {
+    const dx = x - c.cx, dy = y - c.cy;
+    p += c.A * Math.exp(-(dx*dx/(2*c.sx*c.sx) + dy*dy/(2*c.sy*c.sy)));
+  }
+  return p;
+}
+
+// Potenziale elettrico: sistema a tre cariche
+function potentialField(x, y) {
+  const charges = [
+    { cx:  0.00, cy:  0.35, q:  1.0 },
+    { cx: -0.45, cy: -0.35, q: -0.7 },
+    { cx:  0.45, cy: -0.35, q:  0.5 },
+  ];
+  let V = 0;
+  for (const c of charges) {
+    const r = Math.sqrt((x-c.cx)**2 + (y-c.cy)**2) + 0.08;
+    V += c.q / r;
+  }
+  return V;
+}
+
+function saddleField(x, y) { return x * y; }
+
+function waveField(x, y) {
+  return 0.5 * Math.cos(Math.PI * x * 1.8) * Math.cos(Math.PI * y * 1.4)
+       + 0.3 * Math.cos(Math.PI * (x + y) * 1.2);
+}
+
+const scalarFields = {
+  meteo: {
+    label: 'T(x, y)',
+    unit: '°C',
+    canvasLabel: 'T(x, y) — temperatura [°C]',
+    phi: meteoField,
+    colormap: colormapMeteo,
+    isoStep: 4,          // isoterme ogni 4°C
+    isoLabelSuffix: '°',
+    legendMin: '−10°C', legendMid: '14°C', legendMax: '38°C',
+    legendNote: 'Blu/viola → freddo   Rosso → caldo',
+    zones: [
+      { cx:  0.15, cy: -0.35, label: 'Alta pressione (anticiclone)', threshold: 26 },
+      { cx: -0.25, cy:  0.68, label: 'Fronte freddo', threshold: null },
+      { cx:  0.55, cy:  0.72, label: 'Depressione', threshold: null },
+    ],
+    // sfondo geografico stilizzato
+    bgType: 'geo'
+  },
+  pressure: {
+    label: 'p(x, y)',
+    unit: 'hPa',
+    canvasLabel: 'p(x, y) — pressione atmosferica [hPa]',
+    phi: pressureField,
+    colormap: colormapPressure,
+    isoStep: 5,
+    isoLabelSuffix: '',
+    legendMin: '985 hPa', legendMid: '1013 hPa', legendMax: '1045 hPa',
+    legendNote: 'Blu → bassa pressione   Rosso → alta pressione',
+    bgType: 'geo'
+  },
+  potential: {
+    label: 'V(x, y)',
+    unit: 'V',
+    canvasLabel: 'V(x, y) — potenziale elettrico [u.a.]',
+    phi: potentialField,
+    colormap: coolwarmRGB,
+    isoStep: null,       // iso calcolate automaticamente
+    isoLabelSuffix: '',
+    legendMin: 'negativo', legendMid: '0', legendMax: 'positivo',
+    legendNote: 'Blu → V < 0   Bianco → V ≈ 0   Rosso → V > 0',
+    bgType: 'plain'
+  },
+  saddle: {
+    label: 'φ(x, y) = xy',
+    unit: '',
+    canvasLabel: 'φ(x, y) = xy — campo a sella',
+    phi: saddleField,
+    colormap: coolwarmRGB,
+    isoStep: null,
+    isoLabelSuffix: '',
+    legendMin: '−1', legendMid: '0', legendMax: '+1',
+    legendNote: 'Campo a sella: punto di sella in (0,0)',
+    bgType: 'plain'
+  },
+  wave: {
+    label: 'φ(x, y)',
+    unit: '',
+    canvasLabel: 'φ(x, y) — onda stazionaria 2D',
+    phi: waveField,
+    colormap: coolwarmRGB,
+    isoStep: null,
+    isoLabelSuffix: '',
+    legendMin: '−1', legendMid: '0', legendMax: '+1',
+    legendNote: 'Sovrapposizione di modi armonici 2D',
+    bgType: 'plain'
+  }
+};
+
+function coolwarmRGB(t) {
+  const stops = [
+    [0.023,0.055,0.306],[0.129,0.400,0.675],[0.267,0.588,0.757],
+    [0.572,0.773,0.871],[0.820,0.898,0.941],[0.969,0.969,0.969],
+    [0.992,0.859,0.780],[0.957,0.647,0.510],[0.839,0.376,0.302],[0.698,0.094,0.169],
+  ];
+  const idx = clamp(t * (stops.length-1), 0, stops.length-1.001);
+  const lo = Math.floor(idx), hi = lo+1, f = idx-lo;
+  const c = stops[lo].map((v,i) => v + f*(stops[hi][i]-v));
+  return [Math.round(c[0]*255),Math.round(c[1]*255),Math.round(c[2]*255)];
+}
+
+/* gradiente numerico del campo scalare */
+function grad(field, x, y) {
+  const h = 0.005;
+  const dphidx = (field.phi(x+h, y) - field.phi(x-h, y)) / (2*h);
+  const dphidy = (field.phi(x, y+h) - field.phi(x, y-h)) / (2*h);
+  return { gx: dphidx, gy: dphidy };
+}
+
+/* ═══════════════════════════════════════════
+   DEFINIZIONE DEI CAMPI VETTORIALI
+════════════════════════════════════════════ */
+const vectorFields = {
+  coulomb: {
+    name: 'Campo di Coulomb',
+    F: (x, y) => {
+      const r2 = x*x + y*y;
+      const r = Math.sqrt(r2) + 0.05;
+      return { fx: x / (r * r2 + 0.001), fy: y / (r * r2 + 0.001) };
+    },
+    div: 'δ(r) [sorgente puntiforme]',
+    rot: '0 (irrotazionale)'
+  },
+  uniform: {
+    name: 'Campo uniforme',
+    F: (x, y) => ({ fx: 1, fy: 0 }),
+    div: '0',
+    rot: '0 (irrotazionale)'
+  },
+  vortex: {
+    name: 'Campo vorticoso',
+    F: (x, y) => {
+      const r = Math.sqrt(x*x + y*y) + 0.1;
+      return { fx: -y / r, fy: x / r };
+    },
+    div: '0 (solenoidale)',
+    rot: '≠ 0 (rotazionale)'
+  },
+  dipole_v: {
+    name: 'Dipolo vettoriale',
+    F: (x, y) => {
+      const r2 = x*x + y*y;
+      const r4 = r2 * r2 + 0.001;
+      return { fx: (x*x - y*y) / r4, fy: 2*x*y / r4 };
+    },
+    div: '0 (escluso l\'origine)',
+    rot: '0 (irrotazionale)'
+  },
+  gravity: {
+    name: 'Campo gravitazionale',
+    F: (x, y) => {
+      const r2 = x*x + y*y;
+      const r = Math.sqrt(r2) + 0.05;
+      return { fx: -x / (r * r2 + 0.001), fy: -y / (r * r2 + 0.001) };
+    },
+    div: 'δ(r) [pozzo puntiforme]',
+    rot: '0 (irrotazionale)'
+  }
+};
+
+/* ═══════════════════════════════════════════
+   RENDERER CAMPO SCALARE
+════════════════════════════════════════════ */
+class ScalarRenderer {
+  constructor(canvasId, small = false) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.W = this.canvas.width;
+    this.H = this.canvas.height;
+    this.small = small;
+    this.showIso = true;
+    this.showColor = true;
+    this.showGrad = false;
+    this.fieldKey = 'meteo';
+    this.mouseX = null;
+    this.mouseY = null;
+    if (!small) {
+      this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
+      this.canvas.addEventListener('mouseleave', () => { this.mouseX = null; this.render(); this.clearReadout(); });
+    }
+    this.render();
+    this.updateLegend();
+  }
+
+  toWorld(px, py) { return { x: (px/this.W)*2-1, y: -((py/this.H)*2-1) }; }
+  toCanvas(wx, wy) { return { px: (wx+1)/2*this.W, py: (1-(wy+1)/2)*this.H }; }
+
+  onMouseMove(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    this.mouseX = (e.clientX - rect.left) * (this.W / rect.width);
+    this.mouseY = (e.clientY - rect.top) * (this.H / rect.height);
+    this.render();
+    this.updateReadout();
+  }
+
+  clearReadout() {
+    const el = document.getElementById('scalarReadout');
+    if (el) el.innerHTML = '—<br><span style="color:var(--muted);font-size:0.7rem">sposta il cursore sulla mappa</span>';
+    const zb = document.getElementById('scalarZoneBox');
+    if (zb) zb.style.display = 'none';
+  }
+
+  updateReadout() {
+    if (this.mouseX === null) return;
+    const { x, y } = this.toWorld(this.mouseX, this.mouseY);
+    const fd = scalarFields[this.fieldKey];
+    const phi = fd.phi(x, y);
+    const el = document.getElementById('scalarReadout');
+    if (!el) return;
+    const valStr = isFinite(phi)
+      ? `${phi.toFixed(fd.unit === '°C' ? 1 : (fd.unit === 'hPa' ? 1 : 3))} ${fd.unit}`
+      : '∞';
+    // coordinate geografiche stilizzate se meteo
+    let coordStr = '';
+    if (this.fieldKey === 'meteo' || this.fieldKey === 'pressure') {
+      const lat = (45 + y * 15).toFixed(1);
+      const lon = (13 + x * 20).toFixed(1);
+      coordStr = `<span style="color:var(--muted);font-size:0.72rem">${lat}°N, ${lon}°E</span><br>`;
+    } else {
+      coordStr = `<span style="color:var(--muted);font-size:0.72rem">x = ${x.toFixed(3)}, y = ${y.toFixed(3)}</span><br>`;
+    }
+    el.innerHTML = coordStr +
+      `<span style="font-size:1.05rem;font-weight:500;color:var(--highlight)">${valStr}</span>`;
+
+    // zona (solo meteo)
+    if (this.fieldKey === 'meteo' && fd.zones) {
+      const T = phi;
+      let zona = T > 28 ? '🔴 Zona calda — anticiclone'
+                : T < 4 ? '🔵 Zona fredda — fronte polare'
+                : T < 12 ? '🟡 Zona fresca — perturbazione'
+                : '🟢 Zona temperata';
+      const zb = document.getElementById('scalarZoneBox');
+      const zz = document.getElementById('scalarZone');
+      if (zb && zz) { zb.style.display = ''; zz.innerHTML = zona; }
+    } else {
+      const zb = document.getElementById('scalarZoneBox');
+      if (zb) zb.style.display = 'none';
+    }
+
+    // gradiente nel punto (se attivo)
+    const gb = document.getElementById('gradReadoutBox');
+    if (gb) {
+      if (this.showGrad) {
+        gb.style.display = '';
+        const { gx, gy } = grad(fd, x, y);
+        const gmag = Math.sqrt(gx*gx + gy*gy);
+        const gr = document.getElementById('gradReadout');
+        if (gr) gr.innerHTML =
+          `∂φ/∂x = <span class="val">${isFinite(gx) ? gx.toFixed(3) : '∞'}</span><br>` +
+          `∂φ/∂y = <span class="val">${isFinite(gy) ? gy.toFixed(3) : '∞'}</span><br>` +
+          `|∇φ| = <span class="val">${isFinite(gmag) ? gmag.toFixed(3) : '∞'}</span>`;
+      } else {
+        gb.style.display = 'none';
+      }
+    }
+  }
+
+  updateLegend() {
+    const fd = scalarFields[this.fieldKey];
+    // aggiorna canvas legenda
+    const lc = document.getElementById('legendCanvas');
+    if (!lc) return;
+    const lctx = lc.getContext('2d');
+    const W = lc.width, H = lc.height;
+    const img = lctx.createImageData(W, H);
+    for (let px = 0; px < W; px++) {
+      const t = px / (W - 1);
+      const rgb = fd.colormap(t);
+      for (let py = 0; py < H; py++) {
+        const idx = (py * W + px) * 4;
+        img.data[idx] = rgb[0]; img.data[idx+1] = rgb[1]; img.data[idx+2] = rgb[2]; img.data[idx+3] = 255;
+      }
+    }
+    lctx.putImageData(img, 0, 0);
+    document.getElementById('legendMin').textContent = fd.legendMin;
+    document.getElementById('legendMid').textContent = fd.legendMid || '';
+    document.getElementById('legendMax').textContent = fd.legendMax;
+    document.getElementById('legendNote').textContent = fd.legendNote || '';
+    const cl = document.getElementById('scalarCanvasLabel');
+    if (cl) cl.textContent = fd.canvasLabel;
+  }
+
+  computeRange() {
+    const fd = scalarFields[this.fieldKey];
+    let mn = Infinity, mx = -Infinity;
+    const steps = 45;
+    for (let i = 0; i <= steps; i++) for (let j = 0; j <= steps; j++) {
+      const x = -1 + 2*i/steps, y = -1 + 2*j/steps;
+      const v = fd.phi(x, y);
+      if (isFinite(v)) { mn = Math.min(mn, v); mx = Math.max(mx, v); }
+    }
+    return { mn, mx };
+  }
+
+  drawGeoBackground(ctx) {
+    // sfondo "mare" + zone "terra" stilizzate per la mappa meteorologica
+    ctx.fillStyle = '#c8dff0';
+    ctx.fillRect(0, 0, this.W, this.H);
+    // penisola italiana stilizzata
+    ctx.fillStyle = '#d8cfb8';
+    ctx.beginPath();
+    // forma molto approssimata — solo evocativa
+    ctx.ellipse(this.W*0.52, this.H*0.62, this.W*0.07, this.H*0.22, -0.3, 0, Math.PI*2);
+    ctx.fill();
+    // penisola iberica
+    ctx.beginPath();
+    ctx.ellipse(this.W*0.10, this.H*0.58, this.W*0.12, this.H*0.16, 0.1, 0, Math.PI*2);
+    ctx.fill();
+    // europa centrale
+    ctx.beginPath();
+    ctx.ellipse(this.W*0.45, this.H*0.22, this.W*0.42, this.H*0.20, 0.05, 0, Math.PI*2);
+    ctx.fill();
+    // africa nord
+    ctx.beginPath();
+    ctx.ellipse(this.W*0.45, this.H*0.98, this.W*0.55, this.H*0.18, 0, 0, Math.PI*2);
+    ctx.fill();
+    // balcani/turchia
+    ctx.beginPath();
+    ctx.ellipse(this.W*0.78, this.H*0.55, this.W*0.18, this.H*0.14, 0.2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  render() {
+    const ctx = this.ctx;
+    const W = this.W, H = this.H;
+    ctx.clearRect(0, 0, W, H);
+
+    const fd = scalarFields[this.fieldKey];
+    const { mn, mx } = this.computeRange();
+    const range = mx - mn || 1;
+    const isGeo = fd.bgType === 'geo';
+
+    // ── Sfondo geografico (solo per meteo/pressure) ──
+    if (isGeo && this.showColor) this.drawGeoBackground(ctx);
+    else if (!this.showColor) { ctx.fillStyle = isGeo ? '#c8dff0' : '#fafaf7'; ctx.fillRect(0,0,W,H); }
+
+    // ── Mappa colore (sovrapposta con alpha per geo) ──
+    if (this.showColor) {
+      const img = ctx.createImageData(W, H);
+      for (let py = 0; py < H; py++) {
+        for (let px = 0; px < W; px++) {
+          const { x, y } = this.toWorld(px + 0.5, py + 0.5);
+          const v = fd.phi(x, y);
+          const t = isFinite(v) ? clamp((v - mn) / range, 0, 1) : 0.5;
+          const rgb = fd.colormap(t);
+          const idx = (py * W + px) * 4;
+          img.data[idx] = rgb[0]; img.data[idx+1] = rgb[1]; img.data[idx+2] = rgb[2];
+          img.data[idx+3] = isGeo ? 175 : 255; // semi-trasparente su geo
+        }
+      }
+      // disegno su canvas offscreen poi composito
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = W; offCanvas.height = H;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.putImageData(img, 0, 0);
+      ctx.drawImage(offCanvas, 0, 0);
+    }
+
+    // ── Isoterme / isolinee ──
+    if (this.showIso) {
+      const nIso = 16;
+      let levels = [];
+      if (fd.isoStep) {
+        // livelli fissi ogni isoStep
+        const base = Math.ceil(mn / fd.isoStep) * fd.isoStep;
+        for (let l = base; l <= mx; l += fd.isoStep) levels.push(l);
+      } else {
+        const step = range / nIso;
+        for (let k = 0; k <= nIso; k++) levels.push(mn + k * step);
+      }
+
+      const cols = 90, rows = 70;
+      // precomputo griglia valori
+      const grid = [];
+      for (let r = 0; r <= rows; r++) {
+        grid[r] = [];
+        for (let c = 0; c <= cols; c++) {
+          const wx = (c/cols)*2-1, wy = -((r/rows)*2-1);
+          grid[r][c] = fd.phi(wx, wy);
+        }
+      }
+
+      for (const level of levels) {
+        const t = clamp((level - mn) / range, 0, 1);
+        const isMajor = fd.isoStep && (Math.round(level) % (fd.isoStep * 2) === 0);
+        if (isGeo) {
+          ctx.strokeStyle = `rgba(10,10,30,${isMajor ? 0.70 : 0.40})`;
+          ctx.lineWidth = isMajor ? 1.8 : 0.9;
+        } else {
+          ctx.strokeStyle = `rgba(20,20,60,${isMajor ? 0.65 : 0.35})`;
+          ctx.lineWidth = isMajor ? 1.5 : 0.8;
+        }
+
+        // raccolta segmenti e punto rappresentativo per etichetta
+        const segments = [];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const corners = [
+              { wx:(c/cols)*2-1,   wy:-((r/rows)*2-1),     val: grid[r][c] },
+              { wx:((c+1)/cols)*2-1, wy:-((r/rows)*2-1),   val: grid[r][c+1] },
+              { wx:((c+1)/cols)*2-1, wy:-(((r+1)/rows)*2-1), val: grid[r+1][c+1] },
+              { wx:(c/cols)*2-1,   wy:-(((r+1)/rows)*2-1), val: grid[r+1][c] },
+            ];
+            const above = corners.map(co => co.val >= level);
+            const edges = [[0,1],[1,2],[2,3],[3,0]];
+            const pts = [];
+            for (const [a, b] of edges) {
+              if (above[a] !== above[b]) {
+                const tf = (level - corners[a].val) / (corners[b].val - corners[a].val);
+                const wx = corners[a].wx + tf*(corners[b].wx - corners[a].wx);
+                const wy = corners[a].wy + tf*(corners[b].wy - corners[a].wy);
+                pts.push(this.toCanvas(wx, wy));
+              }
+            }
+            if (pts.length === 2) segments.push(pts);
+          }
+        }
+
+        ctx.beginPath();
+        for (const [p0, p1] of segments) {
+          ctx.moveTo(p0.px, p0.py);
+          ctx.lineTo(p1.px, p1.py);
+        }
+        ctx.stroke();
+
+        // etichette: solo sulle linee principali, o una ogni 3 per campi senza isoStep
+        const levelIdx = levels.indexOf(level);
+        const showLabel = segments.length > 0 && (isMajor || (!fd.isoStep && levelIdx % 3 === 1));
+        if (showLabel) {
+          // scelgo un segmento in posizione 1/3 della curva per evitare bordi
+          const si = Math.max(0, Math.floor(segments.length * 0.35));
+          const seg = segments[si];
+          const mx2 = (seg[0].px + seg[1].px) / 2;
+          const my2 = (seg[0].py + seg[1].py) / 2;
+          const ang = Math.atan2(seg[1].py - seg[0].py, seg[1].px - seg[0].px);
+
+          const labelVal = fd.unit === '°C' ? Math.round(level) + '°'
+                         : fd.unit === 'hPa' ? Math.round(level) + ''
+                         : level.toFixed(1);
+          const fontSize = this.small ? 11 : 13;
+          ctx.save();
+          ctx.font = `600 ${fontSize}px IBM Plex Mono, monospace`;
+          const tw = ctx.measureText(labelVal).width;
+          ctx.fillStyle = 'rgba(255,255,255,0.88)';
+          ctx.fillRect(mx2 - tw/2 - 4, my2 - fontSize/2 - 2, tw + 8, fontSize + 4);
+          ctx.fillStyle = isGeo ? 'rgba(10,10,40,0.95)' : 'rgba(20,20,70,0.95)';
+          ctx.fillText(labelVal, mx2 - tw/2, my2 + fontSize/2 + 1);
+          ctx.restore();
+        }
+      }
+    }
+
+    // ── Simboli H/L per meteo ──
+    if ((this.fieldKey === 'meteo' || this.fieldKey === 'pressure') && this.showIso) {
+      const symbols = this.fieldKey === 'meteo'
+        ? [
+            { cx: 0.15, cy: -0.35, sym: 'A', color: '#a30000' },  // Alta
+            { cx:-0.25, cy:  0.68, sym: 'B', color: '#003580' },  // Bassa
+            { cx: 0.55, cy:  0.72, sym: 'B', color: '#003580' },
+          ]
+        : [
+            { cx: 0.55, cy:-0.30, sym: 'A', color: '#a30000' },
+            { cx:-0.65, cy:-0.50, sym: 'A', color: '#a30000' },
+            { cx:-0.30, cy: 0.55, sym: 'B', color: '#003580' },
+            { cx: 0.70, cy: 0.60, sym: 'B', color: '#003580' },
+          ];
+      for (const s of symbols) {
+        const { px, py } = this.toCanvas(s.cx, s.cy);
+        ctx.font = 'bold 22px EB Garamond, serif';
+        ctx.fillStyle = s.color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        // alone
+        ctx.shadowColor = 'rgba(255,255,255,0.9)';
+        ctx.shadowBlur = 6;
+        ctx.fillText(s.sym, px, py);
+        ctx.shadowBlur = 0;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
+      }
+    }
+
+    // ── Frecce del gradiente ∇φ ──
+    if (this.showGrad) {
+      const n = this.small ? 9 : 13;
+      let maxMag = 0;
+      for (let i = 0; i <= n; i++) for (let j = 0; j <= n; j++) {
+        const x = -0.9 + 1.8*i/n, y = -0.9 + 1.8*j/n;
+        const { gx, gy } = grad(fd, x, y);
+        const m = Math.sqrt(gx*gx + gy*gy);
+        if (isFinite(m)) maxMag = Math.max(maxMag, m);
+      }
+      for (let i = 0; i <= n; i++) for (let j = 0; j <= n; j++) {
+        const x = -0.9 + 1.8*i/n, y = -0.9 + 1.8*j/n;
+        const { gx, gy } = grad(fd, x, y);
+        const mag = Math.sqrt(gx*gx + gy*gy);
+        if (!isFinite(mag) || mag < 1e-6) continue;
+        const t = clamp(mag / maxMag, 0, 1);
+        const nx = gx/mag, ny = gy/mag;
+        const arrowLen = 10 + t * 12;
+        const { px: cx, py: cy } = this.toCanvas(x, y);
+        const rv = Math.round(60 + t * 130);
+        const gv = Math.round(10 + t * 30);
+        const bv = Math.round(140 + t * 80);
+        this.drawArrow(ctx, cx, cy, cx + nx*arrowLen, cy - ny*arrowLen,
+          4 + t*2, `rgba(${rv},${gv},${bv},0.88)`, 1.2 + t*0.8);
+      }
+    }
+
+    // ── Cursore ──
+    if (this.mouseX !== null) {
+      const { x, y } = this.toWorld(this.mouseX, this.mouseY);
+      const phi = fd.phi(x, y);
+      const cx = this.mouseX, cy = this.mouseY;
+
+      // alone
+      ctx.beginPath();
+      ctx.arc(cx, cy, 11, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(179,74,0,0.25)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5, 0, Math.PI*2);
+      ctx.fillStyle = '#b34a00';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5, 0, Math.PI*2);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // tooltip con valore
+      if (isFinite(phi)) {
+        const valStr = fd.unit === '°C' ? `${phi.toFixed(1)} °C`
+                     : fd.unit === 'hPa' ? `${phi.toFixed(1)} hPa`
+                     : phi.toFixed(3);
+        ctx.font = '600 11px IBM Plex Mono, monospace';
+        const tw = ctx.measureText(valStr).width;
+        let tx = cx + 14, ty = cy - 14;
+        if (tx + tw + 8 > W) tx = cx - tw - 18;
+        ctx.fillStyle = 'rgba(20,20,20,0.78)';
+        ctx.beginPath();
+        ctx.roundRect(tx-4, ty-12, tw+8, 18, 3);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.fillText(valStr, tx, ty);
+      }
+    }
+  }
+
+  drawArrow(ctx, x1, y1, x2, y2, headLen, color, lw = 1.2) {
+    const dx = x2-x1, dy = y2-y1;
+    const angle = Math.atan2(dy, dx);
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-headLen*Math.cos(angle-0.42), y2-headLen*Math.sin(angle-0.42));
+    ctx.lineTo(x2-headLen*Math.cos(angle+0.42), y2-headLen*Math.sin(angle+0.42));
+    ctx.closePath(); ctx.fill();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RENDERER CAMPO VETTORIALE
+════════════════════════════════════════════ */
+class VectorRenderer {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.W = this.canvas.width;
+    this.H = this.canvas.height;
+    this.showStreamlines = true;
+    this.showArrows = true;
+    this.showIntensity = true;
+    this.fieldKey = 'coulomb';
+    this.density = 12;
+    this.mouseX = null;
+    this.mouseY = null;
+    this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
+    this.canvas.addEventListener('mouseleave', () => { this.mouseX = null; this.render(); });
+    this.render();
+  }
+
+  toWorld(px, py) {
+    return { x: (px / this.W) * 2 - 1, y: -((py / this.H) * 2 - 1) };
+  }
+  toCanvas(wx, wy) {
+    return { px: (wx + 1) / 2 * this.W, py: (1 - (wy + 1) / 2) * this.H };
+  }
+
+  onMouseMove(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.W / rect.width;
+    const scaleY = this.H / rect.height;
+    this.mouseX = (e.clientX - rect.left) * scaleX;
+    this.mouseY = (e.clientY - rect.top) * scaleY;
+    this.render();
+    this.updateReadout();
+  }
+
+  updateReadout() {
+    if (this.mouseX === null) return;
+    const { x, y } = this.toWorld(this.mouseX, this.mouseY);
+    const field = vectorFields[this.fieldKey];
+    const { fx, fy } = field.F(x, y);
+    const mag = Math.sqrt(fx*fx + fy*fy);
+    const theta = Math.atan2(fy, fx) * 180 / Math.PI;
+    document.getElementById('vectorReadout').innerHTML =
+      `x = <span class="val">${x.toFixed(3)}</span><br>` +
+      `y = <span class="val">${y.toFixed(3)}</span><br>` +
+      `Fₓ = <span class="val">${isFinite(fx) ? fx.toFixed(3) : '∞'}</span><br>` +
+      `Fᵧ = <span class="val">${isFinite(fy) ? fy.toFixed(3) : '∞'}</span><br>` +
+      `|F| = <span class="val">${isFinite(mag) ? mag.toFixed(3) : '∞'}</span><br>` +
+      `θ = <span class="val">${isFinite(theta) ? theta.toFixed(1) + '°' : '—'}</span>`;
+    document.getElementById('vectorProps').innerHTML =
+      `div F = <span class="val">${vectorFields[this.fieldKey].div}</span><br>` +
+      `rot F = <span class="val">${vectorFields[this.fieldKey].rot}</span>`;
+  }
+
+  computeMaxMag() {
+    const field = vectorFields[this.fieldKey];
+    let mx = 0;
+    const steps = 30;
+    for (let i = 0; i <= steps; i++) for (let j = 0; j <= steps; j++) {
+      const x = -0.9 + 1.8 * i / steps, y = -0.9 + 1.8 * j / steps;
+      const { fx, fy } = field.F(x, y);
+      const m = Math.sqrt(fx*fx + fy*fy);
+      if (isFinite(m)) mx = Math.max(mx, m);
+    }
+    return mx || 1;
+  }
+
+  render() {
+    const ctx = this.ctx;
+    const W = this.W, H = this.H;
+    ctx.fillStyle = '#fafaf7';
+    ctx.fillRect(0, 0, W, H);
+
+    const field = vectorFields[this.fieldKey];
+    const maxMag = this.computeMaxMag();
+
+    // ── Linee di campo (streamlines) ──
+    if (this.showStreamlines) {
+      const nSeeds = 28;
+      ctx.lineWidth = 0.9;
+      for (let k = 0; k < nSeeds; k++) {
+        const angle = (k / nSeeds) * Math.PI * 2;
+        let wx = Math.cos(angle) * 0.15, wy = Math.sin(angle) * 0.15;
+        ctx.beginPath();
+        const { px, py } = this.toCanvas(wx, wy);
+        ctx.moveTo(px, py);
+        const dt = 0.012;
+        for (let step = 0; step < 300; step++) {
+          const { fx, fy } = field.F(wx, wy);
+          const m = Math.sqrt(fx*fx + fy*fy);
+          if (!isFinite(m) || m < 1e-8) break;
+          wx += (fx / m) * dt;
+          wy += (fy / m) * dt;
+          if (Math.abs(wx) > 1.1 || Math.abs(wy) > 1.1) break;
+          const { px: cpx, py: cpy } = this.toCanvas(wx, wy);
+          ctx.lineTo(cpx, cpy);
+        }
+        ctx.strokeStyle = 'rgba(60,100,160,0.30)';
+        ctx.stroke();
+
+        // anche in senso contrario
+        wx = Math.cos(angle) * 0.15; wy = Math.sin(angle) * 0.15;
+        ctx.beginPath();
+        const { px: px2, py: py2 } = this.toCanvas(wx, wy);
+        ctx.moveTo(px2, py2);
+        for (let step = 0; step < 300; step++) {
+          const { fx, fy } = field.F(wx, wy);
+          const m = Math.sqrt(fx*fx + fy*fy);
+          if (!isFinite(m) || m < 1e-8) break;
+          wx -= (fx / m) * dt;
+          wy -= (fy / m) * dt;
+          if (Math.abs(wx) > 1.1 || Math.abs(wy) > 1.1) break;
+          const { px: cpx, py: cpy } = this.toCanvas(wx, wy);
+          ctx.lineTo(cpx, cpy);
+        }
+        ctx.stroke();
+      }
+    }
+
+    // ── Frecce ──
+    if (this.showArrows) {
+      const n = this.density;
+      for (let i = 0; i <= n; i++) for (let j = 0; j <= n; j++) {
+        const x = -0.9 + 1.8 * i / n, y = -0.9 + 1.8 * j / n;
+        const { fx, fy } = field.F(x, y);
+        const mag = Math.sqrt(fx*fx + fy*fy);
+        if (!isFinite(mag) || mag < 1e-6) continue;
+        const t = clamp(mag / maxMag, 0, 1);
+
+        let color;
+        if (this.showIntensity) {
+          // verde scuro → giallo → arancione
+          const r = Math.round(clamp(t * 2, 0, 1) * 200);
+          const g = Math.round(clamp((1 - t) * 1.5, 0, 1) * 140 + 60);
+          const b = 40;
+          color = `rgba(${r},${g},${b},0.85)`;
+        } else {
+          color = 'rgba(30,60,120,0.75)';
+        }
+
+        const nx = fx / mag, ny = fy / mag;
+        const arrowLen = 14 + t * 10;
+        const { px: cx, py: cy } = this.toCanvas(x, y);
+        this.drawArrow(ctx, cx, cy,
+          cx + nx * arrowLen, cy - ny * arrowLen,
+          4 + t * 3, color, 1 + t);
+      }
+    }
+
+    // ── Cursore ──
+    if (this.mouseX !== null) {
+      const { x, y } = this.toWorld(this.mouseX, this.mouseY);
+      const { fx, fy } = field.F(x, y);
+      const mag = Math.sqrt(fx*fx + fy*fy);
+      if (isFinite(mag) && mag > 1e-6) {
+        const nx = fx / mag, ny = fy / mag;
+        const cx = this.mouseX, cy = this.mouseY;
+        this.drawArrow(ctx, cx, cy,
+          cx + nx * 36, cy - ny * 36, 9, '#b34a00', 2.5);
+      }
+      ctx.beginPath();
+      ctx.arc(this.mouseX, this.mouseY, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#b34a00';
+      ctx.fill();
+
+      const { fx: fxv, fy: fyv } = field.F(this.toWorld(this.mouseX, this.mouseY).x,
+                                            this.toWorld(this.mouseX, this.mouseY).y);
+      const mv = Math.sqrt(fxv*fxv + fyv*fyv);
+      if (isFinite(mv)) {
+        ctx.font = '11px IBM Plex Mono, monospace';
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
+        ctx.fillText(`|F| = ${mv.toFixed(3)}`, this.mouseX + 12, this.mouseY - 8);
+      }
+    }
+  }
+
+  drawArrow(ctx, x1, y1, x2, y2, headLen, color, lw = 1.2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const angle = Math.atan2(dy, dx);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = lw;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - headLen * Math.cos(angle - 0.4), y2 - headLen * Math.sin(angle - 0.4));
+    ctx.lineTo(x2 - headLen * Math.cos(angle + 0.4), y2 - headLen * Math.sin(angle + 0.4));
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   INIZIALIZZAZIONE
+════════════════════════════════════════════ */
+const scalarRend = new ScalarRenderer('scalarCanvas');
+const vectorRend = new VectorRenderer('vectorCanvas');
+
+/* ═══════════════════════════════════════════
+   CONTROLLI
+════════════════════════════════════════════ */
+// Tab
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Scalar controls
+document.getElementById('scalarType').addEventListener('change', e => {
+  scalarRend.fieldKey = e.target.value;
+  scalarRend.clearReadout();
+  scalarRend.updateLegend();
+  scalarRend.render();
+});
+
+function makeToggle(btnId, rendProp, renderer) {
+  const btn = document.getElementById(btnId);
+  btn.addEventListener('click', () => {
+    renderer[rendProp] = !renderer[rendProp];
+    btn.classList.toggle('on', renderer[rendProp]);
+    renderer.render();
+  });
+}
+
+makeToggle('toggleIso', 'showIso', scalarRend);
+makeToggle('toggleColor', 'showColor', scalarRend);
+makeToggle('toggleGrad', 'showGrad', scalarRend);
+makeToggle('toggleStreamlines', 'showStreamlines', vectorRend);
+makeToggle('toggleArrows', 'showArrows', vectorRend);
+makeToggle('toggleIntensity', 'showIntensity', vectorRend);
+
+document.getElementById('vectorType').addEventListener('change', e => {
+  vectorRend.fieldKey = e.target.value;
+  vectorRend.render();
+  document.getElementById('vectorProps').innerHTML =
+    `div F = <span class="val">${vectorFields[e.target.value].div}</span><br>` +
+    `rot F = <span class="val">${vectorFields[e.target.value].rot}</span>`;
+});
+
+document.getElementById('arrowDensity').addEventListener('input', e => {
+  vectorRend.density = parseInt(e.target.value);
+  vectorRend.render();
+});
+</script>
+</body>
+</html>

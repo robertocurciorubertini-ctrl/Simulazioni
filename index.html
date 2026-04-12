@@ -141,6 +141,15 @@
       animation: fadeUp 0.7s ease both;
     }
 
+    .hero-topline {
+      width: min(980px, 100%);
+      margin: 0 auto 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -150,7 +159,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 22px;
+      margin-bottom: 0;
       padding: 6px 14px 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(240,192,96,0.28);
@@ -720,6 +729,11 @@
       .container { width: calc(100% - 24px); padding-top: 24px; }
       .top-nav { margin-bottom: 32px; }
       .hero { padding-bottom: 36px; }
+      .hero-topline {
+        width: 100%;
+        justify-content: center;
+      }
+      .site-wordmark { display: none; }
       h1 { font-size: clamp(2.4rem, 10vw, 3.6rem); }
       .hero-stats { flex-wrap: wrap; }
       .hero-stat + .hero-stat { border-left: none; border-top: 1px solid var(--border); }
@@ -750,9 +764,12 @@
   <div class="container">
     <!-- Hero -->
     <section class="hero">
-      <div class="hero-label">
-        <span class="hero-label-dot"></span>
-        Laboratorio Digitale
+      <div class="hero-topline">
+        <div class="hero-label">
+          <span class="hero-label-dot"></span>
+          Laboratorio Digitale
+        </div>
+        <div class="site-wordmark" aria-hidden="true">fisica.<span>sim</span></div>
       </div>
       <h1>Simulazioni<br>di <em>Fisica</em></h1>
       <p class="hero-subtitle">

@@ -90,3 +90,19 @@ Accanto alle simulazioni già consolidate, possono essere presenti contenuti in 
 Questo repository raccoglie un progetto personale dedicato alla costruzione di un archivio di simulazioni fisiche accessibili, rigorose e didatticamente utili.
 
 L’obiettivo a lungo termine è sviluppare una piattaforma sempre più ampia e organica per la visualizzazione interattiva della fisica.
+
+## Sistema grafico comune
+
+La cartella `assets/` contiene i due file condivisi da tutte le pagine:
+
+- `assets/sim.css` definisce colori, caratteri e componenti standard (pannelli, cursori, pulsanti, riquadri delle grandezze, schede delle formule);
+- `assets/sim.js` inserisce in ogni simulazione la barra superiore con il ritorno al catalogo, la categoria e i collegamenti alla simulazione precedente e successiva, e mette a disposizione in `window.FS` la tavolozza e alcune utilità per i canvas.
+
+Ogni simulazione li include nell'`<head>`, dopo il blocco `window.SIM_METADATA`:
+
+```html
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
+```
+
+Il percorso relativo (`../`) va adattato alla profondità della cartella. Una pagina che usa i componenti standard aggiunge la classe `fs` al `<body>`; il modello di riferimento è `meccanica/moto-parabolico.html`. Le pagine preesistenti usano invece la classe `fs-bridge`: conservano la propria struttura, ma le loro variabili `:root` puntano ai token `--fs-*` e i colori disegnati nei canvas usano la stessa tavolozza. Le scene su fondo scuro aggiungono `fs-dark`.

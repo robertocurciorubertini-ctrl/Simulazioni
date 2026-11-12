@@ -1,0 +1,473 @@
+/* ══════════════════════════════════════════════════════════════════════
+   fisica.sim — sistema grafico comune delle simulazioni
+   ----------------------------------------------------------------------
+   Questo file contiene:
+     1. i token (colori, caratteri, raggi, ombre) condivisi da tutto il sito;
+     2. la barra superiore, inserita automaticamente da assets/sim.js;
+     3. i componenti standard di una simulazione (attivi solo se il <body>
+        ha la classe "fs", così le pagine non ancora migrate restano intatte).
+
+   Convenzione: il catalogo (index.html) usa il tema scuro, le simulazioni
+   usano il tema "carta" chiaro, su cui grafici e canvas restano leggibili
+   anche proiettati in aula. La barra scura in alto lega i due ambienti.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap");
+
+:root {
+  /* — caratteri — */
+  --fs-display: "Crimson Pro", Georgia, "Times New Roman", serif;
+  --fs-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fs-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* — tema scuro (catalogo e barra) — */
+  --fs-night-0: #06090f;
+  --fs-night-1: #0a0f1a;
+  --fs-night-2: #0f1623;
+  --fs-night-3: #141e2e;
+  --fs-night-text: #e8edf7;
+  --fs-night-soft: #8fa0be;
+  --fs-night-dim: #56688a;
+  --fs-night-line: rgba(255, 255, 255, 0.09);
+  --fs-gold: #f0c060;
+  --fs-teal: #5bd4c4;
+
+  /* — tema carta (simulazioni) — */
+  --fs-paper: #f4f1ea;
+  --fs-surface: #fffdf9;
+  --fs-surface-2: #efebe1;
+  --fs-surface-3: #e6e1d5;
+  --fs-ink: #1b1d22;
+  --fs-ink-2: #474c57;
+  --fs-ink-3: #7d828c;
+  --fs-rule: rgba(27, 29, 34, 0.1);
+  --fs-rule-2: rgba(27, 29, 34, 0.18);
+  --fs-line: #d9d5cb;      /* bordi, in versione opaca (utilizzabile anche nei canvas) */
+  --fs-line-2: #c6c1b5;
+
+  /* — colori per i dati: stesso significato in ogni simulazione — */
+  --fs-blue: #1f6fd0;      /* traiettorie, posizione, grandezza principale */
+  --fs-red: #c2491d;       /* forze, gittata, seconda grandezza */
+  --fs-green: #0e8a5a;     /* energie, quote, terza grandezza */
+  --fs-violet: #6d4fc0;    /* punti notevoli, condizioni iniziali */
+  --fs-amber: #b7791f;     /* avvisi, grandezze ausiliarie */
+  --fs-accent: var(--fs-blue);
+
+  /* — forma — */
+  --fs-r-sm: 6px;
+  --fs-r-md: 10px;
+  --fs-r-lg: 14px;
+  --fs-shadow: 0 1px 2px rgba(27, 29, 34, 0.04), 0 6px 20px rgba(27, 29, 34, 0.05);
+  --fs-bar-h: 46px;
+  --fs-cat: var(--fs-gold);   /* colore della categoria, impostato da sim.js */
+}
+
+/* ── 2. Barra superiore ─────────────────────────────────────────────── */
+/* Il bordo trasparente riserva lo spazio per la barra senza alterare i
+   layout a tutta altezza (100vh) delle singole simulazioni. */
+html.fs-has-bar body {
+  box-sizing: border-box;
+  border-top: var(--fs-bar-h) solid transparent;
+}
+
+.fsbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--fs-bar-h);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  background: linear-gradient(180deg, var(--fs-night-1), var(--fs-night-0));
+  border-bottom: 1px solid var(--fs-night-line);
+  box-shadow: inset 0 -2px 0 -1px var(--fs-cat);
+  font-family: var(--fs-sans);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--fs-night-text);
+  -webkit-font-smoothing: antialiased;
+}
+.fsbar * { box-sizing: border-box; }
+.fsbar a { color: inherit; text-decoration: none; }
+
+.fsbar-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--fs-night-line);
+  font-family: var(--fs-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fs-night-soft);
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.fsbar-home b { font-weight: 500; color: var(--fs-gold); }
+.fsbar-home:hover { color: var(--fs-night-text); border-color: rgba(255, 255, 255, 0.24); background: rgba(255, 255, 255, 0.04); }
+
+.fsbar-crumb {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.fsbar-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--fs-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fs-night-soft);
+}
+.fsbar-cat::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fs-cat);
+  box-shadow: 0 0 8px var(--fs-cat);
+}
+.fsbar-cat:hover { color: var(--fs-night-text); }
+.fsbar-title {
+  font-family: var(--fs-display);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fsbar-chip {
+  font-family: var(--fs-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--fs-night-line);
+  color: var(--fs-night-soft);
+  white-space: nowrap;
+}
+.fsbar-chip.wip { color: var(--fs-gold); border-color: rgba(240, 192, 96, 0.35); background: rgba(240, 192, 96, 0.08); }
+
+.fsbar-nav { display: flex; gap: 6px; }
+.fsbar-nav a, .fsbar-nav span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--fs-night-line);
+  color: var(--fs-night-soft);
+  font-size: 15px;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.fsbar-nav a:hover { color: var(--fs-night-text); border-color: rgba(255, 255, 255, 0.24); background: rgba(255, 255, 255, 0.04); }
+.fsbar-nav span { opacity: 0.3; }
+.fsbar a:focus-visible { outline: 2px solid var(--fs-gold); outline-offset: 2px; }
+
+@media (max-width: 640px) {
+  .fsbar { gap: 8px; padding: 0 10px; }
+  .fsbar-cat, .fsbar-chip:not(.wip), .fsbar-home .fsbar-home-text { display: none; }
+  .fsbar-title { font-size: 16px; }
+}
+@media print { .fsbar { display: none; } html.fs-has-bar body { border-top: 0; } }
+
+/* ── 2b. Pagine adattate (<body class="fs-bridge">) ─────────────────────
+   Simulazioni che conservano il proprio markup ma adottano caratteri,
+   sfondo e titolo comuni. Le loro variabili :root puntano ai token --fs-*. */
+body.fs-bridge {
+  background: var(--fs-paper);
+  color: var(--fs-ink);
+  font-family: var(--fs-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body.fs-bridge h1 {
+  font-family: var(--fs-display);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.08;
+  text-transform: none;
+}
+body.fs-bridge h1 em, body.fs-bridge h1 i { font-style: italic; font-weight: 400; }
+/* Variante scura, per le scene che nascono su fondo nero (spazio, campi, orbitali). */
+body.fs-bridge.fs-dark { background: var(--fs-night-1); color: var(--fs-night-text); }
+body.fs-bridge.fs-dark input[type="range"], body.fs-bridge.fs-dark input[type="checkbox"], body.fs-bridge.fs-dark input[type="radio"] { accent-color: var(--fs-gold); }
+body.fs-bridge.fs-dark :focus-visible { outline-color: var(--fs-gold); }
+body.fs-bridge button, body.fs-bridge select, body.fs-bridge input, body.fs-bridge textarea { font-family: inherit; }
+body.fs-bridge input[type="range"], body.fs-bridge input[type="checkbox"], body.fs-bridge input[type="radio"] { accent-color: var(--fs-ink); }
+body.fs-bridge :focus-visible { outline: 2px solid var(--fs-blue); outline-offset: 2px; }
+
+/* ── 3. Componenti standard (pagine migrate: <body class="fs">) ─────── */
+body.fs {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255, 255, 255, 0.55), transparent 70%),
+    var(--fs-paper);
+  color: var(--fs-ink);
+  font-family: var(--fs-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+body.fs *, body.fs *::before, body.fs *::after { box-sizing: border-box; }
+.fs [hidden] { display: none !important; }
+
+.fs .sim-page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 30px 0 56px;
+}
+
+/* intestazione */
+.fs .sim-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--fs-ink);
+}
+.fs .sim-kicker {
+  font-family: var(--fs-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fs-ink-3);
+  margin: 0 0 6px;
+}
+.fs .sim-head h1 {
+  margin: 0;
+  font-family: var(--fs-display);
+  font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+}
+.fs .sim-head h1 em { font-style: italic; font-weight: 400; }
+.fs .sim-lead {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  color: var(--fs-ink-2);
+  font-size: 0.95rem;
+}
+.fs .sim-note {
+  font-family: var(--fs-mono);
+  font-size: 11.5px;
+  color: var(--fs-ink-2);
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-rule);
+  border-radius: var(--fs-r-sm);
+  padding: 7px 11px;
+  white-space: nowrap;
+}
+
+/* griglia principale: controlli a sinistra, scena a destra */
+.fs .sim-layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 820px) {
+  .fs .sim-layout { grid-template-columns: 1fr; }
+  .fs .sim-note { white-space: normal; }
+}
+
+.fs .card {
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-rule);
+  border-radius: var(--fs-r-lg);
+  padding: 18px;
+  box-shadow: var(--fs-shadow);
+}
+.fs .card + .card { margin-top: 16px; }
+.fs .sim-layout > .card + .card { margin-top: 0; }
+.fs .sim-col { min-width: 0; }
+.fs .card-title {
+  margin: 0 0 16px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--fs-rule);
+  font-family: var(--fs-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--fs-ink-3);
+}
+.fs .card-title:not(:first-child) { margin-top: 22px; }
+
+/* controlli */
+.fs .field { margin-bottom: 16px; }
+.fs .field:last-child { margin-bottom: 0; }
+.fs .field-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.84rem;
+  color: var(--fs-ink-2);
+}
+.fs .field-label .sym { font-family: var(--fs-display); font-style: italic; font-size: 1.08rem; color: var(--fs-ink); margin-right: 4px; }
+.fs .field-value { font-family: var(--fs-mono); font-size: 0.84rem; font-weight: 500; color: var(--fs-ink); white-space: nowrap; }
+
+.fs input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.fs input[type="range"]::-webkit-slider-runnable-track { height: 3px; border-radius: 3px; background: var(--fs-rule-2); }
+.fs input[type="range"]::-moz-range-track { height: 3px; border-radius: 3px; background: var(--fs-rule-2); }
+.fs input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6.5px;
+  border-radius: 50%;
+  background: var(--fs-ink);
+  border: 2px solid var(--fs-surface);
+  box-shadow: 0 0 0 1px var(--fs-ink);
+  transition: transform 0.12s;
+}
+.fs input[type="range"]::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--fs-ink);
+  border: 2px solid var(--fs-surface);
+  box-shadow: 0 0 0 1px var(--fs-ink);
+}
+.fs input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.15); }
+.fs input[type="range"]:focus-visible { outline: 2px solid var(--fs-accent); outline-offset: 3px; border-radius: 4px; }
+
+.fs .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.fs .btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--fs-r-sm);
+  border: 1px solid var(--fs-rule-2);
+  background: var(--fs-surface);
+  color: var(--fs-ink);
+  font-family: var(--fs-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+.fs .btn:hover { background: var(--fs-surface-2); border-color: var(--fs-ink-3); }
+.fs .btn:active { transform: translateY(1px); }
+.fs .btn.primary { background: var(--fs-ink); border-color: var(--fs-ink); color: var(--fs-surface); }
+.fs .btn.primary:hover { background: #000; }
+.fs .btn:focus-visible { outline: 2px solid var(--fs-accent); outline-offset: 2px; }
+.fs .btn-row .btn { flex: 1; }
+
+.fs .check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.84rem;
+  color: var(--fs-ink-2);
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.fs .check input { width: 15px; height: 15px; accent-color: var(--fs-ink); margin: 0; }
+
+/* grandezze calcolate */
+.fs .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fs .metrics.cols-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 560px) { .fs .metrics.cols-4 { grid-template-columns: 1fr 1fr; } }
+.fs .metric { background: var(--fs-surface-2); border-radius: var(--fs-r-md); padding: 10px 12px; min-width: 0; }
+.fs .metric.wide { grid-column: 1 / -1; }
+.fs .metric-label {
+  /* niente maiuscoletto: altererebbe i simboli fisici (v₀ diventerebbe V₀) */
+  font-family: var(--fs-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--fs-ink-3);
+  margin-bottom: 3px;
+}
+.fs .metric-value { font-family: var(--fs-mono); font-size: 1.12rem; font-weight: 500; color: var(--fs-ink); }
+.fs .metric-value small { font-size: 0.68rem; font-weight: 400; color: var(--fs-ink-3); margin-left: 3px; }
+.fs .c-blue { color: var(--fs-blue) !important; }
+.fs .c-red { color: var(--fs-red) !important; }
+.fs .c-green { color: var(--fs-green) !important; }
+.fs .c-violet { color: var(--fs-violet) !important; }
+.fs .c-amber { color: var(--fs-amber) !important; }
+
+/* scena */
+.fs .stage { padding: 14px; }
+.fs .stage canvas { display: block; width: 100%; border-radius: var(--fs-r-md); background: #fff; }
+.fs .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--fs-rule);
+  font-family: var(--fs-mono);
+  font-size: 11px;
+  color: var(--fs-ink-2);
+}
+.fs .legend span { display: inline-flex; align-items: center; gap: 7px; }
+.fs .legend i { width: 18px; height: 3px; border-radius: 2px; background: currentColor; }
+.fs .legend i.dash { background: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 7px); }
+
+/* formule e teoria */
+.fs .formulas { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 16px; }
+.fs .formula {
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-rule);
+  border-radius: var(--fs-r-lg);
+  padding: 16px 18px;
+  box-shadow: var(--fs-shadow);
+}
+.fs .formula h3 {
+  margin: 0 0 10px;
+  font-family: var(--fs-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fs-ink-3);
+}
+.fs .formula p { margin: 8px 0 0; font-size: 0.88rem; color: var(--fs-ink-2); }
+.fs .formula .eq { margin: 6px 0; font-size: 0.92rem; color: var(--fs-ink); overflow-x: auto; }
+
+.fs .theory {
+  margin-top: 16px;
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-rule);
+  border-radius: var(--fs-r-lg);
+  padding: 22px 26px;
+  box-shadow: var(--fs-shadow);
+}
+.fs .theory h2 { margin: 0 0 10px; font-family: var(--fs-display); font-size: 1.5rem; font-weight: 500; }
+.fs .theory p { margin: 0 0 12px; max-width: 76ch; color: var(--fs-ink-2); }
+.fs .theory p:last-child { margin-bottom: 0; }
+.fs .theory strong { color: var(--fs-ink); font-weight: 600; }
+
+.fs .hint { font-size: 0.8rem; color: var(--fs-ink-3); margin: 10px 0 0; }

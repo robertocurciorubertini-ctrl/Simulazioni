@@ -15,8 +15,8 @@ window.MathJax = {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #2c2c2a;
+  font-family: -apple-system, BlinkMacSystemFont, 'DM Sans', sans-serif;
+  color: #1b1d22;
   padding: 20px;
   max-width: 860px;
   margin: 0 auto;
@@ -26,7 +26,7 @@ body {
 .tab-bar {
   display: flex;
   gap: 0;
-  border-bottom: 1.5px solid #d3d1c7;
+  border-bottom: 1.5px solid #d9d5cb;
   margin-bottom: 24px;
 }
 .tab-btn {
@@ -38,87 +38,89 @@ body {
   border-bottom: 2.5px solid transparent;
   margin-bottom: -1.5px;
   cursor: pointer;
-  color: #888780;
+  color: #7d828c;
   transition: color .15s, border-color .15s;
 }
-.tab-btn:hover { color: #2c2c2a; }
-.tab-btn.active { color: #185fa5; border-bottom-color: #185fa5; }
+.tab-btn:hover { color: #1b1d22; }
+.tab-btn.active { color: #1f6fd0; border-bottom-color: #1f6fd0; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
 /* ── CONTROLS ── */
 h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
-.subtitle { font-size: 13px; color: #888780; margin-bottom: 16px; line-height: 1.5; }
+.subtitle { font-size: 13px; color: #7d828c; margin-bottom: 16px; line-height: 1.5; }
 .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
 .ctrl-group {
-  background: #f7f6f2; border: 0.5px solid #d3d1c7;
+  background: #efebe1; border: 0.5px solid #d9d5cb;
   border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 155px;
 }
-.ctrl-label { font-size: 11px; color: #888780; margin-bottom: 3px; }
+.ctrl-label { font-size: 11px; color: #7d828c; margin-bottom: 3px; }
 .ctrl-val { font-size: 20px; font-weight: 500; }
-.ctrl-unit { font-size: 12px; color: #888780; }
-input[type=range] { width: 100%; margin-top: 5px; accent-color: #378add; }
+.ctrl-unit { font-size: 12px; color: #7d828c; }
+input[type=range] { width: 100%; margin-top: 5px; accent-color: #1f6fd0; }
 .mat3-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .toggle-btn {
   font-size: 12px; padding: 6px 12px;
-  border: 0.5px solid #d3d1c7; border-radius: 6px;
-  background: white; cursor: pointer; color: #444441;
+  border: 0.5px solid #d9d5cb; border-radius: 6px;
+  background: white; cursor: pointer; color: #474c57;
 }
-.toggle-btn.active { background: #b5d4f4; border-color: #378add; color: #042c53; }
-.mat3-inline { display: none; align-items: center; gap: 8px; font-size: 13px; color: #444441; }
+.toggle-btn.active { background: #b5d4f4; border-color: #1f6fd0; color: #042c53; }
+.mat3-inline { display: none; align-items: center; gap: 8px; font-size: 13px; color: #474c57; }
 .mat3-inline.show { display: flex; }
 .n-input {
-  width: 72px; border: 0.5px solid #d3d1c7; border-radius: 6px;
-  padding: 5px 8px; font-size: 13px; background: white; color: #2c2c2a;
+  width: 72px; border: 0.5px solid #d9d5cb; border-radius: 6px;
+  padding: 5px 8px; font-size: 13px; background: white; color: #1b1d22;
 }
 
 /* ── CANVAS ── */
-.canvas-wrap { border: 0.5px solid #d3d1c7; border-radius: 10px; overflow: hidden; }
+.canvas-wrap { border: 0.5px solid #d9d5cb; border-radius: 10px; overflow: hidden; }
 canvas { display: block; width: 100%; height: auto; background: white; }
 .status-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; min-height: 28px; }
 .tir-badge {
   background: #fcebeb; border: 0.5px solid #f09595;
   border-radius: 6px; padding: 5px 12px; font-size: 13px;
-  color: #a32d2d; font-weight: 500; display: none;
+  color: #c2491d; font-weight: 500; display: none;
 }
 
 /* ── FORMULAS ── */
-.formulas { margin-top: 22px; border-top: 0.5px solid #d3d1c7; padding-top: 18px; }
+.formulas { margin-top: 22px; border-top: 0.5px solid #d9d5cb; padding-top: 18px; }
 .formulas h2 { font-size: 14px; font-weight: 500; margin-bottom: 14px; }
 .formula-row { display: flex; gap: 10px; flex-wrap: wrap; }
 .formula-card {
-  flex: 1; min-width: 190px; background: #f7f6f2;
-  border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 12px 16px;
+  flex: 1; min-width: 190px; background: #efebe1;
+  border: 0.5px solid #d9d5cb; border-radius: 8px; padding: 12px 16px;
 }
-.formula-title { font-size: 10px; color: #888780; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
-.formula-body { font-size: 15px; line-height: 2.4; color: #2c2c2a; }
-.formula-note { font-size: 11px; color: #888780; margin-top: 6px; line-height: 1.5; }
+.formula-title { font-size: 10px; color: #7d828c; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.formula-body { font-size: 15px; line-height: 2.4; color: #1b1d22; }
+.formula-note { font-size: 11px; color: #7d828c; margin-top: 6px; line-height: 1.5; }
 
 /* ── THEORY ── */
 .theory { margin-top: 24px; }
 .theory h3 { font-size: 14px; font-weight: 500; margin-bottom: 8px; margin-top: 18px; }
-.theory p { font-size: 13px; color: #444441; line-height: 1.75; margin-bottom: 6px; }
+.theory p { font-size: 13px; color: #474c57; line-height: 1.75; margin-bottom: 6px; }
 .example {
-  background: #f7f6f2; border-left: 3px solid #378add;
+  background: #efebe1; border-left: 3px solid #1f6fd0;
   border-radius: 0 6px 6px 0; padding: 8px 12px;
-  font-size: 12px; color: #444441; line-height: 1.6; margin-top: 6px;
+  font-size: 12px; color: #474c57; line-height: 1.6; margin-top: 6px;
 }
 
 /* ── PRISMA CHECKBOXES ── */
 .mat-checks { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .mat-check-label {
   display: flex; align-items: center; gap: 6px;
-  font-size: 13px; color: #444441; cursor: pointer;
-  background: #f7f6f2; border: 0.5px solid #d3d1c7;
+  font-size: 13px; color: #474c57; cursor: pointer;
+  background: #efebe1; border: 0.5px solid #d9d5cb;
   border-radius: 6px; padding: 6px 12px;
   user-select: none; transition: background .12s;
 }
 .mat-check-label:hover { background: #eeedfe; }
-.mat-check-label input { accent-color: #378add; width: 14px; height: 14px; cursor: pointer; }
-.mat-check-label.checked { background: #e6f1fb; border-color: #378add; color: #042c53; }
+.mat-check-label input { accent-color: #1f6fd0; width: 14px; height: 14px; cursor: pointer; }
+.mat-check-label.checked { background: #e6f1fb; border-color: #1f6fd0; color: #042c53; }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('snell')">Rifrazione e RIT</button>
@@ -155,9 +157,9 @@ canvas { display: block; width: 100%; height: auto; background: white; }
 <div class="mat3-row">
   <button class="toggle-btn" id="btn-add3" onclick="toggleMat3()">+ Aggiungi terzo materiale</button>
   <div class="mat3-inline" id="mat3-controls">
-    <span style="color:#888780;font-size:12px">n₃ =</span>
+    <span style="color:#7d828c;font-size:12px">n₃ =</span>
     <input class="n-input" type="number" id="inp-n3" min="1.00" max="3.00" step="0.05" value="2.00" oninput="drawSnell()">
-    <span style="font-size:11px;color:#888780">(mezzo inferiore)</span>
+    <span style="font-size:11px;color:#7d828c">(mezzo inferiore)</span>
   </div>
 </div>
 
@@ -275,7 +277,7 @@ canvas { display: block; width: 100%; height: auto; background: white; }
   </div>
 </div>
 
-<p style="font-size:12px;color:#888780;margin-bottom:10px;margin-top:-4px">Seleziona i materiali da confrontare:</p>
+<p style="font-size:12px;color:#7d828c;margin-bottom:10px;margin-top:-4px">Seleziona i materiali da confrontare:</p>
 <div class="mat-checks" id="mat-checks">
   <label class="mat-check-label checked"><input type="checkbox" value="0" checked onchange="drawPrism()"> Vetro crown</label>
   <label class="mat-check-label"><input type="checkbox" value="1" onchange="drawPrism()"> Vetro flint</label>
@@ -367,8 +369,8 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
   }
   function infoBox(x,y,w,h,bc,lbl,val,vc){
     ctx.save(); ctx.fillStyle='rgba(255,255,255,0.88)'; ctx.beginPath(); ctx.roundRect(x,y,w,h,6); ctx.fill(); ctx.strokeStyle=bc; ctx.lineWidth=0.8; ctx.stroke();
-    ctx.fillStyle='#888780'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic'; ctx.fillText(lbl,x+8,y+15);
-    ctx.fillStyle=vc||'#2c2c2a'; ctx.font='500 15px sans-serif'; ctx.fillText(val,x+8,y+34); ctx.restore();
+    ctx.fillStyle='#7d828c'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic'; ctx.fillText(lbl,x+8,y+15);
+    ctx.fillStyle=vc||'#1b1d22'; ctx.font='500 15px sans-serif'; ctx.fillText(val,x+8,y+34); ctx.restore();
   }
 
   function drawSnell(){
@@ -382,8 +384,8 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
 
     ctx.textBaseline='alphabetic'; ctx.font='500 13px sans-serif'; ctx.textAlign='left';
     ctx.fillStyle='#3b6d11'; ctx.fillText('Mezzo 1  ·  n₁ = '+n1.toFixed(2),14,26);
-    ctx.fillStyle='#185fa5'; ctx.fillText('Mezzo 2  ·  n₂ = '+n2.toFixed(2),14,IY+22);
-    if(mat3Active){ const n3v=+document.getElementById('inp-n3').value; ctx.fillStyle='#854f0b'; ctx.fillText('Mezzo 3  ·  n₃ = '+n3v.toFixed(2),14,iY2+22); }
+    ctx.fillStyle='#1f6fd0'; ctx.fillText('Mezzo 2  ·  n₂ = '+n2.toFixed(2),14,IY+22);
+    if(mat3Active){ const n3v=+document.getElementById('inp-n3').value; ctx.fillStyle='#b7791f'; ctx.fillText('Mezzo 3  ·  n₃ = '+n3v.toFixed(2),14,iY2+22); }
 
     seg(0,IY,W,IY,'#73726c',1.5);
     if(mat3Active) seg(0,iY2,W,iY2,'#73726c',1.5);
@@ -399,15 +401,15 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
     document.getElementById('tir-badge').style.display=tir?'':'none';
     const R=130,ARC=48;
     const ix0=OX-Math.sin(t1r)*R, iy0=IY-Math.cos(t1r)*R;
-    ray(ix0,iy0,OX,IY,'#d85a30');
-    if(theta1>=1) arc(OX,IY,ARC,0,-1,-Math.sin(t1r),-Math.cos(t1r),'#d85a30','θ₁='+theta1+'°');
+    ray(ix0,iy0,OX,IY,'#c2491d');
+    if(theta1>=1) arc(OX,IY,ARC,0,-1,-Math.sin(t1r),-Math.cos(t1r),'#c2491d','θ₁='+theta1+'°');
 
     if(tir){
       const rx=OX+Math.sin(t1r)*R,ry=IY-Math.cos(t1r)*R;
-      ray(OX,IY,rx,ry,'#e24b4a');
-      if(theta1>=1) arc(OX,IY,ARC,0,-1,Math.sin(t1r),-Math.cos(t1r),'#e24b4a','θ_r='+theta1+'°');
-      seg(OX,IY,OX+100,IY+50,'#e24b4a',1.5,[5,4]);
-      ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+      ray(OX,IY,rx,ry,'#c2491d');
+      if(theta1>=1) arc(OX,IY,ARC,0,-1,Math.sin(t1r),-Math.cos(t1r),'#c2491d','θ_r='+theta1+'°');
+      seg(OX,IY,OX+100,IY+50,'#c2491d',1.5,[5,4]);
+      ctx.fillStyle='#c2491d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
       ctx.fillText('Onda evanescente',OX+104,IY+54);
       ctx.font='500 11px sans-serif'; ctx.fillText('Raggio riflesso (RIT)',rx+6,ry-6);
     } else {
@@ -415,8 +417,8 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
       let ex2,ey2;
       if(mat3Active){ const d=LAYER2_H/Math.cos(t2r); ex2=OX+Math.sin(t2r)*d; ey2=iY2; }
       else{ ex2=OX+Math.sin(t2r)*R; ey2=IY+Math.cos(t2r)*R; }
-      ray(OX,IY,ex2,ey2,'#185fa5');
-      if(theta2>=1) arc(OX,IY,ARC,0,1,Math.sin(t2r),Math.cos(t2r),'#185fa5','θ₂='+theta2.toFixed(1)+'°');
+      ray(OX,IY,ex2,ey2,'#1f6fd0');
+      if(theta2>=1) arc(OX,IY,ARC,0,1,Math.sin(t2r),Math.cos(t2r),'#1f6fd0','θ₂='+theta2.toFixed(1)+'°');
       const rpx=OX+Math.sin(t1r)*80,rpy=IY-Math.cos(t1r)*80;
       seg(OX,IY,rpx,rpy,'#ccc',1.5,[4,4]); ah(OX,IY,rpx,rpy,'#ccc',0.55);
       ctx.fillStyle='#b4b2a9'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left'; ctx.fillText('Riflesso parziale',rpx+5,rpy-4);
@@ -439,9 +441,9 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
           const topY=IY;
 
           if(topX>0 && topX<W){
-            ray(ex2,iY2,topX,topY,'#e24b4a');
-            if(theta2>=1) arc(ex2,iY2,36,0,-1,dxRef,dyRef,'#e24b4a','θ_r='+theta2.toFixed(1)+'°');
-            ctx.fillStyle='#a32d2d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+            ray(ex2,iY2,topX,topY,'#c2491d');
+            if(theta2>=1) arc(ex2,iY2,36,0,-1,dxRef,dyRef,'#c2491d','θ_r='+theta2.toFixed(1)+'°');
+            ctx.fillStyle='#c2491d'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
             ctx.fillText('RIT (2ª interfaccia)',ex2+8,iY2-8);
 
             // All'interfaccia 1-2 dall'interno: n2 -> n1, stesso angolo rispetto alla normale
@@ -452,8 +454,8 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
             if(exitTop===null){
               // Nuova RIT all'interfaccia superiore: riflessione verso il basso
               const rx4=topX+Math.sin(t2rr)*80, ry4=IY+Math.cos(t2rr)*80;
-              ray(topX,IY,rx4,ry4,'#e24b4a');
-              ctx.fillStyle='#a32d2d'; ctx.font='10px sans-serif'; ctx.textBaseline='alphabetic';
+              ray(topX,IY,rx4,ry4,'#c2491d');
+              ctx.fillStyle='#c2491d'; ctx.font='10px sans-serif'; ctx.textBaseline='alphabetic';
               ctx.fillText('RIT (1ª interfaccia)',rx4+4,ry4-4);
             } else {
               const teR=exitTop*Math.PI/180;
@@ -467,27 +469,27 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
             const edgeT = dxRef > 0 ? (W-ex2)/dxRef : -ex2/dxRef;
             const edgeX = ex2 + dxRef*edgeT;
             const edgeY = iY2 + dyRef*edgeT;
-            ray(ex2,iY2,edgeX,edgeY,'#e24b4a');
-            if(theta2>=1) arc(ex2,iY2,36,0,-1,dxRef,dyRef,'#e24b4a','θ_r='+theta2.toFixed(1)+'°');
+            ray(ex2,iY2,edgeX,edgeY,'#c2491d');
+            if(theta2>=1) arc(ex2,iY2,36,0,-1,dxRef,dyRef,'#c2491d','θ_r='+theta2.toFixed(1)+'°');
           }
         } else {
           const t3r=theta3*Math.PI/180;
           const e3x=ex2+Math.sin(t3r)*85, e3y=iY2+Math.cos(t3r)*85;
-          ray(ex2,iY2,e3x,e3y,'#854f0b');
-          if(theta3>=1) arc(ex2,iY2,36,0,1,Math.sin(t3r),Math.cos(t3r),'#854f0b','θ₃='+theta3.toFixed(1)+'°');
+          ray(ex2,iY2,e3x,e3y,'#b7791f');
+          if(theta3>=1) arc(ex2,iY2,36,0,1,Math.sin(t3r),Math.cos(t3r),'#b7791f','θ₃='+theta3.toFixed(1)+'°');
         }
       }
     }
 
-    ctx.beginPath(); ctx.arc(OX,IY,5,0,Math.PI*2); ctx.fillStyle='#2c2c2a'; ctx.fill();
+    ctx.beginPath(); ctx.arc(OX,IY,5,0,Math.PI*2); ctx.fillStyle='#1b1d22'; ctx.fill();
 
     const bx=450,by=14;
-    if(tc!==null) infoBox(bx,by,200,46,'#d05538','Angolo critico (n₁>n₂)','θ_c = '+tc.toFixed(1)+'°','#d05538');
+    if(tc!==null) infoBox(bx,by,200,46,'#c2491d','Angolo critico (n₁>n₂)','θ_c = '+tc.toFixed(1)+'°','#c2491d');
     else infoBox(bx,by,200,46,'#b4b2a9','Angolo critico','non esiste (n₁≤n₂)','#aaa');
     if(mat3Active){
       const n3v=+document.getElementById('inp-n3').value;
       const tc23=critA(n2,n3v);
-      if(tc23!==null) infoBox(bx,by+54,200,46,'#854f0b','Angolo critico (n₂>n₃)','θ_c = '+tc23.toFixed(1)+'°','#854f0b');
+      if(tc23!==null) infoBox(bx,by+54,200,46,'#b7791f','Angolo critico (n₂>n₃)','θ_c = '+tc23.toFixed(1)+'°','#b7791f');
       else infoBox(bx,by+54,200,46,'#b4b2a9','Angolo critico (2-3)','non esiste (n₂≤n₃)','#aaa');
     }
   }
@@ -563,7 +565,7 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
     // Etichette
     ctx.font='500 12px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
     ctx.fillStyle='#5585aa'; ctx.fillText('Nucleo (core)  n_core = '+ncore.toFixed(2),CORE_X+8,CORE_CY+5);
-    ctx.fillStyle='#185fa5'; ctx.fillText('Mantello (cladding)  n_clad = '+nclad.toFixed(2),12,20);
+    ctx.fillStyle='#1f6fd0'; ctx.fillText('Mantello (cladding)  n_clad = '+nclad.toFixed(2),12,20);
 
     // Angolo critico
     const tc=critA(ncore,nclad);
@@ -571,9 +573,9 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
     ctx.save();
     ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.roundRect(460,8,200,52,6); ctx.fill();
     ctx.strokeStyle='#5585aa'; ctx.lineWidth=0.8; ctx.stroke();
-    ctx.fillStyle='#888780'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#7d828c'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
     ctx.fillText('Angolo critico (core→clad):',468,22);
-    ctx.fillStyle='#d05538'; ctx.font='500 14px sans-serif';
+    ctx.fillStyle='#c2491d'; ctx.font='500 14px sans-serif';
     ctx.fillText('θ_c = '+tc.toFixed(1)+'°   NA = '+NA.toFixed(3),468,42);
     ctx.restore();
 
@@ -596,15 +598,15 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
     const entryX=CORE_X, entryY=CORE_CY-20;
     const incomingLen=50;
     const srcX=entryX-incomingLen, srcY=entryY-Math.tan(alphaR)*incomingLen;
-    ray(srcX,srcY,entryX,entryY,'#d85a30',2.2);
-    ctx.fillStyle='#d85a30'; ctx.font='11px sans-serif'; ctx.textBaseline='middle'; ctx.textAlign='right';
+    ray(srcX,srcY,entryX,entryY,'#c2491d',2.2);
+    ctx.fillStyle='#c2491d'; ctx.font='11px sans-serif'; ctx.textBaseline='middle'; ctx.textAlign='right';
     ctx.fillText('Raggio entrante',srcX-4,srcY);
 
     // Propagazione nel nucleo: il raggio va verso destra con inclinazione alpha verso il basso
     // Rimbalza sulle pareti superiore e inferiore
     let cx=entryX, cy=entryY;
     let vx=Math.cos(alphaR), vy=Math.sin(alphaR); // direzione unitaria
-    const rayCol=tirOccurs?'#185fa5':'#185fa5';
+    const rayCol=tirOccurs?'#1f6fd0':'#1f6fd0';
     let guided=tirOccurs;
     let firstBounce=true;
 
@@ -618,7 +620,7 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
       const nx=cx+vx*t, ny=cy+vy*t;
 
       // Disegna segmento
-      const col=tirOccurs?'#185fa5':'#60aadd';
+      const col=tirOccurs?'#1f6fd0':'#60aadd';
       seg(cx,cy,nx,ny,col,2.4);
       ah(cx,cy,nx,ny,col,0.55);
 
@@ -650,7 +652,7 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
         const normalY = normalDirY;
         const reflX = vx;
         const reflY = -vy;
-        arc(nx,ny,28, normalX,normalY, reflX,reflY, '#d85a30','θ_w='+theta_inc_wall.toFixed(0)+'°');
+        arc(nx,ny,28, normalX,normalY, reflX,reflY, '#c2491d','θ_w='+theta_inc_wall.toFixed(0)+'°');
         firstBounce=false;
       }
 
@@ -662,9 +664,9 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
           const exitDy=wallIsTop?-1:1;
           const ex=nx+Math.sin(trR)*60*(vx>0?1:-1);
           const ey=ny+exitDy*Math.cos(trR)*60;
-          seg(nx,ny,ex,ey,'#e24b4a',1.5,[4,3]);
-          ah(nx,ny,ex,ey,'#e24b4a',0.6);
-          ctx.fillStyle='#a32d2d'; ctx.font='10px sans-serif'; ctx.textBaseline=wallIsTop?'bottom':'top'; ctx.textAlign='left';
+          seg(nx,ny,ex,ey,'#c2491d',1.5,[4,3]);
+          ah(nx,ny,ex,ey,'#c2491d',0.6);
+          ctx.fillStyle='#c2491d'; ctx.font='10px sans-serif'; ctx.textBaseline=wallIsTop?'bottom':'top'; ctx.textAlign='left';
           ctx.fillText('fuga',ex+3,ey);
         }
       }
@@ -675,7 +677,7 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
     }
 
     // Punto di entrata
-    ctx.beginPath(); ctx.arc(entryX,entryY,4,0,Math.PI*2); ctx.fillStyle='#2c2c2a'; ctx.fill();
+    ctx.beginPath(); ctx.arc(entryX,entryY,4,0,Math.PI*2); ctx.fillStyle='#1b1d22'; ctx.fill();
 
     // Info angolo
     ctx.save();
@@ -683,7 +685,7 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
     ctx.strokeStyle='#888'; ctx.lineWidth=0.7; ctx.stroke();
     ctx.fillStyle='#444'; ctx.font='11px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
     ctx.fillText('α = '+alpha+'°  →  θ sulla parete = '+(90-alpha).toFixed(0)+'°  (θ_c = '+(tc?tc.toFixed(1)+'°':'—')+')',18,H-36);
-    ctx.fillStyle=tirOccurs?'#085041':'#a32d2d'; ctx.font='500 12px sans-serif';
+    ctx.fillStyle=tirOccurs?'#085041':'#c2491d'; ctx.font='500 12px sans-serif';
     ctx.fillText(tirOccurs?'Condizione RIT soddisfatta: luce guidata':'Condizione RIT NON soddisfatta: luce perde energia',18,H-18);
     ctx.restore();
   }
@@ -711,8 +713,8 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
   const W=680,H=380,IY=155,OX=160;
 
   const MATS=[
-    {name:'Vetro crown', A:1.5220,B:0.00459, col:'#185fa5'},
-    {name:'Vetro flint',  A:1.6100,B:0.00850, col:'#854f0b'},
+    {name:'Vetro crown', A:1.5220,B:0.00459, col:'#1f6fd0'},
+    {name:'Vetro flint',  A:1.6100,B:0.00850, col:'#b7791f'},
     {name:'Acqua',        A:1.3290,B:0.00314, col:'#0f6e56'},
     {name:'Diamante',     A:2.3900,B:0.01000, col:'#533ab7'}
   ];
@@ -830,24 +832,24 @@ document.querySelectorAll('.mat-check-label input').forEach(inp => {
         ctx.save();
         ctx.fillStyle='rgba(255,255,255,0.88)'; ctx.beginPath(); ctx.roundRect(bx,by,152,62,6); ctx.fill();
         ctx.strokeStyle=md.mat.col; ctx.lineWidth=0.8; ctx.stroke();
-        ctx.fillStyle='#888780'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+        ctx.fillStyle='#7d828c'; ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
         ctx.fillText('n(rosso) = '+nRed.toFixed(4),bx+6,by+14);
         ctx.fillText('n(violetto) = '+nVio.toFixed(4),bx+6,by+28);
         ctx.fillStyle=md.mat.col; ctx.font='500 11px sans-serif';
         ctx.fillText('Δθ reale = '+disp_real.toFixed(3)+'°',bx+6,by+46);
-        ctx.fillStyle='#888780'; ctx.font='10px sans-serif';
+        ctx.fillStyle='#7d828c'; ctx.font='10px sans-serif';
         ctx.fillText('(spread × '+SPREAD_EXAG+' per visibilità)',bx+6,by+58);
         ctx.restore();
       }
 
       // Punto di incidenza
-      ctx.beginPath(); ctx.arc(ox,IY,4,0,Math.PI*2); ctx.fillStyle='#2c2c2a'; ctx.fill();
+      ctx.beginPath(); ctx.arc(ox,IY,4,0,Math.PI*2); ctx.fillStyle='#1b1d22'; ctx.fill();
     });
 
     // Etichetta mezzo
     ctx.font='500 12px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
     ctx.fillStyle='#3b6d11'; ctx.fillText('Aria  n = 1.000',10,20);
-    if(matData.length>0) ctx.fillStyle='#185fa5', ctx.fillText('Secondo mezzo (vedi etichette)',10,IY+18);
+    if(matData.length>0) ctx.fillStyle='#1f6fd0', ctx.fillText('Secondo mezzo (vedi etichette)',10,IY+18);
   }
   window.drawPrism=drawPrism;
 

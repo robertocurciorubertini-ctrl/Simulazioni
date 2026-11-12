@@ -16,17 +16,15 @@ window.SIM_METADATA = {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fluidodinamica — Flussi Laminari e Turbolenti</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap');
-
   :root {
-    --bg: #0a0a0f;
-    --panel: #10101a;
-    --border: #1e1e30;
+    --bg: #0a0f1a;
+    --panel: #0f1623;
+    --border: #1e2a40;
     --accent: #4fc3f7;
     --accent2: #ff6b6b;
-    --text: #c8c8d8;
-    --text-dim: #5a5a7a;
-    --label: #8888aa;
+    --text: #e8edf7;
+    --text-dim: #8fa0be;
+    --label: #8fa0be;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,7 +32,7 @@ window.SIM_METADATA = {
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -51,7 +49,7 @@ window.SIM_METADATA = {
   }
 
   header h1 {
-    font-family: 'EB Garamond', serif;
+    font-family: 'Crimson Pro', serif;
     font-size: 1.25rem;
     font-weight: 400;
     color: #e0e0f0;
@@ -177,7 +175,7 @@ window.SIM_METADATA = {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.08em;
     padding: 7px 10px;
@@ -317,8 +315,10 @@ window.SIM_METADATA = {
     vertical-align: middle;
   }
 </style>
+<link rel="stylesheet" href="../../../assets/sim.css">
+<script src="../../../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge fs-dark">
 
 <header>
   <h1>Simulazione di Fluidodinamica 2D</h1>

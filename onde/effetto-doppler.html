@@ -16,24 +16,23 @@ window.SIM_METADATA = {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Effetto Doppler — simulazione suono e luce</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
   :root{
-    --bg:#f3f3ef;
-    --panel:#ffffff;
-    --soft:#f8f8f4;
-    --border:#d9d9cf;
-    --text:#1a1f2e;
-    --muted:#6f746c;
-    --accent:#126bdb;
-    --accent-2:#d63a3a;
-    --src:#df7a00;
-    --obs:#00786a;
+    --bg:var(--fs-paper);
+    --panel:var(--fs-surface);
+    --soft:var(--fs-surface-2);
+    --border:var(--fs-line);
+    --text:var(--fs-ink);
+    --muted:var(--fs-ink-2);
+    --accent:var(--fs-blue);
+    --accent-2:var(--fs-red);
+    --src:var(--fs-amber);
+    --obs:var(--fs-green);
     --light-src:#ffd34f;
     --light-obs:#5a7dff;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
-    font-family:'Space Mono',monospace;
+    font-family:'DM Mono',monospace;
     color:var(--text);
     background:var(--bg);
     min-height:100vh;
@@ -48,7 +47,7 @@ window.SIM_METADATA = {
     box-shadow:0 1px 4px rgba(0,0,0,.05);
   }
   header h1{
-    font-family:'Syne',sans-serif;
+    font-family:'DM Sans',sans-serif;
     font-size:1.15rem;
     font-weight:800;
     color:var(--accent);
@@ -95,7 +94,7 @@ window.SIM_METADATA = {
     box-shadow:0 2px 8px rgba(0,0,0,.05);
   }
   .panel-head h2{
-    font-family:'Syne',sans-serif;
+    font-family:'DM Sans',sans-serif;
     font-size:.95rem;
     font-weight:800;
     margin-bottom:3px;
@@ -173,14 +172,14 @@ window.SIM_METADATA = {
     line-height:1.35;
   }
   .stat .val{
-    font-family:'Syne',sans-serif;
+    font-family:'DM Sans',sans-serif;
     font-size:1.18rem;
     font-weight:800;
   }
   .stat .val.invalid{
     font-size:.66rem;
     line-height:1.25;
-    font-family:'Space Mono',monospace;
+    font-family:'DM Mono',monospace;
     font-weight:700;
     letter-spacing:0;
   }
@@ -219,7 +218,7 @@ window.SIM_METADATA = {
     border:none;
     border-radius:8px;
     padding:10px 8px;
-    font-family:'Syne',sans-serif;
+    font-family:'DM Sans',sans-serif;
     font-weight:800;
     letter-spacing:.08em;
     text-transform:uppercase;
@@ -269,7 +268,7 @@ window.SIM_METADATA = {
     padding:16px 18px;
   }
   .card h3{
-    font-family:'Syne',sans-serif;
+    font-family:'DM Sans',sans-serif;
     font-size:1rem;
     margin-bottom:10px;
   }
@@ -304,8 +303,10 @@ window.SIM_METADATA = {
   };
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <header>
   <h1>Effetto Doppler</h1>
   <span>Suono nel mezzo materiale e luce in relatività ristretta</span>
@@ -816,10 +817,10 @@ window.SIM_METADATA = {
     sctx.textBaseline = 'middle';
     sctx.fillText(badgeText, bx + padX, by + bh/2 + 0.5);
 
-    drawArrow(sctx, c, sound.src, sound.vS, '#df7a00', `v_S=${sound.vS.toFixed(0)} m/s`, soundVelScale());
-    drawArrow(sctx, c, sound.obs, sound.vO, '#00786a', `v_O=${sound.vO.toFixed(0)} m/s`, soundVelScale());
-    drawEntity(sctx, c, sound.src, '#df7a00', 'Sorgente', 'S');
-    drawEntity(sctx, c, sound.obs, '#00786a', 'Osservatore', 'O');
+    drawArrow(sctx, c, sound.src, sound.vS, '#b7791f', `v_S=${sound.vS.toFixed(0)} m/s`, soundVelScale());
+    drawArrow(sctx, c, sound.obs, sound.vO, '#0e8a5a', `v_O=${sound.vO.toFixed(0)} m/s`, soundVelScale());
+    drawEntity(sctx, c, sound.src, '#b7791f', 'Sorgente', 'S');
+    drawEntity(sctx, c, sound.obs, '#0e8a5a', 'Osservatore', 'O');
   }
 
   function drawLight(){

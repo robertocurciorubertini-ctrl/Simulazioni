@@ -16,20 +16,18 @@ window.SIM_METADATA = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conservazione dell'Energia</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
-
     :root {
-      --bg:#ffffff;
-      --surface:#f8f9fb;
-      --surface2:#eef2f7;
-      --card:#ffffff;
-      --text:#0f172a;
-      --dim:#64748b;
-      --border:#cbd5e1;
-      --c1:#0077cc;
-      --c2:#e0142a;
-      --c3:#2e8b00;
-      --c4:#a855f7;
+      --bg:var(--fs-paper);
+      --surface:var(--fs-surface-2);
+      --surface2:var(--fs-surface-3);
+      --card:var(--fs-surface);
+      --text:var(--fs-ink);
+      --dim:var(--fs-ink-2);
+      --border:var(--fs-line);
+      --c1:var(--fs-blue);
+      --c2:var(--fs-red);
+      --c3:var(--fs-green);
+      --c4:var(--fs-violet);
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:18px;
     }
@@ -37,7 +35,7 @@ window.SIM_METADATA = {
     * { box-sizing:border-box; }
     body {
       margin:0;
-      font-family:'Syne',system-ui,sans-serif;
+      font-family:'DM Sans',system-ui,sans-serif;
       background:linear-gradient(180deg,#ffffff 0%,#f6f8fb 100%);
       color:var(--text);
     }
@@ -99,7 +97,7 @@ window.SIM_METADATA = {
       border:1px solid var(--border);
       border-radius:999px;
       padding:11px 16px;
-      font:600 .95rem 'Syne',sans-serif;
+      font:600 .95rem 'DM Sans',sans-serif;
       cursor:pointer;
       box-shadow:var(--shadow);
       transition:.18s ease;
@@ -166,7 +164,7 @@ window.SIM_METADATA = {
 
     .row-label span:last-child {
       color:var(--c1);
-      font-family:'Space Mono',monospace;
+      font-family:'DM Mono',monospace;
       font-size:.84rem;
     }
 
@@ -174,7 +172,7 @@ window.SIM_METADATA = {
     input[type="range"] { accent-color:var(--c1); cursor:pointer; }
 
     select, button {
-      font:600 .92rem 'Syne',sans-serif;
+      font:600 .92rem 'DM Sans',sans-serif;
       border-radius:12px;
       border:1px solid var(--border);
       padding:10px 12px;
@@ -260,7 +258,7 @@ window.SIM_METADATA = {
     }
 
     .stat .value {
-      font-family:'Space Mono',monospace;
+      font-family:'DM Mono',monospace;
       font-size:1rem;
     }
 
@@ -290,7 +288,7 @@ window.SIM_METADATA = {
       gap:10px;
       font-size:.86rem;
     }
-    .mono { font-family:'Space Mono',monospace; }
+    .mono { font-family:'DM Mono',monospace; }
 
     .legend {
       margin-top:16px;
@@ -361,8 +359,10 @@ window.SIM_METADATA = {
     };
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
   <div class="page">
     <div class="hero">
       <div class="title-wrap">
@@ -382,6 +382,8 @@ window.SIM_METADATA = {
   <script>
     const screensConfig = [
       { id:'track', icon:'⛰', title:'Guida curva', subtitle:'Scambio tra quota e velocità lungo una pista.', kind:'track' },
+      { id:'loop', icon:'◯', title:'Giro della morte', subtitle:'Quota minima di partenza per completare il cerchio.', kind:'loop' },
+      { id:'pendulum', icon:'◔', title:'Pendolo', subtitle:'Scambio periodico tra energia potenziale e cinetica.', kind:'pendulum' },
     ];
 
     const theoryText = {
@@ -579,7 +581,7 @@ window.SIM_METADATA = {
               ${cfg.kind==='track' ? `
               <div class="bar-block" id="${cfg.id}-eel-block" style="display:none;">
                 <div class="bar-meta"><span>Energia potenziale elastica \(E_{\text{el}}\)</span><span class="mono" id="${cfg.id}-eel">0.00 J</span></div>
-                <div class="bar-line"><div class="bar-fill" id="${cfg.id}-eel-bar" style="background:#f59e0b"></div></div>
+                <div class="bar-line"><div class="bar-fill" id="${cfg.id}-eel-bar" style="background:#b7791f"></div></div>
               </div>` : ''}
               <div class="bar-block">
                 <div class="bar-meta"><span>Energia cinetica \(E_k\)</span><span class="mono" id="${cfg.id}-ek">0.00 J</span></div>
@@ -596,7 +598,7 @@ window.SIM_METADATA = {
             </div>
             <div class="legend">
               <span><i class="sw" style="background:var(--c1)"></i> Energia potenziale gravitazionale</span>
-              ${cfg.kind==='track' ? `<span id="${cfg.id}-eel-legend" style="display:none;"><i class="sw" style="background:#f59e0b"></i> Energia potenziale elastica della molla</span>` : ''}
+              ${cfg.kind==='track' ? `<span id="${cfg.id}-eel-legend" style="display:none;"><i class="sw" style="background:#b7791f"></i> Energia potenziale elastica della molla</span>` : ''}
               <span><i class="sw" style="background:var(--c2)"></i> Energia cinetica</span>
               <span><i class="sw" style="background:var(--c3)"></i> Energia termica / dissipata</span>
               <span><i class="sw" style="background:var(--c4)"></i> Energia totale del sistema</span>
@@ -672,6 +674,8 @@ window.SIM_METADATA = {
         this.ui.resetBtn.onclick = () => this.reset();
       }
 
+      visible() { return this.canvas.offsetParent !== null; } // falso quando la scheda non è quella attiva
+      updateSpringControlVisibility() {} // solo la guida curva ha la molla: le altre schede non fanno nulla
       mass() { return parseFloat(this.ui.mass.value); }
       grav() { return 9.81; }
       mu() { return parseFloat(this.ui.mu.value); }
@@ -693,6 +697,7 @@ window.SIM_METADATA = {
         this.graph.height = Math.round(this.graphH * dpr);
         this.gctx.setTransform(dpr,0,0,dpr,0,0);
 
+        if (!this.visible()) return; // scheda nascosta: niente da disegnare
         if (typeof this.draw === 'function') this.draw();
         if (typeof this.drawGraph === 'function') this.drawGraph();
       }
@@ -765,11 +770,11 @@ window.SIM_METADATA = {
           ctx.stroke();
         };
 
-        plotLine('Ep', '#0077cc');
-        if (this.history.some(p => (p.Eel || 0) > 1e-6)) plotLine('Eel', '#f59e0b');
-        plotLine('Ek', '#e0142a');
-        plotLine('Eth', '#2e8b00');
-        plotLine('Etot', '#a855f7');
+        plotLine('Ep', '#1f6fd0');
+        if (this.history.some(p => (p.Eel || 0) > 1e-6)) plotLine('Eel', '#b7791f');
+        plotLine('Ek', '#c2491d');
+        plotLine('Eth', '#0e8a5a');
+        plotLine('Etot', '#6d4fc0');
       }
 
       updateLabels() {
@@ -835,8 +840,10 @@ window.SIM_METADATA = {
         const dt = Math.min(0.03, (ts - this.lastTs)/1000);
         this.lastTs = ts;
         if (this.running) this.step(dt);
-        this.draw();
-        this.drawGraph();
+        if (this.visible()) {
+          this.draw();
+          this.drawGraph();
+        }
         requestAnimationFrame((t) => this.loop(t));
       }
     }
@@ -1116,7 +1123,7 @@ window.SIM_METADATA = {
           const hGrid = (i/4)*maxH;
           const yy = y0 - hScale*hGrid;
           ctx.beginPath(); ctx.moveTo(18,yy); ctx.lineTo(w-20,yy); ctx.stroke();
-          ctx.fillStyle = '#64748b';
+          ctx.fillStyle = '#474c57';
           ctx.font = '12px Space Mono';
           ctx.fillText(`${hGrid.toFixed(1)} m`, 22, yy-5);
         }
@@ -1156,9 +1163,9 @@ window.SIM_METADATA = {
         const mag = Math.hypot(tangent.x,tangent.y) || 1;
         const tx = tangent.x/mag, ty = tangent.y/mag;
         const speedScale = Math.max(-80, Math.min(80, this.vx*26));
-        drawArrow(ctx, cx, cy-28, cx + tx*speedScale, cy-28 + ty*speedScale, '#e0142a', 3);
+        drawArrow(ctx, cx, cy-28, cx + tx*speedScale, cy-28 + ty*speedScale, '#c2491d', 3);
 
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#1b1d22';
         ctx.font = '600 14px Syne';
         ctx.textAlign = 'left';
         ctx.fillText('Quota di riferimento: y = 0', 18, h-18);
@@ -1270,7 +1277,8 @@ window.SIM_METADATA = {
         ctx.fillRect(0,0,w,h);
 
         const R = this.radius();
-        const scale = Math.min((w-120)/(6.2*R), (h-80)/(Math.max(this.h0(),2*R)+1.2));
+        // la scheda può essere nascosta (canvas di dimensione nulla): la scala non deve diventare negativa
+        const scale = Math.max(1e-3, Math.min((w-120)/(6.2*R), (h-80)/(Math.max(this.h0(),2*R)+1.2)));
         const ox = w*0.42;
         const oy = h-48;
         const toX = x => ox + x*scale;
@@ -1297,11 +1305,11 @@ window.SIM_METADATA = {
         const py = toY(this.visual?.y ?? this.h0());
         drawHeatedMass(ctx, px, py, 14 + 2*Math.sqrt(this.mass()), this.getHeatVisual());
 
-        drawArrow(ctx, px, py-28, px + 46, py-28, '#e0142a', 3);
+        drawArrow(ctx, px, py-28, px + 46, py-28, '#c2491d', 3);
 
         const vTopMin = Math.sqrt(this.grav()*R);
         const hMin = 2.5*R;
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#1b1d22';
         ctx.font = '600 14px Syne';
         ctx.fillText(`h₀,min ≈ ${hMin.toFixed(2)} m`, 24, 28);
         ctx.fillText(`v_top,min = √(gR) ≈ ${vTopMin.toFixed(2)} m/s`, 24, 50);
@@ -1389,7 +1397,7 @@ window.SIM_METADATA = {
         const bx = ox + L*scale*Math.sin(this.theta);
         const by = oy + L*scale*Math.cos(this.theta);
 
-        ctx.strokeStyle = '#cbd5e1';
+        ctx.strokeStyle = '#d9d5cb';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(ox, oy, L*scale, Math.PI/2 - this.angle0(), Math.PI/2 + this.angle0());
@@ -1398,13 +1406,13 @@ window.SIM_METADATA = {
         ctx.strokeStyle = '#1e293b';
         ctx.lineWidth = 4;
         ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(bx,by); ctx.stroke();
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#1b1d22';
         ctx.beginPath(); ctx.arc(ox,oy,7,0,Math.PI*2); ctx.fill();
         drawHeatedMass(ctx, bx, by, 16 + 2*Math.sqrt(this.mass()), this.getHeatVisual());
 
-        drawArrow(ctx, bx, by-28, bx + Math.cos(this.theta)*this.omega*L*22, by-28, '#e0142a', 3);
+        drawArrow(ctx, bx, by-28, bx + Math.cos(this.theta)*this.omega*L*22, by-28, '#c2491d', 3);
 
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#1b1d22';
         ctx.font = '600 14px Syne';
         ctx.fillText(`θ = ${(this.theta*180/Math.PI).toFixed(1)}°`, 24, 28);
         ctx.fillText(`L = ${L.toFixed(2)} m`, 24, 50);

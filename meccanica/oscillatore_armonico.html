@@ -15,26 +15,25 @@ window.SIM_METADATA = {
   level: "intermedio"
 };
 </script>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
-:root{--cream:#f5f0e8;--parchment:#ede6d4;--warm-mid:#d4c9b0;--ink:#1a1410;--ink-soft:#3a302a;--ink-light:#6a5a50;--accent:#8b3a2a;--accent2:#2a5a8b;--accent3:#2a7a4a;--border:#c4b89a;--shadow:rgba(26,20,16,0.12);--plot-bg:#faf7f2;}
+:root{--cream:var(--fs-paper);--parchment:var(--fs-surface-2);--warm-mid:var(--fs-line-2);--ink:var(--fs-ink);--ink-soft:var(--fs-ink-2);--ink-light:var(--fs-ink-3);--accent:var(--fs-red);--accent2:var(--fs-blue);--accent3:var(--fs-green);--border:var(--fs-line);--shadow:rgba(26,20,16,0.12);--plot-bg:var(--fs-surface);}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
 
 header{background:var(--ink);color:var(--cream);padding:2.5rem 3rem 2rem;border-bottom:3px solid var(--accent);}
-header .tag{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--warm-mid);margin-bottom:.5rem;}
-header h1{font-family:'EB Garamond',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:500;line-height:1.1;margin-bottom:.6rem;}
-header p{color:var(--warm-mid);font-family:'IBM Plex Sans',sans-serif;font-weight:300;font-size:.95rem;max-width:60ch;}
+header .tag{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--warm-mid);margin-bottom:.5rem;}
+header h1{font-family:'Crimson Pro',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:500;line-height:1.1;margin-bottom:.6rem;}
+header p{color:var(--warm-mid);font-family:'DM Sans',sans-serif;font-weight:300;font-size:.95rem;max-width:60ch;}
 main{max-width:1100px;margin:0 auto;padding:2rem 2rem 4rem;}
 
 /* TAB */
 .tabs-wrapper{margin-bottom:2.5rem;}
 .tab-bar{display:flex;border-bottom:2px solid var(--border);overflow-x:auto;}
-.tab-btn{font-family:'IBM Plex Mono',monospace;font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:.7rem 1.3rem;color:var(--ink-light);cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:.45rem;}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:.7rem 1.3rem;color:var(--ink-light);cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:.45rem;}
 .tab-btn .tn{font-size:.63rem;background:var(--warm-mid);color:var(--ink-soft);border-radius:2px;padding:.04rem .32rem;transition:background .15s,color .15s;}
 .tab-btn:hover{color:var(--ink);}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
@@ -46,47 +45,49 @@ main{max-width:1100px;margin:0 auto;padding:2rem 2rem 4rem;}
 /* CARD */
 .sim-card{background:white;border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:0 2px 12px var(--shadow);}
 .sim-card-header{background:var(--parchment);border-bottom:1px solid var(--border);padding:.85rem 1.4rem;display:flex;align-items:center;gap:.75rem;}
-.sim-card-header h3{font-family:'EB Garamond',serif;font-size:1.22rem;font-weight:500;color:var(--ink);}
-.badge{font-family:'IBM Plex Mono',monospace;font-size:.67rem;background:var(--accent);color:white;padding:.14rem .48rem;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;}
+.sim-card-header h3{font-family:'Crimson Pro',serif;font-size:1.22rem;font-weight:500;color:var(--ink);}
+.badge{font-family:'DM Mono',monospace;font-size:.67rem;background:var(--accent);color:white;padding:.14rem .48rem;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;}
 .badge.blue{background:var(--accent2);} .badge.green{background:var(--accent3);}
 .sim-body{display:grid;grid-template-columns:1fr 1fr;}
 @media(max-width:720px){.sim-body{grid-template-columns:1fr;}}
 .canvas-wrap{border-right:1px solid var(--border);padding:1.1rem;display:flex;flex-direction:column;align-items:center;gap:.65rem;background:var(--plot-bg);}
 .canvas-wrap canvas{display:block;}
 .plot-wrap{padding:1.1rem;display:flex;flex-direction:column;gap:.5rem;background:var(--plot-bg);}
-.plot-label{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--ink-light);letter-spacing:.06em;text-transform:uppercase;}
+.plot-label{font-family:'DM Mono',monospace;font-size:.67rem;color:var(--ink-light);letter-spacing:.06em;text-transform:uppercase;}
 
 /* CONTROLS */
 .controls{background:white;border-top:1px solid var(--border);padding:.95rem 1.4rem;display:flex;flex-wrap:wrap;gap:1.4rem;align-items:flex-end;}
 .ctrl-group{display:flex;flex-direction:column;gap:.22rem;min-width:140px;}
-.ctrl-group label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:.08em;}
-.ctrl-group .val{font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:var(--accent);font-weight:500;}
+.ctrl-group label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:.08em;}
+.ctrl-group .val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent);font-weight:500;}
 input[type=range]{-webkit-appearance:none;appearance:none;height:4px;background:var(--warm-mid);border-radius:2px;outline:none;width:155px;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid white;box-shadow:0 1px 4px var(--shadow);}
-.btn{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:.37rem .95rem;border-radius:2px;cursor:pointer;transition:background .15s,color .15s;}
+.btn{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:.37rem .95rem;border-radius:2px;cursor:pointer;transition:background .15s,color .15s;}
 .btn:hover{background:var(--ink);color:var(--cream);}
 .btn.accent{border-color:var(--accent);color:var(--accent);}
 .btn.accent:hover{background:var(--accent);color:white;}
 
-.info-callout{background:var(--parchment);border-left:3px solid var(--accent2);padding:.55rem .9rem;font-size:.79rem;color:var(--ink-soft);font-style:italic;font-family:'IBM Plex Mono',monospace;}
-.drag-hint{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--ink-light);}
-.regime-badge{display:inline-flex;align-items:center;gap:.42rem;font-family:'IBM Plex Mono',monospace;font-size:.71rem;color:var(--ink-soft);padding:.28rem .65rem;background:var(--parchment);border:1px solid var(--border);border-radius:2px;}
+.info-callout{background:var(--parchment);border-left:3px solid var(--accent2);padding:.55rem .9rem;font-size:.79rem;color:var(--ink-soft);font-style:italic;font-family:'DM Mono',monospace;}
+.drag-hint{font-family:'DM Mono',monospace;font-size:.67rem;color:var(--ink-light);}
+.regime-badge{display:inline-flex;align-items:center;gap:.42rem;font-family:'DM Mono',monospace;font-size:.71rem;color:var(--ink-soft);padding:.28rem .65rem;background:var(--parchment);border:1px solid var(--border);border-radius:2px;}
 .regime-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
 /* TEORIA */
 .theory-section{margin-top:3rem;padding-top:2rem;border-top:2px solid var(--border);}
-.theory-section h2{font-family:'EB Garamond',serif;font-size:2rem;font-weight:500;margin-bottom:1.5rem;color:var(--ink);}
+.theory-section h2{font-family:'Crimson Pro',serif;font-size:2rem;font-weight:500;margin-bottom:1.5rem;color:var(--ink);}
 .theory-block{background:white;border:1px solid var(--border);border-radius:4px;padding:1.8rem 2rem;margin-bottom:1.8rem;box-shadow:0 1px 6px var(--shadow);}
-.theory-block h3{font-family:'EB Garamond',serif;font-size:1.4rem;font-weight:500;margin-bottom:.8rem;color:var(--ink);padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+.theory-block h3{font-family:'Crimson Pro',serif;font-size:1.4rem;font-weight:500;margin-bottom:.8rem;color:var(--ink);padding-bottom:.5rem;border-bottom:1px solid var(--border);}
 .theory-block p{font-size:.93rem;color:var(--ink-soft);margin-bottom:.9rem;line-height:1.75;}
 .theory-block p:last-child{margin-bottom:0;}
 .eq-box{background:var(--plot-bg);border:1px solid var(--border);border-radius:3px;padding:1rem 1.5rem;margin:1rem 0;text-align:center;overflow-x:auto;}
-.eq-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem;text-align:left;}
+.eq-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem;text-align:left;}
 .two-col-theory{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
 @media(max-width:700px){.two-col-theory{grid-template-columns:1fr;}}
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <header>
   <div class="tag">Fisica — Meccanica / Simulazione Interattiva</div>
   <h1>L'Oscillatore Armonico</h1>
@@ -265,7 +266,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 /* ══════════════════════════════════════════════
    COSTANTI COLORI
 ══════════════════════════════════════════════ */
-const INK='#1a1410',INK_LIGHT='#6a5a50',ACCENT='#8b3a2a',ACCENT2='#2a5a8b',ACCENT3='#2a7a4a',WARM_MID='#d4c9b0',BORDER='#c4b89a';
+const INK='#1b1d22',INK_LIGHT='#7d828c',ACCENT='#c2491d',ACCENT2='#1f6fd0',ACCENT3='#0e8a5a',WARM_MID='#c6c1b5',BORDER='#d9d5cb';
 
 /* ══════════════════════════════════════════════
    BUFFER CIRCOLARE
@@ -305,7 +306,7 @@ function drawPlot(ctx,w,h,bufs,colors,opts){
   const pw=w-p.l-p.r, ph=h-p.t-p.b;
   const rng=yMax-yMin;
 
-  ctx.fillStyle='#faf7f2'; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#fffdf9'; ctx.fillRect(0,0,w,h);
 
   // Asse Y
   ctx.strokeStyle=BORDER; ctx.lineWidth=.9;
@@ -330,7 +331,7 @@ function drawPlot(ctx,w,h,bufs,colors,opts){
     return [...ticks].filter(v=>v>=yMin-1e-9&&v<=yMax+1e-9);
   };
 
-  ctx.font='8px "IBM Plex Mono"';
+  ctx.font='8px "DM Mono"';
   makeYTicks().forEach(val=>{
     const yp=p.t+ph*(1-(val-yMin)/rng);
     // griglia
@@ -358,7 +359,7 @@ function drawPlot(ctx,w,h,bufs,colors,opts){
   // Tick e label X (tempo)
   if(xDur&&xDur>0){
     const nX=4;
-    ctx.font='8px "IBM Plex Mono"'; ctx.fillStyle=INK_LIGHT;
+    ctx.font='8px "DM Mono"'; ctx.fillStyle=INK_LIGHT;
     for(let i=0;i<=nX;i++){
       const frac=i/nX, xp=p.l+frac*pw, tv=xDur*frac;
       ctx.strokeStyle=INK_LIGHT; ctx.lineWidth=.8;
@@ -372,7 +373,7 @@ function drawPlot(ctx,w,h,bufs,colors,opts){
 
   // Legenda
   if(legend){
-    ctx.font='9px "IBM Plex Mono"';
+    ctx.font='9px "DM Mono"';
     legend.forEach((l,i)=>{ctx.fillStyle=l.color; ctx.fillText(l.label, p.l+6+i*36, p.t+10);});
   }
 
@@ -424,7 +425,12 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
     const Ek0=.5*m*(om*L)*(om*L), Ep0=m*g*L*(1-Math.cos(th));
     eScale=Math.max(.01,Ek0+Ep0);
   }
-  function info(){const w0=Math.sqrt(g/L),T=2*Math.PI/w0;document.getElementById('pendInfo').textContent=`ω₀ = ${w0.toFixed(3)} rad/s  |  T = ${T.toFixed(3)} s  |  θ₀ = ${(th*180/Math.PI).toFixed(1)}°`;}
+  // Periodo esatto del pendolo rilasciato da fermo con ampiezza θ₀:
+  //   T = T₀ / M(1, cos(θ₀/2)),   T₀ = 2π√(L/g),
+  // dove M è la media aritmetico-geometrica (forma chiusa dell'integrale ellittico completo).
+  // Per θ₀ → 0 si ritrova T₀; a 60° il periodo è già il 7% più lungo.
+  function agm(a,b){for(let i=0;i<12;i++){const m=(a+b)/2;b=Math.sqrt(a*b);a=m;}return a;}
+  function info(){const w0=Math.sqrt(g/L),T0=2*Math.PI/w0,T=T0/agm(1,Math.cos(Math.abs(th)/2));document.getElementById('pendInfo').textContent=`ω₀ = ${w0.toFixed(3)} rad/s  |  T₀ = ${T0.toFixed(3)} s (piccole oscillazioni)  |  T = ${T.toFixed(3)} s (per θ₀ = ${(Math.abs(th)*180/Math.PI).toFixed(1)}°)`;}
   function reset(){th=0.5;om=0;simT=0;tBuf.clear();ekBuf.clear();epBuf.clear();etBuf.clear();setScales();info();}
 
   function rk4(a,b,dt){
@@ -437,7 +443,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
   function mpx(){return{x:piv.x+L*PPM*Math.sin(th),y:piv.y+L*PPM*Math.cos(th)};}
 
   function draw(){
-    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fffdf9';ctx.fillRect(0,0,W,H);
     ctx.fillStyle=INK;ctx.fillRect(piv.x-36,28,72,10);ctx.fillRect(piv.x-1,28,2,20);
     const len=L*PPM;
     ctx.save();ctx.globalAlpha=.13;ctx.strokeStyle=ACCENT2;ctx.lineWidth=1;
@@ -452,7 +458,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
     const vt=om*L*PPM;
     arrow(ctx,pos.x,pos.y,pos.x+vt*.45*Math.cos(th),pos.y-vt*.45*Math.sin(th),ACCENT2,1.5);
     ctx.beginPath();ctx.arc(piv.x,piv.y,4,0,Math.PI*2);ctx.fillStyle=INK;ctx.fill();
-    ctx.fillStyle=INK_LIGHT;ctx.font='11px "IBM Plex Mono"';
+    ctx.fillStyle=INK_LIGHT;ctx.font='11px "DM Mono"';
     ctx.fillText(`θ = ${(th*180/Math.PI).toFixed(2)}°`,10,H-30);
     ctx.fillText(`ω = ${om.toFixed(3)} rad/s`,10,H-14);
   }
@@ -521,23 +527,23 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
   }
 
   function draw(){
-    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fffdf9';ctx.fillRect(0,0,W,H);
     const cx=W/2,mpy=mPY();
     ctx.fillStyle=INK;ctx.fillRect(cx-42,CEIL-10,84,10);
     ctx.strokeStyle=BORDER;ctx.lineWidth=1;
     for(let i=-38;i<42;i+=12){ctx.beginPath();ctx.moveTo(cx+i,CEIL-10);ctx.lineTo(cx+i+8,CEIL);ctx.stroke();}
     ctx.strokeStyle=ACCENT3;ctx.lineWidth=1;ctx.setLineDash([4,3]);
     ctx.beginPath();ctx.moveTo(cx-60,EQY);ctx.lineTo(cx+60,EQY);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=ACCENT3;ctx.font='9px "IBM Plex Mono"';ctx.textAlign='right';ctx.fillText('x=0 (eq.)',cx-62,EQY+4);ctx.textAlign='left';
+    ctx.fillStyle=ACCENT3;ctx.font='9px "DM Mono"';ctx.textAlign='right';ctx.fillText('x=0 (eq.)',cx-62,EQY+4);ctx.textAlign='left';
     if(Math.abs(x)>.01)arrow(ctx,cx+48,EQY,cx+48,EQY+x*PPM,ACCENT,1.5);
     ctx.strokeStyle=INK;ctx.lineWidth=1.5;coil(ctx,cx,CEIL,mpy-MR,8,13);
     const gr=ctx.createRadialGradient(cx-5,mpy-5,2,cx,mpy,MR);
     gr.addColorStop(0,'#c8956a');gr.addColorStop(1,ACCENT);
     ctx.beginPath();ctx.arc(cx,mpy,MR,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
     ctx.strokeStyle='#6a2a1a';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.fillStyle='white';ctx.font='12px "IBM Plex Sans"';ctx.textAlign='center';ctx.fillText('m',cx,mpy+5);ctx.textAlign='left';
+    ctx.fillStyle='white';ctx.font='12px "DM Sans"';ctx.textAlign='center';ctx.fillText('m',cx,mpy+5);ctx.textAlign='left';
     if(Math.abs(v)>.01)arrow(ctx,cx+MR+5,mpy,cx+MR+5,mpy+v*PPM*.5,ACCENT2,1.5);
-    ctx.fillStyle=INK_LIGHT;ctx.font='10px "IBM Plex Mono"';
+    ctx.fillStyle=INK_LIGHT;ctx.font='10px "DM Mono"';
     ctx.fillText(`x = ${x.toFixed(3)} m`,10,H-28);ctx.fillText(`v = ${v.toFixed(3)} m/s`,10,H-12);
     const w0=Math.sqrt(k/m);ctx.fillText(`ω₀=${w0.toFixed(2)} rad/s  T=${(2*Math.PI/w0).toFixed(2)} s`,10,18);
   }
@@ -562,7 +568,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
   document.getElementById('springPause').addEventListener('click',()=>{paused=!paused;document.getElementById('springPause').textContent=paused?'Riprendi':'Pausa';});
 
   function drawPhase(){
-    phCtx.fillStyle='#faf7f2';phCtx.fillRect(0,0,PHW,PHH);
+    phCtx.fillStyle='#fffdf9';phCtx.fillRect(0,0,PHW,PHH);
     const w0=Math.sqrt(k/m),A=Math.sqrt(x*x+(v/w0)*(v/w0)),sc=Math.max(.05,A*1.35);
     const pad={l:38,r:8,t:10,b:20};
     const pw=PHW-pad.l-pad.r,ph=PHH-pad.t-pad.b;
@@ -574,7 +580,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
     phCtx.beginPath();phCtx.moveTo(pad.l,cy);phCtx.lineTo(pad.l+pw,cy);phCtx.stroke();
     phCtx.beginPath();phCtx.moveTo(cx,pad.t);phCtx.lineTo(cx,pad.t+ph);phCtx.stroke();
     // tick/label x
-    phCtx.font='8px "IBM Plex Mono"';phCtx.fillStyle=INK_LIGHT;
+    phCtx.font='8px "DM Mono"';phCtx.fillStyle=INK_LIGHT;
     [[-sc,sc],[0,0],[sc,sc]].forEach(([val,abs])=>{
       const px=pad.l+(val+sc)/(2*sc)*pw;
       phCtx.strokeStyle=INK_LIGHT;phCtx.lineWidth=.8;
@@ -646,7 +652,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
   function drawDamp(ctx,x1,x2,y){const hbw=18,hbh=13,mid=(x1+x2)/2;ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(mid-hbw,y);ctx.stroke();ctx.strokeRect(mid-hbw,y-hbh,hbw*2,hbh*2);ctx.strokeStyle=ACCENT;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mid,y-hbh+2);ctx.lineTo(mid,y+hbh-2);ctx.stroke();ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(mid+hbw,y);ctx.lineTo(x2,y);ctx.stroke();}
 
   function draw(){
-    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fffdf9';ctx.fillRect(0,0,W,H);
     ctx.fillStyle=INK;ctx.fillRect(wallX-10,0,10,H);ctx.strokeStyle=BORDER;ctx.lineWidth=1;
     for(let y=0;y<H;y+=14){ctx.beginPath();ctx.moveTo(wallX-10,y);ctx.lineTo(wallX,y+10);ctx.stroke();}
     const mx=mPx();
@@ -656,9 +662,9 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
     ctx.strokeStyle=ACCENT3;ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(restX+mW/2,10);ctx.lineTo(restX+mW/2,H-10);ctx.stroke();ctx.setLineDash([]);
     const gr=ctx.createLinearGradient(mx,sY-mH/2,mx,sY+mH/2);gr.addColorStop(0,'#c8956a');gr.addColorStop(1,ACCENT);
     ctx.fillStyle=gr;ctx.strokeStyle='#6a2a1a';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(mx,sY-mH/2,mW,mH,4);ctx.fill();ctx.stroke();
-    ctx.fillStyle='white';ctx.font='11px "IBM Plex Sans"';ctx.textAlign='center';ctx.fillText('m',mx+mW/2,sY+4);ctx.textAlign='left';
+    ctx.fillStyle='white';ctx.font='11px "DM Sans"';ctx.textAlign='center';ctx.fillText('m',mx+mW/2,sY+4);ctx.textAlign='left';
     const w0=Math.sqrt(k/m),gm=b/(2*m);
-    ctx.fillStyle=INK_LIGHT;ctx.font='10px "IBM Plex Mono"';
+    ctx.fillStyle=INK_LIGHT;ctx.font='10px "DM Mono"';
     ctx.fillText(`x=${x.toFixed(4)} m`,10,H-28);ctx.fillText(`ω₀=${w0.toFixed(2)}, γ=${gm.toFixed(2)}`,10,H-12);
 
     // Overlay "sistema a riposo"
@@ -667,9 +673,9 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
       ctx.fillStyle='rgba(250,247,242,0.82)';
       ctx.fillRect(0,H/2-28,W,56);
       ctx.fillStyle=ACCENT3;
-      ctx.font='bold 13px "IBM Plex Sans"';ctx.textAlign='center';
+      ctx.font='bold 13px "DM Sans"';ctx.textAlign='center';
       ctx.fillText('Sistema a riposo — equilibrio raggiunto',W/2,H/2-6);
-      ctx.font='10px "IBM Plex Mono"';ctx.fillStyle=INK_LIGHT;
+      ctx.font='10px "DM Mono"';ctx.fillStyle=INK_LIGHT;
       ctx.fillText('Modifica i parametri o premi Reset per ripartire',W/2,H/2+14);
       ctx.restore();
       ctx.textAlign='left';
@@ -728,7 +734,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
   function reset(){x=0;v=0;t=0;xBuf.clear();yScale=Math.max(.1,Ath(omega)*2.5);}
 
   function drawRes(){
-    rCtx.fillStyle='#faf7f2';rCtx.fillRect(0,0,RW,RH);
+    rCtx.fillStyle='#fffdf9';rCtx.fillRect(0,0,RW,RH);
     const pad={l:42,r:8,t:10,b:24};
     const pw=RW-pad.l-pad.r,ph=RH-pad.t-pad.b;
     const wMax=Math.max(omega0*3.5,omega*1.3);
@@ -741,7 +747,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
     rCtx.beginPath();rCtx.moveTo(pad.l,pad.t+ph);rCtx.lineTo(RW-pad.r,pad.t+ph);rCtx.stroke();
 
     // Griglia Y orizzontale
-    rCtx.font='8px "IBM Plex Mono"';rCtx.fillStyle=INK_LIGHT;
+    rCtx.font='8px "DM Mono"';rCtx.fillStyle=INK_LIGHT;
     const yTicks=[Amax, Amax/2, 0];
     yTicks.forEach(val=>{
       const yp=pad.t+ph*(1-val/Amax);
@@ -770,7 +776,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
     const x0=pad.l+(omega0/wMax)*pw;
     rCtx.strokeStyle=ACCENT3;rCtx.lineWidth=1;rCtx.setLineDash([5,3]);
     rCtx.beginPath();rCtx.moveTo(x0,pad.t);rCtx.lineTo(x0,pad.t+ph);rCtx.stroke();rCtx.setLineDash([]);
-    rCtx.fillStyle=ACCENT3;rCtx.font='9px "IBM Plex Mono"';rCtx.textAlign='center';
+    rCtx.fillStyle=ACCENT3;rCtx.font='9px "DM Mono"';rCtx.textAlign='center';
     rCtx.fillText('ω₀',x0,pad.t+10);
 
     // Linea ω corrente
@@ -793,7 +799,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
     rCtx.beginPath();rCtx.arc(xw,cpy,5.5,0,Math.PI*2);rCtx.fillStyle=ACCENT;rCtx.fill();
     rCtx.strokeStyle='white';rCtx.lineWidth=1.5;rCtx.stroke();
     // Label ω
-    rCtx.fillStyle=ACCENT;rCtx.font='9px "IBM Plex Mono"';rCtx.textAlign='center';
+    rCtx.fillStyle=ACCENT;rCtx.font='9px "DM Mono"';rCtx.textAlign='center';
     rCtx.fillText('ω',xw,pad.t+ph+14);rCtx.textAlign='left';
   }
 
@@ -801,7 +807,7 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
   function mPx(){return rX+x*PPM;}
   function coilH(ctx,x1,x2,y,coils,amp){const len=Math.max(2,x2-x1),seg=len/(coils*2+2);ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x1+seg,y);for(let i=0;i<coils*2;i++){const px=x1+seg+(i+.5)*seg,py=y+(i%2===0?-amp:amp);ctx.lineTo(px,py);}ctx.lineTo(x2,y);ctx.stroke();}
   function drawScene(){
-    ctx.fillStyle='#faf7f2';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fffdf9';ctx.fillRect(0,0,W,H);
     ctx.fillStyle=INK;ctx.fillRect(wX-10,0,10,H);ctx.strokeStyle=BORDER;ctx.lineWidth=1;
     for(let y=0;y<H;y+=14){ctx.beginPath();ctx.moveTo(wX-10,y);ctx.lineTo(wX,y+10);ctx.stroke();}
     const mx=mPx();
@@ -815,15 +821,15 @@ function arrow(ctx,x1,y1,x2,y2,col,lw=1.5){
       const aF=F>0?0:Math.PI,hs=8;
       ctx.strokeStyle=ACCENT3;ctx.fillStyle=ACCENT3;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx1,sY);ctx.lineTo(fx2,sY);ctx.stroke();
       ctx.beginPath();ctx.moveTo(fx2,sY);ctx.lineTo(fx2-hs*Math.cos(aF-.4),sY-hs*Math.sin(aF-.4));ctx.lineTo(fx2-hs*Math.cos(aF+.4),sY-hs*Math.sin(aF+.4));ctx.closePath();ctx.fill();
-      ctx.font='9px "IBM Plex Mono"';ctx.textAlign='center';ctx.fillText('F(t)',fx1+(fx2-fx1)/2,sY-12);ctx.textAlign='left';
+      ctx.font='9px "DM Mono"';ctx.textAlign='center';ctx.fillText('F(t)',fx1+(fx2-fx1)/2,sY-12);ctx.textAlign='left';
     }
     const gr=ctx.createLinearGradient(mx,sY-mH/2,mx,sY+mH/2);gr.addColorStop(0,'#c8956a');gr.addColorStop(1,ACCENT);
     ctx.fillStyle=gr;ctx.strokeStyle='#6a2a1a';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(mx,sY-mH/2,mW,mH,4);ctx.fill();ctx.stroke();
-    ctx.fillStyle='white';ctx.font='11px "IBM Plex Sans"';ctx.textAlign='center';ctx.fillText('m',mx+mW/2,sY+4);ctx.textAlign='left';
+    ctx.fillStyle='white';ctx.font='11px "DM Sans"';ctx.textAlign='center';ctx.fillText('m',mx+mW/2,sY+4);ctx.textAlign='left';
     ctx.strokeStyle=ACCENT3;ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(rX+mW/2,10);ctx.lineTo(rX+mW/2,H-10);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=INK_LIGHT;ctx.font='10px "IBM Plex Mono"';
+    ctx.fillStyle=INK_LIGHT;ctx.font='10px "DM Mono"';
     ctx.fillText(`x=${x.toFixed(3)} m`,10,H-28);ctx.fillText(`ω/ω₀=${(omega/omega0).toFixed(3)}`,10,H-12);
-    if(Math.abs(omega/omega0-1)<.07){ctx.fillStyle=ACCENT;ctx.font='bold 11px "IBM Plex Sans"';ctx.fillText('⚡ RISONANZA',W/2-44,22);}
+    if(Math.abs(omega/omega0-1)<.07){ctx.fillStyle=ACCENT;ctx.font='bold 11px "DM Sans"';ctx.fillText('⚡ RISONANZA',W/2-44,22);}
   }
 
   ['forceOmega0','forceOmega','forceF0','forceGamma'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{

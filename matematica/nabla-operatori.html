@@ -15,29 +15,27 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gradiente, Divergenza e Rotore</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 :root{
-  --bg:#f5f0e8;
-  --bg2:#ece4d7;
-  --bg3:#e3d8c8;
-  --panel:#fbf8f3;
-  --ink:#1e1812;
-  --ink2:#5b4f43;
-  --ink3:#877867;
-  --accent:#9e3d18;
-  --accent2:#1f6a8a;
-  --accent3:#2f7b47;
-  --accent4:#7a3f95;
-  --border:#c9baa6;
-  --mono:'IBM Plex Mono', monospace;
-  --sans:'IBM Plex Sans', sans-serif;
-  --serif:'EB Garamond', Georgia, serif;
+  --bg:var(--fs-paper);
+  --bg2:var(--fs-surface-2);
+  --bg3:var(--fs-surface-3);
+  --panel:var(--fs-surface);
+  --ink:var(--fs-ink);
+  --ink2:var(--fs-ink-2);
+  --ink3:var(--fs-ink-3);
+  --accent:var(--fs-red);
+  --accent2:var(--fs-blue);
+  --accent3:var(--fs-green);
+  --accent4:var(--fs-violet);
+  --border:var(--fs-line);
+  --mono:'DM Mono', monospace;
+  --sans:'DM Sans', sans-serif;
+  --serif:'Crimson Pro', Georgia, serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -324,8 +322,10 @@ ul.clean li+li{margin-top:.4rem}
   canvas,.canvas-wrap{height:480px;min-height:480px}
 }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <header>
   <h1>Gradiente, divergenza e rotore</h1>
   <p>
@@ -1072,14 +1072,14 @@ function renderGradient(){
 
   ctx.save();
   ctx.fillStyle = '#fff';
-  ctx.strokeStyle = '#1e1812';
+  ctx.strokeStyle = '#1b1d22';
   ctx.lineWidth = 1.8;
   ctx.beginPath();
   ctx.arc(px, py, 6.5, 0, Math.PI*2);
   ctx.fill();
   ctx.stroke();
   ctx.font = '13px IBM Plex Mono';
-  ctx.fillStyle = '#1e1812';
+  ctx.fillStyle = '#1b1d22';
   ctx.fillText('P', px + 10, py - 10);
   ctx.fillText('∇f', px + g.gx*scale + 8, py - g.gy*scale - 6);
   ctx.restore();
@@ -1158,18 +1158,18 @@ function renderDivergence(){
 
   const F0 = sampleVectorDiv(div.preset.value, p.x, p.y);
   const px = m.xToPx(p.x), py = m.yToPx(p.y);
-  drawArrow(ctx, px, py, px + F0.fx*scale*1.25, py - F0.fy*scale*1.25, '#7a3f95', 3.1);
+  drawArrow(ctx, px, py, px + F0.fx*scale*1.25, py - F0.fy*scale*1.25, '#6d4fc0', 3.1);
 
   ctx.save();
   ctx.fillStyle = '#fff';
-  ctx.strokeStyle = '#1e1812';
+  ctx.strokeStyle = '#1b1d22';
   ctx.lineWidth = 1.6;
   ctx.beginPath();
   ctx.arc(px, py, 5.8, 0, Math.PI*2);
   ctx.fill();
   ctx.stroke();
   ctx.font = '13px IBM Plex Mono';
-  ctx.fillStyle = '#1e1812';
+  ctx.fillStyle = '#1b1d22';
   ctx.fillText('P', px + 10, py - 9);
   ctx.restore();
 
@@ -1212,7 +1212,7 @@ function renderCurl(){
   const F0 = sampleVectorCurl(curl.preset.value, p.x, p.y);
   const px = m.xToPx(p.x), py = m.yToPx(p.y);
 
-  drawArrow(ctx, px, py, px + F0.fx*scale*1.3, py - F0.fy*scale*1.3, '#7a3f95', 3.1);
+  drawArrow(ctx, px, py, px + F0.fx*scale*1.3, py - F0.fy*scale*1.3, '#6d4fc0', 3.1);
 
   const rWorld = parseFloat(curl.wheelInput.value);
   const rx = Math.abs(m.xToPx(p.x + rWorld) - px);
@@ -1244,21 +1244,21 @@ function renderCurl(){
     ctx.stroke();
   }
   ctx.beginPath();
-  ctx.fillStyle = '#1e1812';
+  ctx.fillStyle = '#1b1d22';
   ctx.arc(0,0,4.6,0,Math.PI*2);
   ctx.fill();
   ctx.restore();
 
   ctx.save();
   ctx.fillStyle = '#fff';
-  ctx.strokeStyle = '#1e1812';
+  ctx.strokeStyle = '#1b1d22';
   ctx.lineWidth = 1.6;
   ctx.beginPath();
   ctx.arc(px, py, 4.8, 0, Math.PI*2);
   ctx.fill();
   ctx.stroke();
   ctx.font = '13px IBM Plex Mono';
-  ctx.fillStyle = '#1e1812';
+  ctx.fillStyle = '#1b1d22';
   ctx.fillText('P', px + 10, py - 9);
   ctx.restore();
 

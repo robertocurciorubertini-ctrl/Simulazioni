@@ -31,7 +31,6 @@ window.SIM_METADATA = {
 <meta property="og:type" content="website">
 <meta property="og:locale" content="it_IT">
 
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -42,15 +41,15 @@ window.SIM_METADATA = {
    VARIABILI E RESET
 ═══════════════════════════════════════════ */
 :root {
-  --cream:     #f4f0e6;
-  --cream2:    #ece6d6;
-  --cream3:    #e4dcc8;
-  --ink:       #18140f;
-  --ink-soft:  #3a322a;
-  --ink-muted: #7a6e60;
-  --border:    #c8b89a;
-  --panel:     #eee8d8;
-  --panel-b:   #d8cbb4;
+  --cream:     var(--fs-paper);
+  --cream2:    var(--fs-surface-2);
+  --cream3:    var(--fs-surface-3);
+  --ink:       var(--fs-ink);
+  --ink-soft:  var(--fs-ink-2);
+  --ink-muted: var(--fs-ink-3);
+  --border:    var(--fs-line);
+  --panel:     var(--fs-surface-2);
+  --panel-b:   var(--fs-line);
 
   --hot:   #c8402a;
   --warm:  #d4802a;
@@ -71,7 +70,7 @@ window.SIM_METADATA = {
 body {
   background: var(--cream);
   color: var(--ink);
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-weight: 300;
   min-height: 100vh;
   line-height: 1.6;
@@ -90,13 +89,13 @@ header {
   border-bottom: 3px solid var(--warm);
 }
 header h1 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.55rem;
   font-weight: 500;
   letter-spacing: 0.01em;
 }
 header .tag {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   color: var(--warm);
   text-transform: uppercase;
@@ -121,7 +120,7 @@ header .tag {
 }
 .tab-btn {
   padding: 10px 22px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -148,7 +147,7 @@ header .tag {
   padding: 16px 18px;
 }
 .panel-title {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.05rem;
   font-weight: 500;
   border-bottom: 1px solid var(--border);
@@ -156,7 +155,7 @@ header .tag {
   margin-bottom: 12px;
 }
 .sim-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.66rem;
   color: var(--ink-muted);
   text-transform: uppercase;
@@ -198,12 +197,12 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
   flex-shrink: 0;
 }
 .mat-name {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.05rem;
   font-weight: 500;
 }
 .mat-formula {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.64rem;
   color: var(--ink-muted);
   margin-left: auto;
@@ -230,7 +229,7 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.68rem;
 }
 .data-row .dl { color: var(--ink-muted); }
@@ -258,12 +257,12 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
   margin-bottom: 12px;
 }
 .q-control-header h3 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.1rem;
   font-weight: 500;
 }
 .q-amount {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 1.2rem;
   font-weight: 500;
   color: var(--hot);
@@ -275,7 +274,7 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
   gap: 12px;
 }
 .q-slider-row label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   color: var(--ink-muted);
   white-space: nowrap;
@@ -299,7 +298,7 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
   border: 1.5px solid var(--border);
   border-radius: 3px;
   background: var(--cream);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.68rem;
   cursor: pointer;
   transition: 0.13s;
@@ -328,7 +327,7 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
   border: 1.5px solid var(--border);
   border-radius: 20px;
   background: var(--cream);
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 0.75rem;
   cursor: pointer;
   transition: 0.13s;
@@ -362,14 +361,14 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
   padding: 8px 10px;
 }
 .kpi-box .kl {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.59rem;
   color: var(--ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
 .kpi-box .kv {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 1rem;
   font-weight: 500;
   margin-top: 2px;
@@ -384,7 +383,7 @@ canvas { display: block; border: 1.5px solid var(--border); border-radius: 3px; 
 .sl-label {
   display: flex;
   justify-content: space-between;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.64rem;
   color: var(--ink-muted);
   margin-bottom: 3px;
@@ -400,7 +399,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
   border-radius: 3px;
   background: var(--cream);
   color: var(--ink);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.69rem;
   cursor: pointer;
   transition: 0.14s;
@@ -438,7 +437,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
   display: flex;
   align-items: center;
   gap: 5px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.61rem;
   color: var(--ink-soft);
 }
@@ -453,7 +452,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
   padding: 0 24px 52px;
 }
 .sec-title {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.6rem;
   font-weight: 500;
   text-align: center;
@@ -465,7 +464,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
   margin: 0 auto 24px;
 }
 .exp-intro {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.02rem;
   line-height: 1.8;
   color: var(--ink-soft);
@@ -485,7 +484,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
   padding: 18px 20px;
 }
 .ec h3 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.1rem;
   font-weight: 500;
   margin-bottom: 9px;
@@ -524,7 +523,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
 .mat-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
   margin-top: 10px;
 }
@@ -558,8 +557,10 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
   .gas-layout { grid-template-columns: 1fr; }
 }
 </style>
+<link rel="stylesheet" href="../../assets/sim.css">
+<script src="../../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Calore e Capacità Termica</h1>
@@ -592,7 +593,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
           <div class="mat-selector" id="sel-B"></div>
         </div>
       </div>
-      <div style="margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:0.63rem;color:var(--ink-muted);">
+      <div style="margin-top:10px;font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--ink-muted);">
         Stessa quantità di calore Q viene ceduta a entrambi i corpi. Il materiale con calore specifico minore si scalda di più.
       </div>
     </div>
@@ -610,7 +611,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
         <label>500 kJ</label>
       </div>
       <div class="rate-row">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--ink-muted);align-self:center;">Massa:</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-muted);align-self:center;">Massa:</div>
         <button class="rate-btn" onclick="setMass(0.5)">0.5 kg</button>
         <button class="rate-btn active" onclick="setMass(1)">1 kg</button>
         <button class="rate-btn" onclick="setMass(2)">2 kg</button>
@@ -699,7 +700,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
       <div class="legend-row" style="margin-top:8px;">
         <div class="li"><div class="ld" id="leg-dot-A"></div><span id="leg-name-A">Acqua</span></div>
         <div class="li"><div class="ld" id="leg-dot-B"></div><span id="leg-name-B">Ferro</span></div>
-        <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--ink-muted);">
+        <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-muted);">
           pendenza = 1/(mc) &nbsp;|&nbsp; linea più ripida → scalda più facilmente
         </div>
       </div>
@@ -722,7 +723,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
           <div class="legend-row" style="margin-top:8px;">
             <div class="li"><div class="ld" style="background:#3060c0;"></div>Lente (fredde)</div>
             <div class="li"><div class="ld" style="background:#c04020;"></div>Veloci (calde)</div>
-            <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--ink-muted);" id="gas-T-label">T = 1.0</div>
+            <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--ink-muted);" id="gas-T-label">T = 1.0</div>
           </div>
         </div>
 
@@ -770,11 +771,11 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
 
           <!-- v_rms speedometer -->
           <div style="margin-top:10px;">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--ink-muted);margin-bottom:4px;">Energia cinetica media relativa</div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-muted);margin-bottom:4px;">Energia cinetica media relativa</div>
             <div class="speed-bar">
               <div class="speed-cursor" id="spd-cursor" style="left:20%"></div>
             </div>
-            <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--ink-muted);margin-top:2px;">
+            <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--ink-muted);margin-top:2px;">
               <span>Freddo</span><span>Caldo</span>
             </div>
           </div>
@@ -805,7 +806,7 @@ input[type=range] { width: 100%; accent-color: var(--hot); height: 4px; cursor: 
             <button class="btn" onclick="clearVrmsHistory()">Pulisci grafico</button>
           </div>
 
-          <div style="margin-top:12px;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--ink-muted);line-height:1.6;">
+          <div style="margin-top:12px;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-muted);line-height:1.6;">
             T aumenta → distribuzione più larga → v<sub>rms</sub> maggiore → ⟨E<sub>k</sub>⟩ maggiore.<br>
             $v_\text{rms} = \sqrt{2k_BT/m}$ &nbsp;(in 2D, con m=k_B=1)
           </div>
@@ -1291,7 +1292,7 @@ function drawMB() {
   const W = canvas.width, H = canvas.height;
   const T = gasGetT();
 
-  ctx.fillStyle = '#f4f0e6';
+  ctx.fillStyle = '#f4f1ea';
   ctx.fillRect(0,0,W,H);
 
   const pad = {l:46,r:16,t:12,b:36};
@@ -1378,7 +1379,7 @@ function drawVrmsPlot() {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
 
-  ctx.fillStyle = '#f4f0e6';
+  ctx.fillStyle = '#f4f1ea';
   ctx.fillRect(0,0,W,H);
 
   const pad = {l:46,r:16,t:12,b:28};
@@ -1437,7 +1438,7 @@ function drawTHistory() {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
 
-  ctx.fillStyle = '#f4f0e6';
+  ctx.fillStyle = '#f4f1ea';
   ctx.fillRect(0,0,W,H);
   if (tHistory.length < 2) return;
 
@@ -1467,7 +1468,7 @@ function updateQtPlot() {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
 
-  ctx.fillStyle = '#f4f0e6';
+  ctx.fillStyle = '#f4f1ea';
   ctx.fillRect(0,0,W,H);
 
   const pad = {l:52,r:20,t:16,b:36};

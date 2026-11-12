@@ -17,16 +17,16 @@
   </script>
   <style>
     :root {
-      --bg: #f7f8fb;
-      --panel: #ffffff;
-      --panel-2: #f2f5fa;
-      --text: #18212f;
-      --muted: #5f6f86;
-      --border: #d7dfeb;
-      --accent: #2457d6;
-      --accent-soft: rgba(36, 87, 214, 0.10);
-      --good: #117a4b;
-      --warn: #995f00;
+      --bg: var(--fs-paper);
+      --panel: var(--fs-surface);
+      --panel-2: var(--fs-surface-2);
+      --text: var(--fs-ink);
+      --muted: var(--fs-ink-2);
+      --border: var(--fs-line);
+      --accent: var(--fs-blue);
+      --accent-soft: rgba(31, 111, 208, 0.10);
+      --good: var(--fs-green);
+      --warn: var(--fs-amber);
       --shadow: 0 14px 40px rgba(24, 33, 47, 0.08);
       --radius: 18px;
     }
@@ -35,7 +35,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      font-family: 'DM Sans', "DM Sans", Arial, sans-serif;
       background:
         radial-gradient(circle at top left, rgba(36, 87, 214, 0.08), transparent 26%),
         radial-gradient(circle at top right, rgba(17, 122, 75, 0.06), transparent 18%),
@@ -553,8 +553,10 @@
       .stats { grid-template-columns: 1fr; }
     }
   </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
   <div class="page">
     <section class="hero panel">
       <div class="eyebrow">📘 Archivio di riferimento · Sistema Internazionale</div>
@@ -1208,12 +1210,12 @@
         id: "molarVolume",
         name: "Volume molare di un gas ideale",
         symbol: "V_m",
-        value: "22.413 969 54 × 10^-3",
+        value: "22.710 954 64 × 10^-3",
         unit: "m^3 mol^-1",
         category: "Termodinamica e statistica",
         state: "exact",
         short: "Volume molare ideale a T = 273.15 K e p = 100 kPa.",
-        description: "È un valore convenzionale utile per gas ideali in condizioni standard moderne (100 kPa).",
+        description: "È un valore convenzionale utile per gas ideali in condizioni standard moderne (100 kPa). Alla pressione di 1 atm = 101.325 kPa, usata nei testi meno recenti, vale 22.413 969 54 × 10^-3 m^3 mol^-1.",
         relation: "V_m = R T / p",
         dimensions: "L^3 mol^-1",
         tags: ["gas ideali", "condizioni standard", "mole", "termodinamica"]

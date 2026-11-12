@@ -17,19 +17,20 @@ window.SIM_METADATA = {
     <title>Simulazione Moto Circolare e Armonico</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'DM Sans', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--fs-paper);
             min-height: 100vh;
         }
         
         .container {
-            background: white;
-            border-radius: 15px;
+            background: var(--fs-surface);
+            border: 1px solid var(--fs-rule);
+            border-radius: 14px;
             padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: var(--fs-shadow);
         }
         
         h1 {
@@ -88,12 +89,12 @@ window.SIM_METADATA = {
             width: 80px;
             text-align: right;
             font-family: monospace;
-            color: #667eea;
+            color: #1f6fd0;
             font-weight: bold;
         }
         
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1b1d22;
             color: white;
             border: none;
             padding: 12px 30px;
@@ -107,7 +108,7 @@ window.SIM_METADATA = {
         
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(27,29,34,0.18);
         }
         
         button:active {
@@ -129,7 +130,7 @@ window.SIM_METADATA = {
         }
         
         .toggle-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1b1d22;
             color: white;
         }
         
@@ -160,13 +161,13 @@ window.SIM_METADATA = {
             background: #f0f7ff;
             padding: 15px;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #1f6fd0;
             margin-top: 20px;
         }
         
         .info-panel h3 {
             margin-top: 0;
-            color: #667eea;
+            color: #1f6fd0;
         }
         
         .info-panel p {
@@ -175,30 +176,32 @@ window.SIM_METADATA = {
             color: #444;
         }
     </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
     <div class="container">
-        <h1>🔄 Simulazione Moto Circolare Uniforme e Moto Armonico</h1>
+        <h1>Moto circolare uniforme e moto armonico</h1>
         <p class="subtitle">Visualizzazione dei vettori posizione, velocità e accelerazione - Proiezione sull'asse x</p>
         
         <div class="canvas-container">
             <div>
-                <h3 style="text-align: center; color: #667eea;">Moto Circolare e Proiezione Armonica</h3>
+                <h3 style="text-align: center; color: #1f6fd0;">Moto Circolare e Proiezione Armonica</h3>
                 <canvas id="circleCanvas" width="600" height="600"></canvas>
             </div>
             <div>
-                <h3 style="text-align: center; color: #667eea;">Grafici Temporali (Moto Armonico)</h3>
+                <h3 style="text-align: center; color: #1f6fd0;">Grafici Temporali (Moto Armonico)</h3>
                 <canvas id="graphCanvas" width="600" height="600"></canvas>
             </div>
         </div>
         
         <div class="controls">
-            <h3 style="margin-top: 0; color: #667eea;">⚙️ Controlli della Simulazione</h3>
+            <h3 style="margin-top: 0; color: #1f6fd0;">Controlli della simulazione</h3>
             
             <div class="control-group">
                 <label>Raggio (r):</label>
                 <input type="range" id="radiusSlider" min="50" max="200" value="150" step="10">
-                <span class="value-display" id="radiusValue">150 px</span>
+                <span class="value-display" id="radiusValue">1,50 m</span>
             </div>
             
             <div class="control-group">
@@ -219,12 +222,12 @@ window.SIM_METADATA = {
             </div>
             
             <div style="margin-top: 20px;">
-                <h4 style="margin-bottom: 10px; color: #667eea;">📐 Posiziona il punto agli angoli caratteristici:</h4>
+                <h4 style="margin-bottom: 10px; color: #1f6fd0;">Posiziona il punto agli angoli caratteristici:</h4>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button id="angle0Btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">θ = 0° (x max)</button>
-                    <button id="angle90Btn" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">θ = 90° (π/2)</button>
-                    <button id="angle180Btn" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">θ = 180° (π)</button>
-                    <button id="angle270Btn" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">θ = 270° (3π/2)</button>
+                    <button id="angle0Btn">θ = 0° (x max)</button>
+                    <button id="angle90Btn">θ = 90° (π/2)</button>
+                    <button id="angle180Btn">θ = 180° (π)</button>
+                    <button id="angle270Btn">θ = 270° (3π/2)</button>
                 </div>
             </div>
             
@@ -239,19 +242,19 @@ window.SIM_METADATA = {
         
         <div class="legend">
             <div class="legend-item">
-                <div class="color-box" style="background: #ff8800;"></div>
+                <div class="color-box" style="background: #b7791f;"></div>
                 <span><strong>Raggio vettore (r) e Velocità Angolare (ω)</strong></span>
             </div>
             <div class="legend-item">
-                <div class="color-box" style="background: #ff4444;"></div>
+                <div class="color-box" style="background: #c2491d;"></div>
                 <span><strong>Posizione armonica (x)</strong></span>
             </div>
             <div class="legend-item">
-                <div class="color-box" style="background: #44ff44;"></div>
+                <div class="color-box" style="background: #0e8a5a;"></div>
                 <span><strong>Velocità (v)</strong></span>
             </div>
             <div class="legend-item">
-                <div class="color-box" style="background: #4444ff;"></div>
+                <div class="color-box" style="background: #1f6fd0;"></div>
                 <span><strong>Accelerazione (a)</strong></span>
             </div>
         </div>
@@ -272,6 +275,9 @@ window.SIM_METADATA = {
         const ctxGraph = graphCanvas.getContext('2d');
         
         // Parametri della simulazione
+        // Scala della scena: 100 pixel sullo schermo corrispondono a 1 metro.
+        // 'radius' resta in pixel per il disegno; tutte le grandezze mostrate sono in unità SI.
+        const PX_PER_M = 100;
         let radius = 150;
         let angularVelocity = 2;
         let angle = 0; // Inizia da 0° (a destra)
@@ -305,7 +311,7 @@ window.SIM_METADATA = {
         // Event listeners per i controlli
         radiusSlider.addEventListener('input', (e) => {
             radius = parseFloat(e.target.value);
-            document.getElementById('radiusValue').textContent = radius + ' px';
+            document.getElementById('radiusValue').textContent = (radius / PX_PER_M).toFixed(2).replace('.', ',') + ' m';
         });
         
         speedSlider.addEventListener('input', (e) => {
@@ -346,9 +352,10 @@ window.SIM_METADATA = {
             angularVelocityHistory = [];
             
             // Calcola e aggiungi il punto iniziale
-            const x = radius * Math.cos(angle);
-            const vx = -angularVelocity * radius * Math.sin(angle);
-            const ax = -angularVelocity * angularVelocity * radius * Math.cos(angle);
+            const A = radius / PX_PER_M;                                   // ampiezza in metri
+            const x = A * Math.cos(angle);                                  // x(t) = A cos θ
+            const vx = -angularVelocity * A * Math.sin(angle);             // v(t) = −ωA sin θ
+            const ax = -angularVelocity * angularVelocity * A * Math.cos(angle); // a(t) = −ω²A cos θ = −ω² x
             
             timeHistory.push(0);
             positionHistory.push(x);
@@ -434,9 +441,10 @@ window.SIM_METADATA = {
                 time += 0.016;
                 
                 // Calcola le grandezze per il moto armonico (proiezione sull'asse x)
-                const x = radius * Math.cos(angle);
-                const vx = -angularVelocity * radius * Math.sin(angle);
-                const ax = -angularVelocity * angularVelocity * radius * Math.cos(angle);
+                const A = radius / PX_PER_M;                                   // ampiezza in metri
+                const x = A * Math.cos(angle);                                  // x(t) = A cos θ
+                const vx = -angularVelocity * A * Math.sin(angle);             // v(t) = −ωA sin θ
+                const ax = -angularVelocity * angularVelocity * A * Math.cos(angle); // a(t) = −ω²A cos θ = −ω² x
                 
                 // Aggiungi ai dati storici
                 timeHistory.push(time);
@@ -540,20 +548,20 @@ window.SIM_METADATA = {
             // Salva il contesto per applicare la trasparenza
             ctxCircle.save();
             ctxCircle.globalAlpha = 0.7;
-            drawArrow(ctxCircle, centerX, centerY, x, y, '#ff8800', 'r');
+            drawArrow(ctxCircle, centerX, centerY, x, y, '#b7791f', 'r');
             ctxCircle.restore();
             
             // Vettore velocità (tangente alla circonferenza)
             const vx_circ = -radius * angularVelocity * Math.sin(angle);
             const vy_circ = -radius * angularVelocity * Math.cos(angle);
             const vScale = vectorScale * 0.35;
-            drawArrow(ctxCircle, x, y, x + vx_circ * vScale, y + vy_circ * vScale, '#44ff44', 'v');
+            drawArrow(ctxCircle, x, y, x + vx_circ * vScale, y + vy_circ * vScale, '#0e8a5a', 'v');
             
             // Vettore accelerazione centripeta (verso il centro)
             const ax_circ = -radius * angularVelocity * angularVelocity * Math.cos(angle);
             const ay_circ = radius * angularVelocity * angularVelocity * Math.sin(angle);
             const aScale = vectorScale * 0.125;
-            drawArrow(ctxCircle, x, y, x + ax_circ * aScale, y + ay_circ * aScale, '#4444ff', 'a');
+            drawArrow(ctxCircle, x, y, x + ax_circ * aScale, y + ay_circ * aScale, '#1f6fd0', 'a');
             
             // Disegna il punto sul cerchio (grigio)
             ctxCircle.fillStyle = '#888';
@@ -571,7 +579,7 @@ window.SIM_METADATA = {
             const accX = -angularVelocity * angularVelocity * radius * Math.cos(angle);
             
             // Vettore posizione (dalla posizione di equilibrio al punto proiettato sull'asse x centrale)
-            drawArrow(ctxCircle, centerX, centerY, harmonicXCenter, centerY, '#ff4444', '');
+            drawArrow(ctxCircle, centerX, centerY, harmonicXCenter, centerY, '#c2491d', '');
             
             // Disegna il punto proiettato sull'asse x centrale
             ctxCircle.fillStyle = '#333';
@@ -650,20 +658,20 @@ window.SIM_METADATA = {
             ctxCircle.textBaseline = 'alphabetic';
             
             // Vettore posizione (dalla posizione di equilibrio alla massa)
-            drawArrow(ctxCircle, centerX, harmonicY, harmonicXBottom, harmonicY, '#ff4444', '');
+            drawArrow(ctxCircle, centerX, harmonicY, harmonicXBottom, harmonicY, '#c2491d', '');
             
             // Vettore velocità (orizzontale, parte dalla massa)
             const velScaleHarm = vectorScale * 0.35;
             if (Math.abs(velX) > 0.1) {
                 drawArrow(ctxCircle, harmonicXBottom, harmonicY - 50, 
-                         harmonicXBottom + velX * velScaleHarm, harmonicY - 50, '#44ff44', 'v');
+                         harmonicXBottom + velX * velScaleHarm, harmonicY - 50, '#0e8a5a', 'v');
             }
             
             // Vettore accelerazione (orizzontale, parte dalla massa)
             const accScaleHarm = vectorScale * 0.125;
             if (Math.abs(accX) > 0.1) {
                 drawArrow(ctxCircle, harmonicXBottom, harmonicY - 80, 
-                         harmonicXBottom + accX * accScaleHarm, harmonicY - 80, '#4444ff', 'a');
+                         harmonicXBottom + accX * accScaleHarm, harmonicY - 80, '#1f6fd0', 'a');
             }
             
             // Etichetta "Sistema massa-molla"
@@ -686,16 +694,16 @@ window.SIM_METADATA = {
             if (timeHistory.length < 1) return;
             
             // Trova i valori min e max per la scala
-            const maxPos = Math.max(...positionHistory.map(Math.abs), radius);
-            const maxVel = Math.max(...velocityHistory.map(Math.abs), angularVelocity * radius);
-            const maxAcc = Math.max(...accelerationHistory.map(Math.abs), angularVelocity * angularVelocity * radius);
+            const maxPos = Math.max(...positionHistory.map(Math.abs), radius / PX_PER_M);
+            const maxVel = Math.max(...velocityHistory.map(Math.abs), angularVelocity * radius / PX_PER_M);
+            const maxAcc = Math.max(...accelerationHistory.map(Math.abs), angularVelocity * angularVelocity * radius / PX_PER_M);
             const maxOmega = angularVelocity * 1.2; // Un po' di margine per il grafico
             
             const graphs = [
-                { data: positionHistory, max: maxPos, color: '#ff4444', label: 'Posizione x(t) [px]', show: showGraphs.position, type: 'position' },
-                { data: velocityHistory, max: maxVel, color: '#44ff44', label: 'Velocità vx(t) [px/s]', show: showGraphs.velocity, type: 'velocity' },
-                { data: accelerationHistory, max: maxAcc, color: '#4444ff', label: 'Accelerazione ax(t) [px/s²]', show: showGraphs.acceleration, type: 'acceleration' },
-                { data: angularVelocityHistory, max: maxOmega, color: '#ff8800', label: 'Velocità Angolare ω(t) [rad/s]', show: showGraphs.angularVelocity, type: 'angularVelocity' }
+                { data: positionHistory, max: maxPos, color: '#c2491d', label: 'Posizione x(t) [m]', show: showGraphs.position, type: 'position' },
+                { data: velocityHistory, max: maxVel, color: '#0e8a5a', label: 'Velocità vₓ(t) [m/s]', show: showGraphs.velocity, type: 'velocity' },
+                { data: accelerationHistory, max: maxAcc, color: '#1f6fd0', label: 'Accelerazione aₓ(t) [m/s²]', show: showGraphs.acceleration, type: 'acceleration' },
+                { data: angularVelocityHistory, max: maxOmega, color: '#b7791f', label: 'Velocità Angolare ω(t) [rad/s]', show: showGraphs.angularVelocity, type: 'angularVelocity' }
             ];
             
             let graphIndex = 0;

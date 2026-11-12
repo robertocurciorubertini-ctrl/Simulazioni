@@ -16,25 +16,23 @@ window.SIM_METADATA = {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Piano Inclinato — Simulazione Fisica</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
-
   :root {
-    --bg:     #f4f1ec;
-    --surf:   #ffffff;
-    --panel:  #edeae3;
-    --border: #d4cfc5;
-    --text:   #1a1814;
-    --muted:  #7a746a;
-    --accent: #c0392b;
-    --col-fg:    #c0392b;
-    --col-fpar:  #d35400;
-    --col-fperp: #2471a3;
-    --col-fn:    #7d3c98;
-    --col-fa:    #1e8449;
+    --bg:     var(--fs-paper);
+    --surf:   var(--fs-surface);
+    --panel:  var(--fs-surface-2);
+    --border: var(--fs-line);
+    --text:   var(--fs-ink);
+    --muted:  var(--fs-ink-3);
+    --accent: var(--fs-red);
+    --col-fg:    var(--fs-red);
+    --col-fpar:  var(--fs-amber);
+    --col-fperp: var(--fs-blue);
+    --col-fn:    var(--fs-violet);
+    --col-fa:    var(--fs-green);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { font-family:'Syne',sans-serif; background:var(--bg); color:var(--text); }
+  html, body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
   body { display:flex; flex-direction:column; min-height:100vh; }
 
   /* HEADER */
@@ -47,7 +45,7 @@ window.SIM_METADATA = {
     position: sticky; top: 0; z-index: 10;
   }
   header h1 { font-size:1.05rem; font-weight:800; letter-spacing:-0.02em; color:var(--accent); }
-  header .sub { font-family:'Space Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.1em; }
+  header .sub { font-family:'DM Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.1em; }
 
   /* CONTROLS BAR */
   .cbar {
@@ -66,7 +64,7 @@ min-width:0;
 }
   .cl { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); white-space:nowrap; }
   .cv { 
-font-family:'Space Mono',monospace; 
+font-family:'DM Mono',monospace; 
 font-size:0.72rem; 
 font-weight:700; 
 color:var(--text); 
@@ -94,11 +92,11 @@ flex-shrink:0;
     background:var(--surf); flex-shrink:0;
   }
   .sdot { width:7px; height:7px; border-radius:50%; background:var(--muted); transition:background .3s; }
-  .stxt { font-family:'Space Mono',monospace; font-size:0.63rem; font-weight:700; color:var(--muted); transition:color .3s; letter-spacing:.04em; }
+  .stxt { font-family:'DM Mono',monospace; font-size:0.63rem; font-weight:700; color:var(--muted); transition:color .3s; letter-spacing:.04em; }
 
   .btn {
     background:none; border:1.5px solid var(--border); color:var(--muted);
-    font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:700;
+    font-family:'DM Sans',sans-serif; font-size:0.65rem; font-weight:700;
     letter-spacing:.07em; padding:5px 12px; border-radius:6px;
     cursor:pointer; transition:border-color .15s, color .15s; flex-shrink:0; text-transform:uppercase;
   }
@@ -120,10 +118,10 @@ flex-shrink:0;
   .fr { display:flex; justify-content:space-between; align-items:center; gap:5px; }
   .fn2 { display:flex; align-items:center; gap:6px; font-size:0.66rem; color:var(--muted); }
   .fd { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-  .fv { font-family:'Space Mono',monospace; font-size:0.66rem; font-weight:700; color:var(--text); }
+  .fv { font-family:'DM Mono',monospace; font-size:0.66rem; font-weight:700; color:var(--text); }
   .kr { display:flex; justify-content:space-between; align-items:center; }
   .kk { font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
-  .kv { font-family:'Space Mono',monospace; font-size:0.66rem; font-weight:700; color:var(--text); }
+  .kv { font-family:'DM Mono',monospace; font-size:0.66rem; font-weight:700; color:var(--text); }
   .li { display:flex; align-items:center; gap:6px; font-size:0.61rem; color:var(--muted); }
   .ll { width:15px; height:3px; border-radius:2px; flex-shrink:0; }
 
@@ -183,7 +181,7 @@ flex-shrink:0;
     font-weight: 600;
   }
   .f-eq {
-    font-family: 'Space Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.78rem;
     color: var(--text);
     letter-spacing: -0.01em;
@@ -221,8 +219,10 @@ window.MathJax = {
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Piano Inclinato</h1>
@@ -427,8 +427,10 @@ function physics(dt) {
     stato  = 'IN MOTO';
     moving = true;
     if (dt) {
-      v += acc * dt;        // prima aggiorna v
-      s += v * dt;          // poi s con il nuovo v (Eulero semi-implicito, errore O(dt²))
+      // accelerazione costante: le leggi del moto uniformemente accelerato sono esatte,
+      // quindi l'integrazione non introduce alcun errore numerico
+      s += v * dt + 0.5 * acc * dt * dt;
+      v += acc * dt;
     }
   } else {
     Fa=Fpar; acc=0; v=0; stato='FERMO'; moving=false;
@@ -437,7 +439,7 @@ function physics(dt) {
 }
 
 // ─── grafica ────────────────────────────────────────────────────
-const COL = { fg:'#c0392b', fpar:'#d35400', fperp:'#2471a3', fn:'#7d3c98', fa:'#1e8449' };
+const COL = { fg:'#c2491d', fpar:'#b7791f', fperp:'#1f6fd0', fn:'#6d4fc0', fa:'#0e8a5a' };
 
 function arrow(x1,y1,x2,y2,col,lw,hl) {
   const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
@@ -463,7 +465,7 @@ function arrow(x1,y1,x2,y2,col,lw,hl) {
 
 function lbl(x,y,txt,col,align,fs) {
   ctx.save();
-  ctx.font=`700 ${fs??12}px "Space Mono",monospace`;
+  ctx.font=`700 ${fs??12}px "DM Mono",monospace`;
   ctx.fillStyle=col; ctx.textAlign=align??'left'; ctx.textBaseline='middle';
   ctx.shadowColor='rgba(255,255,255,0.97)'; ctx.shadowBlur=7;
   ctx.fillText(txt,x,y);
@@ -560,7 +562,7 @@ function draw(ph) {
   // ipotenusa (superficie) più marcata
   ctx.beginPath();
   ctx.moveTo(tipX, tipY); ctx.lineTo(rightX, baseY);
-  ctx.strokeStyle='#7a746a'; ctx.lineWidth=3; ctx.stroke();
+  ctx.strokeStyle='#7d828c'; ctx.lineWidth=3; ctx.stroke();
 
   // linee tratteggiate (base e lato verticale)
   ctx.setLineDash([5,5]); ctx.strokeStyle='#c0bbb4'; ctx.lineWidth=1;
@@ -586,8 +588,8 @@ function draw(ph) {
     ctx.strokeStyle = '#2471a370'; ctx.lineWidth = 1.3; ctx.stroke();
     // midpoint dell'arco antiorario
     const midArc = angIpo + rad / 2;  // = -π + 3rad/2  — punto centrale dell'arco
-    ctx.font = 'bold 11px "Space Mono",monospace';
-    ctx.fillStyle = '#2471a3'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold 11px "DM Mono",monospace';
+    ctx.fillStyle = '#1f6fd0'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.shadowColor='rgba(255,255,255,0.9)'; ctx.shadowBlur=4;
     // etichetta θ sotto il piano, lungo la base orizzontale
     const lblX = rightX - planBase * 0.25; // ~1/4 della base da destra, sotto l'arco
@@ -612,7 +614,10 @@ function draw(ph) {
 
   // Se il blocco ha raggiunto il fondo, fermiamo la simulazione
   if (s >= maxS && moving) {
-    vMax = v;
+    // l'ultimo passo ha superato il fondo di (s − maxS): si riporta la velocità al valore
+    // che aveva esattamente in fondo, v² = v_passo² − 2a(s − maxS)
+    const aPlane = G * (Math.sin(rad) - mu * Math.cos(rad));
+    vMax = Math.sqrt(Math.max(0, v * v - 2 * aPlane * (s - maxS)));
     v = 0; s = maxS; moving = false;
     stopped = true;
   }
@@ -633,7 +638,7 @@ function draw(ph) {
   ctx.rotate(Math.atan2(uy, ux));
   ctx.shadowColor='rgba(0,0,0,0.10)'; ctx.shadowBlur=8; ctx.shadowOffsetX=1; ctx.shadowOffsetY=2;
   ctx.fillStyle   = stopped ? '#f5e6e6' : moving ? '#d6e9f8' : '#ece8df';
-  ctx.strokeStyle = stopped ? '#c0392b' : moving ? '#2471a3' : '#8a847a';
+  ctx.strokeStyle = stopped ? '#c2491d' : moving ? '#1f6fd0' : '#8a847a';
   ctx.lineWidth=1.8;
   ctx.beginPath();
   ctx.roundRect(-bW/2, -bH, bW, bH, 4);
@@ -692,8 +697,8 @@ function draw(ph) {
     ctx.arc(ox, oy, arcR2, angFg2, angFpe2, false);
     ctx.strokeStyle = '#c0392b70'; ctx.lineWidth = 1.2; ctx.stroke();
     const midA2 = (angFg2 + angFpe2) / 2;
-    ctx.font = 'bold 10px "Space Mono",monospace';
-    ctx.fillStyle = '#c0392b'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font = 'bold 10px "DM Mono",monospace';
+    ctx.fillStyle = '#c2491d'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.shadowColor='rgba(255,255,255,0.9)'; ctx.shadowBlur=4;
     ctx.fillText('θ', ox+Math.cos(midA2)*(arcR2+11), oy+Math.sin(midA2)*(arcR2+11));
     ctx.restore();
@@ -717,8 +722,8 @@ function draw(ph) {
   const dot  = document.getElementById('sdot');
   const stxt = document.getElementById('stxt');
   const stato = stopped ? 'A TERRA' : ph.stato;
-  dot.style.background = stopped ? '#c0392b' : moving ? '#2471a3' : '#1e8449';
-  stxt.style.color     = stopped ? '#c0392b' : moving ? '#2471a3' : '#1e8449';
+  dot.style.background = stopped ? '#c2491d' : moving ? '#1f6fd0' : '#0e8a5a';
+  stxt.style.color     = stopped ? '#c2491d' : moving ? '#1f6fd0' : '#0e8a5a';
   stxt.textContent     = stato;
 
   document.getElementById('v-fg').textContent  = ph.Fg.toFixed(2)+' N';

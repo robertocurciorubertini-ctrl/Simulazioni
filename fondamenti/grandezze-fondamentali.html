@@ -15,26 +15,24 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grandezze e unità di misura</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f6f4ef;
-  --bg-soft: #fbfaf7;
-  --panel: #fffdf9;
-  --ink: #1b1a17;
-  --ink-soft: #5e594f;
-  --muted: #8b8475;
-  --line: #d9d0c1;
-  --accent: #1f6fb2;
-  --accent-2: #b25d1f;
-  --accent-3: #2f7d54;
+  --bg: var(--fs-paper);
+  --bg-soft: var(--fs-surface-2);
+  --panel: var(--fs-surface);
+  --ink: var(--fs-ink);
+  --ink-soft: var(--fs-ink-2);
+  --muted: var(--fs-ink-3);
+  --line: var(--fs-line);
+  --accent: var(--fs-blue);
+  --accent-2: var(--fs-red);
+  --accent-3: var(--fs-green);
   --danger: #b74444;
   --shadow: 0 12px 28px rgba(33, 30, 23, 0.06);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   background: linear-gradient(180deg, #f8f6f1 0%, #f2eee6 100%);
   color: var(--ink);
   line-height: 1.6;
@@ -46,7 +44,7 @@ header {
   border-bottom: 3px solid var(--accent);
 }
 header h1 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 2.2rem;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -64,7 +62,7 @@ header p {
   flex-wrap: wrap;
 }
 .badge {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -83,7 +81,7 @@ header p {
   color: #aeb7c4;
   cursor: pointer;
   padding: 12px 18px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.73rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -114,7 +112,7 @@ header p {
 }
 .panel-pad { padding: 20px; }
 .panel-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -134,7 +132,7 @@ header p {
 }
 .control-label span {
   color: var(--accent);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
 }
 select, input[type="number"], input[type="text"] {
   width: 100%;
@@ -159,7 +157,7 @@ button.btn {
   border-radius: 4px;
   padding: 10px 14px;
   cursor: pointer;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.77rem;
   letter-spacing: 0.05em;
 }
@@ -175,7 +173,7 @@ button.btn:hover { filter: brightness(0.98); }
   background: linear-gradient(180deg, #fdfcf8 0%, #f6f1e7 100%);
 }
 .converter-hero h2 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.85rem;
   font-weight: 600;
   margin-bottom: 8px;
@@ -212,7 +210,7 @@ button.btn:hover { filter: brightness(0.98); }
   border: 1px solid #c9dced;
 }
 .result-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -243,7 +241,7 @@ button.btn:hover { filter: brightness(0.98); }
   padding: 12px 14px;
 }
 .stat-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
@@ -274,7 +272,7 @@ button.btn:hover { filter: brightness(0.98); }
   font-weight: 600;
 }
 .unit-symbol {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   color: var(--accent);
   font-size: 0.95rem;
 }
@@ -284,7 +282,7 @@ button.btn:hover { filter: brightness(0.98); }
   background: #f7f9fb;
   border: 1px solid #d8e3ec;
   border-radius: 4px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.84rem;
   color: #24455f;
 }
@@ -312,7 +310,7 @@ button.btn:hover { filter: brightness(0.98); }
   vertical-align: top;
 }
 .prefix-table th, .units-table th, .formula-table th {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -354,7 +352,7 @@ button.btn:hover { filter: brightness(0.98); }
   color: var(--ink-soft);
 }
 .inline-code {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   background: #f2efe7;
   border: 1px solid var(--line);
   padding: 1px 6px;
@@ -374,7 +372,7 @@ button.btn:hover { filter: brightness(0.98); }
   border-radius: 4px;
   background: #f8f8f8;
   border: 1px solid var(--line);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   color: #253345;
   overflow-x: auto;
 }
@@ -395,8 +393,10 @@ button.btn:hover { filter: brightness(0.98); }
   .mini-grid, .kpi-strip { grid-template-columns: 1fr; }
 }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <header>
   <div class="topbar">
     <div class="badge">Laboratorio digitale di fisica</div>

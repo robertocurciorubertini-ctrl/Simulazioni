@@ -15,16 +15,15 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Curvatura dello Spaziotempo — Schwarzschild</title>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#f4f1eb; --bg2:#ede9e0; --surface:#fff; --border:#d4cfc4; --border2:#b8b2a6;
-  --text:#1a1714; --text-mid:#4a4540; --text-dim:#8a8278;
-  --accent:#1a3a5c; --accent2:#7c3a10; --red:#8b1a1a; --green:#1a5c3a;
+  --bg:var(--fs-paper); --bg2:var(--fs-surface-2); --surface:var(--fs-surface); --border:var(--fs-line); --border2:var(--fs-line-2);
+  --text:var(--fs-ink); --text-mid:var(--fs-ink-2); --text-dim:var(--fs-ink-3);
+  --accent:var(--fs-blue); --accent2:var(--fs-red); --red:var(--fs-red); --green:var(--fs-green);
   --shadow:rgba(0,0,0,0.10);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'EB Garamond',serif;min-height:100vh;display:flex;flex-direction:column;}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;min-height:100vh;display:flex;flex-direction:column;}
 
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px var(--shadow);}
 header h1{font-size:1.5rem;font-weight:500;color:var(--accent);}
@@ -86,8 +85,10 @@ canvas#cv{display:block;}
 #canvas3d{flex:1;width:100%;display:block;background:var(--bg);}
 .mftr{padding:7px 20px;border-top:1px solid var(--border);background:var(--bg2);font-family:'DM Mono',monospace;font-size:.57rem;color:var(--text-dim);display:flex;gap:20px;flex-wrap:wrap;}
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <div>
@@ -841,7 +842,7 @@ function draw3D(){
   ctx3.beginPath();ctx3.arc(osx3,osy3,or3,0,Math.PI*2);ctx3.fillStyle=g2;
   ctx3.shadowColor='rgba(220,155,55,.5)';ctx3.shadowBlur=14;ctx3.fill();ctx3.shadowBlur=0;
 
-  ctx3.font="500 12px 'EB Garamond'";ctx3.fillStyle='rgba(40,50,70,.5)';
+  ctx3.font="500 12px 'Crimson Pro'";ctx3.fillStyle='rgba(40,50,70,.5)';
   ctx3.fillText('Superficie di Flamm — M='+M.toFixed(1)+'M☉, m='+m_orb.toFixed(2)+'M☉',14,18);
 }
 

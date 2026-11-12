@@ -17,10 +17,6 @@ window.SIM_METADATA = {
 <title>Le tre leggi di Newton — Simulatore interattivo</title>
 
 <!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-
 <!-- KaTeX -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
@@ -32,22 +28,22 @@ window.SIM_METADATA = {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --cream:   #faf8f3;
-  --ink:     #1c1a16;
-  --ink2:    #3d3a32;
-  --ink3:    #6b6659;
-  --rule:    #e2ddd5;
-  --rule2:   #cec9c0;
-  --accent:  #185FA5;
-  --accent2: #0f6e56;
-  --warm:    #c85a1a;
-  --card:    #f4f1eb;
-  --card2:   #ffffff;
+  --cream:   var(--fs-paper);
+  --ink:     var(--fs-ink);
+  --ink2:    var(--fs-ink-2);
+  --ink3:    var(--fs-ink-3);
+  --rule:    var(--fs-line);
+  --rule2:   var(--fs-line-2);
+  --accent:  var(--fs-blue);
+  --accent2: var(--fs-green);
+  --warm:    var(--fs-red);
+  --card:    var(--fs-surface-2);
+  --card2:   var(--fs-surface);
   --shadow:  rgba(28,26,22,0.07);
 }
 
 body {
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   background: var(--cream);
   color: var(--ink);
   min-height: 100vh;
@@ -60,12 +56,12 @@ body {
 /* ── Header ── */
 .page-header { margin-bottom: 2rem; border-bottom: 1px solid var(--rule); padding-bottom: 1.2rem; }
 .page-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink3); margin-bottom: 6px;
 }
 .page-title {
-  font-family: 'EB Garamond', Georgia, serif;
+  font-family: 'Crimson Pro', Georgia, serif;
   font-size: 32px; font-weight: 500; line-height: 1.15;
   color: var(--ink); margin-bottom: 6px;
 }
@@ -80,7 +76,7 @@ body {
   padding: 8px 18px;
   border: 1px solid transparent; border-bottom: none;
   border-radius: 8px 8px 0 0;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 13px; font-weight: 400;
   cursor: pointer; background: transparent; color: var(--ink3);
   transition: all 0.15s; position: relative; bottom: -1px;
@@ -99,12 +95,12 @@ body {
 /* ── Law header ── */
 .law-header { margin-bottom: 1.4rem; }
 .law-number {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink3); margin-bottom: 4px;
 }
 .law-title {
-  font-family: 'EB Garamond', Georgia, serif;
+  font-family: 'Crimson Pro', Georgia, serif;
   font-size: 21px; font-weight: 400; font-style: italic;
   color: var(--ink); line-height: 1.4;
   margin-bottom: 12px;
@@ -131,7 +127,7 @@ canvas {
   padding: 6px 11px;
   border: 1px solid rgba(28,26,22,0.15); border-radius: 7px;
   background: rgba(250,248,243,0.92); color: var(--ink);
-  font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px;
   cursor: pointer; box-shadow: 0 2px 8px var(--shadow); transition: all 0.12s;
 }
 .canvas-action:hover { background: var(--card); }
@@ -141,14 +137,14 @@ canvas {
 .status-bar {
   margin-bottom: 8px; padding: 8px 14px; border-radius: 7px;
   font-size: 13px; font-weight: 500; text-align: center;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   transition: background 0.3s, color 0.3s;
 }
 .s-move         { background: #f0ede8; color: var(--ink2); border: 1px solid var(--rule2); }
 .s-slow         { background: #fdf5e0; color: #7a5200;      border: 1px solid #fac775; }
 .s-stop         { background: #e8f0fb; color: #0c447c;      border: 1px solid #b5d4f4; }
 .s-noninertial  { background: #fdf0ea; color: #993c1d;      border: 1px solid #f5c4b3; }
-.s-inertial-cf  { background: #e8f7f2; color: #0f6e56;      border: 1px solid #9fe1cb; }
+.s-inertial-cf  { background: #e8f7f2; color: #0e8a5a;      border: 1px solid #9fe1cb; }
 .s-rotating-cf  { background: #fdf0ea; color: #993c1d;      border: 1px solid #f5c4b3; }
 
 /* ── Legend ── */
@@ -162,11 +158,11 @@ canvas {
 .control-row { display: flex; align-items: center; gap: 10px; }
 .control-row label {
   font-size: 13px; color: var(--ink2); min-width: 210px;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
 }
 .control-row input[type=range] { flex: 1; accent-color: var(--accent); cursor: pointer; }
 .val {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 13px; font-weight: 500; min-width: 84px; text-align: right;
   color: var(--ink);
 }
@@ -176,7 +172,7 @@ canvas {
 button.action {
   padding: 7px 16px;
   border: 1px solid var(--rule2); border-radius: 8px;
-  font-family: 'IBM Plex Sans', sans-serif; font-size: 13px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
   cursor: pointer; background: var(--card2); color: var(--ink);
   transition: background 0.12s, border-color 0.12s;
 }
@@ -186,7 +182,7 @@ button.action:active { transform: scale(0.98); }
 /* ── Section separator ── */
 .section-sep { margin: 2rem 0; border: none; border-top: 1px solid var(--rule); }
 .section-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 11px; font-weight: 500; color: var(--ink3);
   margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em;
 }
@@ -206,7 +202,7 @@ button.action:active { transform: scale(0.98); }
   padding-top: 1.4rem;
 }
 .theory-section h3 {
-  font-family: 'EB Garamond', Georgia, serif;
+  font-family: 'Crimson Pro', Georgia, serif;
   font-size: 20px; font-weight: 500; color: var(--ink);
   margin-bottom: 0.9rem;
 }
@@ -225,7 +221,7 @@ button.action:active { transform: scale(0.98); }
   border-radius: 10px; background: var(--card2);
 }
 .theory-card .tc-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--ink3); margin-bottom: 8px;
 }
@@ -243,9 +239,9 @@ button.action:active { transform: scale(0.98); }
   background: #f0f7f4; border: 1px solid #b8ddd1; border-radius: 10px;
 }
 .example-strip .ex-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
-  color: #0f6e56; margin-bottom: 8px; font-weight: 500;
+  color: #0e8a5a; margin-bottom: 8px; font-weight: 500;
 }
 .example-strip p { font-size: 13px; color: var(--ink2); line-height: 1.75; margin-bottom: 6px; }
 .example-strip p:last-child { margin-bottom: 0; }
@@ -268,7 +264,7 @@ button.action:active { transform: scale(0.98); }
 }
 .law2-chip .chip-label { font-size: 11px; color: var(--ink3); margin-bottom: 3px; }
 .law2-chip .chip-val {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 18px; font-weight: 500; color: var(--ink);
 }
 .law2-chip.highlight { background: #e8f0fb; border-color: #b5d4f4; }
@@ -280,7 +276,7 @@ button.action:active { transform: scale(0.98); }
 .p3-mode-btn {
   padding: 7px 16px;
   border: 1px solid var(--rule2); border-radius: 999px;
-  background: var(--card2); font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--card2); font-family: 'DM Sans', sans-serif;
   font-size: 13px; color: var(--ink2); cursor: pointer; transition: all 0.15s;
 }
 .p3-mode-btn:hover { background: var(--card); }
@@ -291,7 +287,7 @@ button.action:active { transform: scale(0.98); }
   grid-template-columns: 1fr 1fr; gap: 10px 24px;
 }
 .p3-col-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--ink3); margin-bottom: 5px;
 }
@@ -307,7 +303,7 @@ button.action:active { transform: scale(0.98); }
   font-size: 12px; color: var(--ink3); line-height: 1.6;
 }
 .p3-stat-card strong {
-  display: block; font-family: 'IBM Plex Mono', monospace;
+  display: block; font-family: 'DM Mono', monospace;
   font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 2px;
 }
 .p3-stat-card.full { grid-column: span 2; background: #e8f0fb; border-color: #b5d4f4; }
@@ -330,8 +326,10 @@ button.action:active { transform: scale(0.98); }
   .tab { font-size: 12px; padding: 7px 12px; }
 }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <div class="page">
 
   <div class="page-header">
@@ -360,7 +358,7 @@ button.action:active { transform: scale(0.98); }
     </div>
 
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Oggetto</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1f6fd0"></div>Oggetto</div>
       <div class="legend-item"><div class="legend-line" style="background:#ccc"></div>Griglia S (lab.)</div>
       <div class="legend-item"><div class="legend-line" style="background:rgba(29,158,117,0.6)"></div>Griglia S′</div>
       <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Forza fittizia</div>
@@ -427,7 +425,7 @@ button.action:active { transform: scale(0.98); }
     <!-- 1B Centrifugal -->
     <div class="section-title">Forza centrifuga — sistema di riferimento rotante</div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Oggetto</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1f6fd0"></div>Oggetto</div>
       <div class="legend-item"><div class="legend-line" style="background:#ccc"></div>Griglia S inerziale</div>
       <div class="legend-item"><div class="legend-line" style="background:rgba(29,158,117,0.5)"></div>Griglia S′ rotante</div>
       <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>F centripeta (reale)</div>
@@ -563,7 +561,7 @@ button.action:active { transform: scale(0.98); }
       <div class="example-strip">
         <div class="ex-label">Esempi e ordini di grandezza</div>
         <p><strong>Automobile in accelerazione.</strong> Un'auto da 1 200 kg con motore da 120 kW che eroga una spinta di 4 000 N (attrito trascurato) accelera di \(a = 4000/1200 \approx 3{,}3\;\text{m/s}^2\), raggiungendo 100 km/h in circa 8 s.</p>
-        <p><strong>Pallone da calcio.</strong> Un calciatore colpisce il pallone (0,43 kg) con una forza media di circa 1 500 N per 8 ms. L'impulso è \(J = 1500 \times 0{,}008 = 12\;\text{N·s}\), che corrisponde a una velocità di partenza di \(v = 12/0{,}43 \approx 28\;\text{m/s}\) (≈ 100 km/h).</p>
+        <p><strong>Pallone da calcio.</strong> Un calciatore colpisce il pallone (0,43 kg) con una forza media di circa 1 500 N per 8 ms. L'impulso è \(J = 1500 \times 0{,}008 = 12\;\mathrm{N{\cdot}s}\), che corrisponde a una velocità di partenza di \(v = 12/0{,}43 \approx 28\;\text{m/s}\) (≈ 100 km/h).</p>
         <p><strong>Gravità sulla Luna.</strong> La stessa massa pesa circa 1/6 sulla Luna (\(g_{Luna} \approx 1{,}6\;\text{m/s}^2\)) ma ha identica <em>inerzia</em>. Un astronauta che spinge un sasso di 10 kg con 10 N ottiene la stessa accelerazione (\(a = 1\;\text{m/s}^2\)) sia sulla Terra che sulla Luna.</p>
       </div>
 
@@ -687,7 +685,7 @@ button.action:active { transform: scale(0.98); }
         <p><strong>Pattinatori sul ghiaccio.</strong> Due pattinatori fermi che si spingono acquisiscono velocità uguali e opposte in quantità di moto. Se \(m_A = 50\;\text{kg}\) e \(m_B = 80\;\text{kg}\), e B si allontana a 2 m/s, la conservazione del momento impone \(v_A = 80 \times 2/50 = 3{,}2\;\text{m/s}\).</p>
         <p><strong>Razzo nello spazio.</strong> Il razzo non "spinge sull'aria" — funziona anche nel vuoto. Il propellente espulso all'indietro con velocità \(v_e\) rispetto al razzo fa accelerare il razzo secondo l'<em>equazione di Tsiolkovsky</em>: \(\Delta v = v_e \ln(m_0/m_f)\). Maggiore la velocità di espulsione, maggiore il \(\Delta v\) ottenibile.</p>
         <p><strong>Camminare.</strong> Quando cammini, il tuo piede spinge il suolo all'indietro; il suolo (tramite attrito) spinge il tuo piede in avanti — questa è la forza che ti propella. Senza attrito (ghiaccio liscio) non riesci a camminare perché il suolo non può esercitare la forza di reazione orizzontale.</p>
-        <p><strong>Cannone e rinculo.</strong> Il proiettile di una vecchia cannone (5 kg) viene sparato a 400 m/s: la variazione di quantità di moto è \(5 \times 400 = 2000\;\text{N·s}\). Il cannone (800 kg) riceve la stessa variazione in verso opposto e rincula a \(2000/800 = 2{,}5\;\text{m/s}\).</p>
+        <p><strong>Cannone e rinculo.</strong> Il proiettile di una vecchia cannone (5 kg) viene sparato a 400 m/s: la variazione di quantità di moto è \(5 \times 400 = 2000\;\mathrm{N{\cdot}s}\). Il cannone (800 kg) riceve la stessa variazione in verso opposto e rincula a \(2000/800 = 2{,}5\;\text{m/s}\).</p>
       </div>
 
       <div class="warning-strip">
@@ -900,10 +898,10 @@ function drawSR(dt){
   const stopped=Math.abs(vRel)<0.08&&!isNI;
   if(!stopped){
     const vRelPx=Math.sign(vRel)*Math.min(Math.abs(vRel)*20,100);
-    drawArrow(ctx,objX,ballY-BALL_R-5,objX+vRelPx,ballY-BALL_R-5,'#185FA5',2.5,null,4,-3);
+    drawArrow(ctx,objX,ballY-BALL_R-5,objX+vRelPx,ballY-BALL_R-5,'#1f6fd0',2.5,null,4,-3);
     drawSubLabel(ctx, objX+vRelPx+(vRel>=0?5:-60), ballY-BALL_R-16,
       [{text:'v',sub:'rel'},{text:' = '+(vRel>=0?'+':'')+vRel.toFixed(1)+' m/s'}],
-      '#185FA5', 11);
+      '#1f6fd0', 11);
   }
   if(isNI){
     const fPx=Math.sign(-aShown)*Math.min(Math.abs(aShown)*22,90);
@@ -912,7 +910,7 @@ function drawSR(dt){
       [{text:'F',sub:'app'},{text:' = '+(-aShown).toFixed(1)+'\u00b7m N'}],
       '#D85A30', 11);
   }
-  const ballColor=stopped?'#0C447C':(isNI?'#993C1D':'#185FA5');
+  const ballColor=stopped?'#0C447C':(isNI?'#993C1D':'#1f6fd0');
   ctx.beginPath();ctx.arc(objX,ballY,BALL_R,0,Math.PI*2);
   ctx.fillStyle=ballColor;ctx.fill();
   ctx.font='bold 11px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';
@@ -991,8 +989,8 @@ function drawCF(dt){
     ctx.beginPath();ctx.moveTo(CX,CY);ctx.lineTo(bx,by);ctx.stroke();ctx.setLineDash([]);
     drawArrow(ctx,bx,by,bx-dx*fScale,by-dy*fScale,'#1D9E75',2.5,'F_cp='+fcf.toFixed(0)+' N',-2,-14);
     const vtang=cfOmega*r,vsc=Math.min(vtang*0.4,68);
-    drawArrow(ctx,bx,by,bx-dy*vsc,by+dx*vsc,'#185FA5',2,'v='+vtang.toFixed(1),4,-3);
-    ctx.beginPath();ctx.arc(bx,by,15,0,Math.PI*2);ctx.fillStyle='#185FA5';ctx.fill();
+    drawArrow(ctx,bx,by,bx-dy*vsc,by+dx*vsc,'#1f6fd0',2,'v='+vtang.toFixed(1),4,-3);
+    ctx.beginPath();ctx.arc(bx,by,15,0,Math.PI*2);ctx.fillStyle='#1f6fd0';ctx.fill();
     ctx.font='bold 10px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';
     ctx.fillText(cfMass+'kg',bx,by+4);ctx.textAlign='left';
     ctx.font='12px sans-serif';ctx.fillStyle='#888';
@@ -1019,7 +1017,7 @@ function drawCF(dt){
     ctx.beginPath();ctx.moveTo(CX,CY);ctx.lineTo(bx,by);ctx.stroke();ctx.setLineDash([]);
     drawArrow(ctx,bx,by,bx+fScale,by,'#D85A30',2.5,'F_cf='+fcf.toFixed(0)+' N (fittizia)',4,-10);
     drawArrow(ctx,bx,by,bx-fScale,by,'#1D9E75',2.5,'F_cp='+fcf.toFixed(0)+' N',-fScale-80,14);
-    ctx.beginPath();ctx.arc(bx,by,15,0,Math.PI*2);ctx.fillStyle='#185FA5';ctx.fill();
+    ctx.beginPath();ctx.arc(bx,by,15,0,Math.PI*2);ctx.fillStyle='#1f6fd0';ctx.fill();
     ctx.font='bold 10px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';
     ctx.fillText(cfMass+'kg',bx,by+4);ctx.textAlign='left';
     ctx.font='bold 13px sans-serif';ctx.fillStyle='#0C447C';ctx.textAlign='center';
@@ -1612,7 +1610,7 @@ function p3_draw(){
   // Per il razzo: A è già disegnato nella decorazione con grafica dettagliata.
   // B (gas espulso) viene mostrato come pallina solo dopo la fine della spinta.
   if(p3cfg.scenario !== 'rocket'){
-    p3_drawBody(ctx,p3.A,'A',['#9fe1cb','#0f6e56'],'#1d9e75');
+    p3_drawBody(ctx,p3.A,'A',['#9fe1cb','#0e8a5a'],'#1d9e75');
     p3_drawBody(ctx,p3.B,'B',['#f5c4b3','#993c1d'],'#d85a30');
   } else {
     // Durante la spinta il gas è la fiamma; dopo la spinta mostriamo la pallina gas

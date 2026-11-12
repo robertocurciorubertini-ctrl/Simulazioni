@@ -24,8 +24,8 @@ window.SIM_METADATA = {
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #111827;
+            font-family: 'DM Sans', sans-serif;
+            background-color: #0a0f1a;
             color: #fff;
             padding: 20px;
             display: flex;
@@ -41,14 +41,14 @@ window.SIM_METADATA = {
         }
 
         .subtitle {
-            color: #9ca3af;
+            color: #8fa0be;
             font-size: 0.875rem;
             margin-bottom: 1rem;
             text-align: center;
         }
 
         .controls {
-            background-color: #1f2937;
+            background-color: #0f1623;
             padding: 1rem;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
@@ -84,8 +84,8 @@ window.SIM_METADATA = {
         }
 
         .btn-positive {
-            background-color: #374151;
-            color: #d1d5db;
+            background-color: #1e2a40;
+            color: #c9d3e6;
         }
 
         .btn-positive.active {
@@ -94,8 +94,8 @@ window.SIM_METADATA = {
         }
 
         .btn-negative {
-            background-color: #374151;
-            color: #d1d5db;
+            background-color: #1e2a40;
+            color: #c9d3e6;
         }
 
         .btn-negative.active {
@@ -122,12 +122,12 @@ window.SIM_METADATA = {
         }
 
         .btn-clear {
-            background-color: #374151;
+            background-color: #1e2a40;
             color: white;
         }
 
         .btn-clear:hover {
-            background-color: #4b5563;
+            background-color: #2a3852;
         }
 
         .slider-container {
@@ -136,7 +136,7 @@ window.SIM_METADATA = {
         }
 
         .slider-container label {
-            color: #d1d5db;
+            color: #c9d3e6;
             font-size: 0.75rem;
             margin-bottom: 0.25rem;
         }
@@ -157,19 +157,19 @@ window.SIM_METADATA = {
         }
 
         .checkbox-container label {
-            color: #d1d5db;
+            color: #c9d3e6;
             font-size: 0.875rem;
         }
 
         .divider {
             width: 2px;
             height: 3rem;
-            background-color: #4b5563;
+            background-color: #2a3852;
             margin: 0 0.5rem;
         }
 
         canvas {
-            border: 2px solid #374151;
+            border: 2px solid #1e2a40;
             border-radius: 0.5rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             margin-bottom: 1rem;
@@ -184,7 +184,7 @@ window.SIM_METADATA = {
         }
 
         .legend {
-            background-color: #1f2937;
+            background-color: #0f1623;
             padding: 0.75rem;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
@@ -192,7 +192,7 @@ window.SIM_METADATA = {
         }
 
         .legend-title {
-            color: #d1d5db;
+            color: #c9d3e6;
             font-size: 0.875rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
@@ -205,7 +205,7 @@ window.SIM_METADATA = {
         }
 
         .legend-gradient span {
-            color: #9ca3af;
+            color: #8fa0be;
             font-size: 0.75rem;
         }
 
@@ -222,7 +222,7 @@ window.SIM_METADATA = {
         }
 
         .info-box {
-            background-color: #1f2937;
+            background-color: #0f1623;
             padding: 1rem;
             border-radius: 0.5rem;
             max-width: 48rem;
@@ -232,7 +232,7 @@ window.SIM_METADATA = {
         .info-content {
             display: flex;
             gap: 0.5rem;
-            color: #d1d5db;
+            color: #c9d3e6;
             font-size: 0.875rem;
             line-height: 1.5;
         }
@@ -251,13 +251,15 @@ window.SIM_METADATA = {
         }
 
         .stats {
-            color: #9ca3af;
+            color: #8fa0be;
             font-size: 0.875rem;
             text-align: center;
         }
     </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge fs-dark">
     <h1>Simulatore di Campo Elettrico</h1>
     <p class="subtitle">Clicca sul canvas per aggiungere cariche e visualizzare il campo elettrico generato</p>
 
@@ -851,8 +853,13 @@ window.SIM_METADATA = {
                 }
             }
 
-            charges.forEach(charge => {
-                const force = calculateForceOnCharge(charge);
+            // Le forze si calcolano tutte PRIMA di spostare le cariche: così ogni coppia
+            // si scambia forze uguali e opposte (terzo principio) e la quantità di moto
+            // del sistema non viene alterata dall'ordine di aggiornamento.
+            const forces = charges.map(calculateForceOnCharge);
+
+            charges.forEach((charge, i) => {
+                const force = forces[i];
 
                 const mass = Math.abs(charge.q) * 10;
 

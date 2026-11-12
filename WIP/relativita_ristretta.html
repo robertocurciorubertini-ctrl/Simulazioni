@@ -15,7 +15,6 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Relatività Ristretta</title>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -23,18 +22,18 @@ window.SIM_METADATA = {
 
 <style>
 :root {
-  --bg:        #f5f0e8;
-  --surface:   #faf7f2;
-  --surface2:  #eee9df;
-  --border:    #d4cbbf;
-  --text:      #1a1610;
-  --muted:     #7a6e60;
-  --accent:    #b85c2a;
-  --accent2:   #2a6bb8;
-  --accent3:   #2a8f5a;
-  --mono:      'IBM Plex Mono', monospace;
-  --sans:      'IBM Plex Sans', sans-serif;
-  --serif:     'EB Garamond', serif;
+  --bg:        var(--fs-paper);
+  --surface:   var(--fs-surface);
+  --surface2:  var(--fs-surface-2);
+  --border:    var(--fs-line);
+  --text:      var(--fs-ink);
+  --muted:     var(--fs-ink-3);
+  --accent:    var(--fs-red);
+  --accent2:   var(--fs-blue);
+  --accent3:   var(--fs-green);
+  --mono:      'DM Mono', monospace;
+  --sans:      'DM Sans', sans-serif;
+  --serif:     'Crimson Pro', serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -258,8 +257,10 @@ canvas { display: block; width: 100%; }
   border-radius: 2px;
 }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Relatività Ristretta</h1>
@@ -451,7 +452,7 @@ canvas { display: block; width: 100%; }
   </div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#1a1610;width:24px"></div> Assi S (a riposo)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1b1d22;width:24px"></div> Assi S (a riposo)</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--accent);width:24px"></div> Assi S' (in moto)</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--accent2);width:24px"></div> Cono luce</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--accent3);width:24px;height:14px;border-radius:50%"></div> Evento P</div>
@@ -510,34 +511,34 @@ function drawTab1(beta, g, t){
   ctx1.clearRect(0,0,W,H);
 
   // sfondo
-  ctx1.fillStyle = '#faf7f2'; ctx1.fillRect(0,0,W,H);
+  ctx1.fillStyle = '#fffdf9'; ctx1.fillRect(0,0,W,H);
 
   // --- Orologio a riposo (sinistra) ---
   const cx0 = W*0.22, cy0 = H*0.5, R = 54;
-  drawClock(ctx1, cx0, cy0, R, t, 1, '#1a1610', 'A riposo (S)');
+  drawClock(ctx1, cx0, cy0, R, t, 1, '#1b1d22', 'A riposo (S)');
 
   // --- Orologio in moto (destra) ---
   const cx1_ = W*0.7, cy1_ = H*0.5;
-  drawClock(ctx1, cx1_, cy1_, R, t, g, '#b85c2a', `In moto (v=${beta.toFixed(2)}c)`);
+  drawClock(ctx1, cx1_, cy1_, R, t, g, '#c2491d', `In moto (v=${beta.toFixed(2)}c)`);
 
   // freccia moto
   ctx1.save();
-  ctx1.strokeStyle = '#b85c2a';
+  ctx1.strokeStyle = '#c2491d';
   ctx1.lineWidth = 2;
   ctx1.setLineDash([5,4]);
   const ax = cx1_-70, bx = cx1_+70, ay = H*0.88;
   ctx1.beginPath(); ctx1.moveTo(ax,ay); ctx1.lineTo(bx,ay); ctx1.stroke();
   ctx1.setLineDash([]);
-  ctx1.fillStyle = '#b85c2a';
+  ctx1.fillStyle = '#c2491d';
   ctx1.beginPath(); ctx1.moveTo(bx,ay); ctx1.lineTo(bx-10,ay-5); ctx1.lineTo(bx-10,ay+5); ctx1.closePath(); ctx1.fill();
-  ctx1.font = '13px IBM Plex Sans'; ctx1.fillStyle='#b85c2a'; ctx1.textAlign='center';
+  ctx1.font = '13px IBM Plex Sans'; ctx1.fillStyle='#c2491d'; ctx1.textAlign='center';
   ctx1.fillText('→ v', cx1_, ay+18);
   ctx1.restore();
 
   // confronto testuale
   const t0_shown = (t % (2*Math.PI)) / (2*Math.PI);
   const tp_shown = t0_shown / g;
-  ctx1.font = '13px IBM Plex Mono'; ctx1.fillStyle='#7a6e60'; ctx1.textAlign='center';
+  ctx1.font = '13px IBM Plex Mono'; ctx1.fillStyle='#7d828c'; ctx1.textAlign='center';
   ctx1.fillText(`Δt₀ = ${(t0_shown).toFixed(3)} (u.a.)`, cx0, H-14);
   ctx1.fillText(`Δt' = ${(t0_shown/g).toFixed(3)} (u.a.)`, cx1_, H-14);
 }
@@ -617,7 +618,7 @@ function drawTab2(beta, L0px_input, g, tx){
   const W = c2.offsetWidth; c2.width = W; c2.height = 260;
   const H = 260;
   ctx2.clearRect(0,0,W,H);
-  ctx2.fillStyle='#faf7f2'; ctx2.fillRect(0,0,W,H);
+  ctx2.fillStyle='#fffdf9'; ctx2.fillRect(0,0,W,H);
 
   const maxBarW = W * 0.55;
   const L0bar = maxBarW * (L0px_input/300);
@@ -628,7 +629,7 @@ function drawTab2(beta, L0px_input, g, tx){
   // ---- RIGA SUPERIORE: sistema a riposo ---
   const y1 = H*0.3;
   ctx2.font = '500 13px IBM Plex Sans';
-  ctx2.fillStyle = '#7a6e60'; ctx2.textAlign='left';
+  ctx2.fillStyle = '#7d828c'; ctx2.textAlign='left';
   ctx2.fillText('Sistema S (a riposo con l\'oggetto): lunghezza propria L₀', 20, y1-14);
 
   // barra L0
@@ -638,14 +639,14 @@ function drawTab2(beta, L0px_input, g, tx){
   ctx2.strokeStyle = var2str('--accent2'); ctx2.lineWidth=2;
   ctx2.strokeRect(x1, y1, L0bar, barH);
   // frecce estremità
-  drawBrace(ctx2, x1, y1+barH+8, L0bar, '#2a6bb8');
-  ctx2.font='13px IBM Plex Mono'; ctx2.fillStyle='#2a6bb8'; ctx2.textAlign='center';
+  drawBrace(ctx2, x1, y1+barH+8, L0bar, '#1f6fd0');
+  ctx2.font='13px IBM Plex Mono'; ctx2.fillStyle='#1f6fd0'; ctx2.textAlign='center';
   ctx2.fillText(`L₀ = ${document.getElementById('s2-L0').value} m`, x1+L0bar/2, y1+barH+30);
 
   // ---- RIGA INFERIORE: sistema in moto ---
   const y2 = H*0.67;
   ctx2.font = '500 13px IBM Plex Sans';
-  ctx2.fillStyle = '#7a6e60'; ctx2.textAlign='left';
+  ctx2.fillStyle = '#7d828c'; ctx2.textAlign='left';
   ctx2.fillText(`Sistema S' (osservatore a terra): lunghezza contratta L`, 20, y2-14);
 
   // barra L contratta — con animazione posizione se in moto
@@ -653,14 +654,14 @@ function drawTab2(beta, L0px_input, g, tx){
   const x2 = (W - Lbar)/2;
   ctx2.fillStyle = '#fde8dd';
   ctx2.fillRect(x2, y2, Lbar, barH);
-  ctx2.strokeStyle = '#b85c2a'; ctx2.lineWidth=2;
+  ctx2.strokeStyle = '#c2491d'; ctx2.lineWidth=2;
   ctx2.strokeRect(x2, y2, Lbar, barH);
-  drawBrace(ctx2, x2, y2+barH+8, Lbar, '#b85c2a');
-  ctx2.font='13px IBM Plex Mono'; ctx2.fillStyle='#b85c2a'; ctx2.textAlign='center';
+  drawBrace(ctx2, x2, y2+barH+8, Lbar, '#c2491d');
+  ctx2.font='13px IBM Plex Mono'; ctx2.fillStyle='#c2491d'; ctx2.textAlign='center';
   ctx2.fillText(`L = ${(L0px_input/g).toFixed(1)} m`, x2+Lbar/2, y2+barH+30);
 
   // freccia velocità
-  ctx2.fillStyle='#b85c2a'; ctx2.font='13px IBM Plex Sans'; ctx2.textAlign='center';
+  ctx2.fillStyle='#c2491d'; ctx2.font='13px IBM Plex Sans'; ctx2.textAlign='center';
   ctx2.fillText(`→ v = ${beta.toFixed(2)}c`, W/2, y2+barH+52);
 }
 
@@ -715,7 +716,7 @@ function drawTab3(beta,g,phase){
   const W=c3.offsetWidth; c3.width=W; c3.height=300;
   const H=300;
   ctx3.clearRect(0,0,W,H);
-  ctx3.fillStyle='#faf7f2'; ctx3.fillRect(0,0,W,H);
+  ctx3.fillStyle='#fffdf9'; ctx3.fillRect(0,0,W,H);
 
   // Treno
   const trainW=W*0.55, trainH=52;
@@ -725,7 +726,7 @@ function drawTab3(beta,g,phase){
   // corpo treno
   ctx3.save();
   ctx3.fillStyle='#e8ddd0';
-  ctx3.strokeStyle='#7a6e60'; ctx3.lineWidth=2;
+  ctx3.strokeStyle='#7d828c'; ctx3.lineWidth=2;
   roundRect(ctx3, trainX, trainY, trainW, trainH, 8);
   ctx3.fill(); ctx3.stroke();
 
@@ -740,15 +741,15 @@ function drawTab3(beta,g,phase){
 
   // passeggero al centro
   const px=trainX+trainW/2;
-  drawPerson(ctx3, px, trainY+trainH, '#b85c2a', 'Passeggero');
+  drawPerson(ctx3, px, trainY+trainH, '#c2491d', 'Passeggero');
 
   // binario
   const railY=trainY+trainH+34;
-  ctx3.strokeStyle='#7a6e60'; ctx3.lineWidth=3;
+  ctx3.strokeStyle='#7d828c'; ctx3.lineWidth=3;
   ctx3.beginPath(); ctx3.moveTo(0,railY); ctx3.lineTo(W,railY); ctx3.stroke();
 
   // osservatore a terra
-  drawPerson(ctx3, W/2, railY, '#2a6bb8', 'Osservatore\na terra');
+  drawPerson(ctx3, W/2, railY, '#1f6fd0', 'Osservatore\na terra');
 
   // ─── FULMINI e onde luce ───
   const evtA_x=trainX;      // estremo sinistro treno
@@ -789,22 +790,22 @@ function drawTab3(beta,g,phase){
       ctx3.fillStyle='#888';
       ctx3.fillText('La luce viaggia verso il passeggero...', W/2, H-10);
     } else if(reached_B && !reached_A){
-      ctx3.fillStyle='#b85c2a';
+      ctx3.fillStyle='#c2491d';
       ctx3.fillText('Il passeggero vede prima la luce da B → B è avvenuto prima (per lui)', W/2, H-10);
     } else if(reached_A && !reached_B){
-      ctx3.fillStyle='#b85c2a';
+      ctx3.fillStyle='#c2491d';
       ctx3.fillText('Il passeggero vede prima la luce da A → A è avvenuto prima (per lui)', W/2, H-10);
     } else {
-      ctx3.fillStyle='#2a8f5a';
+      ctx3.fillStyle='#0e8a5a';
       ctx3.fillText('Per l\'osservatore a terra: A e B simultanei. Per il passeggero: B prima!', W/2, H-10);
     }
   } else {
-    ctx3.font='13px IBM Plex Sans'; ctx3.fillStyle='#7a6e60'; ctx3.textAlign='center';
+    ctx3.font='13px IBM Plex Sans'; ctx3.fillStyle='#7d828c'; ctx3.textAlign='center';
     ctx3.fillText('Premi ▶ per avviare. Il treno si muove → v. I fulmini colpiscono le estremità simultaneamente (per S).', W/2, H-10);
   }
 
   // velocità label
-  ctx3.font='12px IBM Plex Mono'; ctx3.fillStyle='#b85c2a'; ctx3.textAlign='left';
+  ctx3.font='12px IBM Plex Mono'; ctx3.fillStyle='#c2491d'; ctx3.textAlign='left';
   ctx3.fillText(`v = ${beta.toFixed(2)}c  →`, trainX+8, trainY+trainH/2+5);
 }
 
@@ -929,7 +930,7 @@ function updateTab4(){
   // Riempimento regioni cono luce
   const H=c4.height;
   ctx4.clearRect(0,0,W,H);
-  ctx4.fillStyle='#faf7f2'; ctx4.fillRect(0,0,W,H);
+  ctx4.fillStyle='#fffdf9'; ctx4.fillRect(0,0,W,H);
 
   if(showCone){
     // futuro (sopra)
@@ -964,7 +965,7 @@ function updateTab4(){
   // ─── CONO LUCE ───
   if(showCone){
     ctx4.save();
-    ctx4.strokeStyle='#2a6bb8'; ctx4.lineWidth=1.8; ctx4.setLineDash([6,4]);
+    ctx4.strokeStyle='#1f6fd0'; ctx4.lineWidth=1.8; ctx4.setLineDash([6,4]);
     // luce verso dx/alto
     ctx4.beginPath(); ctx4.moveTo(ox,oy); ctx4.lineTo(ox+Math.min(W-ox,oy),oy-Math.min(W-ox,oy)); ctx4.stroke();
     // luce verso sx/alto
@@ -975,7 +976,7 @@ function updateTab4(){
     ctx4.beginPath(); ctx4.moveTo(ox,oy); ctx4.lineTo(ox-Math.min(ox,H-oy),oy+Math.min(ox,H-oy)); ctx4.stroke();
     ctx4.setLineDash([]);
     // etichette luce
-    ctx4.font='12px IBM Plex Mono'; ctx4.fillStyle='#2a6bb8'; ctx4.textAlign='left';
+    ctx4.font='12px IBM Plex Mono'; ctx4.fillStyle='#1f6fd0'; ctx4.textAlign='left';
     ctx4.fillText('luce (x=ct)',ox+30,oy-38);
     ctx4.restore();
   }
@@ -993,28 +994,28 @@ function updateTab4(){
 
     // asse x' (in rosso/accent)
     const dx_xp=ext, dct_xp=slopeXp*ext;
-    ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=2;
+    ctx4.strokeStyle='#c2491d'; ctx4.lineWidth=2;
     ctx4.beginPath();
     ctx4.moveTo(ox-dx_xp, oy+dct_xp); ctx4.lineTo(ox+dx_xp, oy-dct_xp);
     ctx4.stroke();
     // freccia e label
-    arrowHead(ctx4, ox+dx_xp*0.45, oy-dct_xp*0.45, Math.atan2(-dct_xp,dx_xp), '#b85c2a');
-    ctx4.font='600 13px IBM Plex Mono'; ctx4.fillStyle='#b85c2a'; ctx4.textAlign='center';
+    arrowHead(ctx4, ox+dx_xp*0.45, oy-dct_xp*0.45, Math.atan2(-dct_xp,dx_xp), '#c2491d');
+    ctx4.font='600 13px IBM Plex Mono'; ctx4.fillStyle='#c2491d'; ctx4.textAlign='center';
     const lx=ox+scale*4.5, lct=-scale*4.5*slopeXp;
     ctx4.fillText("x'", lx, oy+lct+16);
 
     // asse ct' (worldline x'=0)
     if(Math.abs(beta)>0.001){
       const dct_ctp=ext, dx_ctp=beta*ext; // worldline: x=beta·ct → dx=beta·dct
-      ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=2;
+      ctx4.strokeStyle='#c2491d'; ctx4.lineWidth=2;
       ctx4.beginPath();
       ctx4.moveTo(ox-dx_ctp, oy+dct_ctp); ctx4.lineTo(ox+dx_ctp, oy-dct_ctp);
       ctx4.stroke();
-      arrowHead(ctx4, ox+dx_ctp*0.45, oy-dct_ctp*0.45, Math.atan2(-dct_ctp,dx_ctp), '#b85c2a');
+      arrowHead(ctx4, ox+dx_ctp*0.45, oy-dct_ctp*0.45, Math.atan2(-dct_ctp,dx_ctp), '#c2491d');
       ctx4.fillText("ct'", ox+dx_ctp*0.45+20, oy-dct_ctp*0.45-8);
     } else {
       // beta~0: ct' = ct (verticale)
-      ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=2;
+      ctx4.strokeStyle='#c2491d'; ctx4.lineWidth=2;
       ctx4.beginPath(); ctx4.moveTo(ox,0); ctx4.lineTo(ox,H); ctx4.stroke();
       ctx4.fillText("ct'=ct", ox+14, oy-scale*4);
     }
@@ -1023,23 +1024,23 @@ function updateTab4(){
 
   // ─── ASSI S (sistema a riposo) ───
   ctx4.save();
-  ctx4.strokeStyle='#1a1610'; ctx4.lineWidth=2.5;
+  ctx4.strokeStyle='#1b1d22'; ctx4.lineWidth=2.5;
   // asse x
   ctx4.beginPath(); ctx4.moveTo(0,oy); ctx4.lineTo(W,oy); ctx4.stroke();
-  arrowHead(ctx4, W-14, oy, 0, '#1a1610');
+  arrowHead(ctx4, W-14, oy, 0, '#1b1d22');
   // asse ct
   ctx4.beginPath(); ctx4.moveTo(ox,H); ctx4.lineTo(ox,0); ctx4.stroke();
-  arrowHead(ctx4, ox, 14, -Math.PI/2, '#1a1610');
+  arrowHead(ctx4, ox, 14, -Math.PI/2, '#1b1d22');
   // labels
-  ctx4.font='600 14px IBM Plex Mono'; ctx4.fillStyle='#1a1610'; ctx4.textAlign='center';
+  ctx4.font='600 14px IBM Plex Mono'; ctx4.fillStyle='#1b1d22'; ctx4.textAlign='center';
   ctx4.fillText('x', W-24, oy-12);
   ctx4.fillText('ct', ox+20, 20);
   // tacche e numeri
-  ctx4.font='11px IBM Plex Mono'; ctx4.fillStyle='#7a6e60';
+  ctx4.font='11px IBM Plex Mono'; ctx4.fillStyle='#7d828c';
   for(let i=-7;i<=7;i++){
     if(i===0) continue;
     const gx=ox+i*scale, gy=oy-i*scale;
-    ctx4.beginPath(); ctx4.moveTo(gx,oy-4); ctx4.lineTo(gx,oy+4); ctx4.strokeStyle='#1a1610'; ctx4.lineWidth=1.5; ctx4.stroke();
+    ctx4.beginPath(); ctx4.moveTo(gx,oy-4); ctx4.lineTo(gx,oy+4); ctx4.strokeStyle='#1b1d22'; ctx4.lineWidth=1.5; ctx4.stroke();
     ctx4.beginPath(); ctx4.moveTo(ox-4,gy); ctx4.lineTo(ox+4,gy); ctx4.stroke();
     if(i>0){
       ctx4.textAlign='center'; ctx4.fillText(i,gx,oy+16);
@@ -1051,7 +1052,7 @@ function updateTab4(){
   // ─── WORLDLINE dell'osservatore S' (x=v·t) ───
   if(showPrime){
     ctx4.save();
-    ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=1.5; ctx4.setLineDash([4,4]);
+    ctx4.strokeStyle='#c2491d'; ctx4.lineWidth=1.5; ctx4.setLineDash([4,4]);
     // già disegnata sopra come asse ct'
     ctx4.setLineDash([]); ctx4.restore();
   }
@@ -1063,7 +1064,7 @@ function updateTab4(){
 
     // proiezioni su S
     ctx4.save();
-    ctx4.strokeStyle='#2a8f5a'; ctx4.lineWidth=1.2; ctx4.setLineDash([4,3]);
+    ctx4.strokeStyle='#0e8a5a'; ctx4.lineWidth=1.2; ctx4.setLineDash([4,3]);
     ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(pxCanvas,oy); ctx4.stroke();
     ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(ox,pyCanvas); ctx4.stroke();
     ctx4.setLineDash([]); ctx4.restore();
@@ -1080,7 +1081,7 @@ function updateTab4(){
       const y_onCtp_canvas=oy-ct_onCtp*scale;
 
       ctx4.save();
-      ctx4.strokeStyle='#b85c2a'; ctx4.lineWidth=1.2; ctx4.setLineDash([3,3]); ctx4.globalAlpha=0.65;
+      ctx4.strokeStyle='#c2491d'; ctx4.lineWidth=1.2; ctx4.setLineDash([3,3]); ctx4.globalAlpha=0.65;
       ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(x_onXp_canvas,ct_onXp_canvas); ctx4.stroke();
       ctx4.beginPath(); ctx4.moveTo(pxCanvas,pyCanvas); ctx4.lineTo(x_onCtp_canvas,y_onCtp_canvas); ctx4.stroke();
       ctx4.setLineDash([]); ctx4.globalAlpha=1; ctx4.restore();
@@ -1089,22 +1090,22 @@ function updateTab4(){
     // pallino evento P
     ctx4.save();
     ctx4.beginPath(); ctx4.arc(pxCanvas,pyCanvas,9,0,2*Math.PI);
-    ctx4.fillStyle='#2a8f5a'; ctx4.fill();
+    ctx4.fillStyle='#0e8a5a'; ctx4.fill();
     ctx4.strokeStyle='#fff'; ctx4.lineWidth=2; ctx4.stroke();
-    ctx4.font='600 12px IBM Plex Mono'; ctx4.fillStyle='#2a8f5a'; ctx4.textAlign='left';
+    ctx4.font='600 12px IBM Plex Mono'; ctx4.fillStyle='#0e8a5a'; ctx4.textAlign='left';
     ctx4.fillText('P',pxCanvas+13,pyCanvas-5);
     ctx4.restore();
 
     // classificazione intervallo
     const s2=eventP.ct*eventP.ct - eventP.x*eventP.x;
     let tipo, colT;
-    if(Math.abs(s2)<0.05){tipo='Tipo luce (s²≈0)'; colT='#2a6bb8';}
-    else if(s2>0){tipo='Tipo tempo (s²>0)'; colT='#2a8f5a';}
-    else {tipo='Tipo spazio (s²<0)'; colT='#b85c2a';}
+    if(Math.abs(s2)<0.05){tipo='Tipo luce (s²≈0)'; colT='#1f6fd0';}
+    else if(s2>0){tipo='Tipo tempo (s²>0)'; colT='#0e8a5a';}
+    else {tipo='Tipo spazio (s²<0)'; colT='#c2491d';}
     ctx4.font='500 12px IBM Plex Sans'; ctx4.fillStyle=colT; ctx4.textAlign='left';
     ctx4.fillText(`P: s² = ${s2.toFixed(2)} → ${tipo}`, 14, H-14);
 
-    ctx4.font='11px IBM Plex Mono'; ctx4.fillStyle='#7a6e60'; ctx4.textAlign='right';
+    ctx4.font='11px IBM Plex Mono'; ctx4.fillStyle='#7d828c'; ctx4.textAlign='right';
     ctx4.fillText('↖ trascina P', W-10, H-14);
   }
 }

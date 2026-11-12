@@ -19,21 +19,21 @@ window.SIM_METADATA = {
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #ffffff;
-      --bg2: #f5f4f0;
-      --bg3: #eeede8;
-      --text: #1a1a18;
-      --text2: #73726c;
-      --text3: #9c9a92;
+      --bg: var(--fs-surface);
+      --bg2: var(--fs-surface-2);
+      --bg3: var(--fs-surface-3);
+      --text: var(--fs-ink);
+      --text2: var(--fs-ink-2);
+      --text3: var(--fs-ink-3);
       --border: rgba(0,0,0,0.12);
       --border2: rgba(0,0,0,0.22);
-      --blue: #378ADD;
+      --blue: var(--fs-blue);
       --blue-dark: #185FA5;
       --blue-label: #0C447C;
-      --red: #E24B4A;
+      --red: var(--fs-red);
       --red-dark: #A32D2D;
-      --green: #639922;
-      --purple: #534AB7;
+      --green: var(--fs-green);
+      --purple: var(--fs-violet);
       --radius-md: 8px;
       --radius-lg: 12px;
     }
@@ -232,8 +232,10 @@ window.SIM_METADATA = {
       text-align: center;
     }
   </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
   <h1>Simulazione moto circolare uniforme</h1>
   <p class="subtitle">Modifica velocità angolare e raggio per osservare come variano velocità tangenziale e accelerazione centripeta.</p>
@@ -275,8 +277,8 @@ window.SIM_METADATA = {
   <div class="canvas-card">
     <canvas id="c" width="800" height="440"></canvas>
     <div class="legend">
-      <div class="vleg"><div class="vleg-line" style="background:#378ADD;"></div> velocità tangenziale (v)</div>
-      <div class="vleg"><div class="vleg-line" style="background:#E24B4A;"></div> accelerazione centripeta (a<sub>c</sub>)</div>
+      <div class="vleg"><div class="vleg-line" style="background:#1f6fd0;"></div> velocità tangenziale (v)</div>
+      <div class="vleg"><div class="vleg-line" style="background:#c2491d;"></div> accelerazione centripeta (a<sub>c</sub>)</div>
       <div class="vleg"><div class="vleg-dashed"></div> traiettoria</div>
     </div>
   </div>
@@ -363,15 +365,15 @@ window.SIM_METADATA = {
 
       const gridCol   = 'rgba(0,0,0,0.05)';
       const axisCol   = 'rgba(0,0,0,0.15)';
-      const textCol   = '#73726c';
+      const textCol   = '#474c57';
       const radCol    = 'rgba(0,0,0,0.15)';
-      const dotFill   = '#534AB7';
+      const dotFill   = '#6d4fc0';
       const dotStroke = 'rgba(0,0,0,0.18)';
-      const blueV     = '#378ADD';
+      const blueV     = '#1f6fd0';
       const blueTxt   = '#0C447C';
-      const redA      = '#E24B4A';
+      const redA      = '#c2491d';
       const redTxt    = '#A32D2D';
-      const greenT    = '#639922';
+      const greenT    = '#0e8a5a';
 
       ctx.clearRect(0, 0, W, H);
 

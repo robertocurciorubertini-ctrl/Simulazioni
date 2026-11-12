@@ -15,9 +15,6 @@ window.SIM_METADATA = {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Figure di Chladni — Onde Stazionarie su Piastra</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -28,16 +25,16 @@ window.SIM_METADATA = {
 
 <style>
   :root {
-    --cream: #f5f0e8;
-    --cream-dark: #ede6d5;
-    --cream-darker: #e0d5c0;
-    --ink: #1a1510;
-    --ink-soft: #3d3428;
-    --ink-faint: #7a6e5e;
-    --amber: #b8860b;
+    --cream: var(--fs-paper);
+    --cream-dark: var(--fs-surface-2);
+    --cream-darker: var(--fs-surface-3);
+    --ink: var(--fs-ink);
+    --ink-soft: var(--fs-ink-2);
+    --ink-faint: var(--fs-ink-3);
+    --amber: var(--fs-amber);
     --amber-light: #d4a020;
     --amber-pale: #f0d090;
-    --rust: #8b3a1a;
+    --rust: var(--fs-red);
     --sand: #c8a86e;
     --sand-light: #e8d4a8;
     --node-color: #c8a86e;
@@ -49,7 +46,7 @@ window.SIM_METADATA = {
   body {
     background: var(--cream);
     color: var(--ink);
-    font-family: 'EB Garamond', Georgia, serif;
+    font-family: 'Crimson Pro', Georgia, serif;
     font-size: 17px;
     line-height: 1.65;
     min-height: 100vh;
@@ -107,7 +104,7 @@ window.SIM_METADATA = {
 
   .plate-label {
     position: absolute;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: var(--ink-faint);
     background: var(--cream);
@@ -150,7 +147,7 @@ window.SIM_METADATA = {
 
   .control-row .val {
     flex: 0 0 70px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.9rem;
     color: var(--amber);
     font-weight: 400;
@@ -213,7 +210,7 @@ window.SIM_METADATA = {
     background: var(--cream);
     border: 1.5px solid var(--cream-darker);
     color: var(--ink-soft);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.78rem;
     padding: 0.35rem 0.2rem;
     cursor: pointer;
@@ -268,7 +265,7 @@ window.SIM_METADATA = {
   }
 
   .mode-display {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.88rem;
     color: var(--ink-faint);
     margin-top: 0.3rem;
@@ -288,7 +285,7 @@ window.SIM_METADATA = {
     font-size: 0.8rem;
     color: var(--ink-faint);
     margin-bottom: 0.3rem;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
   .resonance-bar {
     height: 6px;
@@ -354,7 +351,7 @@ window.SIM_METADATA = {
     text-align: center;
     padding: 1rem;
     font-size: 0.82rem;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   @media (max-width: 900px) {
@@ -364,8 +361,10 @@ window.SIM_METADATA = {
     .two-col { grid-template-columns: 1fr; }
   }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Figure di Chladni</h1>
@@ -439,8 +438,8 @@ window.SIM_METADATA = {
       <p>I nodi stazionari (in giallo/dorato) corrispondono alle linee dove l'ampiezza di vibrazione è nulla. La sabbia, per effetto della vibrazione, migra verso queste zone di minima energia cinetica.</p>
       <p>Modi propri per bordi <em>liberi</em> (condizione di Neumann):</p>
       <p>$$\phi_{mn}(x,y) = \cos\!\frac{m\pi x}{L}\cos\!\frac{n\pi y}{L}$$</p>
-      <p>Frequenze proprie (approssimazione membrana 2D):</p>
-      <p>$$f_{mn} = \frac{c}{2L}\sqrt{m^2+n^2}$$</p>
+      <p>Frequenze proprie (piastra sottile in flessione):</p>
+      <p>$$f_{mn} = \frac{\pi}{2L^2}\sqrt{\frac{D}{\rho h}}\,(m^2+n^2)$$</p>
     </div>
 
     <div class="info-card">
@@ -471,7 +470,7 @@ window.SIM_METADATA = {
 
   <h2>Modello fisico adottato</h2>
 
-  <p>Per una piastra quadrata di lato $L$ con bordi <em>liberi</em> (condizione al contorno di Neumann: $\partial u/\partial n = 0$), le soluzioni della equazione d'onda sono prodotti di coseni:</p>
+  <p>Per una piastra quadrata di lato $L$ con bordi <em>liberi</em> (condizione al contorno di Neumann: $\partial u/\partial n = 0$), le vibrazioni sono governate dall'equazione della piastra sottile $D\,\nabla^4 u + \rho h\,\partial_t^2 u = 0$, dove $D$ è la rigidezza flessionale, $\rho$ la densità e $h$ lo spessore. In prima approssimazione i modi sono prodotti di coseni:</p>
 
   <div class="two-col">
     <div class="eq-block">
@@ -480,9 +479,11 @@ window.SIM_METADATA = {
     </div>
     <div class="eq-block">
       <div class="label">Frequenze di risonanza</div>
-      $$f_{mn} = \frac{c}{2L}\sqrt{m^2 + n^2}$$
+      $$f_{mn} = \frac{\pi}{2L^2}\sqrt{\frac{D}{\rho h}}\,(m^2 + n^2)$$
     </div>
   </div>
+
+  <p>A differenza di una corda o di una membrana tesa, dove la frequenza è proporzionale al numero d'onda, in una piastra la forza di richiamo nasce dalla rigidezza a flessione e la frequenza cresce con il <em>quadrato</em> del numero d'onda: raddoppiando il numero di linee nodali la frequenza quadruplica. È il contenuto della legge empirica trovata da Chladni. I prodotti di coseni sono esatti solo per bordi appoggiati a scorrimento; per bordi realmente liberi le forme modali esatte non hanno espressione chiusa (si calcolano con il metodo di Ritz), ma la disposizione qualitativa delle linee nodali è la stessa.</p>
 
   <p>con $m,n = 0,1,2,\ldots$ (non entrambi nulli). Il campo di ampiezza stazionaria risultante per un'eccitazione alla frequenza $f$ è la sovrapposizione di tutti i modi, pesata da un fattore risonante lorentziano:</p>
 
@@ -504,7 +505,12 @@ window.SIM_METADATA = {
   const W = canvas.width, H = canvas.height;
 
   // --- Physical parameters ---
-  const C = 200; // effective wave speed [Hz * grid_units]
+  // Una piastra sottile vibra per flessione (equazione di Kirchhoff–Love,
+  //   D ∇⁴u + ρh ∂²u/∂t² = 0), non come una membrana tesa. La relazione di
+  // dispersione è ω = √(D/ρh)·k², quindi le frequenze proprie crescono con il
+  // QUADRATO del numero d'onda: f_mn = F1·(m² + n²), con F1 = (π/2L²)·√(D/ρh).
+  // F1 = 50 Hz è l'ordine di grandezza di una piastra d'acciaio di 1 mm con lato 22 cm.
+  const F1 = 50;
   const L = 1.0;
   const NMODES = 12; // modes from 0..NMODES in each direction
 
@@ -535,7 +541,7 @@ window.SIM_METADATA = {
   });
 
   function freqMN(m,n) {
-    return C / (2*L) * Math.sqrt(m*m + n*n);
+    return F1 * (m*m + n*n);
   }
 
   // --- State ---

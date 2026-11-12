@@ -23,20 +23,18 @@ MathJax = {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
-
   :root {
-    --bg: #f4f6f9;
-    --panel: #ffffff;
-    --border: #d0d7de;
-    --accent1: #0969da;
-    --accent2: #cf222e;
-    --accent3: #1a7f37;
-    --accent4: #9a6700;
-    --text: #1f2328;
-    --muted: #656d76;
-    --body1: #0969da;
-    --body2: #cf222e;
+    --bg: var(--fs-paper);
+    --panel: var(--fs-surface);
+    --border: var(--fs-line);
+    --accent1: var(--fs-blue);
+    --accent2: var(--fs-red);
+    --accent3: var(--fs-green);
+    --accent4: var(--fs-amber);
+    --text: var(--fs-ink);
+    --muted: var(--fs-ink-2);
+    --body1: var(--fs-blue);
+    --body2: var(--fs-red);
     --radius: 8px;
   }
 
@@ -45,7 +43,7 @@ MathJax = {
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     min-height: 100vh;
   }
@@ -59,7 +57,7 @@ MathJax = {
     gap: 16px;
   }
   header h1 {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 18px;
     font-weight: 600;
     color: var(--accent1);
@@ -68,7 +66,7 @@ MathJax = {
   header span {
     color: var(--muted);
     font-size: 12px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   .canvas-area {
@@ -94,7 +92,7 @@ MathJax = {
   }
 
   .section-title {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     font-weight: 600;
     color: var(--muted);
@@ -121,7 +119,7 @@ MathJax = {
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--muted);
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 11px;
     padding: 8px 6px;
     cursor: pointer;
@@ -147,7 +145,7 @@ MathJax = {
   }
   .slider-label span:first-child { color: var(--muted); }
   .slider-label .val {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 13px;
     font-weight: 600;
   }
@@ -197,7 +195,7 @@ MathJax = {
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--muted);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     padding: 7px 4px;
     cursor: pointer;
@@ -212,7 +210,7 @@ MathJax = {
     border: none;
     border-radius: 6px;
     color: #000;
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 600;
     padding: 10px 16px;
@@ -258,7 +256,7 @@ MathJax = {
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 8px 12px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--muted);
     pointer-events: none;
@@ -272,7 +270,7 @@ MathJax = {
     border: 1px solid var(--accent3);
     border-radius: 6px;
     padding: 5px 10px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--accent3);
     pointer-events: none;
@@ -310,7 +308,7 @@ MathJax = {
   /* Momentum bars */
   .quantity-block { display: flex; flex-direction: column; gap: 8px; }
   .q-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-  .q-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }
+  .q-value { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600; }
   .bar-track {
     background: var(--border);
     border-radius: 3px;
@@ -332,7 +330,7 @@ MathJax = {
     font-size: 12px;
   }
   .compare-table th {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: var(--muted);
     text-align: left;
@@ -342,7 +340,7 @@ MathJax = {
   }
   .compare-table td {
     padding: 5px 8px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     border-bottom: 1px solid rgba(48,54,61,0.5);
   }
@@ -360,7 +358,7 @@ MathJax = {
     line-height: 1.9;
   }
   .formula-box .f-title {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: var(--muted);
     letter-spacing: 1px;
@@ -374,7 +372,7 @@ MathJax = {
     padding: 8px 0;
   }
   .impulso-val {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 24px;
     font-weight: 600;
     color: var(--accent4);
@@ -397,7 +395,7 @@ MathJax = {
     flex-shrink: 0;
   }
   .e-num {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 18px;
     font-weight: 600;
   }
@@ -436,7 +434,7 @@ MathJax = {
     transition: background 0.2s;
   }
   .phase-dot.active { background: var(--accent1); box-shadow: 0 0 6px var(--accent1); }
-  .phase-label { font-size: 11px; color: var(--muted); margin-left: 4px; font-family: 'IBM Plex Mono', monospace; }
+  .phase-label { font-size: 11px; color: var(--muted); margin-left: 4px; font-family: 'DM Mono', monospace; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
@@ -457,7 +455,7 @@ MathJax = {
     border-radius: 6px;
     padding: 6px 10px;
     font-size: 11px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     color: var(--text);
     pointer-events: none;
     white-space: nowrap;
@@ -465,8 +463,10 @@ MathJax = {
     display: none;
   }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>// simulazione_urti</h1>
@@ -695,13 +695,13 @@ MathJax = {
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;">
             <div style="width:10px;height:10px;border-radius:50%;background:var(--body1);flex-shrink:0;"></div>
             <span style="font-size:11px;color:var(--muted);">J₁ su corpo 1</span>
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--body1);margin-left:auto;" id="imp1-val">—</span>
+            <span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--body1);margin-left:auto;" id="imp1-val">—</span>
           </div>
           <div class="bar-track"><div class="bar-fill" id="imp1-bar" style="background:var(--body1);width:0%;"></div></div>
           <div style="display:flex;gap:8px;align-items:center;margin-top:8px;margin-bottom:4px;">
             <div style="width:10px;height:10px;border-radius:50%;background:var(--body2);flex-shrink:0;"></div>
             <span style="font-size:11px;color:var(--muted);">J₂ su corpo 2</span>
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--body2);margin-left:auto;" id="imp2-val">—</span>
+            <span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--body2);margin-left:auto;" id="imp2-val">—</span>
           </div>
           <div class="bar-track"><div class="bar-fill" id="imp2-bar" style="background:var(--body2);width:0%;"></div></div>
         </div>
@@ -1035,13 +1035,13 @@ function triggerCollision() {
 // RENDERING
 // ===================================================
 const COLORS = {
-  body1: '#0969da',
-  body2: '#cf222e',
+  body1: '#1f6fd0',
+  body2: '#c2491d',
   grid: '#e2e8f0',
   axis: '#c8d0da',
   vel: '#7c3aed',
   mom: '#6d28d9',
-  cm: '#1a7f37',
+  cm: '#0e8a5a',
 };
 
 // ===================================================
@@ -1153,13 +1153,13 @@ function drawPredictedTrajectories() {
     const midX = (coll.cx1 + coll.cx2) / 2;
     const midY = (coll.cy1 + coll.cy2) / 2;
     ctx.globalAlpha = 0.7;
-    ctx.fillStyle = '#9a6700';
+    ctx.fillStyle = '#b7791f';
     ctx.beginPath();
     ctx.arc(midX, midY, 4, 0, Math.PI*2);
     ctx.fill();
 
     ctx.globalAlpha = 0.85;
-    ctx.fillStyle = '#9a6700';
+    ctx.fillStyle = '#b7791f';
     ctx.font = 'bold 11px IBM Plex Mono';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
@@ -1170,7 +1170,7 @@ function drawPredictedTrajectories() {
     const nx = (coll.cx2 - coll.cx1) / (r1+r2);
     const ny = (coll.cy2 - coll.cy1) / (r1+r2);
     ctx.globalAlpha = 0.25;
-    ctx.strokeStyle = '#9a6700';
+    ctx.strokeStyle = '#b7791f';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -1181,7 +1181,7 @@ function drawPredictedTrajectories() {
   } else {
     // Nessuna collisione prevista: avviso
     ctx.globalAlpha = 0.8;
-    ctx.fillStyle = '#cf222e';
+    ctx.fillStyle = '#c2491d';
     ctx.font = 'bold 12px IBM Plex Mono';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -1213,7 +1213,7 @@ function drawFrame() {
     const r = t * 80;
     ctx.save();
     ctx.globalAlpha = (1-t) * 0.6;
-    ctx.strokeStyle = '#0969da';
+    ctx.strokeStyle = '#1f6fd0';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(state.boomX, state.boomY, r, 0, Math.PI*2);
@@ -1445,8 +1445,8 @@ function updateRightPanelLive() {
   let e_val, eColor, eDesc;
   switch(state.type) {
     case 'elastico': e_val='1.00'; eColor=COLORS.cm; eDesc='Urto perfettamente elastico: nessuna perdita di energia cinetica.'; break;
-    case 'totale': e_val='0.00'; eColor='#cf222e'; eDesc='Urto completamente anelastico: massima perdita di energia compatibile con la conservazione della quantità di moto.'; break;
-    case 'parziale': e_val=state.e_coeff.toFixed(2); eColor='#9a6700'; eDesc=`Urto parzialmente anelastico: ${((1-state.e_coeff**2)*100).toFixed(0)}% dell'energia cinetica relativa è dissipata.`; break;
+    case 'totale': e_val='0.00'; eColor='#c2491d'; eDesc='Urto completamente anelastico: massima perdita di energia compatibile con la conservazione della quantità di moto.'; break;
+    case 'parziale': e_val=state.e_coeff.toFixed(2); eColor='#b7791f'; eDesc=`Urto parzialmente anelastico: ${((1-state.e_coeff**2)*100).toFixed(0)}% dell'energia cinetica relativa è dissipata.`; break;
     case 'obliquo': e_val='1.00'; eColor=COLORS.cm; eDesc='Urto obliquo elastico in 2D: le componenti lungo la normale si scambiano come urto 1D elastico.'; break;
   }
   document.getElementById('e-num').textContent = e_val;

@@ -26,8 +26,8 @@ window.SIM_METADATA = {
         }
         
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'DM Sans', sans-serif;
+            background: #1b1d22;
             min-height: 100vh;
             padding: 20px;
         }
@@ -82,7 +82,7 @@ window.SIM_METADATA = {
         }
         
         .nav-tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1b1d22;
             color: white;
         }
         
@@ -107,8 +107,10 @@ window.SIM_METADATA = {
             color: #666;
         }
     </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -130,11 +132,11 @@ window.SIM_METADATA = {
             const CANVAS_WIDTH = 1000;
             const CANVAS_HEIGHT = 600;
 
-            const COL_R1_INC = "#2ca02c";
+            const COL_R1_INC = "#0e8a5a";
             const COL_R1_OUT = "#8fd19e";
             const COL_R1_EXT = "#8fd19e";
-            const COL_R2_LINE = "#d62728";
-            const COL_R2_EXT = "#ff7f0e";
+            const COL_R2_LINE = "#c2491d";
+            const COL_R2_EXT = "#b7791f";
 
             const safeDi = (f, do_) => {
                 const denom = do_ - f;
@@ -363,7 +365,7 @@ window.SIM_METADATA = {
                 const [pxFL, pyF] = worldToCanvas(-Math.abs(f), 0);
                 const [pxFR, _2] = worldToCanvas(Math.abs(f), 0);
                 
-                ctx.fillStyle = "#1f77b4";
+                ctx.fillStyle = "#1f6fd0";
                 ctx.beginPath();
                 ctx.arc(pxFL, pyF, 5, 0, 2 * Math.PI);
                 ctx.fill();
@@ -431,7 +433,7 @@ window.SIM_METADATA = {
                     }
                 }
                 
-                const imgColor = xImg > 0 ? "#1f77b4" : "#ff7f0e";
+                const imgColor = xImg > 0 ? "#1f6fd0" : "#b7791f";
                 drawVerticalArrow(ctx, xImg, hImg, "Immagine", imgColor);
                 
                 // Disegna i valori di f, p, q, G
@@ -480,28 +482,28 @@ window.SIM_METADATA = {
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
                                 Distanza oggetto (d_o): {do_.toFixed(2)} cm
                             </label>
                             <input type="range" min="2" max="18" step="0.1" value={do_} onChange={(e) => setDo(parseFloat(e.target.value))} style={{ width: '100%' }} />
                         </div>
 
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
                                 Distanza focale (|f|): {fMag.toFixed(2)} cm
                             </label>
                             <input type="range" min="2" max="8" step="0.1" value={fMag} onChange={(e) => setFMag(parseFloat(e.target.value))} style={{ width: '100%' }} />
                         </div>
 
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
                                 Altezza oggetto (h_o): {ho.toFixed(2)} cm
                             </label>
                             <input type="range" min="1" max="5" step="0.1" value={ho} onChange={(e) => setHo(parseFloat(e.target.value))} style={{ width: '100%' }} />
                         </div>
 
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#555' }}>
                                 Tipo di lente:
                             </label>
@@ -518,7 +520,7 @@ window.SIM_METADATA = {
                         </div>
                     </div>
 
-                    <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
+                    <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
                         <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                             <input type="checkbox" checked={showInfo} onChange={(e) => setShowInfo(e.target.checked)} style={{ marginRight: '8px' }} />
                             <span style={{ fontWeight: 'bold' }}>Mostra informazioni dettagliate</span>
@@ -550,10 +552,10 @@ window.SIM_METADATA = {
             const CANVAS_WIDTH = 1000;
             const CANVAS_HEIGHT = 600;
 
-            const COL_R1_INC = "#2ca02c";
+            const COL_R1_INC = "#0e8a5a";
             const COL_R1_REF = "#8fd19e";
-            const COL_R2_INC = "#d62728";
-            const COL_R2_REF = "#ff7f0e";
+            const COL_R2_INC = "#c2491d";
+            const COL_R2_REF = "#b7791f";
 
             const safeDi = (f, do_) => {
                 const denom = do_ - f;
@@ -763,14 +765,14 @@ window.SIM_METADATA = {
                 ctx.fillText("V", pxV, pyVLabel);
                 
                 const [pxF, pyF] = worldToCanvas(xF, 0);
-                ctx.fillStyle = "#1f77b4";
+                ctx.fillStyle = "#1f6fd0";
                 ctx.beginPath(); ctx.arc(pxF, pyF, 5, 0, 2 * Math.PI); ctx.fill();
                 ctx.fillStyle = "black";
                 const [____, pyFLabel] = worldToCanvas(xF, 0.5);
                 ctx.fillText("F", pxF, pyFLabel);
                 
                 const [pxC, pyC] = worldToCanvas(xC, 0);
-                ctx.fillStyle = "#1f77b4";
+                ctx.fillStyle = "#1f6fd0";
                 ctx.beginPath(); ctx.arc(pxC, pyC, 5, 0, 2 * Math.PI); ctx.fill();
                 ctx.fillStyle = "black";
                 const [_____, pyCLabel] = worldToCanvas(xC, 0.5);
@@ -835,7 +837,7 @@ window.SIM_METADATA = {
                     }
                 }
                 
-                const imgColor = xImg < 0 ? "#1f77b4" : "#ff7f0e";
+                const imgColor = xImg < 0 ? "#1f6fd0" : "#b7791f";
                 drawVerticalArrow(ctx, xImg, hImg, "Immagine", imgColor);
                 
                 // Disegna i valori di f, p, q, G
@@ -879,28 +881,28 @@ window.SIM_METADATA = {
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
                                 Distanza oggetto (d_o): {do_.toFixed(2)} cm
                             </label>
                             <input type="range" min="2" max="18" step="0.1" value={do_} onChange={(e) => setDo(parseFloat(e.target.value))} style={{ width: '100%' }} />
                         </div>
 
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
                                 Distanza focale (|f|): {fMag.toFixed(2)} cm
                             </label>
                             <input type="range" min="2" max="8" step="0.1" value={fMag} onChange={(e) => setFMag(parseFloat(e.target.value))} style={{ width: '100%' }} />
                         </div>
 
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
                                 Altezza oggetto (h_o): {ho.toFixed(2)} cm
                             </label>
                             <input type="range" min="1" max="5" step="0.1" value={ho} onChange={(e) => setHo(parseFloat(e.target.value))} style={{ width: '100%' }} />
                         </div>
 
-                        <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px' }}>
                             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#555' }}>
                                 Tipo di specchio:
                             </label>
@@ -917,7 +919,7 @@ window.SIM_METADATA = {
                         </div>
                     </div>
 
-                    <div style={{ backgroundColor: '#f0f0f0', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
+                    <div style={{ backgroundColor: '#efebe1', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
                         <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                             <input type="checkbox" checked={showInfo} onChange={(e) => setShowInfo(e.target.checked)} style={{ marginRight: '8px' }} />
                             <span style={{ fontWeight: 'bold' }}>Mostra informazioni dettagliate</span>

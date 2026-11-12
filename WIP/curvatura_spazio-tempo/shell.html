@@ -4,25 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Curvatura Spazio-Temporale — Metrica di Kerr</title>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
         onload="renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]})"></script>
 <style>
 :root {
-  --bg:      #f4efe6;
-  --bg2:     #ece6d8;
-  --panel:   #faf7f1;
-  --border:  #c9b99a;
-  --accent:  #7a3b10;
-  --accent2: #b03020;
-  --gold:    #a07808;
-  --text:    #2a1808;
-  --text2:   #6a4830;
-  --mono:    'IBM Plex Mono', monospace;
-  --sans:    'IBM Plex Sans', sans-serif;
-  --serif:   'EB Garamond', serif;
+  --bg:      var(--fs-paper);
+  --bg2:     var(--fs-surface-2);
+  --panel:   var(--fs-surface);
+  --border:  var(--fs-line);
+  --accent:  var(--fs-red);
+  --accent2: var(--fs-red);
+  --gold:    var(--fs-amber);
+  --text:    var(--fs-ink);
+  --text2:   var(--fs-ink-2);
+  --mono:    'DM Mono', monospace;
+  --sans:    'DM Sans', sans-serif;
+  --serif:   'Crimson Pro', serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);
@@ -113,8 +112,10 @@ canvas{border:1px solid var(--border);display:block;
          font-family:var(--mono);font-size:.62rem;
          color:var(--text2);line-height:2.0;}
 </style>
+<link rel="stylesheet" href="../../assets/sim.css">
+<script src="../../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <!-- Loading -->
 <div id="loading">

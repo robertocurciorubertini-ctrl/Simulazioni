@@ -17,22 +17,22 @@ window.SIM_METADATA = {
 </script>
 <style>
   :root {
-    --bg: #f5f7fa;
-    --panel: #ffffff;
-    --panel2: #f8fafc;
-    --text: #111827;
-    --muted: #4b5563;
-    --border: #d1d5db;
-    --accent: #2563eb;
-    --accent2: #dc2626;
-    --ok: #059669;
+    --bg: var(--fs-paper);
+    --panel: var(--fs-surface);
+    --panel2: var(--fs-surface-2);
+    --text: var(--fs-ink);
+    --muted: var(--fs-ink-2);
+    --border: var(--fs-line);
+    --accent: var(--fs-blue);
+    --accent2: var(--fs-red);
+    --ok: var(--fs-green);
   }
 
   * { box-sizing: border-box; }
 
   body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'DM Sans', sans-serif;
     background: var(--bg);
     color: var(--text);
   }
@@ -193,7 +193,7 @@ window.SIM_METADATA = {
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 10px 12px;
-    font-family: "Times New Roman", serif;
+    font-family: "Crimson Pro", serif;
     font-size: 1.08rem;
     overflow-x: auto;
   }
@@ -209,8 +209,10 @@ window.SIM_METADATA = {
     }
   }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <div class="container">
   <header>
     <h1>Moto rettilineo uniforme</h1>
@@ -223,9 +225,9 @@ window.SIM_METADATA = {
         <h2>Scena del moto</h2>
         <canvas id="motionCanvas" width="700" height="220"></canvas>
         <div class="legend">
-          <span><span class="dot" style="background:#2563eb"></span>Corpo A</span>
-          <span><span class="dot" style="background:#dc2626"></span>Corpo B</span>
-          <span><span class="dot" style="background:#059669"></span>Punto di incontro</span>
+          <span><span class="dot" style="background:#1f6fd0"></span>Corpo A</span>
+          <span><span class="dot" style="background:#c2491d"></span>Corpo B</span>
+          <span><span class="dot" style="background:#0e8a5a"></span>Punto di incontro</span>
         </div>
       </section>
 
@@ -501,38 +503,38 @@ window.SIM_METADATA = {
     }
 
     const xAc = worldToCanvasX(s.xA, bounds, w, padL, padR);
-    ctx.fillStyle = '#2563eb';
+    ctx.fillStyle = '#1f6fd0';
     ctx.beginPath();
     ctx.arc(xAc, axisY, 11, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#2563eb';
+    ctx.fillStyle = '#1f6fd0';
     ctx.fillText('A', xAc, axisY - 18);
 
     const arrowLenA = Math.max(14, Math.min(42, 10 + Math.abs(s.vA) * 5));
-    drawArrow(ctx, xAc, axisY - 30, xAc + Math.sign(s.vA || 1) * arrowLenA, axisY - 30, '#2563eb');
+    drawArrow(ctx, xAc, axisY - 30, xAc + Math.sign(s.vA || 1) * arrowLenA, axisY - 30, '#1f6fd0');
 
     if (s.activeB) {
       const xBc = worldToCanvasX(s.xB, bounds, w, padL, padR);
-      ctx.fillStyle = '#dc2626';
+      ctx.fillStyle = '#c2491d';
       ctx.beginPath();
       ctx.arc(xBc, axisY + 36, 11, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#dc2626';
+      ctx.fillStyle = '#c2491d';
       ctx.fillText('B', xBc, axisY + 65);
       const arrowLenB = Math.max(14, Math.min(42, 10 + Math.abs(s.vB) * 5));
-      drawArrow(ctx, xBc, axisY + 6, xBc + Math.sign(s.vB || 1) * arrowLenB, axisY + 6, '#dc2626');
+      drawArrow(ctx, xBc, axisY + 6, xBc + Math.sign(s.vB || 1) * arrowLenB, axisY + 6, '#c2491d');
 
       const meet = computeMeeting(s.x0A, s.vA, s.x0B, s.vB);
       if (meet.type === 'futuro' && meet.t <= s.tMax) {
         const xm = worldToCanvasX(meet.x, bounds, w, padL, padR);
-        ctx.strokeStyle = '#059669';
+        ctx.strokeStyle = '#0e8a5a';
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
         ctx.moveTo(xm, 40);
         ctx.lineTo(xm, h - 30);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = '#059669';
+        ctx.fillStyle = '#0e8a5a';
         ctx.fillText(`incontro`, xm, 28);
       }
     }
@@ -638,19 +640,19 @@ window.SIM_METADATA = {
     for (let tt = 0; tt <= Math.min(simTime, tMax) + 1e-9; tt += dtGraph) {
       pointsXA.push({ t: tt, y: s.x0A + s.vA * tt });
     }
-    drawLineGraph(graphXCtx, pointsXA, '#2563eb', wX, hX, pad, 0, tMax, xMin, xMax);
+    drawLineGraph(graphXCtx, pointsXA, '#1f6fd0', wX, hX, pad, 0, tMax, xMin, xMax);
 
     if (s.activeB) {
       const pointsXB = [];
       for (let tt = 0; tt <= Math.min(simTime, tMax) + 1e-9; tt += dtGraph) {
         pointsXB.push({ t: tt, y: s.x0B + s.vB * tt });
       }
-      drawLineGraph(graphXCtx, pointsXB, '#dc2626', wX, hX, pad, 0, tMax, xMin, xMax);
+      drawLineGraph(graphXCtx, pointsXB, '#c2491d', wX, hX, pad, 0, tMax, xMin, xMax);
 
       const meet = computeMeeting(s.x0A, s.vA, s.x0B, s.vB);
       if (meet.type === 'futuro' && meet.t <= tMax) {
         const m = mapPoint(meet.t, meet.x, wX, hX, pad, 0, tMax, xMin, xMax);
-        graphXCtx.fillStyle = '#059669';
+        graphXCtx.fillStyle = '#0e8a5a';
         graphXCtx.beginPath();
         graphXCtx.arc(m.px, m.py, 5, 0, Math.PI * 2);
         graphXCtx.fill();
@@ -669,14 +671,14 @@ window.SIM_METADATA = {
       { t: 0, y: s.vA },
       { t: Math.min(simTime, tMax), y: s.vA }
     ];
-    drawLineGraph(graphVCtx, pointsVA, '#2563eb', wV, hV, pad, 0, tMax, vMin, vMax);
+    drawLineGraph(graphVCtx, pointsVA, '#1f6fd0', wV, hV, pad, 0, tMax, vMin, vMax);
 
     if (s.activeB) {
       const pointsVB = [
         { t: 0, y: s.vB },
         { t: Math.min(simTime, tMax), y: s.vB }
       ];
-      drawLineGraph(graphVCtx, pointsVB, '#dc2626', wV, hV, pad, 0, tMax, vMin, vMax);
+      drawLineGraph(graphVCtx, pointsVB, '#c2491d', wV, hV, pad, 0, tMax, vMin, vMax);
     }
   }
 

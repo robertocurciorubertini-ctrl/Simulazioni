@@ -20,26 +20,24 @@ window.SIM_METADATA = {
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap');
-
   :root {
-    --bg: #f5f6fa;
-    --surface: #ffffff;
-    --surface2: #eef1f7;
-    --border: #d1d9e6;
-    --accent: #1a6fcc;
-    --accent2: #5b47d6;
-    --accent3: #0e9966;
-    --warn: #c47c00;
-    --danger: #c0392b;
-    --text: #1a1f2e;
-    --text-dim: #8a94a6;
-    --text-mid: #4a5568;
-    --psi-re: #1a6fcc;
-    --psi-im: #5b47d6;
-    --prob: #0e9966;
-    --pot: #c47c00;
-    --energy: #c0392b;
+    --bg: var(--fs-paper);
+    --surface: var(--fs-surface);
+    --surface2: var(--fs-surface-2);
+    --border: var(--fs-line);
+    --accent: var(--fs-blue);
+    --accent2: var(--fs-violet);
+    --accent3: var(--fs-green);
+    --warn: var(--fs-amber);
+    --danger: var(--fs-red);
+    --text: var(--fs-ink);
+    --text-dim: var(--fs-ink-3);
+    --text-mid: var(--fs-ink-2);
+    --psi-re: var(--fs-blue);
+    --psi-im: var(--fs-violet);
+    --prob: var(--fs-green);
+    --pot: var(--fs-amber);
+    --energy: var(--fs-red);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,7 +45,7 @@ window.SIM_METADATA = {
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     line-height: 1.6;
     min-height: 100vh;
@@ -67,7 +65,7 @@ window.SIM_METADATA = {
   }
 
   header h1 {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 15px;
     font-weight: 500;
     color: var(--accent);
@@ -77,7 +75,7 @@ window.SIM_METADATA = {
   header span {
     font-size: 12px;
     color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   nav {
@@ -94,7 +92,7 @@ window.SIM_METADATA = {
     border: none;
     border-bottom: 2px solid transparent;
     color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     padding: 12px 20px;
     cursor: pointer;
@@ -146,7 +144,7 @@ window.SIM_METADATA = {
   }
 
   .canvas-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--text-dim);
     margin-bottom: 4px;
@@ -154,7 +152,7 @@ window.SIM_METADATA = {
   }
 
   .section-title {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     font-weight: 500;
     color: var(--accent);
@@ -177,11 +175,11 @@ window.SIM_METADATA = {
   label {
     font-size: 12px;
     color: var(--text-mid);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   .val {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     color: var(--accent);
     min-width: 40px;
@@ -214,7 +212,7 @@ window.SIM_METADATA = {
     background: var(--surface2);
     border: 1px solid var(--border);
     color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     padding: 7px 14px;
     border-radius: 3px;
@@ -282,7 +280,7 @@ window.SIM_METADATA = {
     gap: 5px;
     font-size: 11px;
     color: var(--text-mid);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   .legend-dot {
@@ -305,21 +303,21 @@ window.SIM_METADATA = {
   }
 
   .stat-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: var(--text-dim);
     letter-spacing: 0.05em;
   }
 
   .stat-value {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 14px;
     color: var(--accent);
     margin-top: 2px;
   }
 
   .alert {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     padding: 8px 10px;
     border-radius: 3px;
@@ -342,7 +340,7 @@ window.SIM_METADATA = {
     background: var(--surface2);
     border: 1px solid var(--border);
     color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     padding: 5px 8px;
     border-radius: 3px;
@@ -356,8 +354,10 @@ window.SIM_METADATA = {
     .sidebar { border-left: none; border-top: 1px solid var(--border); }
   }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>ψ — Meccanica Quantistica</h1>
@@ -823,12 +823,12 @@ function updateWell() {
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(pad.l, yS(lv.E)); ctx.lineTo(W - pad.r, yS(lv.E)); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#c0392b';
+      ctx.fillStyle = '#c2491d';
       ctx.font = '9px IBM Plex Mono';
       ctx.textAlign = 'left';
       ctx.fillText(`E${lv.n}`, W - pad.r + 2, yS(lv.E) + 3);
       // Wavefunction offset at E level
-      const colors = ['#1a6fcc','#5b47d6','#0e9966','#c0392b','#8e44ad','#c47c00'];
+      const colors = ['#1f6fd0','#6d4fc0','#0e8a5a','#c2491d','#8e44ad','#b7791f'];
       ctx.strokeStyle = colors[idx % colors.length];
       ctx.lineWidth = 1.2;
       ctx.beginPath();
@@ -844,7 +844,7 @@ function updateWell() {
   } else {
     const lvIdx = Math.min(n - 1, levels.length - 1);
     if (lvIdx < 0) {
-      ctx.fillStyle = '#c0392b';
+      ctx.fillStyle = '#c2491d';
       ctx.font = '12px IBM Plex Mono';
       ctx.textAlign = 'center';
       ctx.fillText('Nessuno stato legato per questi parametri', W / 2, H / 2);
@@ -868,7 +868,7 @@ function updateWell() {
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(pad.l, yS(lv.E)); ctx.lineTo(W - pad.r, yS(lv.E)); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#c0392b';
+    ctx.fillStyle = '#c2491d';
     ctx.font = '10px IBM Plex Mono';
     ctx.textAlign = 'left';
     ctx.fillText(`E${lv.n} = ${lv.E.toFixed(2)}`, W - pad.r + 2, yS(lv.E) + 3);
@@ -882,7 +882,7 @@ function updateWell() {
     ctx.fillRect(wallX2, pad.t, W - pad.r - wallX2, plotH);
 
     if (viewMode === 'both' || viewMode === 'prob') {
-      ctx.strokeStyle = '#0e9966';
+      ctx.strokeStyle = '#0e8a5a';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       let first = true;
@@ -896,7 +896,7 @@ function updateWell() {
     }
 
     if (viewMode === 'both' || viewMode === 'psi') {
-      ctx.strokeStyle = '#1a6fcc';
+      ctx.strokeStyle = '#1f6fd0';
       ctx.lineWidth = 2;
       ctx.beginPath();
       let first = true;
@@ -965,7 +965,7 @@ function updatePacket() {
   ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.stroke();
 
   // |ψ|²
-  ctx.strokeStyle = '#0e9966';
+  ctx.strokeStyle = '#0e8a5a';
   ctx.lineWidth = 2;
   ctx.beginPath();
   for (let i = 0; i <= Nx; i += 2) {
@@ -975,7 +975,7 @@ function updatePacket() {
   ctx.stroke();
 
   // Im[ψ]
-  ctx.strokeStyle = '#5b47d6';
+  ctx.strokeStyle = '#6d4fc0';
   ctx.lineWidth = 1.2;
   ctx.beginPath();
   for (let i = 0; i <= Nx; i += 2) {
@@ -985,7 +985,7 @@ function updatePacket() {
   ctx.stroke();
 
   // Re[ψ]
-  ctx.strokeStyle = '#1a6fcc';
+  ctx.strokeStyle = '#1f6fd0';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   for (let i = 0; i <= Nx; i += 2) {
@@ -999,7 +999,7 @@ function updatePacket() {
   ctx.setLineDash([3, 3]);
   ctx.beginPath(); ctx.moveTo(xS(x0), pad.t); ctx.lineTo(xS(x0), H - pad.b); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#c47c00';
+  ctx.fillStyle = '#b7791f';
   ctx.font = '9px IBM Plex Mono';
   ctx.textAlign = 'center';
   ctx.fillText('x₀', xS(x0), pad.t + 10);
@@ -1014,7 +1014,7 @@ function updatePacket() {
   ctx.lineTo(xS(x0 + sigma), yBracket);
   ctx.lineTo(xS(x0 + sigma), H - pad.b);
   ctx.stroke();
-  ctx.fillStyle = '#1a6fcc';
+  ctx.fillStyle = '#1f6fd0';
   ctx.font = '9px IBM Plex Mono';
   ctx.textAlign = 'center';
   ctx.fillText('2σ = Δx · 2', xS(x0), yBracket + 10);
@@ -1051,7 +1051,7 @@ function updatePacket() {
   ctxM.beginPath(); ctxM.moveTo(padM.l, padM.t); ctxM.lineTo(padM.l, HM - padM.b); ctxM.stroke();
 
   // |φ(k)|²
-  ctxM.strokeStyle = '#c47c00';
+  ctxM.strokeStyle = '#b7791f';
   ctxM.lineWidth = 2;
   ctxM.beginPath();
   for (let i = 0; i <= 800; i += 2) {
@@ -1065,7 +1065,7 @@ function updatePacket() {
   ctxM.setLineDash([3, 3]);
   ctxM.beginPath(); ctxM.moveTo(kS(k0), padM.t); ctxM.lineTo(kS(k0), HM - padM.b); ctxM.stroke();
   ctxM.setLineDash([]);
-  ctxM.fillStyle = '#c0392b';
+  ctxM.fillStyle = '#c2491d';
   ctxM.font = '9px IBM Plex Mono';
   ctxM.textAlign = 'center';
   ctxM.fillText('k₀', kS(k0), padM.t + 10);
@@ -1080,7 +1080,7 @@ function updatePacket() {
   ctxM.lineTo(kS(k0 + sigmaK), yBM);
   ctxM.lineTo(kS(k0 + sigmaK), HM - padM.b);
   ctxM.stroke();
-  ctxM.fillStyle = '#c47c00';
+  ctxM.fillStyle = '#b7791f';
   ctxM.font = '9px IBM Plex Mono';
   ctxM.textAlign = 'center';
   ctxM.fillText(`Δk = 1/(2σ) = ${sigmaK.toFixed(2)}`, kS(k0), yBM + 10);
@@ -1178,7 +1178,7 @@ function updateTunnel() {
 
   // Potential
   const vScale = plotH * 0.9 / V0;
-  ctx.strokeStyle = '#c47c00';
+  ctx.strokeStyle = '#b7791f';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(pad.l, yCenter - 0 * vScale);
@@ -1196,10 +1196,10 @@ function updateTunnel() {
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(pad.l, eY); ctx.lineTo(W - pad.r, eY); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#c0392b';
+  ctx.fillStyle = '#c2491d';
   ctx.font = '10px IBM Plex Mono';
   ctx.fillText(`E = ${E.toFixed(0)}`, pad.l + 4, eY - 4);
-  ctx.fillStyle = '#c47c00';
+  ctx.fillStyle = '#b7791f';
   ctx.fillText(`V₀ = ${V0}`, xS(0) - 20, yCenter - V0 * vScale * 0.8 + 14);
 
   // Wavefunction — stationary solution with exact amplitudes
@@ -1228,7 +1228,7 @@ function updateTunnel() {
   // Region I: ψ_I = cos(kx) + r·cos(-kx+δ) — standing wave pattern
   // For display: |1+r|² oscillates, use amplitude envelope
   // Re[ψ_I] ≈ (1+sqrtR)·cos(kx + phase_shift) — approximate but instructive
-  ctx.strokeStyle = '#1a6fcc';
+  ctx.strokeStyle = '#1f6fd0';
   ctx.beginPath();
   let firstPt = true;
   for (let i = 0; i <= 300; i++) {
@@ -1242,7 +1242,7 @@ function updateTunnel() {
   ctx.stroke();
 
   // Region II: inside barrier
-  ctx.strokeStyle = E < V0 ? '#c47c00' : '#5b47d6';
+  ctx.strokeStyle = E < V0 ? '#b7791f' : '#6d4fc0';
   ctx.beginPath();
   firstPt = true;
   for (let i = 0; i <= 200; i++) {
@@ -1331,7 +1331,7 @@ function drawTransmissionCurve(V0, a) {
   ctx.fillRect(pad.l, pad.t, eV0x - pad.l, plotH);
 
   // T curve
-  ctx.strokeStyle = '#0e9966';
+  ctx.strokeStyle = '#0e8a5a';
   ctx.lineWidth = 2;
   ctx.beginPath();
   let first = true;
@@ -1347,7 +1347,7 @@ function drawTransmissionCurve(V0, a) {
   // Current E marker
   const curE = parseFloat(document.getElementById('tbESlider').value);
   const { T: curT } = computeTransmission(curE, V0, a);
-  ctx.fillStyle = '#c0392b';
+  ctx.fillStyle = '#c2491d';
   ctx.beginPath();
   ctx.arc(eToX(curE), tToY(curT), 4, 0, 2 * Math.PI);
   ctx.fill();
@@ -1594,7 +1594,7 @@ function drawTDSE() {
   ctx.closePath();
   ctx.fill();
 
-  ctx.strokeStyle = '#c47c00';
+  ctx.strokeStyle = '#b7791f';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   let first = true;
@@ -1606,7 +1606,7 @@ function drawTDSE() {
   ctx.stroke();
 
   // Im[ψ]
-  ctx.strokeStyle = '#5b47d6';
+  ctx.strokeStyle = '#6d4fc0';
   ctx.lineWidth = 1.2;
   ctx.beginPath();
   first = true;
@@ -1618,7 +1618,7 @@ function drawTDSE() {
   ctx.stroke();
 
   // Re[ψ]
-  ctx.strokeStyle = '#1a6fcc';
+  ctx.strokeStyle = '#1f6fd0';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   first = true;
@@ -1638,7 +1638,7 @@ function drawTDSE() {
   ctx.closePath();
   ctx.fill();
 
-  ctx.strokeStyle = '#0e9966';
+  ctx.strokeStyle = '#0e8a5a';
   ctx.lineWidth = 2;
   ctx.beginPath();
   first = true;

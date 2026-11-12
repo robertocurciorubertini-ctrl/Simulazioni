@@ -15,24 +15,22 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orbitali Atomici — Meccanica Quantistica</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <style>
 :root {
-  --bg: #faf7f2;
-  --bg2: #f2ede4;
-  --bg3: #e8e0d0;
-  --ink: #1a1510;
-  --ink2: #4a3f30;
-  --ink3: #7a6a55;
-  --accent: #8b3a1a;
-  --accent2: #2a5c8a;
-  --accent3: #1a6b3a;
-  --gold: #b8860b;
-  --border: #c8b89a;
+  --bg: var(--fs-paper);
+  --bg2: var(--fs-surface-2);
+  --bg3: var(--fs-surface-3);
+  --ink: var(--fs-ink);
+  --ink2: var(--fs-ink-2);
+  --ink3: var(--fs-ink-3);
+  --accent: var(--fs-red);
+  --accent2: var(--fs-blue);
+  --accent3: var(--fs-green);
+  --gold: var(--fs-amber);
+  --border: var(--fs-line);
   --shadow: rgba(60,40,10,0.10);
   --canvas-bg: #0d0a06;
   --prob-color: #e8a040;
@@ -44,7 +42,7 @@ window.SIM_METADATA = {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 16px;
   line-height: 1.7;
 }
@@ -60,14 +58,14 @@ header {
 }
 
 header h1 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 2rem;
   font-weight: 400;
   letter-spacing: 0.02em;
 }
 
 header span {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.8rem;
   color: var(--ink3);
   opacity: 0.7;
@@ -98,7 +96,7 @@ header span {
 }
 
 .panel-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -124,7 +122,7 @@ header span {
   cursor: pointer;
   text-align: center;
   transition: all 0.15s;
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1rem;
   color: var(--ink2);
 }
@@ -138,7 +136,7 @@ header span {
 
 .atom-btn small {
   display: block;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.6rem;
   opacity: 0.8;
   margin-top: 1px;
@@ -152,7 +150,7 @@ header span {
 }
 
 .shell-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   color: var(--ink3);
   text-transform: uppercase;
@@ -173,7 +171,7 @@ header span {
   border-radius: 2px;
   padding: 0.3rem 0.6rem;
   cursor: pointer;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.75rem;
   color: var(--ink2);
   transition: all 0.15s;
@@ -196,13 +194,13 @@ header span {
 }
 
 .param-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
   color: var(--ink2);
 }
 
 .param-value {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
   color: var(--accent);
   min-width: 40px;
@@ -220,7 +218,7 @@ input[type=range] {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.4rem;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
   color: var(--ink2);
   cursor: pointer;
@@ -244,14 +242,14 @@ input[type=checkbox] { accent-color: var(--accent2); }
 }
 
 .qn-name {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.6rem;
   color: var(--ink3);
   display: block;
 }
 
 .qn-val {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.2rem;
   color: var(--accent);
   display: block;
@@ -290,14 +288,14 @@ canvas {
   border: 1px solid rgba(200,180,150,0.2);
   border-radius: 2px;
   padding: 4px 10px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.75rem;
   color: #c8b890;
   pointer-events: none;
 }
 
 .orbital-name-badge {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.4rem;
   color: #e8c870;
   background: rgba(13,10,6,0.7);
@@ -320,7 +318,7 @@ canvas {
   border: 1px solid rgba(200,180,150,0.25);
   border-radius: 2px;
   padding: 4px 10px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   color: #c8b890;
   cursor: pointer;
@@ -339,7 +337,7 @@ canvas {
   border: 1px solid rgba(200,180,150,0.2);
   border-radius: 2px;
   padding: 5px 10px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   color: #a09070;
   pointer-events: none;
@@ -353,7 +351,7 @@ canvas {
 }
 
 .desc-header {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.5rem;
   color: var(--ink);
   margin-bottom: 1rem;
@@ -363,13 +361,13 @@ canvas {
 }
 
 .desc-header .energy-val {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.8rem;
   color: var(--accent2);
 }
 
 .desc-body {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 0.93rem;
   color: var(--ink2);
   line-height: 1.8;
@@ -395,7 +393,7 @@ canvas {
 }
 
 .wf-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -418,7 +416,7 @@ canvas {
 }
 
 .prop-card-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.62rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -428,7 +426,7 @@ canvas {
 }
 
 .prop-card-val {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.05rem;
   color: var(--accent);
 }
@@ -441,7 +439,7 @@ canvas {
 }
 
 .radial-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -473,7 +471,7 @@ canvas {
 }
 
 .loading-text {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.8rem;
   color: #a09070;
   letter-spacing: 0.1em;
@@ -498,7 +496,7 @@ footer {
   background: var(--bg2);
   border-top: 1px solid var(--border);
   padding: 1rem 2.5rem;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   color: var(--ink3);
   display: flex;
@@ -511,8 +509,10 @@ footer {
   .content { order: 1; }
 }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Orbitali Atomici</h1>
@@ -595,7 +595,7 @@ footer {
         <span class="param-value" id="zeffVal">1.00</span>
       </div>
       <input type="range" id="zeffSlider" min="0.5" max="12" value="1.0" step="0.05">
-      <div style="font-size:0.65rem; color:var(--ink3); font-family:'IBM Plex Mono',monospace; margin-top:6px; line-height:1.5;">
+      <div style="font-size:0.65rem; color:var(--ink3); font-family:'DM Mono',monospace; margin-top:6px; line-height:1.5;">
         Aggiustato automaticamente con le regole di Slater. Modificabile manualmente.
       </div>
     </div>
@@ -1414,13 +1414,13 @@ function updateDescription() {
     </div>
 
     <p class="desc-body" style="margin-top:1.2rem;">${desc.intro}</p>
-    <p class="desc-body"><strong style="color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">NODI</strong><br>${desc.nodes}</p>
-    <p class="desc-body"><strong style="color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">FISICA</strong><br>${desc.physics}</p>
+    <p class="desc-body"><strong style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.8rem;">NODI</strong><br>${desc.nodes}</p>
+    <p class="desc-body"><strong style="color:var(--accent2);font-family:'DM Mono',monospace;font-size:0.8rem;">FISICA</strong><br>${desc.physics}</p>
 
     <div class="radial-section">
       <div class="radial-title">Distribuzione radiale di probabilità: r²|R<sub>nl</sub>(r)|²</div>
       <canvas id="radialCanvas" height="140"></canvas>
-      <div style="font-size:0.72rem;font-family:'IBM Plex Mono',monospace;color:var(--ink3);margin-top:4px;">
+      <div style="font-size:0.72rem;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px;">
         Ascissa in unità di a₀. Le frecce verticali indicano i nodi radiali.
       </div>
     </div>
@@ -1447,7 +1447,7 @@ function drawRadialPlot() {
   canvas.height = 140;
   const ctx = canvas.getContext('2d');
 
-  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg2').trim() || '#f2ede4';
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg2').trim() || '#efebe1';
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, 140);
 
@@ -1475,7 +1475,7 @@ function drawRadialPlot() {
 
   // Curve
   ctx.beginPath();
-  ctx.strokeStyle = '#8b3a1a';
+  ctx.strokeStyle = '#c2491d';
   ctx.lineWidth = 1.8;
   for (let i=0; i<NP; i++) {
     const x = pad.l + (i/(NP-1)) * pw;

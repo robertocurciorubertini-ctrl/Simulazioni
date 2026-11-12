@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <script>
 window.SIM_METADATA = {
-  "title": "Effetto fotoelettrico"
-  "description": "da fare",
-  "category": "Meccanica quantistica"
-  "icon": "bho",
+  "title": "Effetto fotoelettrico",
+  "description": "Simulazione interattiva dell’effetto fotoelettrico basata sull’equazione di Einstein.",
+  "category": "Meccanica Quantistica",
+  "icon": "⚛️",
   "order": 1,
-  "tags": ["effetto fotoelettrico"],
+  "tags": ["effetto fotoelettrico", "fotoni", "funzione lavoro", "potenziale di arresto", "einstein", "fisica quantistica", "fotoelettroni"],
   "level": "avanzato"
 };
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Effetto Fotoelettrico</title>
 <meta name="description" content="Simulazione interattiva dell'effetto fotoelettrico: emissione di fotoelettroni da una superficie metallica irradiata da luce. Controllo di frequenza, lunghezza d'onda e intensità. Teoria completa con equazioni di Einstein.">
@@ -21,8 +22,6 @@ window.SIM_METADATA = {
 <meta name="level" content="Liceo Scientifico, Università (primo anno)">
 <meta name="topics" content="Effetto fotoelettrico, Quantizzazione dell'energia, Fotone, Funzione lavoro, Equazione di Einstein, Corrente di saturazione, Potenziale di arresto">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -33,19 +32,19 @@ window.SIM_METADATA = {
 
 <style>
   :root {
-    --cream: #f5f0e8;
-    --cream-dark: #ede7d9;
-    --ink: #1a1612;
-    --ink-light: #3d3530;
-    --accent: #8b3a1e;
+    --cream: var(--fs-paper);
+    --cream-dark: var(--fs-surface-2);
+    --ink: var(--fs-ink);
+    --ink-light: var(--fs-ink-2);
+    --accent: var(--fs-red);
     --accent-light: #c4622d;
     --accent-pale: #f0ddd4;
-    --gold: #a07830;
+    --gold: var(--fs-amber);
     --gold-light: #c9a85c;
-    --blue: #1e4d8b;
+    --blue: var(--fs-blue);
     --blue-light: #2e6bb5;
-    --green: #2d6b3a;
-    --border: #c8bfb0;
+    --green: var(--fs-green);
+    --border: var(--fs-line);
     --shadow: rgba(26,22,18,0.12);
   }
 
@@ -54,7 +53,7 @@ window.SIM_METADATA = {
   body {
     background: var(--cream);
     color: var(--ink);
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-weight: 300;
     line-height: 1.7;
     font-size: 15px;
@@ -68,7 +67,7 @@ window.SIM_METADATA = {
     border-bottom: 3px solid var(--accent);
   }
   header .tag {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -76,7 +75,7 @@ window.SIM_METADATA = {
     margin-bottom: 0.6rem;
   }
   header h1 {
-    font-family: 'EB Garamond', serif;
+    font-family: 'Crimson Pro', serif;
     font-size: 2.6rem;
     font-weight: 500;
     letter-spacing: -0.01em;
@@ -96,7 +95,7 @@ window.SIM_METADATA = {
     flex-wrap: wrap;
   }
   .meta-item {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.68rem;
     color: #888078;
     letter-spacing: 0.05em;
@@ -116,7 +115,7 @@ window.SIM_METADATA = {
   }
 
   h2 {
-    font-family: 'EB Garamond', serif;
+    font-family: 'Crimson Pro', serif;
     font-size: 1.75rem;
     font-weight: 500;
     color: var(--ink);
@@ -125,7 +124,7 @@ window.SIM_METADATA = {
     border-bottom: 1px solid var(--border);
   }
   h3 {
-    font-family: 'EB Garamond', serif;
+    font-family: 'Crimson Pro', serif;
     font-size: 1.25rem;
     font-weight: 500;
     color: var(--ink-light);
@@ -143,7 +142,7 @@ window.SIM_METADATA = {
     font-size: 1.05rem;
   }
   .formula-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -201,7 +200,7 @@ window.SIM_METADATA = {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.75rem;
     color: var(--ink-light);
     margin-bottom: 0.5rem;
@@ -224,7 +223,7 @@ window.SIM_METADATA = {
     font-size: 0.72rem;
     color: #888;
     margin-top: 0.35rem;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   /* Material selector */
@@ -240,7 +239,7 @@ window.SIM_METADATA = {
     border-radius: 2px;
     padding: 0.45rem 0.5rem;
     cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     text-align: center;
     transition: all 0.15s;
@@ -264,7 +263,7 @@ window.SIM_METADATA = {
     color: var(--cream);
   }
   .readout .r-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -272,7 +271,7 @@ window.SIM_METADATA = {
     margin-bottom: 0.2rem;
   }
   .readout .r-val {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.95rem;
     font-weight: 500;
   }
@@ -285,7 +284,7 @@ window.SIM_METADATA = {
     margin-top: 1rem;
     padding: 0.8rem 1.2rem;
     border-radius: 3px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.78rem;
     font-weight: 500;
     text-align: center;
@@ -311,7 +310,7 @@ window.SIM_METADATA = {
   th {
     background: var(--ink);
     color: var(--cream);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     font-weight: 400;
     text-transform: uppercase;
@@ -322,7 +321,7 @@ window.SIM_METADATA = {
   td {
     padding: 0.55rem 1rem;
     border-bottom: 1px solid var(--border);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.78rem;
     color: var(--ink-light);
   }
@@ -338,8 +337,10 @@ window.SIM_METADATA = {
     section.card { padding: 1.4rem 1.2rem; }
   }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <div class="tag">Fisica Moderna · Simulazione Interattiva</div>
@@ -536,12 +537,12 @@ window.SIM_METADATA = {
     <div>
       <h3 style="margin-top:0">Diagramma energia — livelli</h3>
       <canvas id="energy-canvas" width="500" height="280"></canvas>
-      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;font-family:'IBM Plex Mono',monospace;">Confronto visivo tra energia del fotone, funzione lavoro Φ e energia cinetica massima $E_{k,\max}$.</p>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;font-family:'DM Mono',monospace;">Confronto visivo tra energia del fotone, funzione lavoro Φ e energia cinetica massima $E_{k,\max}$.</p>
     </div>
     <div>
       <h3 style="margin-top:0">Caratteristica I-V</h3>
       <canvas id="iv-canvas" width="500" height="280"></canvas>
-      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;font-family:'IBM Plex Mono',monospace;">Corrente fotoelettrica in funzione della tensione applicata. Il punto $V = -V_0$ indica l'intercetta con l'asse delle tensioni.</p>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;font-family:'DM Mono',monospace;">Corrente fotoelettrica in funzione della tensione applicata. Il punto $V = -V_0$ indica l'intercetta con l'asse delle tensioni.</p>
     </div>
   </div>
 </section>

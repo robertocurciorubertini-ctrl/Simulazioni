@@ -24,26 +24,24 @@ window.SIM_METADATA = {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ottica Geometrica — Simulatore</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0b0e14;
-    --surface: #12161f;
-    --border: #1e2535;
-    --accent: #f0c040;
-    --accent2: #3ecfcf;
+    --bg: #0a0f1a;
+    --surface: #0f1623;
+    --border: #1e2a40;
+    --accent: #f0c060;
+    --accent2: #5bd4c4;
     --accent3: #e06060;
-    --text: #c8d0e0;
-    --dim: #5a6278;
+    --text: #e8edf7;
+    --dim: #8fa0be;
     --panel-w: 280px;
   }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Space Mono', monospace;
+    font-family: 'DM Mono', monospace;
     display: flex;
     height: 100vh;
     overflow: hidden;
@@ -62,7 +60,7 @@ window.SIM_METADATA = {
   }
 
   #panel h1 {
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-weight: 800;
     font-size: 1.05rem;
     letter-spacing: .06em;
@@ -121,7 +119,7 @@ window.SIM_METADATA = {
     border: 1px solid var(--border);
     border-radius: 4px;
     color: var(--text);
-    font-family: 'Space Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: .68rem;
     cursor: pointer;
     transition: border-color .2s, color .2s, background .2s;
@@ -198,8 +196,10 @@ window.SIM_METADATA = {
     white-space: nowrap;
   }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge fs-dark">
 
 <!-- ── PANNELLO ── -->
 <div id="panel">
@@ -290,7 +290,7 @@ const state = {
   raggi: 60,
   apertura: 360,               // gradi
   direzione: 0,                // gradi
-  colore: '#f0c040',
+  colore: '#f0c060',
   diaframma: 60,               // % apertura
   diafX: 0.40,
   focale: 160,
@@ -306,7 +306,7 @@ const state = {
 //  COLORI DISPONIBILI
 // ════════════════════════════════════════════════════
 const COLORI = [
-  '#f0c040','#ff6633','#ff3366','#cc44ff',
+  '#f0c060','#ff6633','#ff3366','#cc44ff',
   '#4488ff','#33ddaa','#ffffff','#ff9900',
 ];
 const colorRow = document.getElementById('colorRow');

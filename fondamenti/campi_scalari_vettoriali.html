@@ -32,7 +32,6 @@ window.SIM_METADATA = {
 <meta name="topic" content="Campi scalari e vettoriali">
 <meta name="category" content="Matematica e Fisica di base">
 <meta name="language" content="it">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -40,18 +39,18 @@ window.SIM_METADATA = {
 
 <style>
 :root {
-  --cream: #f5f0e8;
-  --ink: #1a1a1a;
-  --warm-mid: #c8b89a;
-  --accent: #8b4513;
+  --cream: var(--fs-paper);
+  --ink: var(--fs-ink);
+  --warm-mid: var(--fs-line-2);
+  --accent: var(--fs-red);
   --accent-light: #d4956a;
-  --muted: #6b5c4c;
-  --border: #d4c9b8;
-  --panel: #ede8df;
+  --muted: var(--fs-ink-2);
+  --border: var(--fs-line);
+  --panel: var(--fs-surface-2);
   --scalar-a: #1a3a6b;
   --scalar-b: #e8f4f8;
   --vector-a: #2d5a27;
-  --highlight: #b34a00;
+  --highlight: var(--fs-red);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,7 +58,7 @@ window.SIM_METADATA = {
 body {
   background: var(--cream);
   color: var(--ink);
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 16px;
   line-height: 1.6;
   min-height: 100vh;
@@ -74,7 +73,7 @@ header {
 }
 
 .site-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   color: var(--muted);
@@ -82,14 +81,14 @@ header {
 }
 
 header h1 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 2.4rem;
   font-weight: 500;
   line-height: 1.15;
 }
 
 header .subtitle {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-weight: 300;
   font-size: 0.95rem;
   color: var(--muted);
@@ -105,7 +104,7 @@ header .subtitle {
 }
 
 .tab-btn {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.1rem;
   padding: 0.7rem 2rem;
   background: none;
@@ -155,7 +154,7 @@ canvas {
   position: absolute;
   top: 10px;
   left: 10px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   color: rgba(0,0,0,0.45);
@@ -178,7 +177,7 @@ canvas {
 }
 
 .info-box h3 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.6rem;
@@ -188,7 +187,7 @@ canvas {
 }
 
 .readout {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.78rem;
   color: var(--ink);
   line-height: 1.9;
@@ -208,7 +207,7 @@ canvas {
 
 .ctrl-group label {
   display: block;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -225,7 +224,7 @@ select {
   background: var(--cream);
   border: 1px solid var(--border);
   padding: 0.3rem 0.5rem;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 0.85rem;
   color: var(--ink);
   cursor: pointer;
@@ -243,7 +242,7 @@ input[type=range] {
 }
 
 .toggle-btn {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -274,7 +273,7 @@ input[type=range] {
 .color-bar-labels {
   display: flex;
   justify-content: space-between;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.62rem;
   color: var(--muted);
   margin-top: 0.15rem;
@@ -295,7 +294,7 @@ input[type=range] {
 }
 
 .theory-block h3 {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Crimson Pro', serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--accent);
@@ -324,7 +323,7 @@ footer {
   margin-top: 3rem;
   border-top: 1px solid var(--border);
   padding: 1.2rem 3rem;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 0.7rem;
   color: var(--muted);
   letter-spacing: 0.05em;
@@ -341,8 +340,10 @@ footer {
   .tab-bar { margin-left: 1.2rem; margin-right: 1.2rem; }
 }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <div class="site-label">Simulazioni di Fisica — Liceo Scientifico</div>
@@ -408,7 +409,7 @@ footer {
         <div class="color-bar-labels" id="legendLabels" style="margin-top:0.2rem">
           <span id="legendMin">—</span><span id="legendMid">—</span><span id="legendMax">—</span>
         </div>
-        <div id="legendNote" style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:0.4rem;line-height:1.6"></div>
+        <div id="legendNote" style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:0.4rem;line-height:1.6"></div>
       </div>
     </div>
   </div>
@@ -473,7 +474,7 @@ footer {
 
 <!-- ═══════════════ TEORIA ═══════════════ -->
 <section class="theory" id="theory-section">
-  <h2 style="font-family:'EB Garamond',serif;font-size:1.7rem;font-weight:500">Descrizione teorica</h2>
+  <h2 style="font-family:'Crimson Pro',serif;font-size:1.7rem;font-weight:500">Descrizione teorica</h2>
   <div class="theory-grid">
     <div class="theory-block">
       <h3>Campo scalare</h3>
@@ -1158,7 +1159,7 @@ class ScalarRenderer {
       ctx.stroke();
       ctx.beginPath();
       ctx.arc(cx, cy, 5, 0, Math.PI*2);
-      ctx.fillStyle = '#b34a00';
+      ctx.fillStyle = '#c2491d';
       ctx.fill();
       ctx.beginPath();
       ctx.arc(cx, cy, 5, 0, Math.PI*2);
@@ -1359,11 +1360,11 @@ class VectorRenderer {
         const nx = fx / mag, ny = fy / mag;
         const cx = this.mouseX, cy = this.mouseY;
         this.drawArrow(ctx, cx, cy,
-          cx + nx * 36, cy - ny * 36, 9, '#b34a00', 2.5);
+          cx + nx * 36, cy - ny * 36, 9, '#c2491d', 2.5);
       }
       ctx.beginPath();
       ctx.arc(this.mouseX, this.mouseY, 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#b34a00';
+      ctx.fillStyle = '#c2491d';
       ctx.fill();
 
       const { fx: fxv, fy: fyv } = field.F(this.toWorld(this.mouseX, this.mouseY).x,

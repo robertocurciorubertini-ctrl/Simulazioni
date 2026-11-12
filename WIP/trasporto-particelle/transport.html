@@ -15,8 +15,6 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulazione Trasporto di Particelle — Monte Carlo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Exo+2:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════
    RESET & BASE
@@ -24,19 +22,19 @@ window.SIM_METADATA = {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #060a10;
-  --bg2:       #0c1220;
-  --bg3:       #111b2e;
-  --border:    #1e3050;
+  --bg:        #06090f;
+  --bg2:       #0a0f1a;
+  --bg3:       #0f1623;
+  --border:    #1e2a40;
   --accent:    #00d4ff;
   --accent2:   #ff6b35;
   --accent3:   #39ff14;
   --warn:      #ffcc00;
-  --text:      #c8ddf0;
-  --text-dim:  #4a6a8a;
-  --font-mono: 'Share Tech Mono', monospace;
-  --font-ui:   'Rajdhani', sans-serif;
-  --font-body: 'Exo 2', sans-serif;
+  --text:      #e8edf7;
+  --text-dim:  #8fa0be;
+  --font-mono: 'DM Mono', monospace;
+  --font-ui:   'DM Sans', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
 
   /* Colori particelle */
   --col-neutron:  #39ff14;
@@ -46,7 +44,7 @@ window.SIM_METADATA = {
   --col-fission:  #ff6b35;
 
   /* Colori materiali */
-  --col-vacuum:   #060a10;
+  --col-vacuum:   #06090f;
   --col-air:      #0d1a2e;
   --col-water:    #0a3d6b;
   --col-iron:     #3a4a5a;
@@ -332,8 +330,10 @@ button.active { background: rgba(57,255,20,0.1); border-color: var(--accent3); c
   white-space: nowrap;
 }
 </style>
+<link rel="stylesheet" href="../../assets/sim.css">
+<script src="../../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge fs-dark">
 <div id="app">
 
   <!-- ══ HEADER ══ -->
@@ -572,7 +572,7 @@ const MAT = {
   LEAD:     4, U235: 5, CONCRETE: 6
 };
 const MAT_NAMES    = ['Vuoto','Aria','Acqua','Ferro','Piombo','U-235','Cemento'];
-const MAT_COLORS   = ['#060a10','#0d1a2e','#0a3d6b','#3a4a5a','#2a1a3a','#6b0000','#2a2a1a'];
+const MAT_COLORS   = ['#06090f','#0d1a2e','#0a3d6b','#3a4a5a','#2a1a3a','#6b0000','#2a2a1a'];
 const MAT_COLORS_B = ['transparent','#0d2040','#0a4d8b','#4a5a6a','#3a2a4a','#8b1a1a','#3a3a2a'];
 
 const MATERIALS = [
@@ -1035,7 +1035,7 @@ function renderMaterial(){
   const d=img.data;
   for(let y=0;y<GRID_H;y++) for(let x=0;x<GRID_W;x++){
     const mi=matGrid[y*GRID_W+x];
-    const hex=MAT_COLORS[mi]||'#060a10';
+    const hex=MAT_COLORS[mi]||'#06090f';
     const r=parseInt(hex.slice(1,3),16);
     const g=parseInt(hex.slice(3,5),16);
     const b=parseInt(hex.slice(5,7),16);
@@ -1082,7 +1082,7 @@ let showTrackMode='all';
 function renderTracks(){
   // Fade parziale
   ctxTrack.globalAlpha=1-trackFade;
-  ctxTrack.fillStyle='#060a10';
+  ctxTrack.fillStyle='#06090f';
   ctxTrack.fillRect(0,0,CW,CH);
   ctxTrack.globalAlpha=1;
 
@@ -1142,7 +1142,7 @@ function renderSource(){
   ctxOvr.lineWidth=1;
   ctxOvr.stroke();
   // Label sorgente
-  ctxOvr.font='10px "Share Tech Mono"';
+  ctxOvr.font='10px "DM Mono"';
   ctxOvr.fillStyle='rgba(255,255,255,0.6)';
   ctxOvr.fillText(['N','γ','e⁻'][srcType]||'?', sx+12, sy-8);
   ctxOvr.fillText(srcE.toFixed(2)+' MeV', sx+12, sy+4);

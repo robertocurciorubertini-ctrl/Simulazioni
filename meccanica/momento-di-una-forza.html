@@ -19,17 +19,16 @@ window.SIM_METADATA = {
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap');
 :root{
-  --bg:#f5f6fa;--bg2:#eef0f7;--panel:#fff;--border:#dde1ee;
-  --accent:#0e9e82;--accent3:#c89200;--text:#1e2340;--text-dim:#8891b0;
-  --fl:#e0335a;--fr:#0e9e82;--fulc:#c89200;
+  --bg:var(--fs-paper);--bg2:var(--fs-surface-2);--panel:var(--fs-surface);--border:var(--fs-line);
+  --accent:var(--fs-green);--accent3:var(--fs-amber);--text:var(--fs-ink);--text-dim:var(--fs-ink-3);
+  --fl:var(--fs-red);--fr:var(--fs-green);--fulc:var(--fs-amber);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
 nav{display:flex;align-items:center;padding:0 32px;height:52px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.nav-title{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-right:40px}
-.nav-tab{height:52px;padding:0 20px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;cursor:pointer;transition:all .2s}
+.nav-title{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-right:40px}
+.nav-tab{height:52px;padding:0 20px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.06em;cursor:pointer;transition:all .2s}
 .nav-tab:hover{color:var(--text)}
 .nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .page{display:none;padding:28px 32px 48px}
@@ -40,11 +39,11 @@ nav{display:flex;align-items:center;padding:0 32px;height:52px;background:#fff;b
 #p1 canvas{width:100%;height:auto}
 .controls-col{display:flex;flex-direction:column;gap:11px}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:15px}
-.panel-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:11px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.panel-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:11px;border-bottom:1px solid var(--border);padding-bottom:6px}
 .ctrl-group{margin-bottom:9px}
 .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
 .ctrl-label span:first-child{font-size:12px;color:var(--text-dim)}
-.ctrl-val{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600}
+.ctrl-val{font-family:'DM Mono',monospace;font-size:11px;font-weight:600}
 .val-l{color:var(--fl)}.val-r{color:var(--fr)}.val-f{color:var(--fulc)}
 input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--border);border-radius:2px;outline:none}
 input[type=range].sl::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--fl);cursor:pointer}
@@ -52,35 +51,35 @@ input[type=range].sr::-webkit-slider-thumb{-webkit-appearance:none;width:13px;he
 input[type=range].sf::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--fulc);cursor:pointer}
 input[type=range].sn::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--text-dim);cursor:pointer}
 .readout{display:flex;flex-direction:column;gap:5px}
-.rrow{display:flex;justify-content:space-between;align-items:center;padding:5px 9px;background:#f5f6fa;border-radius:3px;border-left:2px solid var(--border)}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:5px 9px;background:#f4f1ea;border-radius:3px;border-left:2px solid var(--border)}
 .rrow.hl-r{border-left-color:var(--fl)}.rrow.hl-g{border-left-color:var(--fr)}.rrow.hl-y{border-left-color:var(--accent3)}
 .rlabel{font-size:11px;color:var(--text-dim)}
-.rval{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--text)}
+.rval{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--text)}
 .canvas-wrap{position:relative;background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07)}
 canvas{display:block}
-.mbadge{position:absolute;top:12px;right:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.07em;padding:3px 9px;border-radius:3px;border:1px solid;opacity:.9}
+.mbadge{position:absolute;top:12px;right:12px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.07em;padding:3px 9px;border-radius:3px;border:1px solid;opacity:.9}
 .b-static{background:rgba(136,145,176,.1);border-color:var(--text-dim);color:var(--text-dim)}
 .b-trans{background:rgba(14,158,130,.1);border-color:var(--fr);color:var(--fr)}
 .b-rot{background:rgba(224,51,90,.1);border-color:var(--fl);color:var(--fl)}
 .b-mix{background:rgba(200,146,0,.1);border-color:var(--accent3);color:var(--accent3)}
-.btn-reset{width:100%;padding:8px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.07em;cursor:pointer;transition:all .2s}
+.btn-reset{width:100%;padding:8px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.07em;cursor:pointer;transition:all .2s}
 .btn-reset:hover{background:var(--border);color:var(--text)}
 .btn-toggle-active{background:rgba(200,146,0,.12);border-color:var(--fulc);color:var(--fulc)}
 .description{margin-top:22px;padding:20px 24px;background:var(--panel);border:1px solid var(--border);border-radius:4px;border-left:3px solid var(--accent)}
-.description h3{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:11px}
+.description h3{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:11px}
 .description p{font-size:13.5px;line-height:1.75;color:#3a4060;margin-bottom:9px}
 .description p:last-child{margin-bottom:0}
 .formula-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0;padding:11px 15px;background:#f0f3fa;border-radius:3px;border:1px solid var(--border);align-items:center}
 .formula-item{font-size:13px;color:var(--text)}
 .ltype-wrap{display:flex;gap:6px;margin-bottom:8px}
-.ltype-btn{flex:1;padding:7px 4px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.3}
+.ltype-btn{flex:1;padding:7px 4px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.3}
 .ltype-btn.active{background:rgba(200,146,0,.15);border-color:var(--fulc);color:var(--fulc)}
 .ltype-btn:hover:not(.active){background:var(--border);color:var(--text)}
-.dir-btn,.dir-btn-r{flex:1;padding:5px 0;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s}
+.dir-btn,.dir-btn-r{flex:1;padding:5px 0;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s}
 .dir-btn.active{background:rgba(224,51,90,.12);border-color:var(--fl);color:var(--fl)}
 .dir-btn-r.active{background:rgba(14,158,130,.12);border-color:var(--fr);color:var(--fr)}
 .dir-btn:not(.active):hover,.dir-btn-r:not(.active):hover{background:var(--border);color:var(--text)}
-.vbadge,.eq-badge,.gen-badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 10px;border-radius:3px;border:1px solid;margin-left:5px}
+.vbadge,.eq-badge,.gen-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;padding:3px 10px;border-radius:3px;border:1px solid;margin-left:5px}
 .v-vant{background:rgba(14,158,130,.1);border-color:var(--fr);color:var(--fr)}
 .v-svant{background:rgba(224,51,90,.1);border-color:var(--fl);color:var(--fl)}
 .v-indif{background:rgba(136,145,176,.1);border-color:var(--text-dim);color:var(--text-dim)}
@@ -89,8 +88,10 @@ canvas{display:block}
 .gen-2{background:rgba(14,158,130,.1);border-color:var(--fr);color:var(--fr)}
 .gen-3{background:rgba(224,51,90,.1);border-color:var(--fl);color:var(--fl)}
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <nav>
   <span class="nav-title">Momento di una Forza</span>
   <button class="nav-tab active" onclick="showPage('p1',this)">Asta &amp; Momenti</button>
@@ -452,13 +453,13 @@ function drawSim1(ts){
     ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fillStyle='#2a7fc7'; ctx.fill();
   });
   // Cdm
-  ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2); ctx.fillStyle='#c89200'; ctx.fill();
-  ctx.save(); ctx.font='10px IBM Plex Mono'; ctx.fillStyle='#c89200'; ctx.fillText('cdm',cx+7,cy-7); ctx.restore();
+  ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2); ctx.fillStyle='#b7791f'; ctx.fill();
+  ctx.save(); ctx.font='10px IBM Plex Mono'; ctx.fillStyle='#b7791f'; ctx.fillText('cdm',cx+7,cy-7); ctx.restore();
 
   // Frecce forze: i vettori (f1x,f1y) sono in coord. fisiche → arrow1 li converte
-  arrow1(ctx, lx, ly, d.f1x, d.f1y, '#e0335a', 'F\u2081');
-  arrow1(ctx, rx, ry, d.f2x, d.f2y, '#0e9e82', 'F\u2082');
-  if(d.ftot > 0.5) arrow1(ctx, cx, cy, d.ftx, d.fty, '#c89200', 'F_tot', true);
+  arrow1(ctx, lx, ly, d.f1x, d.f1y, '#c2491d', 'F\u2081');
+  arrow1(ctx, rx, ry, d.f2x, d.f2y, '#0e8a5a', 'F\u2082');
+  if(d.ftot > 0.5) arrow1(ctx, cx, cy, d.ftx, d.fty, '#b7791f', 'F_tot', true);
 
   // Info testo
   const vMag = Math.sqrt(s1.vx*s1.vx + s1.vy*s1.vy);
@@ -760,7 +761,7 @@ function drawSim2(ts){
 
   // Fulcro triangolo
   ctx.save();
-  ctx.fillStyle='rgba(200,146,0,0.12)'; ctx.strokeStyle='#c89200'; ctx.lineWidth=1.5;
+  ctx.fillStyle='rgba(200,146,0,0.12)'; ctx.strokeStyle='#b7791f'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(pivX,pivY); ctx.lineTo(pivX-18,pivY+32); ctx.lineTo(pivX+18,pivY+32);
   ctx.closePath(); ctx.fill(); ctx.stroke();
   ctx.strokeStyle='rgba(200,146,0,0.3)'; ctx.lineWidth=1;
@@ -781,7 +782,7 @@ function drawSim2(ts){
   ctx.restore();
 
   // Fulcro pin
-  ctx.beginPath(); ctx.arc(pivX,pivY,7,0,Math.PI*2); ctx.fillStyle='#c89200'; ctx.fill();
+  ctx.beginPath(); ctx.arc(pivX,pivY,7,0,Math.PI*2); ctx.fillStyle='#b7791f'; ctx.fill();
 
   // Label bracci
   ctx.save(); ctx.font='11px IBM Plex Mono'; ctx.fillStyle='rgba(160,100,0,0.75)';
@@ -792,25 +793,25 @@ function drawSim2(ts){
     ctx.fillText('d\u2081='+d.d1.toFixed(2)+'m', f1px+6, f1py-18);
     ctx.fillText('d\u2082='+d.d2.toFixed(2)+'m', f2px+6, f2py-18);
     // Pallini applicazione forze
-    ctx.beginPath(); ctx.arc(f1px,f1py,4,0,Math.PI*2); ctx.fillStyle='#e0335a'; ctx.fill();
-    ctx.beginPath(); ctx.arc(f2px,f2py,4,0,Math.PI*2); ctx.fillStyle='#0e9e82'; ctx.fill();
+    ctx.beginPath(); ctx.arc(f1px,f1py,4,0,Math.PI*2); ctx.fillStyle='#c2491d'; ctx.fill();
+    ctx.beginPath(); ctx.arc(f2px,f2py,4,0,Math.PI*2); ctx.fillStyle='#0e8a5a'; ctx.fill();
   }
   ctx.restore();
 
   // Tipo leva label (canvas in alto a sx)
   ctx.save(); ctx.font='600 12px IBM Plex Mono';
-  if(levaType===1){ ctx.fillStyle='#c89200'; ctx.fillText('Leva 1\u00b0 genere',10,20); }
-  else if(d.autoGenere===2){ ctx.fillStyle='#0e9e82'; ctx.fillText('Leva 2\u00b0 genere',10,20); }
-  else{ ctx.fillStyle='#e0335a'; ctx.fillText('Leva 3\u00b0 genere',10,20); }
+  if(levaType===1){ ctx.fillStyle='#b7791f'; ctx.fillText('Leva 1\u00b0 genere',10,20); }
+  else if(d.autoGenere===2){ ctx.fillStyle='#0e8a5a'; ctx.fillText('Leva 2\u00b0 genere',10,20); }
+  else{ ctx.fillStyle='#c2491d'; ctx.fillText('Leva 3\u00b0 genere',10,20); }
   ctx.restore();
 
   // Frecce forze
-  vertArrow(ctx, f1px, f1py, d.f1m, d.sign1, '#e0335a', 'F\u2081');
-  vertArrow(ctx, f2px, f2py, d.f2m, d.sign2, '#0e9e82', 'F\u2082');
+  vertArrow(ctx, f1px, f1py, d.f1m, d.sign1, '#c2491d', 'F\u2081');
+  vertArrow(ctx, f2px, f2py, d.f2m, d.sign2, '#0e8a5a', 'F\u2082');
   // Reazione vincolare al fulcro (verso opposto alla risultante delle forze esterne)
   const totFy = d.sign1*d.f1m + d.sign2*d.f2m;
   if(Math.abs(totFy) > 2)
-    vertArrow(ctx, pivX, pivY, Math.abs(totFy)*0.45, -Math.sign(totFy), '#8891b0', 'R');
+    vertArrow(ctx, pivX, pivY, Math.abs(totFy)*0.45, -Math.sign(totFy), '#7d828c', 'R');
 
   // Readout
   document.getElementById('lf1-mag-val').textContent = document.getElementById('lf1-mag').value+' N';

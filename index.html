@@ -4,1220 +4,839 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulazioni di Fisica</title>
+  <meta name="description" content="Laboratorio digitale di fisica: simulazioni interattive dalla meccanica alla relatività e alla meccanica quantistica." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/sim.css" />
   <style>
-    /* ── Tokens ─────────────────────────────────────────────────────── */
-    :root {
-      --bg-0: #06090f;
-      --bg-1: #0a0f1a;
-      --bg-2: #0f1623;
-      --bg-3: #141e2e;
-      --surface: rgba(255,255,255,0.042);
-      --surface-hi: rgba(255,255,255,0.068);
-      --border: rgba(255,255,255,0.09);
-      --border-hi: rgba(255,255,255,0.18);
-      --text: #e8edf7;
-      --text-soft: #8fa0be;
-      --text-dim: #4e5f7a;
-      --gold: #f0c060;
-      --gold-dim: rgba(240,192,96,0.18);
-      --gold-glow: rgba(240,192,96,0.08);
-      --teal: #5bd4c4;
-      --teal-dim: rgba(91,212,196,0.15);
-      --rose: #f07070;
-      --rose-dim: rgba(240,112,112,0.15);
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-      --shadow-md: 0 8px 28px rgba(0,0,0,0.45);
-      --shadow-lg: 0 20px 50px rgba(0,0,0,0.55);
-      --radius-sm: 10px;
-      --radius-md: 16px;
-      --radius-lg: 22px;
-      --radius-xl: 28px;
-      --mono: "DM Mono", monospace;
-      --sans: "DM Sans", sans-serif;
-      --display: "Crimson Pro", Georgia, serif;
-    }
-
-    /* ── Reset ───────────────────────────────────────────────────────── */
+    /* Il catalogo usa i token comuni di assets/sim.css (tema scuro). */
     *, *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 76px; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: var(--sans);
+      font-family: var(--fs-sans);
       font-size: 15px;
-      color: var(--text);
-      background: var(--bg-0);
+      line-height: 1.5;
+      color: var(--fs-night-text);
+      background: var(--fs-night-0);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Background layers ───────────────────────────────────────────── */
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Gradient mesh */
-    .bg-layer::before {
+    /* ── Sfondo ─────────────────────────────────────────────────────── */
+    .bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .bg::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 10% 0%, rgba(91,212,196,0.07) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 90% 5%, rgba(240,192,96,0.06) 0%, transparent 55%),
-        radial-gradient(ellipse 70% 80% at 50% 100%, rgba(91,212,196,0.04) 0%, transparent 50%),
-        linear-gradient(175deg, var(--bg-1) 0%, var(--bg-0) 40%, var(--bg-2) 100%);
+        radial-gradient(ellipse 80% 55% at 12% 0%, rgba(91, 212, 196, 0.08), transparent 60%),
+        radial-gradient(ellipse 60% 45% at 92% 4%, rgba(240, 192, 96, 0.07), transparent 55%),
+        linear-gradient(175deg, var(--fs-night-1), var(--fs-night-0) 42%, var(--fs-night-2));
     }
-
-    /* Grid reticle */
-    .bg-layer::after {
+    .bg::after {
       content: "";
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
       background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(0,0,0,0.8), transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000, transparent 75%);
+      mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000, transparent 75%);
     }
+    .bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.55; }
 
-    /* Animated star field */
-    .stars {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
+    .wrap { position: relative; z-index: 1; width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
 
-    .stars canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0.5;
-    }
-
-    /* ── Layout ──────────────────────────────────────────────────────── */
-    .container {
-      position: relative;
-      z-index: 1;
-      width: min(1280px, calc(100% - 40px));
-      margin: 0 auto;
-      padding: 40px 0 80px;
-    }
-
-    /* ── Top nav ─────────────────────────────────────────────────────── */
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 52px;
-    }
-
-    .site-wordmark {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      user-select: none;
-    }
-
-    .site-wordmark span {
-      color: var(--gold);
-      opacity: 0.85;
-    }
-
-    /* ── Hero ────────────────────────────────────────────────────────── */
+    /* ── Testata ────────────────────────────────────────────────────── */
     .hero {
-      text-align: center;
-      padding: 8px 16px 56px;
-      animation: fadeUp 0.7s ease both;
-    }
-
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
       align-items: center;
-      gap: 20px;
+      gap: 24px;
+      padding: 54px 0 46px;
     }
-
-    .hero-wordmark {
-      font-family: var(--mono);
+    .wordmark {
+      font-family: var(--fs-mono);
       font-size: 0.72rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text-dim);
-      user-select: none;
-      white-space: nowrap;
+      color: var(--fs-night-dim);
     }
-
-    .hero-wordmark span {
-      color: var(--gold);
-      opacity: 0.85;
+    .wordmark b { font-weight: 500; color: var(--fs-gold); }
+    .hero h1 {
+      margin: 18px 0 16px;
+      font-family: var(--fs-display);
+      font-weight: 400;
+      font-size: clamp(2.9rem, 6.6vw, 5.2rem);
+      line-height: 0.98;
+      letter-spacing: -0.02em;
     }
-
-    .hero-topline {
-      width: min(1180px, calc(100% - 8px));
-      margin: 0 auto 22px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
+    .hero h1 em { font-style: italic; color: var(--fs-gold); }
+    .hero p {
+      margin: 0;
+      max-width: 52ch;
+      font-size: 1.04rem;
+      color: var(--fs-night-soft);
     }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .hero-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 0;
-      padding: 6px 14px 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(240,192,96,0.28);
-      background: var(--gold-glow);
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .hero-label-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--gold);
-      animation: pulse 2.4s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.45; transform: scale(0.75); }
-    }
-
-    h1 {
-      margin: 0 0 16px;
-      font-family: var(--display);
-      font-size: clamp(3rem, 7vw, 5.5rem);
-      font-weight: 300;
-      line-height: 1.08;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
-
-    h1 em {
-      font-style: italic;
-      color: var(--gold);
-    }
-
-    .hero-subtitle {
-      max-width: 780px;
-      margin: 0 auto 32px;
-      font-size: 1.08rem;
-      line-height: 1.8;
-      color: var(--text-soft);
-      font-weight: 300;
-    }
-
     .hero-stats {
-      display: inline-flex;
-      gap: 2px;
-      padding: 4px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: var(--surface);
-    }
-
-    .hero-stat {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 10px 24px;
-      border-radius: 8px;
-    }
-
-    .hero-stat + .hero-stat {
-      border-left: 1px solid var(--border);
-    }
-
-    .hero-stat-n {
-      font-family: var(--mono);
-      font-size: 1.45rem;
-      font-weight: 500;
-      color: var(--gold);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .hero-stat-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.06em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      font-family: var(--mono);
-    }
-
-    /* ── Search/filter panel ─────────────────────────────────────────── */
-    .panel {
-      padding: 20px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      box-shadow: var(--shadow-md);
-      animation: fadeUp 0.7s 0.1s ease both;
-    }
-
-    .panel-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .search-wrap {
-      position: relative;
-      flex: 1 1 280px;
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-dim);
-      font-size: 0.85rem;
-      pointer-events: none;
-      font-family: var(--mono);
-    }
-
-    .search {
-      width: 100%;
-      height: 44px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: rgba(6,9,15,0.6);
-      color: var(--text);
-      padding: 0 14px 0 38px;
-      outline: none;
-      font-family: var(--sans);
-      font-size: 0.9rem;
-      transition: border-color 0.2s, background 0.2s;
-    }
-
-    .search::placeholder { color: var(--text-dim); }
-
-    .search:focus {
-      border-color: rgba(240,192,96,0.4);
-      background: rgba(6,9,15,0.8);
-    }
-
-    .filter-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .select {
-      height: 44px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: rgba(6,9,15,0.6);
-      color: var(--text);
-      padding: 0 36px 0 14px;
-      outline: none;
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      letter-spacing: 0.02em;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234e5f7a'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 13px center;
-      cursor: pointer;
-      min-width: 160px;
-      transition: border-color 0.2s;
-    }
-
-    .select:focus { border-color: rgba(240,192,96,0.4); }
-
-    .select option { background: #0f1623; }
-
-    .wip-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      height: 44px;
-      padding: 0 16px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: rgba(6,9,15,0.6);
-      color: var(--text-soft);
-      cursor: pointer;
-      user-select: none;
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      letter-spacing: 0.04em;
-      transition: border-color 0.2s, color 0.2s;
-    }
-
-    .wip-toggle:hover { border-color: rgba(240,192,96,0.3); color: var(--gold); }
-
-    .wip-toggle input { margin: 0; accent-color: var(--gold); cursor: pointer; }
-
-    .panel-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 16px 0;
-    }
-
-    /* ── Results counter ─────────────────────────────────────────────── */
-    .results-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 0 2px;
-    }
-
-    .results-count {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
-
-    .results-count strong {
-      color: var(--text-soft);
-      font-weight: 500;
-    }
-
-    /* ── Category blocks ─────────────────────────────────────────────── */
-    .results {
-      display: grid;
-      gap: 16px;
-    }
-
-    .category-block {
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      overflow: hidden;
-      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-      animation: fadeUp 0.5s ease both;
-    }
-
-    .category-block:hover {
-      border-color: var(--border-hi);
-      box-shadow: var(--shadow-md);
-    }
-
-    .category-toggle {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 22px;
-      border: 0;
-      background: transparent;
-      color: var(--text);
-      text-align: left;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .category-toggle:hover { background: rgba(255,255,255,0.02); }
-    .category-toggle:focus-visible { outline: 2px solid rgba(240,192,96,0.5); outline-offset: -2px; }
-
-    .category-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      min-width: 0;
-    }
-
-    .category-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      background: var(--cat-color, var(--text-dim));
-      box-shadow: 0 0 8px var(--cat-color, transparent);
-      opacity: 0.85;
-    }
-
-    .category-text { min-width: 0; }
-
-    .category-title {
-      margin: 0;
-      font-family: var(--display);
-      font-size: 1.3rem;
-      font-weight: 400;
-      letter-spacing: 0.01em;
-      line-height: 1.2;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-
-    .category-icon {
-      font-size: 1.05rem;
-      line-height: 1;
-      opacity: 0.75;
-      color: var(--cat-color, var(--text-soft));
-      flex-shrink: 0;
-    }
-
-    .category-desc {
-      margin: 5px 0 0;
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      line-height: 1.55;
-      white-space: normal;
-      overflow: visible;
-      text-overflow: initial;
-      max-width: 720px;
-    }
-
-    .category-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-
-    .category-count {
-      font-family: var(--mono);
+      gap: 30px;
+      margin-top: 30px;
+      font-family: var(--fs-mono);
       font-size: 0.7rem;
-      letter-spacing: 0.06em;
-      color: var(--text-dim);
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,0.2);
-    }
-
-    .category-chevron {
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    }
-
-    .category-toggle[aria-expanded="true"] .category-chevron {
-      transform: rotate(180deg);
-    }
-
-    .category-content {
-      border-top: 1px solid var(--border);
-      padding: 20px 22px 22px;
-      background: rgba(0,0,0,0.12);
-    }
-
-    .category-content[hidden] { display: none; }
-
-    /* ── Card grid ───────────────────────────────────────────────────── */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 14px;
-    }
-
-    .card {
-      position: relative;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      overflow: hidden;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.25s cubic-bezier(0.34,1.2,0.64,1), border-color 0.25s, box-shadow 0.25s;
-    }
-
-    /* Shimmer line on hover */
-    .card::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--cat-color, var(--gold)), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(255,255,255,0.18);
-      box-shadow: var(--shadow-md), 0 0 0 1px rgba(240,192,96,0.08);
-    }
-
-    .card:hover::after { opacity: 0.9; }
-
-    .card-inner {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      gap: 10px;
-    }
-
-    .icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-      background: linear-gradient(135deg,
-        color-mix(in srgb, var(--cat-color, var(--gold)) 14%, transparent),
-        rgba(255,255,255,0.04)
-      );
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .sim-level-chip {
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.09em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid;
-      white-space: nowrap;
-      align-self: flex-start;
+      color: var(--fs-night-dim);
+    }
+    .hero-stats strong {
+      display: block;
+      font-family: var(--fs-display);
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      line-height: 1.1;
+      color: var(--fs-night-text);
+    }
+    /* Figura della testata: una scena fisica diversa a ogni apertura. */
+    .hero-fig { position: relative; aspect-ratio: 1 / 0.82; margin: 0; cursor: pointer; }
+    .hero-fig canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero-fig figcaption {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      font-family: var(--fs-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      color: var(--fs-night-dim);
+      text-align: right;
+    }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; padding: 36px 0 30px; }
+      .hero-fig { display: none; }
     }
 
-    .sim-level-chip.base    { color: var(--teal); border-color: rgba(91,212,196,0.3); background: rgba(91,212,196,0.08); }
-    .sim-level-chip.intermedio { color: var(--gold); border-color: rgba(240,192,96,0.3); background: rgba(240,192,96,0.08); }
-    .sim-level-chip.avanzato  { color: var(--rose); border-color: rgba(240,112,112,0.3); background: rgba(240,112,112,0.08); }
-
-    .sim-title {
-      margin: 0 0 8px;
-      font-family: var(--display);
-      font-size: 1.12rem;
-      font-weight: 400;
-      line-height: 1.3;
-      color: var(--text);
+    /* ── Barra di ricerca e filtri (resta visibile durante lo scorrimento) ── */
+    .tools {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: 0 -20px;
+      padding: 12px 20px;
+      background: rgba(6, 9, 15, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--fs-night-line);
+      border-bottom: 1px solid var(--fs-night-line);
     }
-
-    .sim-desc {
-      margin: 0;
-      font-size: 0.83rem;
-      line-height: 1.65;
-      color: var(--text-soft);
-      flex: 1;
+    .tools-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .search {
+      flex: 1 1 260px;
+      position: relative;
     }
-
-    .sim-footer {
-      margin-top: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; stroke: var(--fs-night-dim); }
+    .search input {
+      width: 100%;
+      height: 40px;
+      padding: 0 14px 0 38px;
+      border-radius: 10px;
+      border: 1px solid var(--fs-night-line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--fs-night-text);
+      font: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
     }
+    .search input::placeholder { color: var(--fs-night-dim); }
+    .search input:focus { border-color: rgba(240, 192, 96, 0.5); background: rgba(255, 255, 255, 0.06); }
 
-    .sim-open {
+    .seg { display: inline-flex; padding: 3px; border-radius: 10px; border: 1px solid var(--fs-night-line); background: rgba(255, 255, 255, 0.03); }
+    .seg button {
+      height: 32px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--fs-night-soft);
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .seg button:hover { color: var(--fs-night-text); }
+    .seg button[aria-pressed="true"] { background: rgba(255, 255, 255, 0.1); color: var(--fs-night-text); }
+
+    .switch { display: inline-flex; align-items: center; gap: 9px; height: 40px; padding: 0 4px; font-size: 0.82rem; color: var(--fs-night-soft); cursor: pointer; user-select: none; }
+    .switch input { position: absolute; opacity: 0; pointer-events: none; }
+    .switch i { position: relative; width: 34px; height: 20px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--fs-night-line); transition: background 0.15s; }
+    .switch i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--fs-night-soft); transition: transform 0.15s, background 0.15s; }
+    .switch input:checked + i { background: rgba(240, 192, 96, 0.25); border-color: rgba(240, 192, 96, 0.45); }
+    .switch input:checked + i::after { transform: translateX(14px); background: var(--fs-gold); }
+    .switch input:focus-visible + i, .seg button:focus-visible, .chips a:focus-visible, .card:focus-visible { outline: 2px solid var(--fs-gold); outline-offset: 2px; }
+
+    .chips { display: flex; gap: 6px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chips a {
+      flex: none;
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0.75;
-      transition: opacity 0.2s, gap 0.2s;
-    }
-
-    .card:hover .sim-open { opacity: 1; gap: 11px; }
-
-    /* ── States ──────────────────────────────────────────────────────── */
-    .empty-state,
-    .loading-state,
-    .error-state {
-      text-align: center;
-      padding: 56px 24px;
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      border-radius: var(--radius-lg);
-      border: 1px dashed var(--border);
-    }
-
-    .loading-state {
-      font-family: var(--mono);
+      height: 28px;
+      padding: 0 11px;
+      border-radius: 999px;
+      border: 1px solid var(--fs-night-line);
+      color: var(--fs-night-soft);
       font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      color: var(--text-dim);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
     }
+    .chips a::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c, var(--fs-night-dim)); }
+    .chips a:hover, .chips a.on { color: var(--fs-night-text); border-color: var(--c, rgba(255, 255, 255, 0.25)); background: rgba(255, 255, 255, 0.04); }
+    .chips a small { font-family: var(--fs-mono); font-size: 0.68rem; color: var(--fs-night-dim); }
 
-    .loading-state::after {
+    /* ── Sezioni di categoria ───────────────────────────────────────── */
+    main { padding: 14px 0 40px; }
+    .count { margin: 18px 0 0; font-family: var(--fs-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--fs-night-dim); }
+
+    .cat { padding-top: 44px; }
+    .cat-head {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 6px 16px;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--fs-night-line);
+      position: relative;
+    }
+    .cat-head::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 72px; height: 2px; background: var(--c); border-radius: 2px; }
+    .cat-num { font-family: var(--fs-mono); font-size: 0.72rem; letter-spacing: 0.1em; color: var(--c); }
+    .cat-head h2 { margin: 0; font-family: var(--fs-display); font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 500; line-height: 1.1; }
+    .cat-n { font-family: var(--fs-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fs-night-dim); white-space: nowrap; }
+    .cat-desc { grid-column: 2 / -1; margin: 0; max-width: 78ch; font-size: 0.93rem; color: var(--fs-night-soft); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); gap: 14px; }
+
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 190px;
+      padding: 18px 18px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--fs-night-line);
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+      color: inherit;
+      text-decoration: none;
+      overflow: hidden;
+      transition: transform 0.18s ease, border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    }
+    .card::before {
       content: "";
-      display: inline-block;
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: var(--gold);
-      margin-left: 8px;
-      animation: blink 1.2s ease infinite;
-      vertical-align: middle;
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle 180px at 100% 0%, var(--c), transparent 70%);
+      opacity: 0.07;
+      transition: opacity 0.18s;
     }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.15; }
+    .card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--c) 55%, transparent); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45); }
+    .card:hover::before { opacity: 0.16; }
+    .card > * { position: relative; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+      background: color-mix(in srgb, var(--c) 12%, transparent);
+      color: var(--c);
+      font-size: 1.1rem;
+      line-height: 1;
     }
+    .level { font-family: var(--fs-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fs-night-dim); display: inline-flex; align-items: center; gap: 6px; }
+    .level i { display: inline-flex; gap: 2px; }
+    .level i b { width: 4px; height: 9px; border-radius: 1px; background: rgba(255, 255, 255, 0.14); }
+    .level i b.on { background: var(--c); }
+    .card h3 { margin: 0 0 6px; font-family: var(--fs-display); font-size: 1.32rem; font-weight: 500; line-height: 1.15; }
+    .card p {
+      margin: 0;
+      font-size: 0.86rem;
+      color: var(--fs-night-soft);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-foot { margin-top: auto; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .tags { display: flex; gap: 5px; min-width: 0; overflow: hidden; }
+    .tags span { flex: none; font-family: var(--fs-mono); font-size: 0.64rem; color: var(--fs-night-dim); padding: 3px 7px; border-radius: 5px; background: rgba(255, 255, 255, 0.04); white-space: nowrap; }
+    .go { flex: none; font-size: 1rem; color: var(--fs-night-dim); transition: transform 0.18s, color 0.18s; }
+    .card:hover .go { transform: translateX(4px); color: var(--c); }
+    .wip-badge { font-family: var(--fs-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fs-gold); border: 1px solid rgba(240, 192, 96, 0.35); border-radius: 999px; padding: 3px 8px; }
+    mark { background: rgba(240, 192, 96, 0.25); color: inherit; border-radius: 2px; padding: 0 1px; }
 
-    .error-state { color: var(--rose); }
+    .state { margin-top: 40px; padding: 46px 20px; text-align: center; border: 1px dashed var(--fs-night-line); border-radius: 16px; color: var(--fs-night-soft); }
+    .state button { margin-top: 12px; height: 34px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--fs-night-line); background: transparent; color: var(--fs-night-text); font: inherit; font-size: 0.85rem; cursor: pointer; }
 
-    /* ── Footer ──────────────────────────────────────────────────────── */
-    .footer {
-      margin-top: 56px;
-      padding: 18px 4px 0;
-      border-top: none;
+    footer {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      gap: 16px;
-    }
-
-    .footer-stats {
-      display: flex;
-      gap: 14px;
       flex-wrap: wrap;
-      align-items: center;
-      font-family: var(--mono);
-      font-size: 0.64rem;
-      letter-spacing: 0.05em;
-      color: var(--text-dim);
-      opacity: 0.72;
+      gap: 10px;
+      padding: 22px 0 40px;
+      border-top: 1px solid var(--fs-night-line);
+      font-family: var(--fs-mono);
+      font-size: 0.72rem;
+      color: var(--fs-night-dim);
     }
+    footer a { color: var(--fs-night-soft); text-decoration: none; }
+    footer a:hover { color: var(--fs-gold); }
 
-    .footer-stats strong {
-      color: var(--text-soft);
-      font-weight: 500;
-    }
-
-    .footer-author {
-      text-align: right;
-    }
-
-    .footer-author a {
-      font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
-      font-size: 1.35rem;
-      font-style: italic;
-      letter-spacing: 0.01em;
-      color: var(--text-dim);
-      text-decoration: none;
-      border-bottom: none;
-      opacity: 0.78;
-      transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    }
-
-    .footer-author a:hover {
-      color: var(--text-soft);
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-
-    .footer-note {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.06em;
-      color: var(--text-dim);
-    }
-
-    /* ── Responsive ──────────────────────────────────────────────────── */
-    @media (max-width: 700px) {
-      .container { width: calc(100% - 24px); padding-top: 24px; }
-      .top-nav { margin-bottom: 32px; }
-      .hero { padding-bottom: 36px; }
-      .hero-topline {
-        width: 100%;
-        justify-content: center;
-      }
-      .site-wordmark { display: none; }
-      h1 { font-size: clamp(2.4rem, 10vw, 3.6rem); }
-      .hero-stats { flex-wrap: wrap; }
-      .hero-stat + .hero-stat { border-left: none; border-top: 1px solid var(--border); }
-      .hero-stats { display: grid; grid-template-columns: 1fr 1fr; }
-      .panel-row { flex-direction: column; align-items: stretch; }
-      .search-wrap, .filter-group, .select, .wip-toggle { width: 100%; }
-      .filter-group { flex-direction: column; }
-      .grid { grid-template-columns: 1fr; }
-      .category-desc {
-        display: block;
-        max-width: none;
-        margin-top: 6px;
-      }
-      .footer { flex-direction: column; text-align: center; }
-    }
-
-    /* ── Utility ─────────────────────────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+      .card, .go { transition: none; }
     }
   </style>
 </head>
 <body>
+  <div class="bg" aria-hidden="true"><canvas id="stars"></canvas></div>
 
-  <div class="bg-layer" aria-hidden="true"></div>
-  <div class="stars" aria-hidden="true"><canvas id="starCanvas"></canvas></div>
-
-  <div class="container">
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-topline">
-        <div class="hero-label">
-          <span class="hero-label-dot"></span>
-          Laboratorio Digitale
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <div class="wordmark">fisica.<b>sim</b> &nbsp;·&nbsp; laboratorio digitale</div>
+        <h1>Simulazioni<br />di <em>Fisica</em></h1>
+        <p>Modelli interattivi da esplorare nel browser: si cambiano i parametri, si osserva che cosa succede e si confronta il risultato con le equazioni. Dai fondamenti della meccanica fino alla relatività e alla meccanica quantistica.</p>
+        <div class="hero-stats" aria-label="Statistiche del catalogo">
+          <span><strong id="statTotal">—</strong>simulazioni</span>
+          <span><strong id="statCats">—</strong>aree</span>
+          <span><strong id="statWip">—</strong>in costruzione</span>
         </div>
-        <div class="site-wordmark" aria-hidden="true">fisica.<span>sim</span></div>
       </div>
-      <h1>Simulazioni<br>di <em>Fisica</em></h1>
-      <p class="hero-subtitle">
-        Esplora la fisica attraverso simulazioni interattive, dai fondamenti della meccanica alle frontiere della meccanica quantistica e della relatività.
-      </p>
+      <figure class="hero-fig" title="Clic per cambiare scena">
+        <canvas id="orbit"></canvas>
+        <figcaption></figcaption>
+      </figure>
+    </header>
+
+    <section class="tools" aria-label="Ricerca e filtri">
+      <div class="tools-row">
+        <label class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+          <input id="q" type="search" placeholder="Cerca per titolo, argomento o parola chiave…  ( / )" aria-label="Cerca simulazioni" autocomplete="off" />
+        </label>
+        <div class="seg" role="group" aria-label="Filtra per livello" id="levels">
+          <button type="button" data-level="" aria-pressed="true">Tutti</button>
+          <button type="button" data-level="base" aria-pressed="false">Base</button>
+          <button type="button" data-level="intermedio" aria-pressed="false">Intermedio</button>
+          <button type="button" data-level="avanzato" aria-pressed="false">Avanzato</button>
+        </div>
+        <label class="switch" title="Mostra anche le simulazioni in costruzione">
+          <input type="checkbox" id="wip" /><i></i><span>In costruzione</span>
+        </label>
+      </div>
+      <nav class="chips" id="chips" aria-label="Aree della fisica"></nav>
     </section>
 
-    <!-- Filter panel -->
-    <section class="panel" aria-label="Ricerca e filtri">
-      <div class="panel-row">
-        <div class="search-wrap">
-          <span class="search-icon" aria-hidden="true">⌕</span>
-          <input
-            id="searchInput"
-            class="search"
-            type="search"
-            placeholder="Cerca titolo, tag, categoria…"
-            aria-label="Cerca simulazioni"
-          />
-        </div>
-        <div class="filter-group">
-          <select id="categoryFilter" class="select" aria-label="Filtra per categoria">
-            <option value="">Tutte le categorie</option>
-          </select>
-          <select id="levelFilter" class="select" aria-label="Filtra per livello">
-            <option value="">Tutti i livelli</option>
-            <option value="base">Base</option>
-            <option value="intermedio">Intermedio</option>
-            <option value="avanzato">Avanzato</option>
-          </select>
-          <label class="wip-toggle" for="showWipToggle">
-            <input type="checkbox" id="showWipToggle" />
-            <span>Mostra WIP</span>
-          </label>
-        </div>
-      </div>
+    <main id="results" aria-live="polite">
+      <div class="state" role="status">Caricamento del catalogo…</div>
+    </main>
 
-      <div class="panel-divider"></div>
-
-      <div class="results" id="results" role="region" aria-label="Lista simulazioni">
-        <div class="loading-state" role="status">Caricamento catalogo in corso</div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="footer-stats" id="heroStats" aria-label="Statistiche catalogo">
-        <span><strong id="statTotal">—</strong> simulazioni</span>
-        <span><strong id="statCats">—</strong> categorie</span>
-        <span><strong id="statWip">—</strong> WIP</span>
-      </div>
-      <div class="footer-author">
-       <a href="https://github.com/robertocurciorubertini-ctrl/Simulazioni" target="_blank" rel="noopener">Roberto Curcio Rubertini</a>
-      </div>
+    <footer>
+      <span>Roberto Curcio Rubertini</span>
+      <a href="https://github.com/robertocurciorubertini-ctrl/Simulazioni" target="_blank" rel="noopener">Codice sorgente su GitHub ↗</a>
     </footer>
-
   </div>
 
   <script>
-    /* ── Stars canvas ─────────────────────────────────────────────── */
-    (function () {
-      const canvas = document.getElementById("starCanvas");
-      const ctx = canvas.getContext("2d");
-      let stars = [];
+  "use strict";
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+  /* ── Sfondo stellato ─────────────────────────────────────────────── */
+  (function () {
+    const cv = document.getElementById("stars");
+    const ctx = cv.getContext("2d");
+    let stars = [];
+    function setup() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      stars = Array.from({ length: 170 }, () => ({
+        x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+        r: Math.random() * 1.1 + 0.2, a: Math.random() * 0.6 + 0.1,
+        w: Math.random() * 0.9 + 0.2, p: Math.random() * 6.283
+      }));
+    }
+    function draw(ms) {
+      const t = ms / 1000;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      for (const s of stars) {
+        ctx.globalAlpha = s.a * (0.6 + 0.4 * Math.sin(t * s.w + s.p));
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fillStyle = "#dce6ff"; ctx.fill();
       }
+      if (!reduceMotion) requestAnimationFrame(draw);
+    }
+    setup(); requestAnimationFrame(draw);
+    addEventListener("resize", () => { setup(); if (reduceMotion) draw(0); });
+  })();
 
-      function initStars(n) {
-        stars = [];
-        for (let i = 0; i < n; i++) {
-          stars.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            r: Math.random() * 1.1 + 0.2,
-            alpha: Math.random() * 0.6 + 0.1,
-            speed: Math.random() * 0.012 + 0.003,
-            phase: Math.random() * Math.PI * 2,
-          });
+  /* ── Figura della testata ────────────────────────────────────────────
+     A ogni apertura della pagina viene scelta una scena diversa fra quelle
+     elencate in SCENES (mai la stessa due volte di seguito); un clic sulla
+     figura passa alla successiva. Ogni scena è un piccolo modello fisico
+     integrato in tempo reale, non un'animazione preregistrata.
+
+     Per aggiungerne una: un oggetto { caption, init(W, H) } la cui init
+     restituisce la funzione frame(ctx, W, H, dt) chiamata a ogni fotogramma
+     (dt = tempo reale trascorso, in secondi). */
+  (function () {
+    const cv = document.getElementById("orbit");
+    const fig = cv && cv.parentElement;
+    if (!cv || getComputedStyle(fig).display === "none") return;
+    const ctx = cv.getContext("2d");
+    const cap = fig.querySelector("figcaption");
+    const TAU = Math.PI * 2;
+    const GOLD = "240,192,96", TEAL = "91,212,196", WHITE = "#e8edf7";
+
+    /* Scia che sfuma verso la coda. */
+    function drawTrail(pts, rgb, maxAlpha) {
+      const n = pts.length, chunk = 24;
+      ctx.lineWidth = 1.1; ctx.lineJoin = "round";
+      for (let i = 0; i < n - 1; i += chunk) {
+        ctx.beginPath(); ctx.moveTo(pts[i][0], pts[i][1]);
+        for (let j = i + 1; j <= Math.min(i + chunk, n - 1); j++) ctx.lineTo(pts[j][0], pts[j][1]);
+        ctx.strokeStyle = `rgba(${rgb},${0.03 + maxAlpha * Math.pow(i / n, 2.2)})`;
+        ctx.stroke();
+      }
+    }
+    function dot(x, y, r, fill) { ctx.fillStyle = fill; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); }
+    function glow(x, y, r, rgb) {
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${rgb},0.9)`); g.addColorStop(0.25, `rgba(${rgb},0.25)`); g.addColorStop(1, `rgba(${rgb},0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+    }
+
+    const SCENES = [
+      /* 1 ─ Orbita con precessione.
+         Potenziale U(r) = −k/r − β/r²: il termine in 1/r² rompe la chiusura
+         dell'ellisse kepleriana e il perielio avanza a ogni giro. Schema
+         velocity-Verlet (simplettico: l'energia non deriva nel tempo). */
+      {
+        caption: "orbita in un potenziale −k/r − β/r²<br />la precessione del perielio",
+        init() {
+          const k = 1, beta = 0.045, h = 0.004;
+          let x = 1, y = 0, vx = 0, vy = 0.62;
+          const tr = [];
+          const acc = (px, py) => { const r2 = px * px + py * py, r = Math.sqrt(r2), f = -k / (r2 * r) - 2 * beta / (r2 * r2); return [f * px, f * py]; };
+          const step = () => {
+            let [ax, ay] = acc(x, y);
+            vx += 0.5 * h * ax; vy += 0.5 * h * ay; x += h * vx; y += h * vy;
+            [ax, ay] = acc(x, y);
+            vx += 0.5 * h * ax; vy += 0.5 * h * ay;
+          };
+          for (let i = 0; i < 9000; i++) { step(); if (i % 2 === 0) tr.push([x, y]); }
+          return (c, W, H, dt) => {
+            const n = Math.round(dt * 840);
+            for (let i = 0; i < n; i++) { step(); if (i % 2 === 0) tr.push([x, y]); }
+            while (tr.length > 2600) tr.shift();
+            const s = Math.min(W, H) * 0.44, cx = W * 0.52, cy = H * 0.47;
+            drawTrail(tr.map((p) => [cx + p[0] * s, cy - p[1] * s]), GOLD, 0.62);
+            glow(cx, cy, 26, GOLD);
+            dot(cx + x * s, cy - y * s, 3.2, WHITE);
+          };
+        }
+      },
+
+      /* 2 ─ Pendolo doppio.
+         Due pendoli incernierati l'uno all'altro (masse e lunghezze uguali).
+         Equazioni di Lagrange integrate con Runge-Kutta del quarto ordine.
+         Il moto è caotico: condizioni iniziali quasi identiche divergono. */
+      {
+        caption: "pendolo doppio<br />moto caotico, equazioni di Lagrange",
+        init() {
+          const g = 9.81, h = 0.002;
+          let S = [2.2 + Math.random() * 0.3, 2.7 + Math.random() * 0.3, 0, 0]; // θ₁, θ₂, ω₁, ω₂
+          const tr = [];
+          const f = ([a, b, wa, wb]) => {
+            const d = a - b, den = 3 - Math.cos(2 * d);                      // 2m₁+m₂−m₂cos(2θ₁−2θ₂), con m₁=m₂=1
+            return [wa, wb,
+              (-3 * g * Math.sin(a) - g * Math.sin(a - 2 * b) - 2 * Math.sin(d) * (wb * wb + wa * wa * Math.cos(d))) / den,
+              (2 * Math.sin(d) * (2 * wa * wa + 2 * g * Math.cos(a) + wb * wb * Math.cos(d))) / den];
+          };
+          const add = (u, v, c) => u.map((x, i) => x + c * v[i]);
+          const step = () => {
+            const k1 = f(S), k2 = f(add(S, k1, h / 2)), k3 = f(add(S, k2, h / 2)), k4 = f(add(S, k3, h));
+            S = S.map((x, i) => x + (h / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+          };
+          return (c, W, H, dt) => {
+            const s = Math.min(W, H) * 0.23, px = W * 0.52, py = H * 0.46;
+            const n = Math.round(dt / h);
+            let x1, y1, x2, y2;
+            for (let i = 0; i < Math.max(1, n); i++) {
+              if (n) step();
+              x1 = Math.sin(S[0]); y1 = Math.cos(S[0]); x2 = x1 + Math.sin(S[1]); y2 = y1 + Math.cos(S[1]);
+              if (i % 3 === 0) tr.push([x2, y2]);
+            }
+            while (tr.length > 1500) tr.shift();
+            drawTrail(tr.map((p) => [px + p[0] * s, py + p[1] * s]), GOLD, 0.7);
+            c.strokeStyle = "rgba(232,237,247,0.55)"; c.lineWidth = 1.4;
+            c.beginPath(); c.moveTo(px, py); c.lineTo(px + x1 * s, py + y1 * s); c.lineTo(px + x2 * s, py + y2 * s); c.stroke();
+            dot(px, py, 2.2, "rgba(232,237,247,0.6)");
+            dot(px + x1 * s, py + y1 * s, 4, WHITE);
+            glow(px + x2 * s, py + y2 * s, 16, GOLD); dot(px + x2 * s, py + y2 * s, 4, WHITE);
+          };
+        }
+      },
+
+      /* 3 ─ Onda di pendoli.
+         Quindici pendoli semplici di lunghezza decrescente, scelta in modo che
+         in 40 s il primo compia 24 oscillazioni, il secondo 25, e così via:
+         T = 2π√(L/g). Le fasi si sfasano e si riallineano periodicamente. */
+      {
+        caption: "onda di pendoli: T = 2π√(L/g)<br />quindici periodi, un riallineamento ogni 40 s",
+        init() {
+          const g = 9.81, N = 15, cycle = 40, amp = 0.42;
+          const om = Array.from({ length: N }, (_, i) => TAU * (24 + i) / cycle);
+          let t = 0;
+          return (c, W, H, dt) => {
+            t += dt;
+            const top = H * 0.08, cx = W * 0.52, s = (H * 0.8) / (g / (om[0] * om[0]));
+            c.strokeStyle = "rgba(232,237,247,0.25)"; c.lineWidth = 1;
+            c.beginPath(); c.moveTo(cx - 30, top); c.lineTo(cx + 30, top); c.stroke();
+            for (let i = 0; i < N; i++) {
+              const L = g / (om[i] * om[i]) * s, th = amp * Math.cos(om[i] * t);
+              const x = cx + L * Math.sin(th), y = top + L * Math.cos(th);
+              c.strokeStyle = "rgba(232,237,247,0.13)"; c.beginPath(); c.moveTo(cx, top); c.lineTo(x, y); c.stroke();
+              const mix = i / (N - 1);
+              dot(x, y, 5.2 - 1.6 * mix, `rgba(${Math.round(240 - 149 * mix)},${Math.round(192 + 20 * mix)},${Math.round(96 + 100 * mix)},0.92)`);
+            }
+          };
+        }
+      },
+
+      /* 4 ─ Interferenza di due sorgenti.
+         Somma di due onde circolari coerenti, ψ = Σ cos(k rᵢ − ωt)/√rᵢ.
+         Le iperboli scure sono i luoghi in cui la differenza di cammino vale
+         un numero semidispari di lunghezze d'onda (interferenza distruttiva). */
+      {
+        caption: "interferenza di due sorgenti coerenti<br />frange iperboliche: r₁ − r₂ = costante",
+        init() {
+          const gw = 132, gh = 108, off = document.createElement("canvas");
+          off.width = gw; off.height = gh;
+          const octx = off.getContext("2d"), img = octx.createImageData(gw, gh);
+          const k = 0.62, omega = 3.2, sep = 15;
+          const r1 = new Float32Array(gw * gh), r2 = new Float32Array(gw * gh), fade = new Float32Array(gw * gh);
+          for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) {
+            const q = j * gw + i, x = i - gw / 2, y = j - gh / 2;
+            r1[q] = Math.hypot(x - sep, y) + 1.5; r2[q] = Math.hypot(x + sep, y) + 1.5;
+            fade[q] = Math.max(0, 1 - Math.pow(Math.hypot(x / (gw / 2), y / (gh / 2)), 2.4));
+          }
+          let t = 0;
+          return (c, W, H, dt) => {
+            t += dt;
+            const d = img.data;
+            for (let q = 0; q < gw * gh; q++) {
+              const a = Math.cos(k * r1[q] - omega * t) / Math.sqrt(r1[q]) + Math.cos(k * r2[q] - omega * t) / Math.sqrt(r2[q]);
+              const v = Math.max(-1, Math.min(1, a * 2.1));
+              const p = q * 4;
+              if (v > 0) { d[p] = 240; d[p + 1] = 192; d[p + 2] = 96; } else { d[p] = 91; d[p + 1] = 212; d[p + 2] = 196; }
+              d[p + 3] = Math.abs(v) * fade[q] * (v > 0 ? 200 : 90);
+            }
+            octx.putImageData(img, 0, 0);
+            c.imageSmoothingEnabled = true; c.imageSmoothingQuality = "high";
+            c.drawImage(off, 0, 0, W, H * 0.94);
+          };
+        }
+      },
+
+      /* 5 ─ Attrattore di Lorenz.
+         ẋ = σ(y−x), ẏ = x(ρ−z)−y, ż = xy−βz con σ = 10, ρ = 28, β = 8/3:
+         il modello minimo della convezione termica di un fluido, primo esempio
+         di caos deterministico (Lorenz, 1963). Proiezione sul piano x–z. */
+      {
+        caption: "attrattore di Lorenz (σ = 10, ρ = 28, β = 8/3)<br />convezione termica e caos deterministico",
+        init() {
+          const h = 0.004;
+          let S = [0.1 + Math.random(), 0, 20];
+          const tr = [];
+          const f = ([x, y, z]) => [10 * (y - x), x * (28 - z) - y, x * y - (8 / 3) * z];
+          const add = (u, v, c) => u.map((x, i) => x + c * v[i]);
+          const step = () => {
+            const k1 = f(S), k2 = f(add(S, k1, h / 2)), k3 = f(add(S, k2, h / 2)), k4 = f(add(S, k3, h));
+            S = S.map((x, i) => x + (h / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+          };
+          for (let i = 0; i < 5000; i++) { step(); if (i % 2 === 0) tr.push([S[0], S[2]]); }
+          return (c, W, H, dt) => {
+            const n = Math.round(dt * 190);
+            for (let i = 0; i < n; i++) { step(); if (i % 2 === 0) tr.push([S[0], S[2]]); }
+            while (tr.length > 3200) tr.shift();
+            const s = Math.min(W / 46, H / 52), cx = W * 0.52, cy = H * 0.47;
+            drawTrail(tr.map((p) => [cx + p[0] * s, cy - (p[1] - 25) * s]), GOLD, 0.6);
+            glow(cx + S[0] * s, cy - (S[2] - 25) * s, 14, GOLD); dot(cx + S[0] * s, cy - (S[2] - 25) * s, 3, WHITE);
+          };
+        }
+      },
+
+      /* 6 ─ Impulso su una catena di masse e molle.
+         N masse uguali collegate da molle uguali, estremi fissi:
+         m ÿᵢ = k (yᵢ₊₁ − 2yᵢ + yᵢ₋₁). L'impulso si divide in due metà che
+         viaggiano in versi opposti e si riflettono capovolte agli estremi;
+         il reticolo discreto è dispersivo, quindi la forma si deforma. */
+      {
+        caption: "impulso su una catena di masse e molle<br />propagazione, riflessione, dispersione",
+        init() {
+          const N = 64, k = 400, h = 0.002;
+          const y = new Float64Array(N + 2), v = new Float64Array(N + 2), a = new Float64Array(N + 2);
+          const c0 = 14 + Math.random() * 36;
+          for (let i = 1; i <= N; i++) y[i] = Math.exp(-Math.pow((i - c0) / 3.2, 2));
+          const accel = () => { for (let i = 1; i <= N; i++) a[i] = k * (y[i + 1] - 2 * y[i] + y[i - 1]); };
+          accel();
+          const step = () => {                                             // velocity-Verlet
+            for (let i = 1; i <= N; i++) { v[i] += 0.5 * h * a[i]; y[i] += h * v[i]; }
+            accel();
+            for (let i = 1; i <= N; i++) v[i] += 0.5 * h * a[i];
+          };
+          return (c, W, H, dt) => {
+            const n = Math.round(dt / h);
+            for (let i = 0; i < n; i++) step();
+            const x0 = W * 0.06, dx = (W * 0.9) / (N + 1), cy = H * 0.47, s = H * 0.3;
+            c.strokeStyle = "rgba(232,237,247,0.1)"; c.lineWidth = 1;
+            c.beginPath(); c.moveTo(x0, cy); c.lineTo(x0 + dx * (N + 1), cy); c.stroke();
+            c.strokeStyle = `rgba(${GOLD},0.45)`; c.lineWidth = 1.2;
+            c.beginPath();
+            for (let i = 0; i <= N + 1; i++) { const X = x0 + i * dx, Y = cy - y[i] * s; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }
+            c.stroke();
+            for (let i = 1; i <= N; i++) dot(x0 + i * dx, cy - y[i] * s, 2.3, Math.abs(y[i]) > 0.04 ? WHITE : "rgba(232,237,247,0.45)");
+            dot(x0, cy, 3, `rgba(${TEAL},0.8)`); dot(x0 + dx * (N + 1), cy, 3, `rgba(${TEAL},0.8)`);
+          };
         }
       }
+    ];
 
-      let frame = 0;
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const t = frame * 0.012;
-        for (const s of stars) {
-          const a = s.alpha * (0.6 + 0.4 * Math.sin(t * s.speed * 60 + s.phase));
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(220,230,255,${a})`;
-          ctx.fill();
-        }
-        frame++;
-        requestAnimationFrame(draw);
-      }
+    /* Scelta della scena: casuale, ma diversa dall'ultima mostrata. */
+    let index;
+    try {
+      const last = Number(localStorage.getItem("fs-hero"));
+      do { index = Math.floor(Math.random() * SCENES.length); } while (SCENES.length > 1 && index === last);
+    } catch (e) { index = Math.floor(Math.random() * SCENES.length); }
 
-      resize();
-      initStars(180);
-      draw();
-      window.addEventListener("resize", () => { resize(); initStars(180); });
-    })();
-
-    /* ── Category color — read from simulations.json ────────────── */
-    // getCatColor() uses the categoryMap built from the loaded catalog.
-    // It is called only after loadCatalog() has populated `catalog`,
-    // so the map is always available at render time.
-    const FALLBACK_COLOR = "#8fa0be";
-
-    function getCatColor(name) {
-      const key = normalize(name);
-      const map = getCategoryMap(catalog.categories || []);
-      // exact match first
-      const exact = map.get(key);
-      if (exact?.color) return exact.color;
-      // partial match as fallback (handles minor name discrepancies)
-      for (const [k, cat] of map.entries()) {
-        if (cat?.color && (key.includes(k) || k.includes(key))) return cat.color;
-      }
-      return FALLBACK_COLOR;
+    let W = 0, H = 0, frame = null, lastTs = 0, raf = 0;
+    function size() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = cv.clientWidth; H = cv.clientHeight;
+      cv.width = W * dpr; cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function render(dt) { ctx.clearRect(0, 0, W, H); frame(ctx, W, H, dt); }
+    function loop(ts) {
+      const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0);   // il tetto evita salti dopo un cambio di scheda
+      lastTs = ts;
+      render(dt);
+      raf = requestAnimationFrame(loop);
+    }
+    function show(i) {
+      index = (i + SCENES.length) % SCENES.length;
+      try { localStorage.setItem("fs-hero", String(index)); } catch (e) {}
+      cap.innerHTML = SCENES[index].caption;
+      frame = SCENES[index].init(W, H);
+      cancelAnimationFrame(raf);
+      if (reduceMotion) { for (let j = 0; j < 90; j++) render(1 / 30); }   // un fotogramma fermo, a moto già avviato
+      else { lastTs = performance.now(); raf = requestAnimationFrame(loop); }
     }
 
-    /* ── Catalog logic ───────────────────────────────────────────── */
-    const CATALOG_PATH = "simulations.json";
+    size();
+    show(index);
+    fig.addEventListener("click", () => show(index + 1));
+    addEventListener("resize", () => { size(); if (reduceMotion) render(0); });
+    document.addEventListener("visibilitychange", () => {
+      if (reduceMotion) return;
+      cancelAnimationFrame(raf);
+      if (!document.hidden) { lastTs = performance.now(); raf = requestAnimationFrame(loop); }
+    });
+    window.__heroScenes = SCENES.length; window.__heroShow = show;
+  })();
 
-    const results       = document.getElementById("results");
-    const searchInput   = document.getElementById("searchInput");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const levelFilter   = document.getElementById("levelFilter");
-    const showWipToggle = document.getElementById("showWipToggle");
+  /* ── Catalogo ────────────────────────────────────────────────────── */
+  const $ = (id) => document.getElementById(id);
+  const results = $("results"), q = $("q"), wip = $("wip"), chips = $("chips"), levels = $("levels");
+  const FALLBACK = "#8fa0be";
+  let catalog = { categories: [], simulations: [] };
+  let level = "";
 
-    const statTotal = document.getElementById("statTotal");
-    const statCats  = document.getElementById("statCats");
-    const statWip   = document.getElementById("statWip");
+  const norm = (v) => String(v ?? "").trim().toLowerCase();
+  const fold = (v) => norm(v).normalize("NFD").replace(/[̀-ͯ]/g, ""); // ricerca insensibile agli accenti
+  const slug = (v) => fold(v).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const esc = (v) => String(v ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  const titleFromSlug = (v) => String(v ?? "").replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-    let catalog = { categories: [], simulations: [] };
-    let expandedCategoryKey = null;
+  function normalizeSim(sim) {
+    const file = String(sim.file ?? "").trim().replace(/\\/g, "/");
+    const first = file.split("/").filter(Boolean)[0] || "";
+    const isWip = norm(first) === "wip" || sim.isWip === true;
+    const inferred = file.includes("/") ? titleFromSlug(first) : "Senza categoria";
+    return {
+      file,
+      title: String(sim.title ?? "Simulazione senza titolo").trim(),
+      description: String(sim.description ?? "").trim(),
+      icon: String(sim.icon ?? "").trim() || "Φ",
+      category: isWip ? "WIP" : String(sim.category ?? inferred).trim() || inferred,
+      order: Number.isFinite(Number(sim.order)) ? Number(sim.order) : 9999,
+      tags: Array.isArray(sim.tags) ? sim.tags.map((t) => String(t).trim()).filter(Boolean) : [],
+      level: norm(sim.level),
+      isWip
+    };
+  }
 
-    function escapeHtml(v) {
-      return String(v ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;")
-        .replaceAll(">","&gt;").replaceAll('"',"&quot;");
-    }
+  function highlight(text, query) {
+    const safe = esc(text);
+    if (!query) return safe;
+    const i = fold(text).indexOf(query);
+    if (i < 0 || fold(text).length !== text.length) return safe;
+    return esc(text.slice(0, i)) + "<mark>" + esc(text.slice(i, i + query.length)) + "</mark>" + esc(text.slice(i + query.length));
+  }
 
-    function normalize(v) { return String(v ?? "").trim().toLowerCase(); }
+  function levelMarkup(lv) {
+    const n = { base: 1, intermedio: 2, avanzato: 3 }[lv];
+    if (!n) return "";
+    const bars = [1, 2, 3].map((i) => `<b class="${i <= n ? "on" : ""}"></b>`).join("");
+    return `<span class="level" title="Livello ${lv}"><i aria-hidden="true">${bars}</i>${lv}</span>`;
+  }
 
-    function titleCaseFromSlug(v) {
-      return String(v ?? "").replace(/[-_]+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
-    }
+  function card(sim, color, query) {
+    const tags = sim.tags.slice(0, 2).map((t) => `<span>${esc(t)}</span>`).join("");
+    return `
+      <a class="card" href="${encodeURI(sim.file)}" style="--c:${esc(color)}">
+        <div class="card-top">
+          <div class="icon" aria-hidden="true">${esc(sim.icon)}</div>
+          ${sim.isWip ? '<span class="wip-badge">in costruzione</span>' : levelMarkup(sim.level)}
+        </div>
+        <h3>${highlight(sim.title, query)}</h3>
+        <p>${highlight(sim.description, query)}</p>
+        <div class="card-foot"><div class="tags">${tags}</div><span class="go" aria-hidden="true">→</span></div>
+      </a>`;
+  }
 
-    function levelLabel(v) {
-      const n = normalize(v);
-      if (n==="base") return "Base";
-      if (n==="intermedio") return "Intermedio";
-      if (n==="avanzato") return "Avanzato";
-      return v || "";
-    }
-
-    function simulationCountLabel(n) {
-      return n === 1 ? "1 simulazione" : `${n} simulazioni`;
-    }
-
-    function hasActiveFilters() {
-      return Boolean(
-        normalize(searchInput.value) ||
-        normalize(categoryFilter.value) ||
-        normalize(levelFilter.value)
-      );
-    }
-
-    function getCategoryKey(name) { return normalize(name); }
-
-    function getCategoryMap(cats) {
-      const m = new Map();
-      cats.forEach(c => { if (c?.name) m.set(normalize(c.name), c); });
-      return m;
-    }
-
-    function inferCategoryFromPath(fp) {
-      const parts = String(fp ?? "").split("/").filter(Boolean);
-      if (parts.length <= 1) return "Senza categoria";
-      return titleCaseFromSlug(parts[0]);
-    }
-
-    function normalizeSimulation(sim) {
-      const file = String(sim.file ?? "").trim();
-      const norm = file.replace(/\\/g,"/");
-      const first = norm.split("/").filter(Boolean)[0] || "";
-      const isWip = normalize(first) === "wip";
-      const inferredCategory = isWip ? "WIP" : inferCategoryFromPath(file);
-      const category = isWip ? "WIP" : (String(sim.category ?? inferredCategory).trim() || inferredCategory);
-      const tags = Array.isArray(sim.tags) ? sim.tags.map(t=>String(t).trim()).filter(Boolean) : [];
+  function categoriesInOrder(sims) {
+    const map = new Map((catalog.categories || []).filter((c) => c?.name).map((c) => [norm(c.name), c]));
+    const names = [...new Set(sims.map((s) => s.category))];
+    return names.map((name) => {
+      const c = map.get(norm(name)) || {};
+      const isW = norm(name) === "wip";
       return {
-        ...sim,
-        file,
-        title: String(sim.title ?? "Simulazione senza titolo").trim(),
-        description: String(sim.description ?? "Simulazione interattiva di fisica.").trim(),
-        icon: String(sim.icon ?? "Φ").trim() || "Φ",
-        category,
-        order: Number.isFinite(Number(sim.order)) ? Number(sim.order) : 9999,
-        tags,
-        level: String(sim.level ?? "").trim(),
-        isWip
+        name,
+        label: isW ? "In costruzione" : name,
+        description: c.description || "",
+        color: c.color || FALLBACK,
+        order: isW ? Infinity : Number.isFinite(Number(c.order)) ? Number(c.order) : 9999
       };
-    }
+    }).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, "it"));
+  }
 
-    function matchesFilters(sim) {
-      const query = normalize(searchInput.value);
-      const selCat = normalize(categoryFilter.value);
-      const selLvl = normalize(levelFilter.value);
-      const showWip = showWipToggle.checked;
-
-      if (sim.isWip && !showWip) return false;
-      if (selCat && normalize(sim.category) !== selCat) return false;
-      if (selLvl && normalize(sim.level) !== selLvl) return false;
+  function render() {
+    const query = fold(q.value);
+    const all = (catalog.simulations || []).map(normalizeSim);
+    const sims = all.filter((s) => {
+      if (s.isWip && !wip.checked) return false;
+      if (level && s.level !== level) return false;
       if (!query) return true;
-
-      const hay = [sim.title, sim.description, sim.category, sim.level, ...(sim.tags||[])]
-        .map(normalize).join(" ");
-      return hay.includes(query);
-    }
-
-    function getVisibleSimulations() {
-      return (catalog.simulations || []).map(normalizeSimulation).filter(matchesFilters);
-    }
-
-    function sortCategories(cats, sims) {
-      const map = getCategoryMap(cats);
-      const names = new Set();
-      cats.forEach(c => {
-        if (!c?.name) return;
-        if (normalize(c.name)==="wip" && !showWipToggle.checked) return;
-        names.add(c.name);
-      });
-      sims.forEach(s => { if (s?.category) names.add(s.category); });
-
-      return Array.from(names).map(name => {
-        const cd = map.get(normalize(name)) || {};
-        let order = Number.isFinite(Number(cd.order)) ? Number(cd.order) : 9999;
-        if (normalize(name)==="wip") order = 999999;
-        return { name, description: cd.description || "", icon: cd.icon || "", order };
-      }).sort((a,b) => a.order !== b.order ? a.order - b.order : a.name.localeCompare(b.name,"it"));
-    }
-
-    function buildCategoryOptions(sims, cats) {
-      const map = getCategoryMap(cats);
-      const names = new Set();
-      cats.forEach(c => {
-        if (!c?.name) return;
-        if (normalize(c.name)==="wip" && !showWipToggle.checked) return;
-        names.add(c.name);
-      });
-      sims.forEach(s => { if (s?.category) names.add(s.category); });
-
-      const sorted = Array.from(names).map(name => {
-        const cd = map.get(normalize(name)) || {};
-        let order = Number.isFinite(Number(cd.order)) ? Number(cd.order) : 9999;
-        if (normalize(name)==="wip") order = 999999;
-        return { name, order };
-      }).sort((a,b) => a.order !== b.order ? a.order - b.order : a.name.localeCompare(b.name,"it"));
-
-      const cur = categoryFilter.value;
-      categoryFilter.innerHTML = '<option value="">Tutte le categorie</option>' +
-        sorted.map(it => `<option value="${escapeHtml(it.name)}">${escapeHtml(it.name)}</option>`).join("");
-      if (sorted.some(it => it.name === cur)) categoryFilter.value = cur;
-    }
-
-    function updateStats() {
-      const all = (catalog.simulations || []).map(normalizeSimulation);
-      const visible = all.filter(s => !s.isWip);
-      const wip = all.filter(s => s.isWip);
-      const cats = new Set(visible.map(s => normalize(s.category)));
-
-      if (statTotal) statTotal.textContent = visible.length;
-      if (statCats)  statCats.textContent  = cats.size;
-      if (statWip)   statWip.textContent   = wip.length;
-    }
-
-    function updateResultsCount(sims) {
-      const resultsCount = document.getElementById("resultsCount");
-      if (!resultsCount) return;
-      const n = sims.length;
-      resultsCount.innerHTML = n === 0
-        ? "Nessun risultato"
-        : `<strong>${n}</strong> ${n === 1 ? "simulazione trovata" : "simulazioni trovate"}`;
-    }
-
-    function renderCard(sim) {
-      const color = getCatColor(sim.category);
-      const levelMarkup = sim.level
-        ? `<span class="sim-level-chip ${escapeHtml(normalize(sim.level))}">${escapeHtml(levelLabel(sim.level))}</span>`
-        : "";
-      return `
-        <a class="card" href="${encodeURI(sim.file)}" style="--cat-color:${escapeHtml(color)}"
-           aria-label="Apri simulazione: ${escapeHtml(sim.title)}">
-          <div class="card-inner">
-            <div class="card-header">
-              <div class="icon" aria-hidden="true">${escapeHtml(sim.icon)}</div>
-              ${levelMarkup}
-            </div>
-            <h3 class="sim-title">${escapeHtml(sim.title)}</h3>
-            <p class="sim-desc">${escapeHtml(sim.description)}</p>
-            <div class="sim-footer">
-              <span class="sim-open" aria-hidden="true">Apri &nbsp;→</span>
-            </div>
-          </div>
-        </a>
-      `;
-    }
-
-    function render() {
-      const sims = getVisibleSimulations();
-      const orderedCats = sortCategories(catalog.categories || [], sims);
-      const autoExpand = hasActiveFilters();
-
-      updateResultsCount(sims);
-
-      if (sims.length === 0) {
-        results.innerHTML = `<div class="empty-state">Nessuna simulazione corrisponde ai filtri selezionati.</div>`;
-        return;
-      }
-
-      const html = orderedCats.map((cat, catIdx) => {
-        const catSims = sims
-          .filter(s => normalize(s.category) === normalize(cat.name))
-          .sort((a,b) => a.order !== b.order ? a.order - b.order : a.title.localeCompare(b.title,"it"));
-
-        if (catSims.length === 0) return "";
-
-        const key = getCategoryKey(cat.name);
-        const isExpanded = autoExpand || expandedCategoryKey === key;
-        const color = getCatColor(cat.name);
-        const delay = `${catIdx * 0.05}s`;
-
-        return `
-          <section class="category-block" style="animation-delay:${delay}; --cat-color:${escapeHtml(color)}">
-            <button class="category-toggle" type="button"
-              data-category="${escapeHtml(cat.name)}"
-              aria-expanded="${isExpanded ? "true" : "false"}">
-              <div class="category-left">
-                <div class="category-dot"></div>
-                <div class="category-text">
-                  <h2 class="category-title">
-                    ${cat.icon ? `<span class="category-icon" aria-hidden="true">${escapeHtml(cat.icon)}</span>` : ""}${escapeHtml(cat.name)}
-                  </h2>
-                  ${cat.description ? `<p class="category-desc">${escapeHtml(cat.description)}</p>` : ""}
-                </div>
-              </div>
-              <div class="category-right">
-                <span class="category-count">${escapeHtml(simulationCountLabel(catSims.length))}</span>
-                <span class="category-chevron" aria-hidden="true">▾</span>
-              </div>
-            </button>
-            <div class="category-content" ${isExpanded ? "" : "hidden"}>
-              <div class="grid">
-                ${catSims.map(renderCard).join("")}
-              </div>
-            </div>
-          </section>
-        `;
-      }).filter(Boolean).join("");
-
-      results.innerHTML = html;
-    }
-
-    function refreshFiltersAndRender() {
-      buildCategoryOptions(getVisibleSimulations(), catalog.categories || []);
-      render();
-    }
-
-    async function loadCatalog() {
-      try {
-        const resp = await fetch(CATALOG_PATH, { cache: "no-store" });
-        if (!resp.ok) throw new Error("Impossibile recuperare simulations.json");
-        const data = await resp.json();
-        catalog = Array.isArray(data)
-          ? { categories: [], simulations: data }
-          : {
-              categories: Array.isArray(data.categories) ? data.categories : [],
-              simulations: Array.isArray(data.simulations) ? data.simulations : []
-            };
-        updateStats();
-        refreshFiltersAndRender();
-      } catch(err) {
-        results.innerHTML = `
-          <div class="error-state">
-            Non è stato possibile caricare il catalogo.<br>
-            Verifica che <code>simulations.json</code> sia presente e valido.
-          </div>`;
-        console.error(err);
-      }
-    }
-
-    searchInput.addEventListener("input", render);
-    categoryFilter.addEventListener("change", render);
-    levelFilter.addEventListener("change", render);
-    showWipToggle.addEventListener("change", refreshFiltersAndRender);
-
-    results.addEventListener("click", e => {
-      const toggle = e.target.closest(".category-toggle");
-      if (!toggle || hasActiveFilters()) return;
-
-      const block = toggle.closest(".category-block");
-      const content = block?.querySelector(".category-content");
-      if (!block || !content) return;
-
-      const isExpanded = toggle.getAttribute("aria-expanded") === "true";
-
-      results.querySelectorAll(".category-toggle[aria-expanded='true']").forEach(btn => {
-        if (btn === toggle) return;
-        btn.setAttribute("aria-expanded", "false");
-        const otherContent = btn.closest(".category-block")?.querySelector(".category-content");
-        if (otherContent) otherContent.hidden = true;
-      });
-
-      const nextExpanded = !isExpanded;
-      toggle.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
-      content.hidden = !nextExpanded;
-
-      const key = getCategoryKey(toggle.dataset.category || "");
-      expandedCategoryKey = nextExpanded ? key : null;
+      return fold([s.title, s.description, s.category, s.level, ...s.tags].join(" ")).includes(query);
     });
 
-    loadCatalog();
+    const published = all.filter((s) => !s.isWip);
+    $("statTotal").textContent = published.length;
+    $("statCats").textContent = new Set(published.map((s) => norm(s.category))).size;
+    $("statWip").textContent = all.length - published.length;
+
+    const cats = categoriesInOrder(sims);
+    chips.innerHTML = cats.map((c) =>
+      `<a href="#${slug(c.name)}" style="--c:${esc(c.color)}">${esc(c.label)} <small>${sims.filter((s) => s.category === c.name).length}</small></a>`
+    ).join("");
+
+    if (!sims.length) {
+      results.innerHTML = `<div class="state">Nessuna simulazione corrisponde alla ricerca.<br /><button type="button" id="reset">Azzera i filtri</button></div>`;
+      $("reset").onclick = () => { q.value = ""; setLevel(""); render(); };
+      return;
+    }
+
+    const filtered = Boolean(query || level);
+    results.innerHTML =
+      (filtered ? `<p class="count">${sims.length} ${sims.length === 1 ? "simulazione trovata" : "simulazioni trovate"}</p>` : "") +
+      cats.map((c, i) => {
+        const list = sims.filter((s) => s.category === c.name).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, "it"));
+        return `
+          <section class="cat" id="${slug(c.name)}" style="--c:${esc(c.color)}">
+            <div class="cat-head">
+              <span class="cat-num">${String(i + 1).padStart(2, "0")}</span>
+              <h2>${esc(c.label)}</h2>
+              <span class="cat-n">${list.length} ${list.length === 1 ? "simulazione" : "simulazioni"}</span>
+              ${c.description ? `<p class="cat-desc">${esc(c.description)}</p>` : ""}
+            </div>
+            <div class="grid">${list.map((s) => card(s, c.color, query)).join("")}</div>
+          </section>`;
+      }).join("");
+    observeSections();
+  }
+
+  /* Evidenzia nella barra la categoria che si sta leggendo. */
+  let observer;
+  function observeSections() {
+    if (observer) observer.disconnect();
+    if (!("IntersectionObserver" in window)) return;
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        chips.querySelectorAll("a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id));
+        const on = chips.querySelector("a.on");
+        if (on) chips.scrollTo({ left: on.offsetLeft - chips.clientWidth / 2 + on.clientWidth / 2, behavior: reduceMotion ? "auto" : "smooth" });
+      });
+    }, { rootMargin: "-25% 0px -65% 0px" });
+    document.querySelectorAll(".cat").forEach((s) => observer.observe(s));
+  }
+
+  function setLevel(v) {
+    level = v;
+    levels.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.level === v)));
+  }
+
+  levels.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { setLevel(b.dataset.level); render(); } });
+  q.addEventListener("input", render);
+  wip.addEventListener("change", () => {
+    try { localStorage.setItem("fs-wip", wip.checked ? "1" : "0"); } catch (e) {}
+    render();
+  });
+  addEventListener("keydown", (e) => {
+    if (e.key === "/" && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === "Escape" && document.activeElement === q) { q.value = ""; render(); q.blur(); }
+  });
+
+  (async function load() {
+    try { wip.checked = localStorage.getItem("fs-wip") === "1"; } catch (e) {}
+    if (norm(location.hash) === "#wip") wip.checked = true;
+    try {
+      const r = await fetch("simulations.json", { cache: "no-cache" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const data = await r.json();
+      catalog = {
+        categories: Array.isArray(data.categories) ? data.categories : [],
+        simulations: Array.isArray(data.simulations) ? data.simulations : []
+      };
+      render();
+      if (location.hash) {
+        const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        if (target) target.scrollIntoView();
+      }
+    } catch (err) {
+      results.innerHTML = `<div class="state">Non è stato possibile caricare <code>simulations.json</code> (${esc(err.message)}).<br />Se stai aprendo il file dal disco, avvia un server locale: <code>python3 -m http.server</code>.</div>`;
+    }
+  })();
   </script>
 </body>
 </html>

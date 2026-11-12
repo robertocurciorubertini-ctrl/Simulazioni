@@ -15,22 +15,21 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fluidodinamica — Simulazioni Didattiche</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f1eb;
-    --surface: #faf8f3;
-    --border: #d4cfc4;
-    --ink: #1a1814;
-    --ink2: #4a4640;
-    --ink3: #8a8480;
-    --accent: #1a5fa8;
-    --accent2: #c84b1a;
-    --accent3: #1a8a5a;
+    --bg: var(--fs-paper);
+    --surface: var(--fs-surface);
+    --border: var(--fs-line);
+    --ink: var(--fs-ink);
+    --ink2: var(--fs-ink-2);
+    --ink3: var(--fs-ink-3);
+    --accent: var(--fs-blue);
+    --accent2: var(--fs-red);
+    --accent3: var(--fs-green);
     --water: #4a9fd4;
     --water-light: #a8d4f0;
     --water-dark: #1a5a8a;
-    --gold: #c8941a;
+    --gold: var(--fs-amber);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,7 +52,7 @@ window.SIM_METADATA = {
   }
 
   header h1 {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Crimson Pro', serif;
     font-size: 2rem;
     letter-spacing: -0.02em;
   }
@@ -109,7 +108,7 @@ window.SIM_METADATA = {
   }
 
   .module-header h2 {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Crimson Pro', serif;
     font-size: 1.8rem;
     color: var(--ink);
     margin-bottom: 0.5rem;
@@ -262,8 +261,10 @@ window.SIM_METADATA = {
     border-radius: 0 4px 4px 0;
   }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Fluidodinamica</h1>
@@ -292,7 +293,7 @@ window.SIM_METADATA = {
       <canvas id="c0" width="680" height="440"></canvas>
       <div class="legend">
         <div class="legend-item"><div class="legend-dot" style="background:#e05050"></div> Peso (F_g)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#1a8a5a"></div> Spinta di Archimede (F_A)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0e8a5a"></div> Spinta di Archimede (F_A)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#c89a20"></div> Forza risultante</div>
       </div>
     </div>
@@ -373,7 +374,7 @@ window.SIM_METADATA = {
       <canvas id="c2" width="680" height="440"></canvas>
       <div class="legend">
         <div class="legend-item"><div class="legend-dot" style="background:#e05050"></div> Forza applicata (F₁)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#1a8a5a"></div> Forza risultante (F₂)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0e8a5a"></div> Forza risultante (F₂)</div>
       </div>
     </div>
     <div class="controls">
@@ -412,7 +413,7 @@ window.SIM_METADATA = {
     <div>
       <canvas id="c3" width="680" height="440"></canvas>
       <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#1a5fa8"></div> Particelle di fluido</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1f6fd0"></div> Particelle di fluido</div>
       </div>
     </div>
     <div class="controls">
@@ -527,8 +528,8 @@ window.SIM_METADATA = {
     <div>
       <canvas id="c6" width="680" height="440"></canvas>
       <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#1a5fa8"></div> Linee di flusso</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#1a8a5a"></div> Forza di Magnus (F_M)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1f6fd0"></div> Linee di flusso</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0e8a5a"></div> Forza di Magnus (F_M)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#e05050"></div> Vel. libera (v_∞)</div>
       </div>
     </div>
@@ -812,7 +813,7 @@ function draw0(ctx, W, H) {
   arrow(ctx, cxc, bodyCyPx, cxc, bodyCyPx + fgLen, '#e05050', `F_g=${fmt(Fg2,1)}N`);
   // Archimede ↑
   const faLen = Math.min(FA2 * fScale, 110);
-  if (faLen > 3) arrow(ctx, cxc - 36, bodyCyPx, cxc - 36, bodyCyPx - faLen, '#1a8a5a', `F_A=${fmt(FA2,1)}N`);
+  if (faLen > 3) arrow(ctx, cxc - 36, bodyCyPx, cxc - 36, bodyCyPx - faLen, '#0e8a5a', `F_A=${fmt(FA2,1)}N`);
   // Risultante
   if (Math.abs(Fr2) > 0.3) {
     const frLen = Math.min(Math.abs(Fr2) * fScale, 80);
@@ -821,7 +822,7 @@ function draw0(ctx, W, H) {
   }
 
   // --- Velocità e scala ---
-  ctx.fillStyle = '#4a4640';
+  ctx.fillStyle = '#474c57';
   ctx.font = '11px DM Mono';
   ctx.fillText(`v = ${arch.vy.toFixed(2)} m/s`, W - 180, H - 20);
 }
@@ -914,7 +915,7 @@ function draw1(rho, P0, h, pgh, Ptot) {
   const drawBar = (x, val, maxVal, color, label, sub) => {
     const bh = (val/maxVal)*barMaxH;
     ctx.fillStyle = '#f0f0ec';
-    ctx.strokeStyle = '#d4cfc4';
+    ctx.strokeStyle = '#d9d5cb';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.rect(x, tankTop + 20, 50, barMaxH);
@@ -923,7 +924,7 @@ function draw1(rho, P0, h, pgh, Ptot) {
     ctx.beginPath();
     ctx.rect(x, tankTop + 20 + barMaxH - bh, 50, bh);
     ctx.fill();
-    ctx.fillStyle = '#1a1814';
+    ctx.fillStyle = '#1b1d22';
     ctx.font = '500 11px DM Sans';
     ctx.textAlign = 'center';
     ctx.fillText(label, x+25, tankTop + 16);
@@ -939,7 +940,7 @@ function draw1(rho, P0, h, pgh, Ptot) {
 
   // Pa labels below
   [P0, pgh, Ptot].forEach((v,i) => {
-    ctx.fillStyle = '#4a4640';
+    ctx.fillStyle = '#474c57';
     ctx.font = '10px DM Mono';
     ctx.textAlign = 'center';
     ctx.fillText('Pa', barX + i*70 + 25, tankBot + 14);
@@ -1062,8 +1063,8 @@ function draw2(r1, r2, F1, F2, A1, A2, P) {
   ctx.fillText(`F₁ = ${fmt(F1)}N`, p1x, fluidY - 166 - f1Len);
   ctx.textAlign = 'left';
 
-  arrow(ctx, p2x, fluidY - 162, p2x, fluidY - 162 - f2Len, '#1a8a5a', '');
-  ctx.fillStyle = '#1a8a5a'; ctx.font = '500 12px DM Sans'; ctx.textAlign = 'center';
+  arrow(ctx, p2x, fluidY - 162, p2x, fluidY - 162 - f2Len, '#0e8a5a', '');
+  ctx.fillStyle = '#0e8a5a'; ctx.font = '500 12px DM Sans'; ctx.textAlign = 'center';
   ctx.fillText(`F₂ = ${fmt(F2,0)}N`, p2x, fluidY - 166 - f2Len);
   ctx.textAlign = 'left';
 
@@ -1075,7 +1076,7 @@ function draw2(r1, r2, F1, F2, A1, A2, P) {
   ctx.textAlign = 'left';
 
   // multiplication factor
-  ctx.fillStyle = '#c84b1a';
+  ctx.fillStyle = '#c2491d';
   ctx.font = '700 16px DM Mono';
   ctx.textAlign = 'center';
   const rap = A2/A1;
@@ -1192,7 +1193,7 @@ function startAnim3() {
 }
 
 function drawConduitBg(ctx, c, W, H) {
-  ctx.fillStyle = '#f4f1eb';
+  ctx.fillStyle = '#f4f1ea';
   ctx.fillRect(0,0,W,H);
 
   // conduit shape
@@ -1225,7 +1226,7 @@ function drawConduitLabels(ctx, c, W, H) {
   const v2 = v1 * (c.r1*c.r1)/(c.r2*c.r2);
   // section lines
   [180, 300, 440, 560].forEach(x => {
-    ctx.strokeStyle = '#8a8480';
+    ctx.strokeStyle = '#7d828c';
     ctx.lineWidth = 1;
     ctx.setLineDash([4,3]);
     ctx.beginPath();
@@ -1235,7 +1236,7 @@ function drawConduitLabels(ctx, c, W, H) {
     ctx.setLineDash([]);
   });
   // labels
-  ctx.fillStyle = '#1a1814';
+  ctx.fillStyle = '#1b1d22';
   ctx.font = '500 12px DM Sans';
   ctx.textAlign = 'center';
   ctx.fillText(`v₁ = ${v1.toFixed(1)} m/s`, 90, c.cy - c.r1 - 14);
@@ -1350,7 +1351,7 @@ function startAnim4() {
       ctx.fillStyle = '#4a9fd4';
       ctx.fillRect(mx-9, tubY + tubH - h, 18, h);
       // label
-      ctx.fillStyle = '#1a1814';
+      ctx.fillStyle = '#1b1d22';
       ctx.font = '11px DM Mono';
       ctx.textAlign = 'center';
       ctx.fillText(fmt(PsArr[idx]/1000,0)+'k', mx, tubY - 4);
@@ -1361,7 +1362,7 @@ function startAnim4() {
     });
 
     // labels on conduit
-    ctx.fillStyle = '#1a1814';
+    ctx.fillStyle = '#1b1d22';
     ctx.font = '500 12px DM Sans';
     ctx.textAlign = 'center';
     ctx.fillText(`v₁ = ${v1.toFixed(1)} m/s`, 90, cy + r1 + 40);
@@ -1436,11 +1437,11 @@ function startAnim5() {
     document.getElementById('i5g').textContent  = fmt(G,1) + ' kg/s';
 
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = '#f4f1eb';
+    ctx.fillStyle = '#f4f1ea';
     ctx.fillRect(0,0,W,H);
 
     // tank walls
-    ctx.strokeStyle = '#4a4640';
+    ctx.strokeStyle = '#474c57';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(tankX, tankTop);
@@ -1460,14 +1461,14 @@ function startAnim5() {
     // height markers
     for (let i=0; i<=5; i++) {
       const my = tankBot - i*(tankH/5);
-      ctx.strokeStyle = '#8a8480';
+      ctx.strokeStyle = '#7d828c';
       ctx.lineWidth = 1;
       ctx.setLineDash([3,3]);
       ctx.beginPath();
       ctx.moveTo(tankX-2, my); ctx.lineTo(tankX+tankW+2, my);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#4a4640';
+      ctx.fillStyle = '#474c57';
       ctx.font = '10px DM Mono';
       ctx.textAlign = 'right';
       ctx.fillText((i * Hm/5).toFixed(1)+'m', tankX-6, my+4);
@@ -1477,7 +1478,7 @@ function startAnim5() {
     // orifice
     const oy = tankBot;
     const ox = tankX + tankW;
-    ctx.fillStyle = '#1a1814';
+    ctx.fillStyle = '#1b1d22';
     ctx.fillRect(ox - 1, oy - d*600/2, 8, d*600);
 
     // jet
@@ -1508,33 +1509,33 @@ function startAnim5() {
 
     // graph: Q vs h on right
     const gx = 360, gy = 60, gw = 260, gh = 200;
-    ctx.fillStyle = '#faf8f3';
-    ctx.strokeStyle = '#d4cfc4';
+    ctx.fillStyle = '#fffdf9';
+    ctx.strokeStyle = '#d9d5cb';
     ctx.lineWidth = 1;
     ctx.fillRect(gx, gy, gw, gh);
     ctx.strokeRect(gx, gy, gw, gh);
 
-    ctx.fillStyle = '#4a4640';
+    ctx.fillStyle = '#474c57';
     ctx.font = '11px DM Mono';
     ctx.textAlign = 'center';
     ctx.fillText('Q = A√(2gh)', gx+gw/2, gy-8);
     ctx.textAlign = 'left';
 
     // axes
-    ctx.strokeStyle = '#4a4640'; ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#474c57'; ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(gx+30, gy+10); ctx.lineTo(gx+30, gy+gh-10);
     ctx.lineTo(gx+gw-10, gy+gh-10);
     ctx.stroke();
 
-    ctx.fillStyle = '#8a8480'; ctx.font = '10px DM Mono';
+    ctx.fillStyle = '#7d828c'; ctx.font = '10px DM Mono';
     ctx.fillText('h →', gx+gw-30, gy+gh-2);
     ctx.save(); ctx.translate(gx+12, gy+gh/2); ctx.rotate(-Math.PI/2);
     ctx.fillText('Q →', 0, 0); ctx.restore();
 
     // curve
     const Qmax = A * Math.sqrt(2*g*Hm);
-    ctx.strokeStyle = '#1a5fa8'; ctx.lineWidth = 2;
+    ctx.strokeStyle = '#1f6fd0'; ctx.lineWidth = 2;
     ctx.beginPath();
     for (let hi=0; hi<=Hm; hi+=Hm/100) {
       const qi = A * Math.sqrt(2*g*hi);
@@ -1558,7 +1559,7 @@ function startAnim5() {
     if (waterLevel5 <= 0.005) {
       ctx.fillStyle = 'rgba(244,241,235,0.8)';
       ctx.fillRect(tankX, tankTop, tankW, tankH);
-      ctx.fillStyle = '#8a8480';
+      ctx.fillStyle = '#7d828c';
       ctx.font = '13px DM Sans';
       ctx.textAlign = 'center';
       ctx.fillText('Serbatoio vuoto', tankX+tankW/2, (tankTop+tankBot)/2);
@@ -1797,19 +1798,19 @@ function startAnim6() {
     if (Math.abs(omega) > 0.3) {
       const fDir = omega > 0 ? -1 : 1;
       const fLen = Math.min(Math.abs(omega) * vinf * 0.5, 110);
-      arrow(ctx, cx+R+32, cy, cx+R+32, cy+fDir*fLen, '#1a8a5a', 'F_M');
+      arrow(ctx, cx+R+32, cy, cx+R+32, cy+fDir*fLen, '#0e8a5a', 'F_M');
     }
 
     // === Indicatore rotazione ===
     if (omega !== 0) {
       const arcR=R+15;
-      ctx.strokeStyle='#c84b1a'; ctx.lineWidth=2;
+      ctx.strokeStyle='#c2491d'; ctx.lineWidth=2;
       const sa=omega>0?0.3:Math.PI+0.3, ea=omega>0?Math.PI-0.3:2*Math.PI-0.3;
       ctx.beginPath(); ctx.arc(cx,cy,arcR,sa,ea,omega<0); ctx.stroke();
       const aEnd=omega>0?ea:sa, td=omega>0?1:-1;
       const ax2=cx+arcR*Math.cos(aEnd), ay2=cy+arcR*Math.sin(aEnd);
       const tx=-Math.sin(aEnd)*td, ty=Math.cos(aEnd)*td;
-      ctx.fillStyle='#c84b1a';
+      ctx.fillStyle='#c2491d';
       ctx.beginPath(); ctx.moveTo(ax2+tx*8-ty*5,ay2+ty*8+tx*5);
       ctx.lineTo(ax2,ay2); ctx.lineTo(ax2+tx*8+ty*5,ay2+ty*8-tx*5); ctx.fill();
     }
@@ -1819,7 +1820,7 @@ function startAnim6() {
       const hd = omega > 0 ? 1 : -1;
       ctx.font='bold 11px DM Mono'; ctx.textAlign='center';
       ctx.fillStyle='#cc2020'; ctx.fillText('▲ alta P',  cx, cy+hd*(R+44));
-      ctx.fillStyle='#1a8a5a'; ctx.fillText('▼ bassa P', cx, cy-hd*(R+44));
+      ctx.fillStyle='#0e8a5a'; ctx.fillText('▼ bassa P', cx, cy-hd*(R+44));
       ctx.textAlign='left';
     }
   }

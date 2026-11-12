@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fluidodinamica 2D — Navier–Stokes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -13,21 +11,21 @@
 
 <style>
 :root {
-  --bg:      #f7f4ee;
-  --bg2:     #eeebe3;
-  --bg3:     #e4dfd4;
-  --panel:   #faf8f4;
-  --border:  #cdc5b4;
-  --border2: #b5aa96;
-  --text:    #26211c;
-  --text2:   #534a40;
-  --text3:   #8a7e6e;
-  --red:     #b83232;
-  --blue:    #1e5f8a;
-  --green:   #2a7a50;
+  --bg:      var(--fs-paper);
+  --bg2:     var(--fs-surface-2);
+  --bg3:     var(--fs-surface-3);
+  --panel:   var(--fs-surface);
+  --border:  var(--fs-line);
+  --border2: var(--fs-line-2);
+  --text:    var(--fs-ink);
+  --text2:   var(--fs-ink-2);
+  --text3:   var(--fs-ink-3);
+  --red:     var(--fs-red);
+  --blue:    var(--fs-blue);
+  --green:   var(--fs-green);
   --shadow:  rgba(60,45,30,0.10);
-  --mono:    'IBM Plex Mono', monospace;
-  --serif:   'EB Garamond', Georgia, serif;
+  --mono:    'DM Mono', monospace;
+  --serif:   'Crimson Pro', Georgia, serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -449,8 +447,10 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
   letter-spacing: 0.1em;
 }
 </style>
+<link rel="stylesheet" href="../../assets/sim.css">
+<script src="../../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Fluidodinamica 2D — Navier–Stokes</h1>
@@ -545,8 +545,8 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
     </div>
 
     <div class="legend">
-      <div><span class="dot" style="background:#b83232"></span>ω &lt; 0 — rotazione oraria</div>
-      <div><span class="dot" style="background:#1e5f8a"></span>ω &gt; 0 — rotazione antioraria</div>
+      <div><span class="dot" style="background:#c2491d"></span>ω &lt; 0 — rotazione oraria</div>
+      <div><span class="dot" style="background:#1f6fd0"></span>ω &gt; 0 — rotazione antioraria</div>
       <div><span class="dot" style="background:#888"></span>Ostacolo solido</div>
     </div>
 
@@ -587,7 +587,7 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
   <div class="cards">
     <div class="card">
       <div class="card-label">Laminare stabile</div>
-      <div class="card-re" style="color:#2a7a50">Re &lt; 40</div>
+      <div class="card-re" style="color:#0e8a5a">Re &lt; 40</div>
       <p>Flusso ordinato, simmetrico. Eventuale coppia di vortici stazionari nella scia. Soluzione unica e stabile alle perturbazioni.</p>
     </div>
     <div class="card">
@@ -597,7 +597,7 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
     </div>
     <div class="card">
       <div class="card-label">Turbolenza incipiente</div>
-      <div class="card-re" style="color:#b83232">200 ≲ Re ≲ 1000</div>
+      <div class="card-re" style="color:#c2491d">200 ≲ Re ≲ 1000</div>
       <p>La scia diventa irregolare, i vortici interagiscono e si frammentano. Perdita della periodicità temporale.</p>
     </div>
     <div class="card">
@@ -849,9 +849,9 @@ function updateHUD() {
   reEl.textContent = Re.toLocaleString('it');
 
   let color, label;
-  if      (Re < 40)   { color='#2a7a50'; label='Laminare'; }
+  if      (Re < 40)   { color='#0e8a5a'; label='Laminare'; }
   else if (Re < 150)  { color='#c07020'; label='Scia di Kármán'; }
-  else if (Re < 600)  { color='#b83232'; label='Turbolenza incipiente'; }
+  else if (Re < 600)  { color='#c2491d'; label='Turbolenza incipiente'; }
   else                { color='#7a1818'; label='Turbolenza'; }
 
   reEl.style.color    = color;
@@ -977,7 +977,7 @@ async function init() {
     ldEl.style.display = 'none';
     requestAnimationFrame(loop);
   } catch(e) {
-    ldEl.innerHTML = `<div style="font-family:var(--mono);font-size:0.65rem;color:#b83232;padding:20px;text-align:center">
+    ldEl.innerHTML = `<div style="font-family:var(--mono);font-size:0.65rem;color:#c2491d;padding:20px;text-align:center">
       Errore: ${e.message}<br><br>
       Assicurati che <code>fluid.js</code> e <code>fluid.wasm</code><br>
       siano nella stessa cartella di questo file HTML.

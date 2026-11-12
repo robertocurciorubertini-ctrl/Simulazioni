@@ -18,14 +18,14 @@
   <title>Simulazione del suono</title>
   <style>
     :root {
-      --bg: #f6f7fb;
-      --panel: #ffffff;
-      --panel-2: #fbfcff;
-      --text: #1e2430;
-      --muted: #5f6b7a;
-      --border: #d9e0ea;
-      --accent: #2d6cdf;
-      --accent-soft: rgba(45, 108, 223, 0.12);
+      --bg: var(--fs-paper);
+      --panel: var(--fs-surface);
+      --panel-2: var(--fs-surface-2);
+      --text: var(--fs-ink);
+      --muted: var(--fs-ink-2);
+      --border: var(--fs-line);
+      --accent: var(--fs-blue);
+      --accent-soft: rgba(31, 111, 208, 0.12);
       --shadow: 0 10px 30px rgba(25, 35, 52, 0.08);
       --radius: 18px;
     }
@@ -34,7 +34,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, "DM Sans", sans-serif;
       color: var(--text);
       background: radial-gradient(circle at top left, #ffffff 0%, #f8faff 35%, #f1f4f9 100%);
       line-height: 1.55;
@@ -366,7 +366,7 @@
       border-radius: 12px;
       background: #fff;
       border: 1px solid var(--border);
-      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+      font-family: "Cambria Math", "STIX Two Math", "Crimson Pro", serif;
       font-size: 1.04rem;
       color: var(--text);
     }
@@ -435,8 +435,10 @@
 .tab-pane.active { display: block; }
 
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
   <div class="page">
     <section class="hero panel">
@@ -1108,7 +1110,7 @@
       context.moveTo(0, h / 2);
       context.lineTo(w, h / 2);
       context.stroke();
-      context.fillStyle = '#5f6b7a';
+      context.fillStyle = '#474c57';
       context.font = '13px Inter, sans-serif';
       context.fillText('ampiezza', 12, 22);
       context.fillText(xLabel, w - 88, h - 16);
@@ -1136,7 +1138,7 @@
       const amp = h * (spatial ? 0.22 : 0.28);
       const speed = 0.65 + freq / 650;
       context.save();
-      context.strokeStyle = '#2d6cdf';
+      context.strokeStyle = '#1f6fd0';
       context.lineWidth = 2.2;
       context.beginPath();
       for (let x = 0; x < w; x++) {
@@ -1152,7 +1154,7 @@
       context.stroke();
       context.fillStyle = 'rgba(45,108,223,0.08)';
       context.fillRect(0, 0, w, h);
-      context.fillStyle = '#5f6b7a';
+      context.fillStyle = '#474c57';
       context.font = '13px Inter, sans-serif';
       context.fillText('nessuna periodicità singola', 16, h - 18);
       context.restore();
@@ -1174,7 +1176,7 @@
         return;
       }
       waveCtx.save();
-      waveCtx.strokeStyle = '#2d6cdf';
+      waveCtx.strokeStyle = '#1f6fd0';
       waveCtx.lineWidth = 2.8;
       waveCtx.beginPath();
       for (let x = 0; x < w; x++) {
@@ -1232,7 +1234,7 @@
         return;
       }
       lambdaCtx.save();
-      lambdaCtx.strokeStyle = '#2d6cdf';
+      lambdaCtx.strokeStyle = '#1f6fd0';
       lambdaCtx.lineWidth = 2.6;
       lambdaCtx.beginPath();
       for (let x = 0; x < w; x++) {
@@ -1298,7 +1300,7 @@
       spectrumCtx.stroke();
 
       const marks = [0, 1000, 2000, 3000, 4000, 5000];
-      spectrumCtx.fillStyle = '#5f6b7a';
+      spectrumCtx.fillStyle = '#474c57';
       spectrumCtx.font = '12px Inter, sans-serif';
       marks.forEach(mark => {
         if (mark > maxFreq) return;
@@ -1402,7 +1404,7 @@
       ctx.closePath();
       ctx.fill();
 
-      ctx.strokeStyle = '#2d6cdf';
+      ctx.strokeStyle = '#1f6fd0';
       ctx.lineWidth = 2.6;
       ctx.beginPath();
       ctx.moveTo(x0, yBase);
@@ -1412,7 +1414,7 @@
       ctx.lineTo(x4, yBase);
       ctx.stroke();
 
-      ctx.fillStyle = '#1e2430';
+      ctx.fillStyle = '#1b1d22';
       [[x0,yBase],[x1,yTop],[x2,ySustain],[x3,ySustain],[x4,yBase]].forEach(([x,y]) => {
         ctx.beginPath();
         ctx.arc(x, y, 3.2, 0, 2*Math.PI);
@@ -1453,7 +1455,7 @@
       ctx.arc(xDot, yDot, 6, 0, 2 * Math.PI);
       ctx.fill();
 
-      ctx.fillStyle = '#5f6b7a';
+      ctx.fillStyle = '#474c57';
       ctx.font = '12px Inter, sans-serif';
       ctx.fillText('A', (x0 + x1) / 2 - 4, yBase + 18);
       ctx.fillText('D', (x1 + x2) / 2 - 4, yBase + 18);

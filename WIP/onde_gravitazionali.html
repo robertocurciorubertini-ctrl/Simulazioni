@@ -19,17 +19,17 @@
 
   <style>
     :root {
-      --bg: #f6f8fc;
-      --card: #ffffff;
-      --card-soft: #f3f7ff;
-      --line: #d8e0ef;
-      --text: #162033;
-      --muted: #5e6f8d;
-      --accent: #335fff;
-      --accent2: #7d56ff;
+      --bg: var(--fs-paper);
+      --card: var(--fs-surface);
+      --card-soft: var(--fs-surface-2);
+      --line: var(--fs-line);
+      --text: var(--fs-ink);
+      --muted: var(--fs-ink-2);
+      --accent: var(--fs-blue);
+      --accent2: var(--fs-violet);
       --accent3: #0093b7;
-      --warn: #c56d00;
-      --good: #0b9f5a;
+      --warn: var(--fs-amber);
+      --good: var(--fs-green);
       --shadow: 0 16px 34px rgba(26, 45, 78, 0.10);
       --radius: 22px;
     }
@@ -38,12 +38,12 @@
 
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, "DM Sans", sans-serif;
       color: var(--text);
       background:
         radial-gradient(circle at 0% 0%, rgba(51,95,255,0.08), transparent 24%),
         radial-gradient(circle at 100% 0%, rgba(125,86,255,0.08), transparent 22%),
-        linear-gradient(180deg, #fbfcff 0%, #f6f8fc 100%);
+        linear-gradient(180deg, #fbfcff 0%, #f4f1ea 100%);
     }
 
     .page {
@@ -300,7 +300,7 @@
       border: 1px solid #dde6f5;
       background: linear-gradient(180deg, #fbfdff 0%, #f4f8ff 100%);
       overflow-x: auto;
-      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+      font-family: "Cambria Math", "STIX Two Math", "Crimson Pro", serif;
       font-size: 1.06rem;
       color: #1a2640;
     }
@@ -322,8 +322,10 @@
       .controlsGrid, .stats, .buttons, .miniGrid { grid-template-columns: 1fr; }
     }
   </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
   <div class="page">
     <section class="hero">
       <div class="eyebrow">Relatività generale · Sorgenti compatte · Interferometri laser</div>
@@ -1294,7 +1296,7 @@
       wctx.strokeStyle = 'rgba(197,109,0,0.92)';
       wctx.lineWidth = 2;
       wctx.beginPath(); wctx.moveTo(xPlay, top); wctx.lineTo(xPlay, top + innerH); wctx.stroke();
-      wctx.fillStyle = '#c56d00';
+      wctx.fillStyle = '#b7791f';
       wctx.beginPath(); wctx.arc(xPlay, yPlay, 4.3, 0, Math.PI * 2); wctx.fill();
     }
 
@@ -1324,7 +1326,7 @@
       spctx.strokeStyle = 'rgba(197,109,0,0.92)';
       spctx.lineWidth = 2;
       spctx.beginPath(); spctx.moveTo(xPlay, top); spctx.lineTo(xPlay, top + innerH); spctx.stroke();
-      spctx.fillStyle = '#c56d00';
+      spctx.fillStyle = '#b7791f';
       spctx.beginPath(); spctx.arc(xPlay, yPlay, 4.2, 0, Math.PI * 2); spctx.fill();
     }
 

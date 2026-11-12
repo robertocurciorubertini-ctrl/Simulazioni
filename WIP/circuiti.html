@@ -15,28 +15,27 @@ window.SIM_METADATA = {
   "level": "intermedio"
 };
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f5f2eb;--bg2:#eceae0;--bg3:#e2dfd4;--panel:#faf9f5;
-  --border:#c8c4b5;--text:#1a1a16;--text2:#5a5a50;--text3:#8a8a7a;
-  --acc:#c04a1a;--acc2:#e06030;--blue:#1a4a8a;--blue2:#2a6abf;
-  --green:#1a6a2a;--green2:#3a9a4a;--yel:#c08010;--yel2:#e0a020;--r:6px;
+  --bg:var(--fs-paper);--bg2:var(--fs-surface-2);--bg3:var(--fs-surface-3);--panel:var(--fs-surface);
+  --border:var(--fs-line);--text:var(--fs-ink);--text2:var(--fs-ink-2);--text3:var(--fs-ink-3);
+  --acc:var(--fs-red);--acc2:#e06030;--blue:var(--fs-blue);--blue2:#2a6abf;
+  --green:var(--fs-green);--green2:#3a9a4a;--yel:var(--fs-amber);--yel2:#e0a020;--r:6px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
 header{background:var(--text);color:var(--bg);padding:10px 20px;display:flex;align-items:center;gap:10px;border-bottom:3px solid var(--acc);flex-shrink:0;}
-header h1{font-family:'Space Mono',monospace;font-size:.9rem;letter-spacing:-.02em;}
-.tag{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--acc2);background:rgba(192,74,26,.15);padding:2px 6px;border-radius:3px;}
+header h1{font-family:'DM Mono',monospace;font-size:.9rem;letter-spacing:-.02em;}
+.tag{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--acc2);background:rgba(192,74,26,.15);padding:2px 6px;border-radius:3px;}
 .app{display:grid;grid-template-columns:252px 1fr 240px;flex:1;min-height:0;overflow:hidden;}
 /* LEFT */
 .lp{background:var(--panel);border-right:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;}
 .ps{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px;}
-.ps h3{font-family:'Space Mono',monospace;font-size:.57rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:7px;}
+.ps h3{font-family:'DM Mono',monospace;font-size:.57rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:7px;}
 .sr{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;}
 .sr label{font-size:.73rem;color:var(--text2);display:flex;justify-content:space-between;}
-.sr label span{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--acc);font-weight:700;}
+.sr label span{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--acc);font-weight:700;}
 input[type=range]{width:100%;accent-color:var(--acc);}
 button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;border-radius:4px;font-size:.73rem;padding:5px 9px;transition:all .15s;}
 .br{display:flex;gap:5px;flex-wrap:wrap;}
@@ -53,49 +52,51 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;border-radius
 .mb.active{background:var(--blue);color:#fff;border-color:var(--blue);}
 /* CENTER */
 .cw{position:relative;background:var(--bg);overflow:hidden;display:flex;flex-direction:column;}
-.sb{background:var(--bg2);border-bottom:1px solid var(--border);padding:3px 12px;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text3);flex-shrink:0;}
+.sb{background:var(--bg2);border-bottom:1px solid var(--border);padding:3px 12px;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text3);flex-shrink:0;}
 .sb span{color:var(--acc);}
 #cc{display:block;flex:1;width:100%;}
-#hint{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(192,74,26,.9);color:#fff;font-family:'Space Mono',monospace;font-size:.62rem;padding:3px 12px;border-radius:20px;pointer-events:none;display:none;}
+#hint{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(192,74,26,.9);color:#fff;font-family:'DM Mono',monospace;font-size:.62rem;padding:3px 12px;border-radius:20px;pointer-events:none;display:none;}
 .ga{display:none;position:absolute;bottom:0;left:0;right:0;background:rgba(20,20,14,.93);border-top:1px solid #555;padding:7px 12px;gap:12px;}
 .ga.vis{display:flex;}
 /* RIGHT */
 .rp{background:var(--panel);border-left:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
 .meter{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 9px;}
-.ml{font-family:'Space Mono',monospace;font-size:.52rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:1px;}
-.mv{font-family:'Space Mono',monospace;font-size:.92rem;font-weight:700;color:var(--acc);}
+.ml{font-family:'DM Mono',monospace;font-size:.52rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:1px;}
+.mv{font-family:'DM Mono',monospace;font-size:.92rem;font-weight:700;color:var(--acc);}
 .mv.bl{color:var(--blue2);}.mv.gr{color:var(--green2);}.mv.ye{color:var(--yel2);}.mv.rd{color:#dd2222;}
 .cl{display:flex;flex-direction:column;gap:3px;}
 .ci{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:.68rem;display:flex;align-items:center;gap:6px;}
 .ci:hover{border-color:var(--acc);}
 .ci .csym{font-size:.95rem;flex-shrink:0;}
 .ci .cname{flex:1;font-weight:600;}
-.ci .cv{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text2);}
+.ci .cv{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text2);}
 .ci .cd{color:#aa2a2a;cursor:pointer;padding:0 2px;margin-left:2px;}
 /* Resistor mini-symbol */
 .rsym{display:inline-flex;align-items:center;gap:0;}
 .rsym span{display:inline-block;}
 /* FORMULARIO */
 details.form{background:var(--text);color:var(--bg);flex-shrink:0;border-top:3px solid var(--acc);}
-details.form summary{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--acc2);cursor:pointer;padding:8px 16px;user-select:none;}
+details.form summary{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--acc2);cursor:pointer;padding:8px 16px;user-select:none;}
 details.form summary:hover{color:var(--acc);}
 .fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px;padding:9px 16px 13px;}
 .fc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:9px;}
-.fc h4{font-family:'Space Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.09em;color:var(--acc2);margin-bottom:6px;}
-.fc p{font-family:'Space Mono',monospace;font-size:.67rem;color:rgba(245,242,235,.85);line-height:1.6;}
+.fc h4{font-family:'DM Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.09em;color:var(--acc2);margin-bottom:6px;}
+.fc p{font-family:'DM Mono',monospace;font-size:.67rem;color:rgba(245,242,235,.85);line-height:1.6;}
 .fc p em{color:var(--yel2);font-style:normal;}
 /* MODAL */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
 .mo.vis{display:flex;}
 .mod{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;width:280px;box-shadow:0 8px 40px rgba(0,0,0,.3);}
-.mod h3{font-family:'Space Mono',monospace;font-size:.75rem;margin-bottom:11px;color:var(--acc);}
+.mod h3{font-family:'DM Mono',monospace;font-size:.75rem;margin-bottom:11px;color:var(--acc);}
 .mf{margin-bottom:8px;}
 .mf label{display:block;font-size:.72rem;color:var(--text2);margin-bottom:2px;}
-.mf input{width:100%;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--text);}
+.mf input{width:100%;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);}
 .mf input:focus{outline:none;border-color:var(--acc);}
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 <header>
   <h1>⚡ Simulatore di Circuiti Elettrici</h1>
   <span class="tag">FISICA II — LICEO</span>
@@ -168,8 +169,8 @@ details.form summary:hover{color:var(--acc);}
     <canvas id="cc"></canvas>
     <div id="hint">Clicca su un lato del circuito</div>
     <div class="ga" id="ga">
-      <div><div style="font-family:'Space Mono',monospace;font-size:.55rem;color:#aaa;margin-bottom:2px">V(t) generatore</div><canvas id="gv" width="310" height="90" style="background:rgba(255,255,255,.04);border-radius:3px"></canvas></div>
-      <div><div style="font-family:'Space Mono',monospace;font-size:.55rem;color:#aaa;margin-bottom:2px">I(t) maglia 1</div><canvas id="gi" width="310" height="90" style="background:rgba(255,255,255,.04);border-radius:3px"></canvas></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:.55rem;color:#aaa;margin-bottom:2px">V(t) generatore</div><canvas id="gv" width="310" height="90" style="background:rgba(255,255,255,.04);border-radius:3px"></canvas></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:.55rem;color:#aaa;margin-bottom:2px">I(t) maglia 1</div><canvas id="gi" width="310" height="90" style="background:rgba(255,255,255,.04);border-radius:3px"></canvas></div>
     </div>
   </div>
   <!-- RIGHT -->
@@ -314,9 +315,9 @@ function draw(dt){
 
 function wcolor(s){
   if(s.type==='R'){const h=Math.min(S.heat[s.compId]||0,1);return`rgb(${Math.round(80+h*172)},${Math.round(38-h*30)},20)`;}
-  if(s.type==='C')return'#1a4a8a';
-  if(s.type==='L')return'#1a6a2a';
-  if(s.type==='gen')return'#1a1a16';
+  if(s.type==='C')return'#1f6fd0';
+  if(s.type==='L')return'#0e8a5a';
+  if(s.type==='gen')return'#1b1d22';
   return'#2a2a22';
 }
 
@@ -346,12 +347,12 @@ function drawSeg(s){
 }
 
 function drawGen(s,mx,my,isV){
-  ctx.strokeStyle='#1a1a16';ctx.lineWidth=2.5;const r=22;
+  ctx.strokeStyle='#1b1d22';ctx.lineWidth=2.5;const r=22;
   if(isV){ctx.beginPath();ctx.moveTo(mx,s.y1);ctx.lineTo(mx,my-r);ctx.stroke();ctx.beginPath();ctx.moveTo(mx,my+r);ctx.lineTo(mx,s.y2);ctx.stroke();}
   else{ctx.beginPath();ctx.moveTo(s.x1,my);ctx.lineTo(mx-r,my);ctx.stroke();ctx.beginPath();ctx.moveTo(mx+r,my);ctx.lineTo(s.x2,my);ctx.stroke();}
   if(S.running&&!S.paused){ctx.beginPath();ctx.arc(mx,my,r+5,0,Math.PI*2);ctx.strokeStyle='rgba(192,74,26,.28)';ctx.lineWidth=5;ctx.stroke();}
-  ctx.beginPath();ctx.arc(mx,my,r,0,Math.PI*2);ctx.fillStyle='#faf9f5';ctx.fill();ctx.strokeStyle='#1a1a16';ctx.lineWidth=2;ctx.stroke();
-  ctx.fillStyle='#c04a1a';ctx.font='bold 12px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.beginPath();ctx.arc(mx,my,r,0,Math.PI*2);ctx.fillStyle='#fffdf9';ctx.fill();ctx.strokeStyle='#1b1d22';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#c2491d';ctx.font='bold 12px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
   if(isV){ctx.fillText('+',mx,my-11);ctx.fillText('−',mx,my+12);}else{ctx.fillText('+',mx-11,my);ctx.fillText('−',mx+12,my);}
   ctx.fillStyle='#333';ctx.font='10px DM Sans,sans-serif';
   ctx.fillText(`ε=${S.fem}V`,mx+(isV?28:0),my+(isV?0:-18));
@@ -390,7 +391,7 @@ function drawHeat(s,mx,my,ang){
 
 function drawC(s,mx,my,ang,len){
   ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
-  ctx.strokeStyle='#1a4a8a';const gap=10,pl=26;
+  ctx.strokeStyle='#1f6fd0';const gap=10,pl=26;
   ctx.beginPath();ctx.moveTo(-len/2,0);ctx.lineTo(-gap/2,0);ctx.moveTo(gap/2,0);ctx.lineTo(len/2,0);ctx.stroke();
   ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(-gap/2,-pl/2);ctx.lineTo(-gap/2,pl/2);ctx.stroke();
   ctx.beginPath();ctx.moveTo(gap/2,-pl/2);ctx.lineTo(gap/2,pl/2);ctx.stroke();ctx.restore();
@@ -427,7 +428,7 @@ function arrowCtx(ctx,x1,y1,x2,y2,color,lw){
 
 function drawL(s,mx,my,ang,len){
   ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
-  ctx.strokeStyle='#1a6a2a';const hcl=40;
+  ctx.strokeStyle='#0e8a5a';const hcl=40;
   ctx.beginPath();ctx.moveTo(-len/2,0);ctx.lineTo(-hcl,0);ctx.moveTo(hcl,0);ctx.lineTo(len/2,0);ctx.stroke();
   const loops=5,lw=hcl*2/loops;
   for(let i=0;i<loops;i++){const cx=-hcl+(i+.5)*lw;ctx.beginPath();ctx.arc(cx,0,lw/2,Math.PI,0,false);ctx.stroke();}
@@ -855,7 +856,7 @@ function removeComp(id){
 function compSymbol(type){
   if(type==='R'){
     // Zigzag ASCII art
-    return '<span style="font-family:monospace;font-size:.75rem;color:#c04a1a">⊓⊔⊓</span>';
+    return '<span style="font-family:monospace;font-size:.75rem;color:#c2491d">⊓⊔⊓</span>';
   }
   if(type==='C')return '<span style="font-size:.9rem">⊣⊢</span>';
   if(type==='L')return '<span style="font-size:.9rem">⌇⌇</span>';

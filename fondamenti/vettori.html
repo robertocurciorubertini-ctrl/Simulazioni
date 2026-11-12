@@ -16,20 +16,19 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vettori – Simulazione Interattiva</title>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.getElementById('theory'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 :root {
-  --bg:#f5f0e8; --bg2:#ede8dc; --bg3:#e2ddd0;
-  --ink:#2a2520; --ink2:#5a5248; --ink3:#8a8278;
-  --accent:#b5470f; --accent2:#1a6b4a; --accent3:#1e4d8c;
-  --border:#c8c0b0;
-  --font-serif:'EB Garamond',Georgia,serif;
-  --font-sans:'IBM Plex Sans',sans-serif;
-  --font-mono:'IBM Plex Mono',monospace;
+  --bg:var(--fs-paper); --bg2:var(--fs-surface-2); --bg3:var(--fs-surface-3);
+  --ink:var(--fs-ink); --ink2:var(--fs-ink-2); --ink3:var(--fs-ink-3);
+  --accent:var(--fs-red); --accent2:var(--fs-green); --accent3:var(--fs-blue);
+  --border:var(--fs-line);
+  --font-serif:'Crimson Pro',Georgia,serif;
+  --font-sans:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-sans);font-size:16px;line-height:1.65}
@@ -119,8 +118,10 @@ hr.thin{border:none;border-top:1px solid var(--border);margin:2rem 0}
   #theory{padding:0 1rem 3rem}
 }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Grandezze Vettoriali</h1>
@@ -323,7 +324,7 @@ hr.thin{border:none;border-top:1px solid var(--border);margin:2rem 0}
     <p>Il modulo $|\vec{A}||\vec{B}|\sin\theta$ è l'<strong>area del parallelogramma</strong> costruito sui due vettori — geometria e algebra si fondono elegantemente. Il prodotto vettoriale è <em>anticommutativo</em>: $\vec{A}\times\vec{B} = -\vec{B}\times\vec{A}$. In 2D con $A_z=B_z=0$ il risultato è puramente lungo $\hat{k}$: $\vec{A}\times\vec{B}=(A_xB_y-A_yB_x)\,\hat{k}$.</p>
     <div class="example-box">
       <div class="ex-title">Esempi fisici — Momento torcente e Forza di Lorentz</div>
-      <p>Il momento torcente: $\vec{\tau} = \vec{r}\times\vec{F}$. Con $\vec{r}=(0{,}5,0,0)\,\text{m}$ e $\vec{F}=(0,10,0)\,\text{N}$, si ha $\vec{\tau}=(0,0,5)\,\text{N·m}$ lungo $+\hat{k}$, cioè rotazione antioraria.</p>
+      <p>Il momento torcente: $\vec{\tau} = \vec{r}\times\vec{F}$. Con $\vec{r}=(0{,}5,0,0)\,\text{m}$ e $\vec{F}=(0,10,0)\,\text{N}$, si ha $\vec{\tau}=(0,0,5)\,\mathrm{N{\cdot}m}$ lungo $+\hat{k}$, cioè rotazione antioraria.</p>
       <p>La forza di Lorentz: $\vec{F}=q\,\vec{v}\times\vec{B}$. Il prodotto vettoriale spiega perché la forza è perpendicolare sia a $\vec{v}$ che a $\vec{B}$, e perché una carica in campo magnetico uniforme descrive un moto circolare uniforme senza che la forza compia lavoro ($\vec{F}\cdot\vec{v}=0$).</p>
     </div>
   </div>
@@ -778,7 +779,7 @@ function drawCross3D(){
   }
 
   // Bottom info
-  cctx2.save();cctx2.fillStyle='#8a8278';cctx2.font='10px IBM Plex Mono';cctx2.globalAlpha=.85;
+  cctx2.save();cctx2.fillStyle='#7d828c';cctx2.font='10px IBM Plex Mono';cctx2.globalAlpha=.85;
   cctx2.fillText(`|A\u00d7B| = ${Math.abs(crossVal).toFixed(3)}`,10,H-20);
   cctx2.fillText(crossVal>0?'verso +Y (antiorario)':crossVal<0?'verso \u2212Y (orario)':'vettori paralleli',10,H-8);
   cctx2.restore();
@@ -805,10 +806,10 @@ function drawDecomp(){
 
   if(sXY){
     const [cax]=toC(ox,oy,z,ax,0),[,cay]=toC(ox,oy,z,0,ay);
-    arrowOn(dctx,osx,osy,cax,osy,'#b5470f',2.2,.75,true);
-    arrowOn(dctx,cax,osy,ax2,ay2,'#1e4d8c',2.2,.75,true);
-    lbl(dctx,`Ax=${ax.toFixed(2)}`,(osx+cax)/2,osy,'#b5470f',12,0,-10);
-    lbl(dctx,`Ay=${ay.toFixed(2)}`,cax,(osy+ay2)/2,'#1e4d8c',12,7,0);
+    arrowOn(dctx,osx,osy,cax,osy,'#c2491d',2.2,.75,true);
+    arrowOn(dctx,cax,osy,ax2,ay2,'#1f6fd0',2.2,.75,true);
+    lbl(dctx,`Ax=${ax.toFixed(2)}`,(osx+cax)/2,osy,'#c2491d',12,0,-10);
+    lbl(dctx,`Ay=${ay.toFixed(2)}`,cax,(osy+ay2)/2,'#1f6fd0',12,7,0);
   }
 
   if(sGen){
@@ -905,14 +906,14 @@ function drawPolar(){
   if(document.getElementById('polPolarGrid').checked){
     pctx2.save();
     for(let ri=1;ri<=8;ri++){
-      pctx2.strokeStyle='#c8c0b0';pctx2.lineWidth=.8;pctx2.globalAlpha=.55;
+      pctx2.strokeStyle='#d9d5cb';pctx2.lineWidth=.8;pctx2.globalAlpha=.55;
       pctx2.beginPath();pctx2.arc(Ox,Oy,ri*z,0,Math.PI*2);pctx2.stroke();
       pctx2.fillStyle='#b8b0a4';pctx2.font='9px IBM Plex Mono';pctx2.globalAlpha=.7;
       pctx2.fillText(ri,Ox+ri*z+2,Oy-3);
     }
     for(let deg=0;deg<360;deg+=30){
       const rad=deg*Math.PI/180;
-      pctx2.strokeStyle='#c8c0b0';pctx2.lineWidth=.6;pctx2.globalAlpha=.35;
+      pctx2.strokeStyle='#d9d5cb';pctx2.lineWidth=.6;pctx2.globalAlpha=.35;
       pctx2.beginPath();pctx2.moveTo(Ox,Oy);pctx2.lineTo(Ox+8*z*Math.cos(rad),Oy-8*z*Math.sin(rad));pctx2.stroke();
     }
     pctx2.fillStyle='#b0a898';pctx2.font='10px IBM Plex Mono';pctx2.globalAlpha=.85;
@@ -926,7 +927,7 @@ function drawPolar(){
 
   // Circle r
   if(document.getElementById('polCircle').checked){
-    pctx2.save();pctx2.strokeStyle='#b5470f';pctx2.lineWidth=1.2;pctx2.setLineDash([6,4]);pctx2.globalAlpha=.32;
+    pctx2.save();pctx2.strokeStyle='#c2491d';pctx2.lineWidth=1.2;pctx2.setLineDash([6,4]);pctx2.globalAlpha=.32;
     pctx2.beginPath();pctx2.arc(Ox,Oy,r*z,0,Math.PI*2);pctx2.stroke();pctx2.restore();
   }
 
@@ -935,7 +936,7 @@ function drawPolar(){
     pctx2.save();
     pctx2.translate(Ox,Oy);
     pctx2.scale(1,-1);
-    pctx2.strokeStyle='#1a6b4a';
+    pctx2.strokeStyle='#0e8a5a';
     pctx2.lineWidth=1.8;
     pctx2.globalAlpha=.72;
     pctx2.beginPath();
@@ -946,7 +947,7 @@ function drawPolar(){
     // Label
     const tmid=thetaDisplay/2;
     pctx2.save();
-    pctx2.fillStyle='#1a6b4a';
+    pctx2.fillStyle='#0e8a5a';
     pctx2.font='italic 13px EB Garamond';
     pctx2.globalAlpha=.82;
     pctx2.fillText('\u03b8',Ox+(z*1.18)*Math.cos(tmid),Oy-(z*1.18)*Math.sin(tmid));
@@ -956,11 +957,11 @@ function drawPolar(){
   // Cartesian components (dashed)
   if(document.getElementById('polCart').checked){
     const [cx1]=toC(ox,oy,z,px_u,0);
-    arrowOn(pctx2,Ox,Oy,cx1,Oy,'#b5470f',2,.65,true);
-    arrowOn(pctx2,cx1,Oy,Px,Py,'#1e4d8c',2,.65,true);
+    arrowOn(pctx2,Ox,Oy,cx1,Oy,'#c2491d',2,.65,true);
+    arrowOn(pctx2,cx1,Oy,Px,Py,'#1f6fd0',2,.65,true);
     pctx2.save();pctx2.font='italic 12px EB Garamond';pctx2.globalAlpha=.9;
-    pctx2.fillStyle='#b5470f';pctx2.fillText(`x=${px_u.toFixed(2)}`,(Ox+cx1)/2,Oy+18);
-    pctx2.fillStyle='#1e4d8c';pctx2.fillText(`y=${py_u.toFixed(2)}`,cx1+6,(Oy+Py)/2);
+    pctx2.fillStyle='#c2491d';pctx2.fillText(`x=${px_u.toFixed(2)}`,(Ox+cx1)/2,Oy+18);
+    pctx2.fillStyle='#1f6fd0';pctx2.fillText(`y=${py_u.toFixed(2)}`,cx1+6,(Oy+Py)/2);
     pctx2.restore();
   }
 
@@ -981,9 +982,9 @@ function drawPolar(){
     pctx2.restore();
 
     const thx=Px+rLen*Math.cos(theta+Math.PI/2),thy=Py-rLen*Math.sin(theta+Math.PI/2);
-    arrowOn(pctx2,Px,Py,thx,thy,'#1a6b4a',1.35,.38);
+    arrowOn(pctx2,Px,Py,thx,thy,'#0e8a5a',1.35,.38);
     pctx2.save();
-    pctx2.fillStyle='#1a6b4a';
+    pctx2.fillStyle='#0e8a5a';
     pctx2.font='italic 10px EB Garamond';
     pctx2.globalAlpha=.46;
     pctx2.fillText('\u03b8\u0302',thx+3,thy-2);
@@ -1000,7 +1001,7 @@ function drawPolar(){
   }
 
   // Point P
-  pctx2.save();pctx2.fillStyle='#2a2520';pctx2.globalAlpha=.9;
+  pctx2.save();pctx2.fillStyle='#1b1d22';pctx2.globalAlpha=.9;
   pctx2.beginPath();pctx2.arc(Px,Py,5.5,0,Math.PI*2);pctx2.fill();pctx2.restore();
 
   // Update info panel

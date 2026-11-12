@@ -15,7 +15,6 @@ window.SIM_METADATA = {
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tensione nella Fune — Macchina di Atwood</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
 <script>
   MathJax = {
     tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
@@ -25,23 +24,23 @@ window.SIM_METADATA = {
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 <style>
   :root {
-    --bg: #f4f1eb;
-    --panel: #ffffff;
-    --border: #ddd8cc;
-    --border2: #c8c0b0;
-    --accent: #8b6914;
-    --accent3: #2a7a4a;
-    --text: #1a1814;
-    --muted: #7a7060;
-    --m1: #2a6090;
-    --m2: #902a2a;
+    --bg: var(--fs-paper);
+    --panel: var(--fs-surface);
+    --border: var(--fs-line);
+    --border2: var(--fs-line-2);
+    --accent: var(--fs-amber);
+    --accent3: var(--fs-green);
+    --text: var(--fs-ink);
+    --muted: var(--fs-ink-3);
+    --m1: var(--fs-blue);
+    --m2: var(--fs-red);
     --shadow: rgba(0,0,0,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -56,7 +55,7 @@ window.SIM_METADATA = {
     box-shadow: 0 1px 4px var(--shadow);
   }
   header h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Crimson Pro', serif;
     font-size: 1.4rem;
     color: var(--accent);
   }
@@ -106,7 +105,7 @@ window.SIM_METADATA = {
     flex: 1;
     padding: 8px 4px;
     font-size: 0.66rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     border: none;
     background: transparent;
     color: var(--muted);
@@ -150,7 +149,7 @@ window.SIM_METADATA = {
   button.ctrl {
     flex: 1; padding: 8px 9px;
     border: 1px solid var(--border2); background: var(--bg); color: var(--text);
-    font-family: 'JetBrains Mono', monospace; font-size: 0.71rem; letter-spacing: 0.05em;
+    font-family: 'DM Mono', monospace; font-size: 0.71rem; letter-spacing: 0.05em;
     cursor: pointer; border-radius: 4px; transition: border-color 0.13s, background 0.13s;
   }
   button.ctrl:hover { border-color: var(--accent); background: #fff9f0; }
@@ -168,8 +167,10 @@ window.SIM_METADATA = {
   .side::-webkit-scrollbar { width: 4px; }
   .side::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
 
 <header>
   <h1>Tensione nella Fune</h1>
@@ -349,8 +350,8 @@ function drawAtwood() {
   rope(m1x, m1y-BH/2, m1x, PY);
   rope(m2x, m2y-BH/2, m2x, PY);
   drawPulley();
-  drawBlock(m1x,m1y,'#2a6090','m₁',m1);
-  drawBlock(m2x,m2y,'#902a2a','m₂',m2);
+  drawBlock(m1x,m1y,'#1f6fd0','m₁',m1);
+  drawBlock(m2x,m2y,'#c2491d','m₂',m2);
   forcesAtwood(m1x,m1y,m2x,m2y,ph);
   drawFloor();
 }
@@ -412,10 +413,10 @@ function drawInclined() {
   ctx.save();
   ctx.translate(m1x,m1y);
   ctx.rotate(-rad);
-  drawBlockLocal(0,0,'#2a6090','m₁',m1);
+  drawBlockLocal(0,0,'#1f6fd0','m₁',m1);
   ctx.restore();
 
-  drawBlock(m2x,m2y,'#902a2a','m₂',m2);
+  drawBlock(m2x,m2y,'#c2491d','m₂',m2);
   forcesInclined(m1x,m1y,m2x,m2y,rad,ph);
   drawFloor();
 }
@@ -439,12 +440,12 @@ function drawSupport(){
 function drawPulley(){
   ctx.beginPath(); ctx.arc(PX,PY,PR,0,Math.PI*2);
   ctx.fillStyle='#e8e2d5'; ctx.fill();
-  ctx.strokeStyle='#8b6914'; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.strokeStyle='#b7791f'; ctx.lineWidth=2.5; ctx.stroke();
   ctx.beginPath(); ctx.arc(PX,PY,PR*0.52,0,Math.PI*2);
   ctx.fillStyle='#d8d0c0'; ctx.fill();
   ctx.strokeStyle='#a08040'; ctx.lineWidth=1.5; ctx.stroke();
   ctx.beginPath(); ctx.arc(PX,PY,5,0,Math.PI*2);
-  ctx.fillStyle='#8b6914'; ctx.fill();
+  ctx.fillStyle='#b7791f'; ctx.fill();
 }
 function rope(x1,y1,x2,y2){
   ctx.strokeStyle='#7a5a1a'; ctx.lineWidth=2.2; ctx.lineCap='round';
@@ -495,16 +496,16 @@ function forcesAtwood(m1x,m1y,m2x,m2y,ph){
   const sc=18, mx=95;
   const T=Math.min(ph.T*sc,mx);
   const w1=Math.min(m1*g*sc,mx), w2=Math.min(m2*g*sc,mx);
-  arrow(m1x,m1y-BH/2, m1x,m1y-BH/2-T, '#8b6914','T');
-  arrow(m2x,m2y-BH/2, m2x,m2y-BH/2-T, '#8b6914','');
-  arrow(m1x,m1y+BH/2, m1x,m1y+BH/2+w1,'#2a6090','m₁g');
-  arrow(m2x,m2y+BH/2, m2x,m2y+BH/2+w2,'#902a2a','m₂g');
+  arrow(m1x,m1y-BH/2, m1x,m1y-BH/2-T, '#b7791f','T');
+  arrow(m2x,m2y-BH/2, m2x,m2y-BH/2-T, '#b7791f','');
+  arrow(m1x,m1y+BH/2, m1x,m1y+BH/2+w1,'#1f6fd0','m₁g');
+  arrow(m2x,m2y+BH/2, m2x,m2y+BH/2+w2,'#c2491d','m₂g');
   if(Math.abs(ph.a)>0.02){
     const aA=Math.min(Math.abs(ph.a)*28,52);
     // ph.a>0 → m2 scende, m1 sale
     const d2=ph.a>0?1:-1;
-    arrow(m1x-34,m1y, m1x-34,m1y-d2*aA,'#2a7a4a','a',10);
-    arrow(m2x+34,m2y, m2x+34,m2y+d2*aA,'#2a7a4a','',10);
+    arrow(m1x-34,m1y, m1x-34,m1y-d2*aA,'#0e8a5a','a',10);
+    arrow(m2x+34,m2y, m2x+34,m2y+d2*aA,'#0e8a5a','',10);
   }
 }
 
@@ -514,14 +515,14 @@ function forcesInclined(m1x,m1y,m2x,m2y,rad,ph){
   const T=Math.min(ph.T*sc,mx);
   const w2=Math.min(m2*g*sc,mx);
   // su m2 (verticale): T verso l'alto, peso verso il basso
-  arrow(m2x,m2y-BH/2, m2x,m2y-BH/2-T,'#8b6914','T');
-  arrow(m2x,m2y+BH/2, m2x,m2y+BH/2+w2,'#902a2a','m₂g');
+  arrow(m2x,m2y-BH/2, m2x,m2y-BH/2-T,'#b7791f','T');
+  arrow(m2x,m2y+BH/2, m2x,m2y+BH/2+w2,'#c2491d','m₂g');
   // su m1 (nel piano): tensione verso la carrucola (su-destra lungo il piano)
   const Tpx=-Math.cos(rad)*T, Tpy=-Math.sin(rad)*T;
-  arrow(m1x,m1y, m1x+Tpx,m1y+Tpy,'#8b6914','T');
+  arrow(m1x,m1y, m1x+Tpx,m1y+Tpy,'#b7791f','T');
   // componente peso lungo il piano (giù-sx)
   const w1s=Math.min(m1*g*Math.sin(rad)*sc,mx);
-  arrow(m1x,m1y, m1x+Math.cos(rad)*w1s,m1y+Math.sin(rad)*w1s,'#2a6090','m₁g sinθ');
+  arrow(m1x,m1y, m1x+Math.cos(rad)*w1s,m1y+Math.sin(rad)*w1s,'#1f6fd0','m₁g sinθ');
   // normale (perpendicolare al piano, verso l'esterno = verso sinistra-alto)
   const w1n=Math.min(m1*g*Math.cos(rad)*sc*0.55,55);
   arrow(m1x,m1y, m1x-Math.sin(rad)*w1n,m1y-Math.cos(rad)*w1n,'#5a8a5a','N');
@@ -556,11 +557,11 @@ function drawGraph(){
   const pyV=v=>gh-4-(v/mxV)*(gh-10);
   gctx.strokeStyle='rgba(0,0,0,0.06)'; gctx.lineWidth=1;
   for(let i=0;i<=6;i++){const x=(i/6)*gw;gctx.beginPath();gctx.moveTo(x,0);gctx.lineTo(x,gh);gctx.stroke();}
-  gctx.strokeStyle='#8b6914'; gctx.lineWidth=2;
+  gctx.strokeStyle='#b7791f'; gctx.lineWidth=2;
   gctx.beginPath();
   graphData.T.forEach((d,i)=>{i===0?gctx.moveTo(px(d.t),pyT(d.v)):gctx.lineTo(px(d.t),pyT(d.v));});
   gctx.stroke();
-  gctx.strokeStyle='#2a7a4a'; gctx.lineWidth=1.5; gctx.setLineDash([5,4]);
+  gctx.strokeStyle='#0e8a5a'; gctx.lineWidth=1.5; gctx.setLineDash([5,4]);
   gctx.beginPath();
   graphData.V.forEach((d,i)=>{i===0?gctx.moveTo(px(d.t),pyV(d.v)):gctx.lineTo(px(d.t),pyV(d.v));});
   gctx.stroke(); gctx.setLineDash([]);

@@ -17,19 +17,19 @@
 
   <style>
     :root{
-      --bg:#f4f7fb;
-      --panel:#ffffff;
-      --panel-soft:#f8fbff;
-      --text:#162033;
-      --muted:#627086;
-      --border:#d8e1ee;
-      --accent:#2563eb;
-      --accent-soft:#dbeafe;
-      --green:#059669;
-      --green-soft:#d1fae5;
-      --red:#dc2626;
-      --red-soft:#fee2e2;
-      --grid:#e9eef6;
+      --bg:var(--fs-paper);
+      --panel:var(--fs-surface);
+      --panel-soft:var(--fs-surface-2);
+      --text:var(--fs-ink);
+      --muted:var(--fs-ink-2);
+      --border:var(--fs-line);
+      --accent:var(--fs-blue);
+      --accent-soft:#dfe9f7;
+      --green:var(--fs-green);
+      --green-soft:#d9efe5;
+      --red:var(--fs-red);
+      --red-soft:#f6e1d8;
+      --grid:#ebe7de;
       --shadow:0 10px 30px rgba(15,23,42,0.08);
       --radius:20px;
       --radius-sm:14px;
@@ -39,11 +39,11 @@
 
     body{
       margin:0;
-      font-family:Inter, Arial, Helvetica, sans-serif;
+      font-family:'DM Sans', Arial, Helvetica, sans-serif;
       color:var(--text);
       background:
         radial-gradient(circle at top left, #eef5ff 0%, transparent 30%),
-        radial-gradient(circle at top right, #f8fbff 0%, transparent 26%),
+        radial-gradient(circle at top right, #efebe1 0%, transparent 26%),
         var(--bg);
     }
 
@@ -82,7 +82,7 @@
       display:grid;
       place-items:center;
       border-radius:18px;
-      background:linear-gradient(135deg, #dbeafe, #eff6ff);
+      background:linear-gradient(135deg, #dfe9f7, #eff6ff);
       font-size:1.7rem;
       border:1px solid #cfe0ff;
     }
@@ -291,7 +291,7 @@
     .formula code{
       display:block;
       white-space:pre-wrap;
-      font-family:"Courier New", monospace;
+      font-family:"DM Mono", monospace;
       font-size:0.9rem;
       line-height:1.55;
       color:#1e293b;
@@ -351,7 +351,7 @@
       font-size:0.8rem;
       color:#3b82f6;
       background:#eff6ff;
-      border:1px solid #dbeafe;
+      border:1px solid #dfe9f7;
       padding:6px 10px;
       border-radius:999px;
       font-weight:700;
@@ -436,8 +436,10 @@
       }
     }
   </style>
+<link rel="stylesheet" href="../assets/sim.css">
+<script src="../assets/sim.js" defer></script>
 </head>
-<body>
+<body class="fs-bridge">
   <div class="wrap">
     <section class="hero">
       <div class="hero-top">
@@ -972,7 +974,7 @@ g  = accelerazione di gravità`;
         const sDot = Math.max((p.mode === "y") ? 0 : -Infinity, positionAt(tDot, p));
 
         ctx.save();
-        ctx.fillStyle = "#dc2626";
+        ctx.fillStyle = "#c2491d";
         ctx.beginPath();
         ctx.arc(xMap(tDot), yMap(sDot), 6, 0, 2 * Math.PI);
         ctx.fill();
@@ -1028,7 +1030,7 @@ g  = accelerazione di gravità`;
 
         ctx.save();
         const grad = ctx.createLinearGradient(left, top, right, bottom);
-        grad.addColorStop(0, "#059669");
+        grad.addColorStop(0, "#0e8a5a");
         grad.addColorStop(1, "#34d399");
         ctx.strokeStyle = grad;
         ctx.lineWidth = 3.5;
@@ -1049,7 +1051,7 @@ g  = accelerazione di gravità`;
         const vDot = velocityAt(tDot, p);
 
         ctx.save();
-        ctx.fillStyle = "#dc2626";
+        ctx.fillStyle = "#c2491d";
         ctx.beginPath();
         ctx.arc(xMap(tDot), yMap(vDot), 6, 0, 2 * Math.PI);
         ctx.fill();
@@ -1074,7 +1076,7 @@ g  = accelerazione di gravità`;
 
       function drawBackgroundSky(ctx, w, h) {
         const grad = ctx.createLinearGradient(0, 0, 0, h);
-        grad.addColorStop(0, "#f8fbff");
+        grad.addColorStop(0, "#efebe1");
         grad.addColorStop(1, "#eef5ff");
         ctx.save();
         ctx.fillStyle = grad;
@@ -1141,7 +1143,7 @@ g  = accelerazione di gravità`;
           ctx.save();
           const grad = ctx.createLinearGradient(xObj - 18, yObj - 18, xObj + 18, yObj + 18);
           grad.addColorStop(0, "#60a5fa");
-          grad.addColorStop(1, "#2563eb");
+          grad.addColorStop(1, "#1f6fd0");
           ctx.fillStyle = grad;
           ctx.beginPath();
           ctx.roundRect(xObj - 20, yObj - 20, 40, 40, 12);
@@ -1154,8 +1156,8 @@ g  = accelerazione di gravità`;
           const velScale = 18;
           const accScale = 10;
 
-          drawArrow(ctx, xObj, yObj - 38, xObj + v * velScale, yObj - 38, "#059669", 3.5);
-          drawArrow(ctx, xObj, yObj - 66, xObj + p.a * accScale, yObj - 66, "#dc2626", 3.5);
+          drawArrow(ctx, xObj, yObj - 38, xObj + v * velScale, yObj - 38, "#0e8a5a", 3.5);
+          drawArrow(ctx, xObj, yObj - 66, xObj + p.a * accScale, yObj - 66, "#c2491d", 3.5);
 
           ctx.fillStyle = "#1f2937";
           ctx.font = "13px Inter, Arial, sans-serif";
@@ -1187,7 +1189,7 @@ g  = accelerazione di gravità`;
           ctx.restore();
 
           ctx.save();
-          ctx.fillStyle = "#dbeafe";
+          ctx.fillStyle = "#dfe9f7";
           ctx.fillRect(axisX - 205, bottom, 410, h - bottom);
           ctx.restore();
 
@@ -1224,7 +1226,7 @@ g  = accelerazione di gravità`;
           ctx.save();
           const grad = ctx.createRadialGradient(xObj - 6, yObj - 8, 4, xObj, yObj, 22);
           grad.addColorStop(0, "#93c5fd");
-          grad.addColorStop(1, "#2563eb");
+          grad.addColorStop(1, "#1f6fd0");
           ctx.fillStyle = grad;
           ctx.beginPath();
           ctx.arc(xObj, yObj, 19, 0, 2 * Math.PI);
@@ -1236,8 +1238,8 @@ g  = accelerazione di gravità`;
 
           const velScale = 10;
           const accScale = 8;
-          drawArrow(ctx, xObj + 38, yObj, xObj + 38, yObj - v * velScale, "#059669", 3.5);
-          drawArrow(ctx, xObj + 68, yObj, xObj + 68, yObj - p.a * accScale, "#dc2626", 3.5);
+          drawArrow(ctx, xObj + 38, yObj, xObj + 38, yObj - v * velScale, "#0e8a5a", 3.5);
+          drawArrow(ctx, xObj + 68, yObj, xObj + 68, yObj - p.a * accScale, "#c2491d", 3.5);
 
           ctx.fillStyle = "#1f2937";
           ctx.font = "13px Inter, Arial, sans-serif";
